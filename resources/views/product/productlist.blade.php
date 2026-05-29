@@ -493,6 +493,83 @@
             background: #ececec;
         }
 
+        .product-details-row {
+            display: none;
+        }
+
+        .product-details-row.show {
+            display: table-row;
+        }
+
+        .product-details-content {
+            padding: 15px;
+            background: #fff;
+            border-top: 2px solid #e0e0e0;
+        }
+
+        .product-detail-row-simple {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .product-detail-row-simple:last-of-type {
+            border-bottom: none;
+        }
+
+        .product-detail-label-simple {
+            font-weight: 600;
+            color: #595b5d;
+            font-size: 14px;
+        }
+
+        .product-detail-value-simple {
+            color: #1b2850;
+            font-size: 14px;
+            text-align: right;
+        }
+
+        .product-mobile-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+            padding-top: 12px;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .product-details-content .action-buttons a {
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            max-width: none !important;
+            line-height: 1 !important;
+            white-space: nowrap !important;
+        }
+
+        .mobile-toggle-btn-table {
+            background: #ff9f43;
+            border: none;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .mobile-toggle-btn-table.minus {
+            background: #dc3545;
+        }
+
         #quantityHistoryModal .modal-content {
             max-height: 85vh;
         }
@@ -755,6 +832,9 @@
                                     return char.toUpperCase();
                                 });
                             }
+
+                            window.productDataMap = {};
+
                             $.each(products, function(index, product) {
                                 let productName = capitalizeWords(product.name || 'N/A');
                                 let sku = product.SKU || 'N/A';
@@ -770,10 +850,10 @@
                                     .product_type
                                     .name : "N/A");
                                 let detailsToggle = `
-    <a href="#details-${product.id}" class="toggle-details" data-bs-toggle="collapse">
-        <i class="fas fa-plus-circle" style="color: #ff9f43;"></i>
-    </a>
-`;
+                                    <button type="button" class="mobile-toggle-btn-table" onclick="toggleProductRowDetails('${product.id}')" data-product-id="${product.id}">
+                                        <span class="toggle-icon">+</span>
+                                    </button>
+                                `;
 
                                 let productImage =
                                     '{{ env('ImagePath') . 'admin/assets/img/product/noimage.png' }}';
@@ -809,6 +889,19 @@
                                     quantityDisplay +=
                                         ` <span class="badge bg-danger ms-1">Low Stock</span>`;
                                 }
+
+                                if (!window.productDataMap) {
+                                    window.productDataMap = {};
+                                }
+
+                                window.productDataMap[product.id] = {
+                                    sku: sku,
+                                    categoryName: categoryName,
+                                    unitName: unitName,
+                                    brandName: brandName,
+                                    formattedPrice: formattedPrice,
+                                    quantityDisplay: quantityDisplay
+                                };
 
                                 tableBody.push([
                                     `<div style="display: flex;">
@@ -905,6 +998,7 @@
                                                 `
                                 ]);
                             });
+                            $('tr.product-details-row').remove();
                             table.clear().rows.add(tableBody).draw();
 
                             // Sync top scrollbar
@@ -1239,6 +1333,71 @@
             });
         });
 
+
+        function buildProductExpandableRowContent(product, actionButtons) {
+            return `
+                <td colspan="9" class="product-details-content">
+                    <div class="product-detail-row-simple">
+                        <span class="product-detail-label-simple">SKU:</span>
+                        <span class="product-detail-value-simple">${product.sku}</span>
+                    </div>
+                    <div class="product-detail-row-simple">
+                        <span class="product-detail-label-simple">Category:</span>
+                        <span class="product-detail-value-simple">${product.categoryName}</span>
+                    </div>
+                    <div class="product-detail-row-simple">
+                        <span class="product-detail-label-simple">Unit:</span>
+                        <span class="product-detail-value-simple">${product.unitName}</span>
+                    </div>
+                    <div class="product-detail-row-simple">
+                        <span class="product-detail-label-simple">Brand:</span>
+                        <span class="product-detail-value-simple">${product.brandName}</span>
+                    </div>
+                    <div class="product-detail-row-simple">
+                        <span class="product-detail-label-simple">Price:</span>
+                        <span class="product-detail-value-simple" style="font-weight: bold; color: #ff9f43;">${product.formattedPrice}</span>
+                    </div>
+                    <div class="product-detail-row-simple">
+                        <span class="product-detail-label-simple">Quantity:</span>
+                        <span class="product-detail-value-simple">${product.quantityDisplay}</span>
+                    </div>
+                    <div class="product-mobile-actions">
+                        ${actionButtons || ''}
+                    </div>
+                </td>
+            `;
+        }
+
+        window.toggleProductRowDetails = function(productId) {
+            const btn = $(`.mobile-toggle-btn-table[data-product-id="${productId}"]`);
+            if (btn.length === 0) return;
+
+            const row = btn.closest('tr');
+            let detailsRow = row.next(`tr.product-details-row[data-product-id="${productId}"]`);
+            const icon = btn.find('.toggle-icon');
+
+            if (detailsRow.length === 0) {
+                const productData = window.productDataMap && window.productDataMap[productId];
+                if (!productData) return;
+
+                const actionButtons = row.find('td:last').html();
+                detailsRow = $('<tr>')
+                    .addClass('product-details-row')
+                    .attr('data-product-id', productId)
+                    .html(buildProductExpandableRowContent(productData, actionButtons));
+                row.after(detailsRow);
+            }
+
+            if (detailsRow.hasClass('show')) {
+                detailsRow.removeClass('show');
+                btn.removeClass('minus');
+                icon.text('+');
+            } else {
+                detailsRow.addClass('show');
+                btn.addClass('minus');
+                icon.text('−');
+            }
+        };
 
         $(document).on('click', '.toggle-details', function() {
             let icon = $(this).find('i');
