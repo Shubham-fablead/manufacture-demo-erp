@@ -4,6 +4,11 @@
 
 @push('css')
     <style>
+        a.btn.back-button {
+            background: #ff9f43;
+            color: #fff;
+        }
+
         .brand-preview-box {
             width: 220px;
             height: 140px;
@@ -58,6 +63,11 @@
         <div class="page-header">
             <div class="page-title">
                 <h4>Edit Brand</h4>
+            </div>
+            <div class="back-button">
+                <a href="{{ route('brand.list') }}" class="btn back-button">
+                    <i class="fa-solid fa-arrow-left"></i> Back
+                </a>
             </div>
         </div>
 

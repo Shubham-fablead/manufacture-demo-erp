@@ -21437,3 +21437,35 @@
 #22 C:/xampp/htdocs/manufacture-demo-erp/artisan(35): Illuminate/Foundation/Console/Kernel->handle(Object(Symfony/Component/Console/Input/ArgvInput), Object(Symfony/Component/Console/Output/ConsoleOutput))
 #23 {main}
 "} 
+[2026-05-29 17:10:07] local.WARNING: Admin login email skipped: Failed to authenticate on SMTP server with username "tejasfeblead@gmail.com" using the following authenticators: "LOGIN", "PLAIN", "XOAUTH2". Authenticator "LOGIN" returned "Expected response code "235" but got code "535", with message "535-5.7.8 Username and Password not accepted. For more information, go to
+535 5.7.8  https://support.google.com/mail/?p=BadCredentials d9443c01a7336-2bf23c3a5c8sm16409475ad.71 - gsmtp".". Authenticator "PLAIN" returned "Expected response code "235" but got code "535", with message "535-5.7.8 Username and Password not accepted. For more information, go to
+535 5.7.8  https://support.google.com/mail/?p=BadCredentials d9443c01a7336-2bf23c3a5c8sm16409475ad.71 - gsmtp".". Authenticator "XOAUTH2" returned "Expected response code "235" but got code "334", with message "334 eyJzdGF0dXMiOiI0MDAiLCJzY2hlbWVzIjoiQmVhcmVyIiwic2NvcGUiOiJodHRwczovL21haWwuZ29vZ2xlLmNvbS8ifQ==".".  
+[2026-05-29 17:20:24] local.WARNING: Admin login email skipped: Failed to authenticate on SMTP server with username "tejasfeblead@gmail.com" using the following authenticators: "LOGIN", "PLAIN", "XOAUTH2". Authenticator "LOGIN" returned "Expected response code "235" but got code "535", with message "535-5.7.8 Username and Password not accepted. For more information, go to
+535 5.7.8  https://support.google.com/mail/?p=BadCredentials 41be03b00d2f7-c8577299738sm1494235a12.18 - gsmtp".". Authenticator "PLAIN" returned "Expected response code "235" but got code "535", with message "535-5.7.8 Username and Password not accepted. For more information, go to
+535 5.7.8  https://support.google.com/mail/?p=BadCredentials 41be03b00d2f7-c8577299738sm1494235a12.18 - gsmtp".". Authenticator "XOAUTH2" returned "Expected response code "235" but got code "334", with message "334 eyJzdGF0dXMiOiI0MDAiLCJzY2hlbWVzIjoiQmVhcmVyIiwic2NvcGUiOiJodHRwczovL21haWwuZ29vZ2xlLmNvbS8ifQ==".".  
+[2026-05-29 17:30:28] local.ERROR: Undefined array key 0 {"exception":"[object] (ErrorException(code: 0): Undefined array key 0 at C:/xampp/htdocs/manufacture-demo-erp/vendor/laravel/framework/src/Illuminate/Foundation/Console/ServeCommand.php:278)
+[stacktrace]
+#0 C:/xampp/htdocs/manufacture-demo-erp/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(255): Illuminate/Foundation/Bootstrap/HandleExceptions->handleError(2, 'Undefined array...', 'C://xampp//htdocs...', 278)
+#1 C:/xampp/htdocs/manufacture-demo-erp/vendor/laravel/framework/src/Illuminate/Foundation/Console/ServeCommand.php(278): Illuminate/Foundation/Bootstrap/HandleExceptions->Illuminate/Foundation/Bootstrap/{closure}(2, 'Undefined array...', 'C://xampp//htdocs...', 278)
+#2 C:/xampp/htdocs/manufacture-demo-erp/vendor/laravel/framework/src/Illuminate/Collections/Traits/EnumeratesValues.php(240): Illuminate/Foundation/Console/ServeCommand->Illuminate/Foundation/Console/{closure}('[Fri May 29 17:...', 14)
+#3 C:/xampp/htdocs/manufacture-demo-erp/vendor/laravel/framework/src/Illuminate/Foundation/Console/ServeCommand.php(248): Illuminate/Support/Collection->each(Object(Closure))
+#4 C:/xampp/htdocs/manufacture-demo-erp/vendor/symfony/process/Process.php(1276): Illuminate/Foundation/Console/ServeCommand->Illuminate/Foundation/Console/{closure}('err', 'ccepted/n[Fri Ma...')
+#5 C:/xampp/htdocs/manufacture-demo-erp/vendor/symfony/process/Process.php(1378): Symfony/Component/Process/Process->Symfony/Component/Process/{closure}('err', 'ccepted/n[Fri Ma...')
+#6 C:/xampp/htdocs/manufacture-demo-erp/vendor/symfony/process/Process.php(1298): Symfony/Component/Process/Process->readPipes(false, false)
+#7 C:/xampp/htdocs/manufacture-demo-erp/vendor/symfony/process/Process.php(840): Symfony/Component/Process/Process->updateStatus(false)
+#8 C:/xampp/htdocs/manufacture-demo-erp/vendor/laravel/framework/src/Illuminate/Foundation/Console/ServeCommand.php(95): Symfony/Component/Process/Process->isRunning()
+#9 C:/xampp/htdocs/manufacture-demo-erp/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php(36): Illuminate/Foundation/Console/ServeCommand->handle()
+#10 C:/xampp/htdocs/manufacture-demo-erp/vendor/laravel/framework/src/Illuminate/Container/Util.php(41): Illuminate/Container/BoundMethod::Illuminate/Container/{closure}()
+#11 C:/xampp/htdocs/manufacture-demo-erp/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php(93): Illuminate/Container/Util::unwrapIfClosure(Object(Closure))
+#12 C:/xampp/htdocs/manufacture-demo-erp/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php(35): Illuminate/Container/BoundMethod::callBoundMethod(Object(Illuminate/Foundation/Application), Array, Object(Closure))
+#13 C:/xampp/htdocs/manufacture-demo-erp/vendor/laravel/framework/src/Illuminate/Container/Container.php(662): Illuminate/Container/BoundMethod::call(Object(Illuminate/Foundation/Application), Array, Array, NULL)
+#14 C:/xampp/htdocs/manufacture-demo-erp/vendor/laravel/framework/src/Illuminate/Console/Command.php(211): Illuminate/Container/Container->call(Array)
+#15 C:/xampp/htdocs/manufacture-demo-erp/vendor/symfony/console/Command/Command.php(326): Illuminate/Console/Command->execute(Object(Symfony/Component/Console/Input/ArgvInput), Object(Illuminate/Console/OutputStyle))
+#16 C:/xampp/htdocs/manufacture-demo-erp/vendor/laravel/framework/src/Illuminate/Console/Command.php(180): Symfony/Component/Console/Command/Command->run(Object(Symfony/Component/Console/Input/ArgvInput), Object(Illuminate/Console/OutputStyle))
+#17 C:/xampp/htdocs/manufacture-demo-erp/vendor/symfony/console/Application.php(1121): Illuminate/Console/Command->run(Object(Symfony/Component/Console/Input/ArgvInput), Object(Symfony/Component/Console/Output/ConsoleOutput))
+#18 C:/xampp/htdocs/manufacture-demo-erp/vendor/symfony/console/Application.php(324): Symfony/Component/Console/Application->doRunCommand(Object(Illuminate/Foundation/Console/ServeCommand), Object(Symfony/Component/Console/Input/ArgvInput), Object(Symfony/Component/Console/Output/ConsoleOutput))
+#19 C:/xampp/htdocs/manufacture-demo-erp/vendor/symfony/console/Application.php(175): Symfony/Component/Console/Application->doRun(Object(Symfony/Component/Console/Input/ArgvInput), Object(Symfony/Component/Console/Output/ConsoleOutput))
+#20 C:/xampp/htdocs/manufacture-demo-erp/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(201): Symfony/Component/Console/Application->run(Object(Symfony/Component/Console/Input/ArgvInput), Object(Symfony/Component/Console/Output/ConsoleOutput))
+#21 C:/xampp/htdocs/manufacture-demo-erp/artisan(35): Illuminate/Foundation/Console/Kernel->handle(Object(Symfony/Component/Console/Input/ArgvInput), Object(Symfony/Component/Console/Output/ConsoleOutput))
+#22 {main}
+"} 
