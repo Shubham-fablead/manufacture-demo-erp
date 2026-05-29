@@ -3,11 +3,22 @@
 @section('title', 'Category Edit')
 
 @section('content')
+<style>
+    a.btn.back-button {
+        background: #ff9f43;
+        color: #fff;
+    }
+</style>
 <div class="content">
     <div class="page-header">
         <div class="page-title">
             <h4>Edit Product Category</h4>
             <!-- <h6>Edit a product Category</h6> -->
+        </div>
+        <div class="back-button">
+            <a href="{{ route('category.list') }}" class="btn back-button">
+                <i class="fa-solid fa-arrow-left"></i> Back
+            </a>
         </div>
     </div>
 

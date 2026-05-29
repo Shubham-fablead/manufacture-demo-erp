@@ -453,6 +453,13 @@
         }
     }
 
+    /* Gap between Latest Sales and Latest Purchases cards on mobile */
+    @media screen and (max-width: 767px) {
+        .col-md-6 {
+            margin-bottom: 15px !important;
+        }
+    }
+
     /* Mobile collapse styles */
     .mobile-details-collapse {
         border: 1px solid #dee2e6;
