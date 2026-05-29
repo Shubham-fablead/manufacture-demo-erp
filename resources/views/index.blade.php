@@ -360,13 +360,21 @@
         .dataview table tbody td:nth-child(2) {
             display: table-cell !important;
             text-align: center;
-            vertical-align: middle;
+            vertical-align: top !important;
             width: 50px;
+            padding-top: 10px;
         }
 
         .dataview .toggle-details i {
             font-size: 18px;
             transition: transform 0.3s ease;
+        }
+
+        .dataview .toggle-details {
+            display: inline-flex;
+            align-items: flex-start;
+            justify-content: center;
+            line-height: 1;
         }
 
         /* Order ID column styling */

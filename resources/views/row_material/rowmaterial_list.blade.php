@@ -318,8 +318,13 @@
             table.datanew tbody td:nth-child(2) {
                 display: table-cell !important;
                 text-align: center;
-                vertical-align: middle;
-                width: 50px;
+                vertical-align: top !important;
+                width: 60px;
+                min-width: 60px;
+                max-width: 60px;
+                white-space: nowrap !important;
+                word-break: keep-all !important;
+                writing-mode: horizontal-tb !important;
             }
 
             .toggle-details i {
@@ -328,48 +333,55 @@
 
             /* Add these styles for product name wrapping */
             table.datanew tbody td:first-child {
-                /* display: flex !important; */
+                display: flex !important;
                 align-items: center !important;
+                min-width: 0 !important;
                 max-width: calc(100vw - 100px) !important;
-                /* Adjust based on your layout */
+            }
+
+            table.datanew tbody td:first-child > div {
+                display: flex !important;
+                align-items: center !important;
+                gap: 8px !important;
+                width: 100% !important;
+                min-width: 0 !important;
+            }
+
+            table.datanew tbody td:first-child a.product-img {
+                flex: 0 0 40px !important;
+                margin: 0 !important;
             }
 
             table.datanew tbody td:first-child a {
-                /* display: -webkit-box !important; */
-                display: -ms-flexbox !important;
-                /* display: flex !important; */
-                -webkit-box-align: center !important;
-                -ms-flex-align: center !important;
+                display: flex !important;
                 align-items: center !important;
                 text-align: left !important;
                 max-width: 100% !important;
-                word-wrap: break-word !important;
-                word-break: break-word !important;
-                overflow-wrap: break-word !important;
+                word-wrap: normal !important;
+                word-break: normal !important;
+                overflow-wrap: normal !important;
                 white-space: normal !important;
                 line-height: 1.3 !important;
             }
 
             /* For the product name text specifically */
             table.datanew tbody td:first-child a[style*="font-weight: 500"] {
-                display: inline-block !important;
+                display: block !important;
+                flex: 1 1 auto !important;
+                min-width: 0 !important;
                 max-width: calc(100% - 70px) !important;
-                /* Account for image width */
                 margin-left: 8px !important;
                 font-size: 14px !important;
-                word-break: break-word !important;
-                hyphens: auto !important;
-                -webkit-hyphens: auto !important;
-                -ms-hyphens: auto !important;
+                word-break: normal !important;
+                overflow-wrap: break-word !important;
+                white-space: normal !important;
+                hyphens: none !important;
             }
 
-            /* If you want to limit to 2 lines with ellipsis */
             table.datanew tbody td:first-child a.product-name {
-                display: -webkit-box !important;
-                -webkit-line-clamp: 2 !important;
-                -webkit-box-orient: vertical !important;
-                overflow: hidden !important;
-                text-overflow: ellipsis !important;
+                display: block !important;
+                overflow: visible !important;
+                text-overflow: unset !important;
             }
 
             .product-toolbar {
@@ -799,11 +811,7 @@
                                 let createdAt = capitalizeWords(product.product_type ? product
                                     .product_type
                                     .name : "N/A");
-                                let detailsToggle = `
-    <a href="#details-${product.id}" class="toggle-details" data-bs-toggle="collapse">
-        <i class="fas fa-plus-circle" style="color: #ff9f43;"></i>
-    </a>
-`;
+                                let detailsToggle = ``; // no longer used as separate column
 
                                 let productImage =
                                     '{{ env('ImagePath') . 'admin/assets/img/product/noimage.png' }}';
@@ -841,15 +849,19 @@
                                 }
 
                                 tableBody.push([
-                                    `<div style="display: flex;">
-
-                                    <a href="/row-material-detail/${product.id}" class="product-img mb-1">
-                                        <img src="${productImage}" alt="product" style="max-width: 60px;">
+                                    `<div style="display: flex; align-items: center; justify-content: space-between;">
+                                    <div style="display: flex; align-items: center;">
+                                        <a href="/row-material-detail/${product.id}" class="product-img mb-1">
+                                            <img src="${productImage}" alt="product" style="max-width: 60px;">
+                                        </a>
+                                        <a href="/row-material-detail/${product.id}" style="color: #1b2850; font-weight: 500; margin-left: 8px;">
+                                            ${productName}
+                                        </a>
+                                    </div>
+                                    <!-- Inline toggle button for mobile only -->
+                                    <a href="#details-${product.id}" class="toggle-details d-xl-none ms-2" data-bs-toggle="collapse" style="flex-shrink: 0;">
+                                        <i class="fas fa-plus-circle" style="color: #ff9f43;"></i>
                                     </a>
-                                    <a href="/row-material-detail/${product.id}" style="color: #1b2850; font-weight: 500; margin-left: 8px;">
-                                        ${productName}
-                                    </a>
-
                                 </div>
 
                                   <!-- Collapsible Details (visible only on mobile) -->
@@ -894,7 +906,7 @@
             </div>
         </div>
     </div>`,
-                                    detailsToggle,
+                                    detailsToggle, // empty string - toggle is now inline
                                     sku,
                                     categoryName,
                                     unitName,

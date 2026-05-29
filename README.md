@@ -1,66 +1,242 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Fablead ERP System
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Fablead ERP System is a Laravel-based manufacturing ERP designed to manage raw materials, production, finished goods, purchase, sales, inventory, accounting, GST reports, and role-based user access from a single platform.
 
-## About Laravel
+## Features
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- Sales management: quotations, sales orders, invoices, and sales returns
+- Purchase management: purchase orders, vendor bills, and purchase returns
+- Inventory control: raw materials, finished goods, stock tracking, and adjustments
+- Manufacturing flow: BOM, production entries, and stock conversion from raw material to finished goods
+- Custom invoicing: flexible invoice and bill generation with GST support
+- Financial management: cashbook, bankbook, ledger, advance payments, credit notes, and debit notes
+- Reporting: sales, purchase, GST, income statement, and balance sheet reports
+- User management: role-based access for admin, sub-admin, staff, and branch users
+- Export support: PDF and Excel export for major records
+- Responsive UI: desktop and mobile friendly screens built with Blade and Bootstrap
+- API support: secure API token based actions for AJAX save and load requests
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Technology Stack
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- Backend: Laravel 10+
+- Frontend: Blade templates, Bootstrap 5, jQuery, AJAX, DataTables, Select2, Moment.js
+- Database: MySQL
+- Authentication: Laravel session login + Laravel Passport API tokens
+- Permissions: Spatie Laravel Permission
+- Exports and documents: DomPDF, PhpSpreadsheet, Maatwebsite Excel
+- Barcode support: milon/barcode
 
-## Learning Laravel
+## Installation
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+1. Clone the repository.
+   ```bash
+  git clone https://github.com/Shubham-fablead/manufacture-demo-erp.git
+   cd manufacture-demo-erp
+   ```
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+2. **Install dependencies**:
+   ```bash
+   composer install
+   npm install
+   ```
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
 
-## Laravel Sponsors
+3. **Environment setup**:
+   Copy `.env.example` to `.env` and configure your database credentials.
+   ```bash
+   cp .env.example .env
+   php artisan key:generate
+   ```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+   Set your application URL and asset base URL (required for CSS, JS, and images):
 
-### Premium Partners
+   ```env
+   APP_URL=http://127.0.0.1:8000
+   ImagePath=http://127.0.0.1:8000/
+   ```
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+   > `ImagePath` **must end with `/`**. On a live server, use your real domain, for example:
+   > `APP_URL=https://erp.yourdomain.com` and `ImagePath=https://erp.yourdomain.com/`
+   >
+   > If `ImagePath` is omitted, the app falls back to `APP_URL`.
 
-## Contributing
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+4. Configure your application URL and asset path.
+   ```env
+   APP_URL=http://127.0.0.1:8000
+   ImagePath=http://127.0.0.1:8000/
+   ```
 
-## Code of Conduct
+   Use the same host consistently. Do not mix `localhost` and `127.0.0.1`.
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+5. Run migrations and Passport.
+   ```bash
+   php artisan migrate
+   php artisan passport:install --force
+   ```
 
-## Security Vulnerabilities
+6. Import the demo database if you want ready-made sample data.
+   ```text
+   database/inventory_and_billing.sql
+   ```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+7. Link storage.
+   ```bash
+   php artisan storage:link
+   ```
+
+8. Start the application.
+   ```bash
+   php artisan serve
+   ```
+
+## Login
+
+- Open the app in your browser.
+- Sign in from the home page.
+- If you imported the demo database, use:
+  - Email: `admin@gmail.com`
+  - Password: `12345678`
+
+After login, the app stores the API token in browser local storage as `authToken`. This token is required for create, update, and delete actions that use protected API routes.
+
+## Authentication
+
+This application uses two layers of authentication:
+
+| Layer | Purpose |
+|-------|---------|
+| Web session | Page access after login |
+| API token (`authToken`) | Save and load actions through API endpoints |
+
+- Pages can open with a valid web session.
+- Save actions use API routes and require the `authToken` token.
+- If the token is missing, you may see `401 Unauthorized` on form submit.
+
+## Project Flow
+
+1. Log in to the system.
+2. Configure company settings, tax rates, currency, and SMTP.
+3. Create master data such as brands, categories, units, customers, vendors, and staff.
+4. Add raw materials, products, and BOM details.
+5. Record raw material purchases and stock inward.
+6. Create production entries to move raw material into finished goods.
+7. Process quotations, sales, invoices, and returns.
+8. Track cashbook, bankbook, ledger, and expenses.
+9. Generate GST and business reports.
+10. Export records to PDF or Excel when needed.
+
+## Main Modules
+
+### Master Data
+
+- Brands
+- Categories
+- Units
+- Tax rates
+- Currency
+- Banks
+- Customers
+- Vendors
+- Staff
+- Sub-branches
+
+### Inventory and Manufacturing
+
+- Products
+- Raw materials
+- Stock tracking
+- BOM management
+- Production entries
+- Finished goods flow
+- Connected device and scanner support
+
+### Sales
+
+- Quotations
+- Sales invoices
+- Sales returns
+- Custom invoices
+- POS style sales entry
+
+### Purchase
+
+- Purchases
+- Purchase invoices
+- Purchase returns
+- Raw material purchases
+
+### Finance
+
+- Cashbook
+- Bankbook
+- Account ledger
+- Advance payments
+- Credit notes
+- Debit notes
+- Expenses
+
+### Reports
+
+- Sales reports
+- Purchase reports
+- GST reports
+- Income statement
+- Balance sheet
+- PDF and Excel exports
+
+## Requirements
+
+- PHP 8.1 or later
+- Composer
+- Node.js and npm
+- MySQL
+- XAMPP, Laragon, or a production web server
+
+## Important Configuration
+
+- `APP_URL` should match your real site URL.
+- `ImagePath` should end with a trailing slash.
+- Keep the same base URL throughout the session, especially during local development.
+- If images or CSS do not load, check `ImagePath` first.
+
+## Troubleshooting
+
+### Client authentication failed on login
+
+Run Passport client reset and try again.
+
+```bash
+php artisan passport:reset-clients --force
+```
+
+### Save action returns 401 Unauthorized
+
+- Log out and log in again.
+- Confirm that `authToken` exists in browser local storage.
+- Make sure `php artisan passport:install --force` was run after a fresh database setup.
+
+### Images or CSS are broken
+
+- Check the `ImagePath` value in `.env`.
+- Make sure it ends with `/`.
+- Use the same host format everywhere, such as `http://127.0.0.1:8000/`.
+
+### Demo login does not work
+
+- Confirm that `database/inventory_and_billing.sql` was imported successfully.
+- Verify that the admin user exists in the database.
+
+## Folder Structure
+
+```text
+app/            Application controllers, models, middleware, and services
+config/         Framework and package configuration
+database/       Migrations, SQL dump, seeders, and templates
+resources/      Blade views, styles, and frontend assets
+routes/         Web and API route definitions
+```
 
 ## License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+This project is proprietary software developed by Fablead Developers Technolab. All rights reserved.
