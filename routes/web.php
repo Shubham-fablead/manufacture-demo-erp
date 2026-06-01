@@ -38,6 +38,9 @@ use App\Http\Controllers\admin\StaffController;
 use App\Http\Controllers\admin\SubBranchController;
 use App\Http\Controllers\admin\transactionController;
 use App\Http\Controllers\admin\VendorController;
+use App\Http\Controllers\admin\FollowUpController;
+use App\Http\Controllers\admin\MeetingController;
+use App\Http\Controllers\admin\LeadController;
 use App\Http\Controllers\api\GstController;
 use App\Http\Controllers\api\GstSalesReportController as ApiGstSalesReportController;
 use App\Http\Controllers\api\LoginController;
@@ -208,6 +211,40 @@ Route::middleware(['auth:web', 'auto.permission'])->group(function () {
     Route::get('/edit-vendor/{num}', [VendorController::class, 'edit_vendor'])->name('vendor.edit');
     Route::get('/vendor-report', [VendorController::class, 'vendor_report'])->name('vendor.report');
     Route::get('/vendor-view/{id}', [VendorController::class, 'vendor_view'])->name('vendor.view');
+
+
+    // Follow Up
+    Route::get('/follow-ups', [FollowUpController::class, 'follow_up_list'])->name('followup.list');
+    Route::get('/add-follow-up', [FollowUpController::class, 'add_follow_up'])->name('followup.add');
+    Route::get('/edit-follow-up/{id}', [FollowUpController::class, 'edit_follow_up'])->name('followup.edit');
+    Route::get('/follow-up-view/{id}', [FollowUpController::class, 'follow_up_view'])->name('followup.view');
+    Route::get('/follow-up-report', [FollowUpController::class, 'follow_up_report'])->name('followup.report');
+    Route::post('/follow-up/store', [FollowUpController::class, 'store'])->name('followup.store');
+    Route::put('/follow-up/{id}/update', [FollowUpController::class, 'update'])->name('followup.update');
+    Route::get('/follow-up/{id}/show', [FollowUpController::class, 'show'])->name('followup.show');
+    Route::delete('/follow-up/{id}/delete', [FollowUpController::class, 'destroy'])->name('followup.delete');
+    Route::get('/api/follow-up/customers', [FollowUpController::class, 'getCustomers'])->name('followup.customers');
+    Route::get('/api/follow-up/staff', [FollowUpController::class, 'getStaff'])->name('followup.staff');
+
+    // Leads
+    Route::get('/leads', [LeadController::class, 'lead_list'])->name('lead.list');
+    Route::get('/add-lead', [LeadController::class, 'add_lead'])->name('lead.add');
+    Route::get('/edit-lead/{id}', [LeadController::class, 'edit_lead'])->name('lead.edit');
+    Route::get('/lead-view/{id}', [LeadController::class, 'view_lead'])->name('lead.view');
+
+       // Meeting
+    Route::get('/meetings', [MeetingController::class, 'meeting_list'])->name('meeting.list');
+    Route::get('/add-meeting', [MeetingController::class, 'add_meeting'])->name('meeting.add');
+    Route::get('/edit-meeting/{id}', [MeetingController::class, 'edit_meeting'])->name('meeting.edit');
+    Route::get('/meeting-view/{id}', [MeetingController::class, 'meeting_view'])->name('meeting.view');
+    Route::get('/meeting-report', [MeetingController::class, 'meeting_report'])->name('meeting.report');
+    Route::post('/meeting/store', [MeetingController::class, 'store'])->name('meeting.store');
+    Route::put('/meeting/{id}/update', [MeetingController::class, 'update'])->name('meeting.update');
+    Route::get('/meeting/{id}/show', [MeetingController::class, 'show'])->name('meeting.show');
+    Route::delete('/meeting/{id}/delete', [MeetingController::class, 'destroy'])->name('meeting.delete');
+    Route::get('/api/meeting/branches', [MeetingController::class, 'getBranches'])->name('meeting.branches');
+    Route::get('/api/meeting/customers', [MeetingController::class, 'getCustomers'])->name('meeting.customers');
+    Route::get('/api/meeting/staff', [MeetingController::class, 'getStaff'])->name('meeting.staff');
 
     //settings
     Route::get('/setting', [SettingController::class, 'generalsettings'])->name('setting.generalsettings');

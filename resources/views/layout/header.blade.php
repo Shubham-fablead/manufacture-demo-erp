@@ -337,6 +337,160 @@
         text-decoration: underline;
     }
 
+    .today-alert-toggle {
+        width: 38px;
+        height: 38px;
+        /* border-radius: 6px; */
+        /* border: 1px solid #d9dde3; */
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: #fff;
+        color: #1b2850;
+        transition: all 0.2s ease;
+    }
+
+    .today-alert-toggle:hover {
+        color: #ff9f43;
+        border-color: #ff9f43;
+    }
+
+    .today-alert-toggle i {
+        font-size: 18px;
+    }
+
+    .today-alert-modal-backdrop {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.55);
+        z-index: 10000;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+    }
+
+    .today-alert-modal {
+        width: min(650px, 96vw);
+        background: #fff;
+        border-radius: 4px;
+        box-shadow: 0 12px 35px rgba(0, 0, 0, 0.18);
+        border: 1px solid #e5e7eb;
+    }
+
+    .today-alert-modal-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px 18px;
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+    .today-alert-modal-header h5 {
+        margin: 0;
+        color: #1f2937;
+        font-size: 18px;
+        font-weight: 700;
+    }
+
+    .today-alert-close {
+        border: 0;
+        background: transparent;
+        color: #ef4444;
+        font-size: 18px;
+        line-height: 1;
+        font-weight: 700;
+    }
+
+    .today-alert-modal-body {
+        padding: 18px;
+    }
+
+    .today-alert-tabs {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        border-bottom: 1px solid #e5e7eb;
+        margin-bottom: 14px;
+    }
+
+    .today-alert-tab {
+        border: 0;
+        background: transparent;
+        padding: 0 4px 10px;
+        color: #6b7280;
+        font-size: 13px;
+        font-weight: 700;
+        border-bottom: 1px solid transparent;
+    }
+
+    .today-alert-tab.active {
+        color: #ff9f43;
+        border-bottom-color: #ff9f43;
+    }
+
+    .today-alert-tab .count-pill {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 18px;
+        height: 18px;
+        padding: 0 6px;
+        margin-left: 5px;
+        border-radius: 999px;
+        background: #fff2e4;
+        color: #ff9f43;
+        font-size: 11px;
+    }
+
+    .today-alert-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+    }
+
+    .today-alert-table th {
+        background: #f8f9fb;
+        color: #1f2937;
+        padding: 10px;
+        font-weight: 700;
+        border-bottom: 1px solid #e5e7eb;
+        white-space: nowrap;
+    }
+
+    .today-alert-table td {
+        padding: 10px;
+        color: #52677a;
+        border-bottom: 1px solid #e5e7eb;
+        vertical-align: middle;
+    }
+
+    .today-alert-table .action-link {
+        color: #1b2850;
+        text-decoration: none;
+    }
+
+    .today-alert-empty {
+        padding: 28px 12px;
+        text-align: center;
+        color: #8c8c8c;
+        border: 1px dashed #e5e7eb;
+        border-radius: 6px;
+    }
+
+    .today-alert-footer {
+        padding: 14px 18px 16px;
+    }
+
+    .today-alert-footer .btn {
+        min-width: 116px;
+        height: 46px;
+        border-radius: 3px;
+        background: #1f2937;
+        border-color: #1f2937;
+        font-weight: 700;
+    }
+
     @keyframes pulse {
         0% {
             transform: scale(1);
@@ -439,8 +593,17 @@
                 </div>
             </div>
 
+            <li class="nav-item me-3 notification-wrapper">
+                <a href="javascript:void(0);" class="nav-link position-relative today-alert-toggle" id="todayAlertToggle" title="Today Alerts">
+                     <i class="fa-regular fa-clock" style="font-size: 18px;color: #1b2850;"></i>
+                    <span id="todayAlertCount" class="notification-badge d-none">0</span>
+                </a>
+            </li>
+
            <!-- Notifications -->
+           @if ($user->role !== 'staff')
 <li class="nav-item dropdown me-3 notification-wrapper">
+
     <a href="javascript:void(0);" class="nav-link position-relative" id="notificationToggle">
         <i class="fa fa-bell notification-bell"></i>
         <span id="notificationCount" class="notification-badge d-none">0</span>
@@ -466,6 +629,7 @@
         </div>
     </div>
 </li>
+@endif
 
             <!-- New Order Button -->
             @if (in_array($user->role, ['sales-manager', 'inventory-manager', 'admin']))
@@ -533,6 +697,31 @@
     </div>
 </div>
 
+<div id="todayAlertModalBackdrop" class="today-alert-modal-backdrop">
+    <div class="today-alert-modal" role="dialog" aria-modal="true" aria-labelledby="todayAlertModalTitle">
+        <div class="today-alert-modal-header">
+            <h5 id="todayAlertModalTitle">Today Alerts</h5>
+            <button type="button" class="today-alert-close" id="todayAlertCloseBtn" aria-label="Close">x</button>
+        </div>
+        <div class="today-alert-modal-body">
+            <div class="today-alert-tabs">
+                <button type="button" class="today-alert-tab active" data-alert-tab="meetings">
+                    Meetings <span class="count-pill" id="todayMeetingTabCount">0</span>
+                </button>
+                <button type="button" class="today-alert-tab" data-alert-tab="followups">
+                    Follow Ups <span class="count-pill" id="todayFollowUpTabCount">0</span>
+                </button>
+            </div>
+            <div id="todayAlertContent">
+                <div class="today-alert-empty">Loading today alerts...</div>
+            </div>
+        </div>
+        <div class="today-alert-footer">
+            <button type="button" class="btn btn-dark" id="todayAlertFooterCloseBtn">Close</button>
+        </div>
+    </div>
+</div>
+
 @push('js')
 <script>
     const currentUserRole = "{{ auth()->user()->role }}";
@@ -540,6 +729,248 @@
 </script>
 
 <script>
+    // ==================== TODAY ALERTS FUNCTIONALITY ====================
+    let todayAlertData = {
+        meetings: [],
+        followups: []
+    };
+    let activeTodayAlertTab = 'meetings';
+
+    document.addEventListener('DOMContentLoaded', function() {
+        initializeTodayAlerts();
+    });
+
+    function initializeTodayAlerts() {
+        const toggle = document.getElementById('todayAlertToggle');
+        const backdrop = document.getElementById('todayAlertModalBackdrop');
+        const closeBtn = document.getElementById('todayAlertCloseBtn');
+        const footerCloseBtn = document.getElementById('todayAlertFooterCloseBtn');
+
+        if (!toggle || !backdrop) return;
+
+        toggle.addEventListener('click', function(e) {
+            e.preventDefault();
+            openTodayAlertModal();
+        });
+
+        [closeBtn, footerCloseBtn].forEach(button => {
+            if (button) {
+                button.addEventListener('click', closeTodayAlertModal);
+            }
+        });
+
+        backdrop.addEventListener('click', function(e) {
+            if (e.target === backdrop) {
+                closeTodayAlertModal();
+            }
+        });
+
+        document.querySelectorAll('.today-alert-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                activeTodayAlertTab = this.dataset.alertTab || 'meetings';
+                document.querySelectorAll('.today-alert-tab').forEach(item => item.classList.remove('active'));
+                this.classList.add('active');
+                renderTodayAlerts();
+            });
+        });
+
+        loadTodayAlerts();
+        setInterval(loadTodayAlerts, 60000);
+    }
+
+    function openTodayAlertModal() {
+        const backdrop = document.getElementById('todayAlertModalBackdrop');
+        if (!backdrop) return;
+
+        backdrop.style.display = 'flex';
+        loadTodayAlerts().then(renderTodayAlerts);
+    }
+
+    function closeTodayAlertModal() {
+        const backdrop = document.getElementById('todayAlertModalBackdrop');
+        if (backdrop) {
+            backdrop.style.display = 'none';
+        }
+    }
+
+    function getApiHeaders() {
+        const headers = {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        };
+        const authToken = localStorage.getItem('authToken');
+        if (authToken) {
+            headers.Authorization = 'Bearer ' + authToken;
+        }
+        return headers;
+    }
+
+    async function loadTodayAlerts() {
+        const selectedSubAdminId = localStorage.getItem('selectedSubAdminId') || '';
+        const query = `per_page=100&selectedSubAdminId=${encodeURIComponent(selectedSubAdminId)}`;
+
+        try {
+            const [meetingsResponse, followUpsResponse] = await Promise.all([
+                fetch(`/api/getAllMeetings?${query}`, { headers: getApiHeaders(), credentials: 'same-origin' }),
+                fetch(`/api/getAllFollowUps?${query}`, { headers: getApiHeaders(), credentials: 'same-origin' })
+            ]);
+
+            const meetingsJson = meetingsResponse.ok ? await meetingsResponse.json() : { data: [] };
+            const followUpsJson = followUpsResponse.ok ? await followUpsResponse.json() : { data: [] };
+
+            todayAlertData.meetings = (meetingsJson.data || []).filter(item => isTodayAlertDate(item.scheduled_on, item.formatted_scheduled_on));
+            todayAlertData.followups = (followUpsJson.data || []).filter(item => isTodayAlertDate(item.follow_up_datetime, item.formatted_follow_up_datetime));
+
+            updateTodayAlertCounts();
+            renderTodayAlerts();
+        } catch (error) {
+            console.error('Error loading today alerts:', error);
+            const content = document.getElementById('todayAlertContent');
+            if (content) {
+                content.innerHTML = '<div class="today-alert-empty text-danger">Failed to load today alerts</div>';
+            }
+        }
+    }
+
+    function isTodayAlertDate(rawDate, formattedDate) {
+        const todayLabel = formatTodayLabel();
+
+        if (formattedDate && String(formattedDate).startsWith(todayLabel)) {
+            return true;
+        }
+
+        if (!rawDate) return false;
+
+        const date = new Date(String(rawDate).replace(' ', 'T'));
+        if (isNaN(date.getTime())) return false;
+
+        const today = new Date();
+        return date.getFullYear() === today.getFullYear()
+            && date.getMonth() === today.getMonth()
+            && date.getDate() === today.getDate();
+    }
+
+    function formatTodayLabel() {
+        const today = new Date();
+        return [
+            String(today.getDate()).padStart(2, '0'),
+            String(today.getMonth() + 1).padStart(2, '0'),
+            today.getFullYear()
+        ].join('-');
+    }
+
+    function updateTodayAlertCounts() {
+        const meetingCount = todayAlertData.meetings.length;
+        const followUpCount = todayAlertData.followups.length;
+        const totalCount = meetingCount + followUpCount;
+        const totalBadge = document.getElementById('todayAlertCount');
+        const meetingBadge = document.getElementById('todayMeetingTabCount');
+        const followUpBadge = document.getElementById('todayFollowUpTabCount');
+
+        if (meetingBadge) meetingBadge.innerText = meetingCount;
+        if (followUpBadge) followUpBadge.innerText = followUpCount;
+
+        if (totalBadge) {
+            if (totalCount > 0) {
+                totalBadge.innerText = totalCount > 99 ? '99+' : totalCount;
+                totalBadge.classList.remove('d-none');
+            } else {
+                totalBadge.classList.add('d-none');
+            }
+        }
+    }
+
+    function renderTodayAlerts() {
+        const content = document.getElementById('todayAlertContent');
+        if (!content) return;
+
+        const rows = todayAlertData[activeTodayAlertTab] || [];
+        if (!rows.length) {
+            content.innerHTML = `<div class="today-alert-empty">No ${activeTodayAlertTab === 'meetings' ? 'meetings' : 'follow ups'} for today</div>`;
+            return;
+        }
+
+        content.innerHTML = activeTodayAlertTab === 'meetings'
+            ? renderMeetingAlertTable(rows)
+            : renderFollowUpAlertTable(rows);
+    }
+
+    function renderMeetingAlertTable(rows) {
+        return `
+            <div class="table-responsive">
+                <table class="today-alert-table">
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Customer</th>
+                            <th>Status</th>
+                            <th>Date & Time</th>
+                            <th>Assigned</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${rows.map(item => `
+                            <tr>
+                                <td>${escapeHtml(item.meeting_title || 'N/A')}</td>
+                                <td>${escapeHtml(item.customer?.name || 'N/A')}</td>
+                                <td>${escapeHtml(item.status || 'N/A')}</td>
+                                <td>${escapeHtml(item.formatted_scheduled_on || formatAlertDate(item.scheduled_on))}</td>
+                                <td>${escapeHtml(item.assigned_user?.name || 'N/A')}</td>
+                                <td><a class="action-link" href="/meeting-view/${item.id}" title="View"><i class="fa fa-eye"></i></a></td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            </div>
+        `;
+    }
+
+    function renderFollowUpAlertTable(rows) {
+        return `
+            <div class="table-responsive">
+                <table class="today-alert-table">
+                    <thead>
+                        <tr>
+                            <th>Purpose</th>
+                            <th>Customer</th>
+                            <th>Status</th>
+                            <th>Date & Time</th>
+                            <th>Assigned</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${rows.map(item => `
+                            <tr>
+                                <td>${escapeHtml(item.purpose || 'N/A')}</td>
+                                <td>${escapeHtml(item.subject_name || item.customer?.name || item.lead?.name || 'N/A')}</td>
+                                <td>${escapeHtml(item.status || 'N/A')}</td>
+                                <td>${escapeHtml(item.formatted_follow_up_datetime || formatAlertDate(item.follow_up_datetime))}</td>
+                                <td>${escapeHtml(item.assigned_user?.name || 'N/A')}</td>
+                                <td><a class="action-link" href="/follow-up-view/${item.id}" title="View"><i class="fa fa-eye"></i></a></td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            </div>
+        `;
+    }
+
+    function formatAlertDate(rawDate) {
+        if (!rawDate) return 'N/A';
+        const date = new Date(String(rawDate).replace(' ', 'T'));
+        if (isNaN(date.getTime())) return rawDate;
+        return date.toLocaleString('en-IN', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: true
+        }).replace(',', '');
+    }
+
     // // ==================== SEARCH FUNCTIONALITY ====================
     // document.addEventListener('DOMContentLoaded', function() {
     //     const searchInput = document.getElementById('customerSearch');

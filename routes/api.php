@@ -46,6 +46,9 @@ use App\Http\Controllers\api\GstSalesReportController;
 use App\Http\Controllers\api\TransactionApiController;
 use App\Http\Controllers\api\TransactionController;
 use App\Http\Controllers\api\ConnectedDevicesController;
+use App\Http\Controllers\api\FollowUpController;
+use App\Http\Controllers\api\LeadController;
+use App\Http\Controllers\api\MeetingController;
 use App\Http\Controllers\api\NotificationController;
 use App\Http\Controllers\api\RowMaterialController;
 use App\Http\Controllers\api\RowMaterialInventoryController;
@@ -440,6 +443,40 @@ Route::middleware(['auth.api'])->group(function () {
     Route::post('/update-unit/{id}', [ApiUnitController::class, 'update'])->name('units.update');
     Route::delete('/delete-unit/{id}', [ApiUnitController::class, 'destroy'])->name('units.destroy');
     });
+
+      // Follow Up API Routes
+    Route::get('/getAllFollowUps', [FollowUpController::class, 'index'])->name('followup.index');
+    Route::post('/follow-up/store', [FollowUpController::class, 'store'])->name('followup.store.api');
+    Route::put('/follow-up/{id}/update', [FollowUpController::class, 'update'])->name('followup.update.api');
+    Route::get('/follow-up/{id}/show', [FollowUpController::class, 'show'])->name('followup.show.api');
+    Route::delete('/follow-up/{id}/delete', [FollowUpController::class, 'destroy'])->name('followup.delete.api');
+    Route::get('/follow-up/customers', [FollowUpController::class, 'getCustomers'])->name('followup.customers.api');
+    Route::get('/follow-up/staff', [FollowUpController::class, 'getStaff'])->name('followup.staff.api');
+
+    // Leads API Routes
+    Route::get('/getAllLeads', [LeadController::class, 'index'])->name('lead.index');
+    Route::post('/lead/store', [LeadController::class, 'store'])->name('lead.store.api');
+    Route::put('/lead/{id}/update', [LeadController::class, 'update'])->name('lead.update.api');
+    Route::get('/lead/{id}/show', [LeadController::class, 'show'])->name('lead.show.api');
+    Route::delete('/lead/{id}/delete', [LeadController::class, 'destroy'])->name('lead.delete.api');
+    Route::post('/lead/{id}/convert-to-customer', [LeadController::class, 'convertToCustomer'])->name('lead.convert.customer.api');
+    Route::get('/lead/customers', [LeadController::class, 'getCustomers'])->name('lead.customers.api');
+    Route::get('/lead/staff', [LeadController::class, 'getStaff'])->name('lead.staff.api');
+    Route::get('/lead/export-excel', [LeadController::class, 'exportExcel'])->name('lead.export.excel');
+    Route::get('/lead/export-pdf', [LeadController::class, 'exportPdf'])->name('lead.export.pdf');
+
+ // Meeting API Routes
+    Route::get('/getAllMeetings', [MeetingController::class, 'index'])->name('meeting.index');
+    Route::post('/meeting/store', [MeetingController::class, 'store'])->name('meeting.store.api');
+    Route::put('/meeting/{id}/update', [MeetingController::class, 'update'])->name('meeting.update.api');
+    Route::get('/meeting/{id}/show', [MeetingController::class, 'show'])->name('meeting.show.api');
+    Route::delete('/meeting/{id}/delete', [MeetingController::class, 'destroy'])->name('meeting.delete.api');
+    Route::get('/meeting/branches', [MeetingController::class, 'getBranches'])->name('meeting.branches.api');
+    Route::get('/meeting/customers', [MeetingController::class, 'getCustomers'])->name('meeting.customers.api');
+    Route::get('/meeting/staff', [MeetingController::class, 'getStaff'])->name('meeting.staff.api');
+
+
+
 
 
 

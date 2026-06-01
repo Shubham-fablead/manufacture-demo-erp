@@ -47,6 +47,77 @@
                         </ul>
                     </li>
                 @endif
+                    {{-- Customers --}}
+                @if (app('hasPermission')(9, 'view') || app('hasPermission')(9, 'add'))
+                    <li class="submenu">
+                        <a href="javascript:void(0);">
+                            {{-- <img src="{{ env('ImagePath') . '/admin/assets/img/icons/users1.svg' }}"
+                                alt="img"> --}}
+                            <i class="fa fa-users"></i>
+                            <span> Customers</span> <span class="menu-arrow"></span></a>
+                        <ul>
+                            @if (app('hasPermission')(9, 'view'))
+                                <li><a href="{{ route('customer.list') }}">All Customers</a></li>
+                            @endif
+                            @if (app('hasPermission')(9, 'add'))
+                                <li><a href="{{ route('customer.add') }}">New Customer</a></li>
+                            @endif
+                        </ul>
+                    </li>
+                @endif
+
+                {{-- Manage Leads --}}
+                @if (app('hasPermission')(32, 'view') || app('hasPermission')(32, 'add'))
+                    <li class="submenu">
+                        <a href="javascript:void(0);">
+                            <i class="fa fa-bullhorn"></i>
+                            <span> Manage Leads</span> <span class="menu-arrow"></span>
+                        </a>
+                        <ul>
+                            @if (app('hasPermission')(32, 'view'))
+                                <li><a href="{{ route('lead.list') }}">All Leads</a></li>
+                            @endif
+                            @if (app('hasPermission')(32, 'add'))
+                                <li><a href="{{ route('lead.add') }}">New Lead</a></li>
+                            @endif
+                        </ul>
+                    </li>
+                @endif
+
+                    {{-- Follow Ups --}}
+                @if (app('hasPermission')(30, 'view') || app('hasPermission')(30, 'add'))
+                    <li class="submenu">
+                        <a href="javascript:void(0);">
+                            <i class="fa fa-calendar-check"></i>
+                            <span> Follow Ups</span> <span class="menu-arrow"></span></a>
+                        <ul>
+                            @if (app('hasPermission')(30, 'view'))
+                                <li><a href="{{ route('followup.list') }}">All Follow Ups</a></li>
+                            @endif
+                            @if (app('hasPermission')(30, 'add'))
+                                <li><a href="{{ route('followup.add') }}">New Follow Up</a></li>
+                            @endif
+                        </ul>
+                    </li>
+                @endif
+
+                   {{-- Meetings --}}
+                @if (app('hasPermission')(31, 'view') || app('hasPermission')(31, 'add'))
+                    <li class="submenu">
+                        <a href="javascript:void(0);">
+                            <i class="fa fa-handshake"></i>
+                            <span> Meetings</span> <span class="menu-arrow"></span></a>
+                        <ul>
+                            @if (app('hasPermission')(31, 'view'))
+                                <li><a href="{{ route('meeting.list') }}">All Meetings</a></li>
+                            @endif
+                            @if (app('hasPermission')(31, 'add'))
+                                    <li><a href="{{ route('meeting.add') }}">New Meeting</a></li>
+                            @endif
+                        </ul>
+                    </li>
+                @endif
+
                 {{-- Sales and Orders --}}
                 @if (app('hasPermission')(2, 'view') || app('hasPermission')(2, 'add'))
                     <li class="submenu">
@@ -63,6 +134,23 @@
                         </ul>
                     </li>
                 @endif
+                 {{-- Vendors --}}
+                @if (app('hasPermission')(10, 'view') || app('hasPermission')(10, 'add'))
+                    <li class="submenu">
+                        <a href="javascript:void(0);">
+                            {{-- <img src="{{ env('ImagePath') . '/admin/assets/img/icons/users1.svg' }}"
+                                alt="img"> --}}
+                            <i class="fa fa-handshake"></i>
+                            <span> Vendors</span> <span class="menu-arrow"></span></a>
+                        <ul>
+                            @if (app('hasPermission')(10, 'view'))
+                                <li><a href="{{ route('vendor.list') }}">All Vendors</a></li>
+                            @endif
+                            @if (app('hasPermission')(10, 'add'))
+                                <li><a href="{{ route('vendor.add') }}">New Vendor </a></li>
+                            @endif
+                        </ul>
+                    </li>
                 {{-- Purchases --}}
                 @if (app('hasPermission')(3, 'view') || app('hasPermission')(3, 'add'))
                     <li class="submenu">
@@ -304,41 +392,7 @@
                         </ul>
                     </li>
                 @endif
-                {{-- Customers --}}
-                @if (app('hasPermission')(9, 'view') || app('hasPermission')(9, 'add'))
-                    <li class="submenu">
-                        <a href="javascript:void(0);">
-                            {{-- <img src="{{ env('ImagePath') . '/admin/assets/img/icons/users1.svg' }}"
-                                alt="img"> --}}
-                            <i class="fa fa-users"></i>
-                            <span> Customers</span> <span class="menu-arrow"></span></a>
-                        <ul>
-                            @if (app('hasPermission')(9, 'view'))
-                                <li><a href="{{ route('customer.list') }}">All Customers</a></li>
-                            @endif
-                            @if (app('hasPermission')(9, 'add'))
-                                <li><a href="{{ route('customer.add') }}">New Customer</a></li>
-                            @endif
-                        </ul>
-                    </li>
-                @endif
-                {{-- Vendors --}}
-                @if (app('hasPermission')(10, 'view') || app('hasPermission')(10, 'add'))
-                    <li class="submenu">
-                        <a href="javascript:void(0);">
-                            {{-- <img src="{{ env('ImagePath') . '/admin/assets/img/icons/users1.svg' }}"
-                                alt="img"> --}}
-                            <i class="fa fa-handshake"></i>
-                            <span> Vendors</span> <span class="menu-arrow"></span></a>
-                        <ul>
-                            @if (app('hasPermission')(10, 'view'))
-                                <li><a href="{{ route('vendor.list') }}">All Vendors</a></li>
-                            @endif
-                            @if (app('hasPermission')(10, 'add'))
-                                <li><a href="{{ route('vendor.add') }}">New Vendor </a></li>
-                            @endif
-                        </ul>
-                    </li>
+
                 @endif
                 {{-- GST Reports --}}
                 @if (app('hasPermission')(20, 'view'))
