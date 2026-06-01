@@ -73,6 +73,15 @@
             gap: 5px !important;
         }
 
+        /* Small-screen stability without changing desktop layout */
+        .page-header {
+            gap: 12px;
+        }
+
+        .page-header .page-btn .btn.btn-added {
+            white-space: nowrap;
+        }
+
         /* Unit name proper word wrapping */
         table.datanew tbody td:first-child {
             vertical-align: middle;
@@ -112,6 +121,52 @@
 
         /* Mobile responsive design */
         @media (max-width: 768px) {
+            .content {
+                padding: 12px 10px;
+            }
+
+            .page-header {
+                align-items: center;
+                margin-bottom: 12px;
+                flex-wrap: wrap;
+            }
+
+            .page-header .page-title h4 {
+                font-size: 16px;
+                margin-bottom: 0;
+            }
+
+            .page-header .page-btn {
+                margin-left: auto;
+            }
+
+            .page-header .page-btn .btn.btn-added {
+                padding: 6px 10px;
+                font-size: 12px;
+                line-height: 1;
+            }
+
+            .card {
+                border-radius: 10px;
+            }
+
+            .card-body {
+                padding: 12px 10px;
+            }
+
+            .search-set {
+                width: 100%;
+            }
+
+            .search-input {
+                width: 100%;
+            }
+
+            #search-input {
+                width: 100%;
+                min-height: 38px;
+                font-size: 13px;
+            }
 
             /* Hide non-essential columns, show Details toggle */
             table.datanew thead th:nth-child(3),
@@ -125,8 +180,9 @@
             table.datanew tbody td:nth-child(2) {
                 display: table-cell !important;
                 text-align: center;
-                vertical-align: middle;
-                width: 60px;
+                vertical-align: top;
+                width: 52px;
+                padding-top: 8px;
             }
 
             /* Hide desktop action buttons on mobile */
@@ -139,7 +195,7 @@
                 display: table-cell !important;
                 width: auto;
                 max-width: calc(100vw - 80px);
-                padding: 12px 8px;
+                padding: 10px 8px;
             }
 
             table.datanew tbody td:first-child>div {
@@ -151,13 +207,13 @@
                 align-items: center !important;
                 text-align: left !important;
                 width: 100%;
-                min-height: 44px;
+                min-height: 40px;
             }
 
             .unit-name {
                 display: block !important;
                 width: 100% !important;
-                font-size: 14px !important;
+                font-size: 13px !important;
                 line-height: 1.4 !important;
                 white-space: normal !important;
                 word-break: break-word !important;
@@ -170,14 +226,15 @@
                 display: inline-flex;
                 align-items: center;
                 justify-content: center;
-                width: 44px;
-                height: 44px;
+                width: 36px;
+                height: 36px;
                 text-decoration: none;
                 cursor: pointer;
+                margin-top: 0;
             }
 
             .toggle-details i {
-                font-size: 24px;
+                font-size: 20px;
                 transition: all 0.2s ease;
             }
 
@@ -187,7 +244,7 @@
                 border: 1px solid #e9ecef;
                 border-radius: 8px;
                 margin-top: 8px;
-                padding: 12px;
+                padding: 10px 12px;
             }
 
             .collapse .card-body p {
@@ -244,16 +301,53 @@
             .pagination-controls {
                 flex-direction: column;
                 gap: 15px;
+                align-items: flex-start !important;
             }
 
             .pagination .page-item .page-link {
                 padding: 4px 12px;
                 font-size: 12px;
             }
+
+            .pagination-controls > div {
+                width: 100%;
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+
+            .pagination-controls nav {
+                width: 100%;
+            }
+
+            .pagination-controls .pagination {
+                justify-content: flex-start;
+                flex-wrap: wrap;
+                gap: 4px;
+            }
         }
 
         /* Tablet specific fixes (769px–1024px) */
         @media (min-width: 769px) and (max-width: 1024px) {
+            .content {
+                padding: 14px 12px;
+            }
+
+            .page-header .page-title h4 {
+                font-size: 17px;
+            }
+
+            .page-header .page-btn .btn.btn-added {
+                padding: 6px 12px;
+                font-size: 12px;
+            }
+
+            .card-body {
+                padding: 14px;
+            }
+
+            #search-input {
+                max-width: 260px;
+            }
 
             /* Keep table structure intact */
             table.datanew tbody td,

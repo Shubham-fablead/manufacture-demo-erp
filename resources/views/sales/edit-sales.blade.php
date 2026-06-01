@@ -161,6 +161,195 @@
         min-width: 70px;
         justify-content: center;
     }
+
+    .card .card-body {
+        padding: 12px 10px;
+    }
+
+    .select2-container--default .select2-selection--multiple {
+        min-height: 40px;
+        border-radius: 6px;
+        padding: 2px 4px;
+    }
+
+    .select2-container--default .select2-selection--multiple .select2-selection__choice {
+        font-size: 11px;
+        line-height: 1.2;
+        margin-top: 4px;
+        padding: 2px 6px;
+    }
+
+    .table-responsive {
+        overflow: visible;
+    }
+
+    .table-responsive table {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .table-responsive thead {
+        display: none;
+    }
+
+    #product-table-body tr {
+        display: block;
+        position: relative;
+        margin-bottom: 12px;
+        padding: 12px 10px 10px;
+        border: 1px solid #e9ecef;
+        border-radius: 10px;
+        background: #fff;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    }
+
+    #product-table-body tr#no-products-row {
+        display: table-row;
+        margin-bottom: 0;
+        padding: 0;
+        border: 0;
+        box-shadow: none;
+        background: transparent;
+    }
+
+    #product-table-body tr td {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        padding: 6px 0 !important;
+        border: 0 !important;
+        white-space: normal;
+    }
+
+    #product-table-body tr#no-products-row td {
+        display: table-cell;
+        padding: 12px !important;
+    }
+
+    #product-table-body tr#no-products-row td:last-child {
+        position: static;
+        top: auto;
+        right: auto;
+        width: auto;
+    }
+
+    #product-table-body tr td:first-child {
+        flex-wrap: wrap;
+        align-items: flex-start;
+        justify-content: flex-start;
+        gap: 8px;
+        padding-right: 40px !important;
+    }
+
+    #product-table-body tr td:first-child .product-img {
+        flex: 0 0 54px;
+        width: 54px;
+        height: 54px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    #product-table-body tr td:first-child .product-img img {
+        width: 54px !important;
+        height: 54px !important;
+        object-fit: cover;
+        border-radius: 8px;
+    }
+
+    #product-table-body tr td:first-child a:not(.product-img) {
+        flex: 1 1 auto;
+        font-size: 13px;
+        font-weight: 700;
+        color: #111;
+        line-height: 1.25;
+        margin-top: 2px;
+    }
+
+    #product-table-body tr td:first-child .gst-badge {
+        flex-basis: 100%;
+        margin: 2px 0 0 62px;
+        font-size: 10px;
+        padding: 2px 6px;
+    }
+
+    #product-table-body tr td:nth-child(3)::before {
+        content: "Unit";
+        font-weight: 600;
+        color: #6b7280;
+        margin-right: 12px;
+    }
+
+    #product-table-body tr td:nth-child(4)::before {
+        content: "QTY";
+        font-weight: 600;
+        color: #6b7280;
+        margin-right: 12px;
+    }
+
+    #product-table-body tr td:nth-child(5)::before {
+        content: "Price";
+        font-weight: 600;
+        color: #6b7280;
+        margin-right: 12px;
+    }
+
+    #product-table-body tr td:nth-child(6)::before {
+        content: "Discount %";
+        font-weight: 600;
+        color: #6b7280;
+        margin-right: 12px;
+    }
+
+    #product-table-body tr td:nth-child(7)::before {
+        content: "GST Details";
+        font-weight: 600;
+        color: #6b7280;
+        margin-right: 12px;
+    }
+
+    #product-table-body tr td:nth-child(8)::before {
+        content: "Total";
+        font-weight: 600;
+        color: #6b7280;
+        margin-right: 12px;
+    }
+
+    #product-table-body tr td:nth-child(4) .quantity-input,
+    #product-table-body tr td:nth-child(6) .discount-input {
+        width: 95px !important;
+        margin-left: auto;
+    }
+
+    #product-table-body tr td:nth-child(7) .product-gst-details {
+        width: 100%;
+        margin-left: auto;
+        padding: 6px 8px;
+    }
+
+    #product-table-body tr td:nth-child(8) .total-amount {
+        width: 100%;
+        text-align: right;
+    }
+
+    #product-table-body tr td:nth-child(8) .total-amount div {
+        font-size: 11px;
+        line-height: 1.35;
+    }
+
+    #product-table-body tr td:last-child {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        width: auto;
+        padding: 0 !important;
+    }
+
+    #product-table-body tr td:last-child img {
+        width: 18px;
+        height: 18px;
+    }
 }
     </style>
     <div class="content">

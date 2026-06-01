@@ -82,8 +82,17 @@
         .datatable tbody td.details-control {
             display: table-cell !important;
             text-align: center;
-            vertical-align: middle;
+            vertical-align: top;
             width: 50px !important;
+            padding-top: 12px;
+        }
+
+        .toggle-details {
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            width: 100%;
+            text-decoration: none;
         }
     }
 
@@ -98,6 +107,12 @@
         font-size: 18px;
         color: #ff9f43;
         cursor: pointer;
+    }
+
+    @media (max-width: 767px) {
+        .toggle-details i {
+            margin-top: 2px;
+        }
     }
 
     .collapse-details {

@@ -129,6 +129,49 @@
             flex: 1;
         }
 
+        /* Tablet layout: keep the table readable on iPad Mini / Air / Pro */
+        @media (min-width: 768px) and (max-width: 1024px) {
+            .table-container {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            #creditNoteItemsTable {
+                min-width: 980px;
+            }
+
+            #creditNoteItemsTable thead th,
+            #creditNoteItemsTable tbody td {
+                white-space: nowrap;
+                font-size: 12px;
+                padding: 10px 8px;
+                vertical-align: middle;
+            }
+
+            .page-header {
+                gap: 10px;
+            }
+
+            .page-actions {
+                flex-wrap: wrap;
+                justify-content: flex-end;
+            }
+
+            .page-actions > div {
+                margin-right: 0 !important;
+                margin-bottom: 8px;
+            }
+
+            .credit-mobile {
+                margin-top: 0;
+            }
+
+            .search-input {
+                max-width: 320px;
+                width: 100%;
+            }
+        }
+
         .inventory-toggle-btn-table {
             background: transparent;
             border: none;

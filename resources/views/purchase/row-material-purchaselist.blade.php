@@ -3,6 +3,155 @@
 @section('title', 'Row Material Purchases')
 
 @section('content')
+    <style>
+        .mobile-row-material-card {
+            display: none;
+        }
+
+        .mobile-row-material-item {
+            border: 1px solid #e9ecef;
+            border-radius: 10px;
+            background: #fff;
+            margin-bottom: 12px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+        }
+
+        .mobile-row-material-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 10px 12px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .mobile-row-material-invoice {
+            font-weight: 700;
+            color: #1b2850;
+            font-size: 14px;
+            word-break: break-word;
+        }
+
+        .mobile-row-material-toggle {
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: #ff9f43;
+            color: #fff;
+            font-size: 18px;
+            line-height: 1;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .mobile-row-material-toggle.minus {
+            background: #dc3545;
+        }
+
+        .mobile-row-material-details {
+            display: none;
+            padding: 12px;
+        }
+
+        .mobile-row-material-details.active {
+            display: block;
+        }
+
+        .mobile-row-material-detail {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 5px 0;
+            font-size: 13px;
+            border-bottom: 1px dashed #f0f0f0;
+        }
+
+        .mobile-row-material-detail:last-child {
+            border-bottom: 0;
+        }
+
+        .mobile-row-material-label {
+            font-weight: 600;
+            color: #6b7280;
+            flex: 0 0 42%;
+        }
+
+        .mobile-row-material-value {
+            flex: 1;
+            text-align: right;
+            word-break: break-word;
+        }
+
+        .mobile-row-material-actions {
+            display: flex;
+            gap: 10px;
+            padding-top: 10px;
+            margin-top: 10px;
+            border-top: 1px solid #f0f0f0;
+        }
+
+        .mobile-row-material-actions a {
+            width: 34px;
+            height: 34px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            background: #f8f9fa;
+        }
+
+        .mobile-row-material-actions img {
+            width: 18px;
+            height: 18px;
+        }
+
+        @media screen and (max-width: 1024px) {
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .page-header .page-btn {
+                width: 100%;
+            }
+
+            .page-header .page-btn .btn.btn-added {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .table-responsive {
+                display: none;
+            }
+
+            .mobile-row-material-card {
+                display: block;
+            }
+
+            .mobile-row-material-details .badges {
+                display: inline-flex;
+            }
+
+            .d-flex.justify-content-between.align-items-center.mt-3 {
+                flex-direction: column;
+                align-items: stretch !important;
+                gap: 10px;
+            }
+
+            #row-material-purchase-summary {
+                text-align: center;
+            }
+
+            .d-flex.gap-2 {
+                justify-content: center;
+            }
+        }
+    </style>
+
     <div class="content">
         <div class="page-header d-flex justify-content-between align-items-center">
             <div class="page-title">
@@ -47,6 +196,8 @@
                     </table>
                 </div>
 
+                <div class="mobile-row-material-card mt-3" id="mobile-row-material-container"></div>
+
                 <div class="d-flex justify-content-between align-items-center mt-3">
                     <div id="row-material-purchase-summary" class="text-muted"></div>
                     <div class="d-flex gap-2">
@@ -78,6 +229,84 @@
                 return `<span class="badges ${badgeClass}">${status || '-'}</span>`;
             }
 
+            function renderMobileRowMaterialPurchases(items) {
+                const container = $('#mobile-row-material-container');
+                container.empty();
+
+                if (!items || items.length === 0) {
+                    container.html('<div class="text-center p-4 text-muted">No row material purchases found.</div>');
+                    return;
+                }
+
+                items.forEach(function(item) {
+                    const card = `
+                        <div class="mobile-row-material-item" data-purchase-id="${item.id}">
+                            <div class="mobile-row-material-row">
+                                <div class="mobile-row-material-invoice">${item.invoice_number || '-'}</div>
+                                <button type="button" class="mobile-row-material-toggle" onclick="toggleRowMaterialDetails('${item.id}')">+</button>
+                            </div>
+                            <div class="mobile-row-material-details" id="mobile-row-material-details-${item.id}">
+                                <div class="mobile-row-material-detail">
+                                    <span class="mobile-row-material-label">Vendor</span>
+                                    <span class="mobile-row-material-value">${item.vendor_name || '-'}</span>
+                                </div>
+                                <div class="mobile-row-material-detail">
+                                    <span class="mobile-row-material-label">Row Materials</span>
+                                    <span class="mobile-row-material-value">${item.material_names || '-'}</span>
+                                </div>
+                                <div class="mobile-row-material-detail">
+                                    <span class="mobile-row-material-label">Grand Total</span>
+                                    <span class="mobile-row-material-value">${parseFloat(item.grand_total || 0).toFixed(2)}</span>
+                                </div>
+                                <div class="mobile-row-material-detail">
+                                    <span class="mobile-row-material-label">Remaining</span>
+                                    <span class="mobile-row-material-value">${parseFloat(item.remaining_amount || 0).toFixed(2)}</span>
+                                </div>
+                                <div class="mobile-row-material-detail">
+                                    <span class="mobile-row-material-label">Purchase Status</span>
+                                    <span class="mobile-row-material-value">${statusBadge(item.purchase_status)}</span>
+                                </div>
+                                <div class="mobile-row-material-detail">
+                                    <span class="mobile-row-material-label">Payment Status</span>
+                                    <span class="mobile-row-material-value">${statusBadge(item.payment_status)}</span>
+                                </div>
+                                <div class="mobile-row-material-detail">
+                                    <span class="mobile-row-material-label">Date</span>
+                                    <span class="mobile-row-material-value">${item.date || '-'}</span>
+                                </div>
+                                <div class="mobile-row-material-actions">
+                                    <a href="/view-row-material-purchase/${item.id}" title="View">
+                                        <img src="{{ env('ImagePath') . '/admin/assets/img/icons/eye.svg' }}" alt="view">
+                                    </a>
+                                    <a href="/edit-row-material-purchase/${item.id}" title="Edit">
+                                        <img src="{{ env('ImagePath') . '/admin/assets/img/icons/edit.svg' }}" alt="edit">
+                                    </a>
+                                    <a href="javascript:void(0);" class="delete-row-material-purchase" data-id="${item.id}" title="Delete">
+                                        <img src="{{ env('ImagePath') . '/admin/assets/img/icons/delete.svg' }}" alt="delete">
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    container.append(card);
+                });
+            }
+
+            window.toggleRowMaterialDetails = function(purchaseId) {
+                const details = $(`#mobile-row-material-details-${purchaseId}`);
+                const btn = $(`.mobile-row-material-item[data-purchase-id="${purchaseId}"] .mobile-row-material-toggle`);
+
+                if (details.hasClass('active')) {
+                    details.removeClass('active');
+                    btn.removeClass('minus');
+                    btn.text('+');
+                } else {
+                    details.addClass('active');
+                    btn.addClass('minus');
+                    btn.text('−');
+                }
+            };
+
             function loadRowMaterialPurchases() {
                 $.ajax({
                     url: '/api/row-material-purchase-list',
@@ -92,6 +321,7 @@
                         Authorization: 'Bearer ' + authToken
                     },
                     success: function(response) {
+                        const items = response.data || [];
                         const rows = (response.data || []).map(function(item, index) {
                             return `
                                 <tr>
@@ -120,6 +350,7 @@
                         }).join('');
 
                         $('#row-material-purchase-table-body').html(rows || '<tr><td colspan="10" class="text-center text-muted">No row material purchases found.</td></tr>');
+                        renderMobileRowMaterialPurchases(items);
 
                         currentPage = response.pagination?.current_page || 1;
                         lastPage = response.pagination?.last_page || 1;
@@ -129,6 +360,7 @@
                     },
                     error: function() {
                         $('#row-material-purchase-table-body').html('<tr><td colspan="10" class="text-center text-danger">Failed to load row material purchases.</td></tr>');
+                        $('#mobile-row-material-container').html('<div class="text-center p-4 text-danger">Failed to load row material purchases.</div>');
                     }
                 });
             }

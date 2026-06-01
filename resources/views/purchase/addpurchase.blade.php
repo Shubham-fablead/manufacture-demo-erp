@@ -174,30 +174,64 @@
                 margin-bottom: 0;
             }
 
+            .purchase-header .page-title {
+                width: auto;
+                flex: 1 1 160px;
+                min-width: 0;
+            }
+
+            .purchase-tabs {
+                display: flex;
+                flex-wrap: nowrap;
+                gap: 6px;
+                margin-top: 8px;
+                width: auto;
+                max-width: 100%;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                scrollbar-width: none;
+            }
+
+            .purchase-tabs::-webkit-scrollbar {
+                display: none;
+            }
+
+            .purchase-tab {
+                flex: 0 0 auto;
+                white-space: nowrap;
+                padding: 8px 6px;
+                font-size: 11px;
+                border-radius: 8px;
+                text-align: center;
+            }
+
             .gst-header {
                 display: flex;
                 align-items: center;
                 width: auto;
                 padding: 0;
-                gap: 14px;
-                flex-wrap: wrap;
+                gap: 8px;
+                flex-wrap: nowrap;
+                margin-left: auto;
+                justify-content: flex-end;
+                flex: 0 0 auto;
             }
 
             .custom-radio-label {
-                font-size: 13px;
+                font-size: 12px;
                 font-weight: 500;
-                padding-left: 22px;
-                gap: 6px;
+                padding-left: 20px;
+                gap: 4px;
             }
 
             .custom-radio-label input[type="radio"] {
-                width: 15px;
-                height: 15px;
+                width: 14px;
+                height: 14px;
             }
 
             .custom-radio-label input[type="radio"]:checked::after {
-                width: 6px;
-                height: 6px;
+                width: 5px;
+                height: 5px;
             }
 
             .add-row-btn {

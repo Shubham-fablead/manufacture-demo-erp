@@ -108,6 +108,34 @@
         .add-row-btn {
             margin-top: 28px;
         }
+
+        @media screen and (min-width: 768px) and (max-width: 1024px) {
+            .form-row {
+                display: flex;
+                flex-wrap: wrap;
+            }
+
+            .form-row > .col-lg-3.col-sm-12.col-6,
+            .form-row > .col-lg-2.col-sm-12.col-6 {
+                flex: 0 0 50%;
+                max-width: 50%;
+            }
+
+            .form-row > .col-lg-2.col-sm-12.col-6:nth-of-type(5),
+            .form-row > .col-lg-1.col-sm-12.add-row-btn {
+                flex: 0 0 100%;
+                max-width: 100%;
+            }
+
+            .form-row > .col-lg-1.col-sm-12.add-row-btn {
+                margin-top: 10px;
+            }
+
+            .form-row .add-row-btn .add-row,
+            .form-row .add-row-btn .remove-row {
+                width: 100%;
+            }
+        }
     </style>
     @php
         $settings = \DB::table('settings')->first();

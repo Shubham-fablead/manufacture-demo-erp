@@ -268,6 +268,21 @@
             .details-col-th {
                 width: unset !important;
             }
+
+            table.datanew tbody td:nth-child(2) {
+                width: 52px;
+                padding: 12px 4px !important;
+                text-align: center;
+                vertical-align: top !important;
+            }
+
+            .toggle-details {
+                width: 100% !important;
+                padding-left: 0 !important;
+                justify-content: center;
+                align-items: flex-start;
+                padding-top: 8px;
+            }
         }
 
         /* =============================================

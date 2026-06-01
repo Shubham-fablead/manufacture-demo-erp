@@ -414,6 +414,46 @@
 
         }
 
+        @media screen and (min-width: 993px) and (max-width: 1180px) {
+            .tabs_container .row {
+                margin-left: -6px;
+                margin-right: -6px;
+            }
+
+            .tabs_container .row > [class*="col-"] {
+                padding-left: 6px;
+                padding-right: 6px;
+            }
+
+            .tabs_container .col-lg-3 {
+                flex: 0 0 50%;
+                max-width: 50%;
+            }
+
+            .productsetimgin {
+                height: 86px;
+                margin: 0.75rem auto 0;
+            }
+
+            .productsetcontent {
+                padding: 0.4rem !important;
+            }
+
+            .productsetcontent h4 {
+                font-size: 13px;
+                line-height: 1.25;
+            }
+
+            .productsetcontent h5 {
+                font-size: 11px;
+            }
+
+            .productsetbtn {
+                right: 8px;
+                top: 38px;
+            }
+        }
+
         .gst-info {
             margin: 4px 0;
             padding: 3px 8px;

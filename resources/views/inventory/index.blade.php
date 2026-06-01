@@ -87,6 +87,68 @@
 
         /* Responsive breakpoints for all screen sizes */
 
+        @media screen and (max-width: 767.98px) {
+            .page-header {
+                display: flex;
+                align-items: flex-start;
+                justify-content: space-between;
+                flex-wrap: nowrap;
+                gap: 8px;
+            }
+
+            .page-header .page-title {
+                display: flex;
+                flex-direction: column;
+                align-items: flex-start;
+                flex: 1 1 auto;
+                min-width: 0;
+            }
+
+            .page-header .page-title h4 {
+                font-size: 16px;
+                margin-bottom: 6px;
+                white-space: nowrap;
+            }
+
+            .inventory-tabs {
+                display: flex;
+                flex-wrap: nowrap;
+                gap: 8px;
+                margin: 0;
+                width: auto;
+                max-width: 100%;
+                overflow-x: hidden;
+                -webkit-overflow-scrolling: touch;
+                scrollbar-width: none;
+            }
+
+            .inventory-tabs::-webkit-scrollbar {
+                display: none;
+            }
+
+            .inventory-tab {
+                flex: 0 0 auto;
+                min-width: 0;
+                padding: 8px 12px;
+                font-size: 11px;
+                white-space: nowrap;
+                border-radius: 8px;
+                text-align: center;
+            }
+
+            .page-header .page-btn {
+                flex: 0 0 auto;
+                margin-left: auto;
+            }
+
+            .page-header .page-btn .btn.btn-added {
+                padding: 6px 8px;
+                font-size: 10px;
+                line-height: 1;
+                white-space: nowrap;
+            }
+        }
+
         /* Extra small devices (phones, less than 576px) */
         @media screen and (max-width: 575.98px) {
             /* Filter Section Mobile Styles */
@@ -201,6 +263,91 @@
             .dataTables_filter {
                 text-align: left !important;
             }
+
+            .page-header .page-title h4 {
+                font-size: 15px;
+            }
+
+            .page-header .page-btn .btn.btn-added {
+                padding: 6px 7px;
+            }
+
+            .inventory-tabs {
+                gap: 6px;
+            }
+
+            .inventory-tab {
+                padding: 8px 10px;
+                font-size: 10px;
+            }
+        }
+
+        @media screen and (min-width: 768px) and (max-width: 1024px) {
+            .page-header {
+                display: grid;
+                grid-template-columns: minmax(0, 1fr) auto;
+                grid-template-rows: auto auto;
+                column-gap: 10px;
+                row-gap: 8px;
+                align-items: start;
+            }
+
+            .page-header .page-title {
+                grid-column: 1;
+                grid-row: 1 / span 2;
+                display: flex;
+                flex-direction: column;
+                align-items: flex-start;
+                min-width: 0;
+            }
+
+            .page-header .page-title h4 {
+                font-size: 17px;
+                margin-bottom: 4px;
+                white-space: nowrap;
+            }
+
+            .inventory-tabs {
+                display: flex;
+                flex-wrap: nowrap;
+                gap: 8px;
+                margin: 0;
+                width: max-content;
+                max-width: 100%;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                scrollbar-width: none;
+            }
+
+            .inventory-tabs::-webkit-scrollbar {
+                display: none;
+            }
+
+            .inventory-tab {
+                flex: 0 0 auto;
+                padding: 8px 12px;
+                font-size: 11px;
+                white-space: nowrap;
+                border-radius: 8px;
+            }
+
+            .page-header .page-btn {
+                grid-column: 2;
+                grid-row: 1;
+                justify-self: end;
+                align-self: start;
+            }
+
+            .page-header .page-btn .btn.btn-added {
+                padding: 7px 10px;
+                font-size: 11px;
+                line-height: 1;
+                white-space: nowrap;
+            }
+
+            .page-header .page-btn .btn.btn-added img {
+                margin-right: 4px;
+            }
         }
 
         /* Small devices (landscape phones, 576px and up) */
@@ -245,13 +392,9 @@
                 padding: 8px 4px;
             }
 
-            /* Show Sr No, Product Name, Details, SKU, Price */
-            .table thead th:nth-child(6),
-            .table tbody td:nth-child(6),
-            .table thead th:nth-child(7),
-            .table tbody td:nth-child(7),
-            .table thead th:nth-child(8),
-            .table tbody td:nth-child(8) {
+            /* Match product list behavior: keep only the compact columns visible */
+            .table thead th:nth-child(n+4),
+            .table tbody td:nth-child(n+4) {
                 display: none;
             }
 
@@ -289,17 +432,28 @@
                 padding: 8px 6px;
             }
 
-            /* Hide Details and Action columns on tablet and above */
-            .table thead th:nth-child(3),
-            .table tbody td:nth-child(3),
-            .table thead th:nth-child(8),
-            .table tbody td:nth-child(8) {
+            /* Match product list behavior on tablets: keep the table compact */
+            .table thead th:nth-child(n+4),
+            .table tbody td:nth-child(n+4) {
                 display: none;
             }
 
-            /* Disable expandable rows on tablets */
+            /* Center Details column */
+            .table thead th:nth-child(3),
+            .table tbody td:nth-child(3) {
+                text-align: center;
+                width: 60px;
+                min-width: 60px;
+            }
+
+            .inventory-toggle-btn-table {
+                margin: 0 auto;
+                display: block;
+            }
+
+            /* Keep expandable rows available on tablets, like product list */
             .inventory-details-row {
-                display: none !important;
+                display: none;
             }
         }
 

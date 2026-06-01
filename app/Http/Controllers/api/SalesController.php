@@ -900,9 +900,16 @@ class SalesController extends Controller
                     'user_id' => $customer_id,
                     'order_id' => $order->id,
                     'payment_amount' => $request->total,
+                    'remaining_amount' => $remain,
                     'payment_date' => now(),
                     'payment_method' => $paymentMethod,
                     'payment_type' => 'full',
+                    'cash_amount' => $request->cash_amount ?? 0,
+                    'upi_amount' => $request->online_amount ?? 0,
+                    'bank_id' => $request->bank_id,
+                    'status' => 'credit',
+                    'emi_month' => 1,
+                    'isDeleted' => 0,
                     'created_at' => now(),
                 ]);
             }
