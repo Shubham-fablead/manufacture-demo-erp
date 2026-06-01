@@ -41,6 +41,12 @@
                             🏢 Company Rules
                         </button>
                     </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="dashboard-tab" data-bs-toggle="tab" data-bs-target="#dashboard-settings"
+                            type="button" role="tab" aria-controls="dashboard-settings" aria-selected="false">
+                            📊 Dashboard
+                        </button>
+                    </li>
                 </ul>
 
                 <!-- Tab Content -->
@@ -300,6 +306,333 @@
                             </div>
                         </div>
                     </div>
+
+                    <!-- ================= DASHBOARD TAB ================= -->
+                    <div class="tab-pane fade" id="dashboard-settings" role="tabpanel" aria-labelledby="dashboard-tab">
+                        <!-- Main Dashboard Sections -->
+                        <div class="row mb-4">
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label>CRM Section On Dashboard</label>
+                                    <select id="crm_section_enabled" class="form-select">
+                                        <option value="Enable">Enable</option>
+                                        <option value="Disable">Disable</option>
+                                    </select>
+                                    <small class="text-muted d-block mt-1">When disabled, the entire CRM section is hidden from the dashboard.</small>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label>HR Portal Section On Dashboard</label>
+                                    <select id="hr_section_enabled" class="form-select">
+                                        <option value="Enable">Enable</option>
+                                        <option value="Disable">Disable</option>
+                                    </select>
+                                    <small class="text-muted d-block mt-1">When disabled, the staff, attendance, and salary section is hidden.</small>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label>ERP Section On Dashboard</label>
+                                    <select id="erp_section_enabled" class="form-select">
+                                        <option value="Enable">Enable</option>
+                                        <option value="Disable">Disable</option>
+                                    </select>
+                                    <small class="text-muted d-block mt-1">When disabled, the entire ERP section is hidden from the dashboard.</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <!-- CRM Dashboard Subsections -->
+                        <h5 class="mb-3">CRM Dashboard Subsections</h5>
+                        <p class="text-muted mb-3"><small>Control visibility of individual CRM dashboard components</small></p>
+                        <div class="row mb-4">
+                            <div class="col-lg-4 col-sm-6">
+                                <div class="form-group">
+                                    <label>Lead Pipeline Box</label>
+                                    <select id="crm_lead_pipeline_box" class="form-select">
+                                        <option value="Enable">Enable</option>
+                                        <option value="Disable">Disable</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-sm-6">
+                                <div class="form-group">
+                                    <label>Conversion Box</label>
+                                    <select id="crm_conversion_box" class="form-select">
+                                        <option value="Enable">Enable</option>
+                                        <option value="Disable">Disable</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-sm-6">
+                                <div class="form-group">
+                                    <label>Follow-up Lead Box</label>
+                                    <select id="crm_followup_lead_box" class="form-select">
+                                        <option value="Enable">Enable</option>
+                                        <option value="Disable">Disable</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-sm-6">
+                                <div class="form-group">
+                                    <label>Meeting Momentum Box</label>
+                                    <select id="crm_meeting_momentum_box" class="form-select">
+                                        <option value="Enable">Enable</option>
+                                        <option value="Disable">Disable</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-sm-6">
+                                <div class="form-group">
+                                    <label>Lead Status Mix Chart</label>
+                                    <select id="crm_lead_status_mix_chart" class="form-select">
+                                        <option value="Enable">Enable</option>
+                                        <option value="Disable">Disable</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-sm-6">
+                                <div class="form-group">
+                                    <label>CRM Activity Trend Chart</label>
+                                    <select id="crm_activity_trend_chart" class="form-select">
+                                        <option value="Enable">Enable</option>
+                                        <option value="Disable">Disable</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-sm-6">
+                                <div class="form-group">
+                                    <label>Pipeline Quality Table</label>
+                                    <select id="crm_pipeline_quality_table" class="form-select">
+                                        <option value="Enable">Enable</option>
+                                        <option value="Disable">Disable</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-sm-6">
+                                <div class="form-group">
+                                    <label>Recent Leads Table</label>
+                                    <select id="crm_recent_leads_table" class="form-select">
+                                        <option value="Enable">Enable</option>
+                                        <option value="Disable">Disable</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-sm-6">
+                                <div class="form-group">
+                                    <label>Next 7 Days Table</label>
+                                    <select id="crm_next_7_days_table" class="form-select">
+                                        <option value="Enable">Enable</option>
+                                        <option value="Disable">Disable</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <!-- HR Dashboard Subsections -->
+                        <h5 class="mb-3">HR Dashboard Subsections</h5>
+                        <p class="text-muted mb-3"><small>Control visibility of individual HR dashboard components</small></p>
+                        <div class="row mb-4">
+                            <div class="col-lg-4 col-sm-6">
+                                <div class="form-group">
+                                    <label>Staff Strength Box</label>
+                                    <select id="hr_staff_strength_box" class="form-select">
+                                        <option value="Enable">Enable</option>
+                                        <option value="Disable">Disable</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-sm-6">
+                                <div class="form-group">
+                                    <label>Active Staff Box</label>
+                                    <select id="hr_active_staff_box" class="form-select">
+                                        <option value="Enable">Enable</option>
+                                        <option value="Disable">Disable</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-sm-6">
+                                <div class="form-group">
+                                    <label>Monthly Attendance Box</label>
+                                    <select id="hr_monthly_attendance_box" class="form-select">
+                                        <option value="Enable">Enable</option>
+                                        <option value="Disable">Disable</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-sm-6">
+                                <div class="form-group">
+                                    <label>Personal Progress Box</label>
+                                    <select id="hr_personal_progress_box" class="form-select">
+                                        <option value="Enable">Enable</option>
+                                        <option value="Disable">Disable</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-sm-6">
+                                <div class="form-group">
+                                    <label>7 Day Attendance Pattern Chart</label>
+                                    <select id="hr_7day_attendance_chart" class="form-select">
+                                        <option value="Enable">Enable</option>
+                                        <option value="Disable">Disable</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-sm-6">
+                                <div class="form-group">
+                                    <label>Salary Payout Trend Chart</label>
+                                    <select id="hr_salary_payout_trend_chart" class="form-select">
+                                        <option value="Enable">Enable</option>
+                                        <option value="Disable">Disable</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-sm-6">
+                                <div class="form-group">
+                                    <label>Payroll Snapshot Table</label>
+                                    <select id="hr_payroll_snapshot_table" class="form-select">
+                                        <option value="Enable">Enable</option>
+                                        <option value="Disable">Disable</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-sm-6">
+                                <div class="form-group">
+                                    <label>Attendance Watch Table</label>
+                                    <select id="hr_attendance_watch_table" class="form-select">
+                                        <option value="Enable">Enable</option>
+                                        <option value="Disable">Disable</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-sm-6">
+                                <div class="form-group">
+                                    <label>Payroll Status Table</label>
+                                    <select id="hr_payroll_status_table" class="form-select">
+                                        <option value="Enable">Enable</option>
+                                        <option value="Disable">Disable</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <!-- ERP Dashboard Subsections -->
+                        <h5 class="mb-3">ERP Dashboard Subsections</h5>
+                        <p class="text-muted mb-3"><small>Control visibility of individual ERP dashboard components</small></p>
+                        <div class="row mb-4">
+                            <div class="col-lg-4 col-sm-6">
+                                <div class="form-group">
+                                    <label>Total Sales Amount Box</label>
+                                    <select id="erp_total_sales_box" class="form-select">
+                                        <option value="Enable">Enable</option>
+                                        <option value="Disable">Disable</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-sm-6">
+                                <div class="form-group">
+                                    <label>Total Purchase Amount Box</label>
+                                    <select id="erp_total_purchase_box" class="form-select">
+                                        <option value="Enable">Enable</option>
+                                        <option value="Disable">Disable</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-sm-6">
+                                <div class="form-group">
+                                    <label>Total Expense Amount Box</label>
+                                    <select id="erp_total_expense_box" class="form-select">
+                                        <option value="Enable">Enable</option>
+                                        <option value="Disable">Disable</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-sm-6">
+                                <div class="form-group">
+                                    <label>Sales Invoice Count Box</label>
+                                    <select id="erp_sales_invoice_count_box" class="form-select">
+                                        <option value="Enable">Enable</option>
+                                        <option value="Disable">Disable</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-sm-6">
+                                <div class="form-group">
+                                    <label>Purchase Invoice Count Box</label>
+                                    <select id="erp_purchase_invoice_count_box" class="form-select">
+                                        <option value="Enable">Enable</option>
+                                        <option value="Disable">Disable</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-sm-6">
+                                <div class="form-group">
+                                    <label>Customers Count Box</label>
+                                    <select id="erp_customers_count_box" class="form-select">
+                                        <option value="Enable">Enable</option>
+                                        <option value="Disable">Disable</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-sm-6">
+                                <div class="form-group">
+                                    <label>Vendors Count Box</label>
+                                    <select id="erp_vendors_count_box" class="form-select">
+                                        <option value="Enable">Enable</option>
+                                        <option value="Disable">Disable</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-sm-6">
+                                <div class="form-group">
+                                    <label>Sales Chart</label>
+                                    <select id="erp_sales_chart" class="form-select">
+                                        <option value="Enable">Enable</option>
+                                        <option value="Disable">Disable</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-sm-6">
+                                <div class="form-group">
+                                    <label>Purchase Chart</label>
+                                    <select id="erp_purchase_chart" class="form-select">
+                                        <option value="Enable">Enable</option>
+                                        <option value="Disable">Disable</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-sm-6">
+                                <div class="form-group">
+                                    <label>Latest Sales Table</label>
+                                    <select id="erp_latest_sales_table" class="form-select">
+                                        <option value="Enable">Enable</option>
+                                        <option value="Disable">Disable</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-sm-6">
+                                <div class="form-group">
+                                    <label>Latest Purchases Table</label>
+                                    <select id="erp_latest_purchases_table" class="form-select">
+                                        <option value="Enable">Enable</option>
+                                        <option value="Disable">Disable</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-12 mt-3">
+                            <a href="javascript:void(0);" class="btn btn-submit me-2" id="saveDashboardSettings">Save
+                                Dashboard Settings</a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -399,6 +732,46 @@
                         if (settings.qr_code_url) {
                             $("#qr_preview").attr("src", settings.qr_code_url).show();
                         }
+
+                        // 📊 Dashboard Settings
+                        $("#crm_section_enabled").val(settings.crm_section_enabled || 'Enable');
+                        $("#hr_section_enabled").val(settings.hr_section_enabled || 'Enable');
+                        $("#erp_section_enabled").val(settings.erp_section_enabled || 'Enable');
+
+                        // CRM Subsections
+                        $("#crm_lead_pipeline_box").val(settings.crm_lead_pipeline_box || 'Enable');
+                        $("#crm_conversion_box").val(settings.crm_conversion_box || 'Enable');
+                        $("#crm_followup_lead_box").val(settings.crm_followup_lead_box || 'Enable');
+                        $("#crm_meeting_momentum_box").val(settings.crm_meeting_momentum_box || 'Enable');
+                        $("#crm_lead_status_mix_chart").val(settings.crm_lead_status_mix_chart || 'Enable');
+                        $("#crm_activity_trend_chart").val(settings.crm_activity_trend_chart || 'Enable');
+                        $("#crm_pipeline_quality_table").val(settings.crm_pipeline_quality_table || 'Enable');
+                        $("#crm_recent_leads_table").val(settings.crm_recent_leads_table || 'Enable');
+                        $("#crm_next_7_days_table").val(settings.crm_next_7_days_table || 'Enable');
+
+                        // HR Subsections
+                        $("#hr_staff_strength_box").val(settings.hr_staff_strength_box || 'Enable');
+                        $("#hr_active_staff_box").val(settings.hr_active_staff_box || 'Enable');
+                        $("#hr_monthly_attendance_box").val(settings.hr_monthly_attendance_box || 'Enable');
+                        $("#hr_personal_progress_box").val(settings.hr_personal_progress_box || 'Enable');
+                        $("#hr_7day_attendance_chart").val(settings.hr_7day_attendance_chart || 'Enable');
+                        $("#hr_salary_payout_trend_chart").val(settings.hr_salary_payout_trend_chart || 'Enable');
+                        $("#hr_payroll_snapshot_table").val(settings.hr_payroll_snapshot_table || 'Enable');
+                        $("#hr_attendance_watch_table").val(settings.hr_attendance_watch_table || 'Enable');
+                        $("#hr_payroll_status_table").val(settings.hr_payroll_status_table || 'Enable');
+
+                        // ERP Subsections
+                        $("#erp_total_sales_box").val(settings.erp_total_sales_box || 'Enable');
+                        $("#erp_total_purchase_box").val(settings.erp_total_purchase_box || 'Enable');
+                        $("#erp_total_expense_box").val(settings.erp_total_expense_box || 'Enable');
+                        $("#erp_sales_invoice_count_box").val(settings.erp_sales_invoice_count_box || 'Enable');
+                        $("#erp_purchase_invoice_count_box").val(settings.erp_purchase_invoice_count_box || 'Enable');
+                        $("#erp_customers_count_box").val(settings.erp_customers_count_box || 'Enable');
+                        $("#erp_vendors_count_box").val(settings.erp_vendors_count_box || 'Enable');
+                        $("#erp_sales_chart").val(settings.erp_sales_chart || 'Enable');
+                        $("#erp_purchase_chart").val(settings.erp_purchase_chart || 'Enable');
+                        $("#erp_latest_sales_table").val(settings.erp_latest_sales_table || 'Enable');
+                        $("#erp_latest_purchases_table").val(settings.erp_latest_purchases_table || 'Enable');
                     }
                 });
             }
@@ -616,6 +989,84 @@
                             Swal.fire("Error!", xhr.responseJSON.message ||
                                 "Something went wrong!", "error");
                         }
+                    },
+                });
+            });
+
+            // ================== DASHBOARD SETTINGS SAVE ==================
+            $("#saveDashboardSettings").on("click", function(e) {
+                e.preventDefault();
+
+                const selectedSubAdminId = localStorage.getItem("selectedSubAdminId");
+                const authToken = localStorage.getItem("authToken");
+
+                let formData = new FormData();
+
+                // Main sections
+                formData.append("crm_section_enabled", $("#crm_section_enabled").val());
+                formData.append("hr_section_enabled", $("#hr_section_enabled").val());
+                formData.append("erp_section_enabled", $("#erp_section_enabled").val());
+
+                // CRM Subsections
+                formData.append("crm_lead_pipeline_box", $("#crm_lead_pipeline_box").val());
+                formData.append("crm_conversion_box", $("#crm_conversion_box").val());
+                formData.append("crm_followup_lead_box", $("#crm_followup_lead_box").val());
+                formData.append("crm_meeting_momentum_box", $("#crm_meeting_momentum_box").val());
+                formData.append("crm_lead_status_mix_chart", $("#crm_lead_status_mix_chart").val());
+                formData.append("crm_activity_trend_chart", $("#crm_activity_trend_chart").val());
+                formData.append("crm_pipeline_quality_table", $("#crm_pipeline_quality_table").val());
+                formData.append("crm_recent_leads_table", $("#crm_recent_leads_table").val());
+                formData.append("crm_next_7_days_table", $("#crm_next_7_days_table").val());
+
+                // HR Subsections
+                formData.append("hr_staff_strength_box", $("#hr_staff_strength_box").val());
+                formData.append("hr_active_staff_box", $("#hr_active_staff_box").val());
+                formData.append("hr_monthly_attendance_box", $("#hr_monthly_attendance_box").val());
+                formData.append("hr_personal_progress_box", $("#hr_personal_progress_box").val());
+                formData.append("hr_7day_attendance_chart", $("#hr_7day_attendance_chart").val());
+                formData.append("hr_salary_payout_trend_chart", $("#hr_salary_payout_trend_chart").val());
+                formData.append("hr_payroll_snapshot_table", $("#hr_payroll_snapshot_table").val());
+                formData.append("hr_attendance_watch_table", $("#hr_attendance_watch_table").val());
+                formData.append("hr_payroll_status_table", $("#hr_payroll_status_table").val());
+
+                // ERP Subsections
+                formData.append("erp_total_sales_box", $("#erp_total_sales_box").val());
+                formData.append("erp_total_purchase_box", $("#erp_total_purchase_box").val());
+                formData.append("erp_total_expense_box", $("#erp_total_expense_box").val());
+                formData.append("erp_sales_invoice_count_box", $("#erp_sales_invoice_count_box").val());
+                formData.append("erp_purchase_invoice_count_box", $("#erp_purchase_invoice_count_box").val());
+                formData.append("erp_customers_count_box", $("#erp_customers_count_box").val());
+                formData.append("erp_vendors_count_box", $("#erp_vendors_count_box").val());
+                formData.append("erp_sales_chart", $("#erp_sales_chart").val());
+                formData.append("erp_purchase_chart", $("#erp_purchase_chart").val());
+                formData.append("erp_latest_sales_table", $("#erp_latest_sales_table").val());
+                formData.append("erp_latest_purchases_table", $("#erp_latest_purchases_table").val());
+
+                formData.append("selectedSubAdminId", selectedSubAdminId);
+                formData.append("_token", "{{ csrf_token() }}");
+
+                $.ajax({
+                    url: "{{ route('general-settings.update') }}",
+                    type: "POST",
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    headers: {
+                        "Authorization": "Bearer " + authToken
+                    },
+                    success: function(response) {
+                        Swal.fire({
+                            title: "Success!",
+                            text: response.message || "Dashboard settings saved successfully!",
+                            icon: "success",
+                            confirmButtonText: "OK",
+                            confirmButtonColor: "#ff9f43",
+                        }).then(() => {
+                            window.location.reload();
+                        });
+                    },
+                    error: function(xhr) {
+                        Swal.fire("Error!", xhr.responseJSON.message || "Something went wrong!", "error");
                     },
                 });
             });

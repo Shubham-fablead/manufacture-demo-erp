@@ -445,7 +445,7 @@ Route::middleware(['auth.api'])->group(function () {
     });
 
       // Follow Up API Routes
-    Route::get('/getAllFollowUps', [FollowUpController::class, 'index'])->name('followup.index');
+    Route::get('/getAllFollowUps', [Fol::class, 'index'])->name('followup.index');
     Route::post('/follow-up/store', [FollowUpController::class, 'store'])->name('followup.store.api');
     Route::put('/follow-up/{id}/update', [FollowUpController::class, 'update'])->name('followup.update.api');
     Route::get('/follow-up/{id}/show', [FollowUpController::class, 'show'])->name('followup.show.api');
