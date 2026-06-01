@@ -190,6 +190,16 @@
                 padding: 6px 3px;
             }
 
+            .datanew tbody td:first-child {
+                white-space: normal !important;
+                word-break: break-word !important;
+                overflow-wrap: anywhere !important;
+                hyphens: auto !important;
+                min-width: 0 !important;
+                max-width: 0 !important;
+                line-height: 1.3;
+            }
+
             /* Show only Expense name and Details */
             .datanew thead th:nth-child(3),
             .datanew tbody td:nth-child(3),
@@ -251,6 +261,16 @@
             .datanew th,
             .datanew td {
                 padding: 8px 4px;
+            }
+
+            .datanew tbody td:first-child {
+                white-space: normal !important;
+                word-break: break-word !important;
+                overflow-wrap: anywhere !important;
+                hyphens: auto !important;
+                min-width: 0 !important;
+                max-width: 0 !important;
+                line-height: 1.3;
             }
 
             /* Show Expense name, Details, Date, Amount */

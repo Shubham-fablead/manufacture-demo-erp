@@ -7,41 +7,51 @@
         @media screen and (max-width: 768px) {
             .purchase-header {
                 display: flex;
-                align-items: center;
-                justify-content: space-between;
-                flex-wrap: wrap;
-                gap: 8px;
+                flex-direction: column;
+                align-items: stretch;
+                justify-content: flex-start;
+                gap: 6px;
             }
 
             .purchase-header .page-title h4 {
                 font-size: 16px;
                 margin-bottom: 0;
+                text-align: left;
+            }
+
+            .purchase-header .page-title {
+                width: 100%;
+                flex: 1 1 100%;
+                min-width: 0;
             }
 
             .gst-header {
                 display: flex;
                 align-items: center;
-                width: auto;
+                width: 100%;
                 padding: 0;
-                gap: 14px;
-                flex-wrap: wrap;
+                gap: 8px;
+                flex-wrap: nowrap;
+                margin-left: 0;
+                justify-content: space-between;
+                flex: 1 1 100%;
             }
 
             .custom-radio-label {
-                font-size: 13px;
+                font-size: 12px;
                 font-weight: 500;
-                padding-left: 22px;
-                gap: 6px;
+                padding-left: 20px;
+                gap: 4px;
             }
 
             .custom-radio-label input[type="radio"] {
-                width: 15px;
-                height: 15px;
+                width: 14px;
+                height: 14px;
             }
 
             .custom-radio-label input[type="radio"]:checked::after {
-                width: 6px;
-                height: 6px;
+                width: 5px;
+                height: 5px;
             }
 
             .add-row-btn {
@@ -61,6 +71,101 @@
 
             .form-group {
                 margin-bottom: 10px !important
+            }
+
+            .purchase-back-btn {
+                margin-left: auto;
+                padding: 4px 10px;
+                height: 28px;
+                font-size: 12px;
+            }
+
+            .card .card-body {
+                padding: 12px 10px;
+            }
+
+            .form-row {
+                padding: 14px 8px 8px;
+                margin-bottom: 14px;
+            }
+
+            .form-row .col-6,
+            .form-row .col-12,
+            .row:not(.form-row) .col-6,
+            .row:not(.form-row) .col-12 {
+                padding-left: 6px;
+                padding-right: 6px;
+            }
+
+            .form-group label {
+                font-size: 12px;
+                margin-bottom: 4px;
+            }
+
+            .form-group .form-control,
+            .form-group .select2-container--default .select2-selection--single {
+                height: 38px;
+                font-size: 12px;
+            }
+
+            .add-row-btn {
+                margin-top: 0;
+                margin-bottom: 0;
+            }
+
+            .add-row {
+                width: 100%;
+                height: 38px;
+                border-radius: 4px;
+            }
+
+            .remove-row {
+                width: 100%;
+                height: 38px;
+                border-radius: 4px;
+            }
+
+            .product-gst-info {
+                margin-top: 4px !important;
+                font-size: 11px;
+            }
+
+            #form-container .form-row {
+                position: relative;
+            }
+
+            #form-container .form-row .add-row-btn,
+            #form-container .form-row .col-lg-1.col-sm-12.add-row-btn {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .row.form-row > [class*="col-"] {
+                margin-bottom: 6px;
+            }
+
+            .row.form-row .form-group {
+                margin-bottom: 0 !important;
+            }
+
+            .row.form-row .col-6 {
+                flex: 0 0 50%;
+                max-width: 50%;
+            }
+
+            .row.form-row .col-12 {
+                flex: 0 0 100%;
+                max-width: 100%;
+            }
+
+            .row.form-row .select2-container {
+                width: 100% !important;
+            }
+
+            .purchase-header .page-title,
+            .gst-header {
+                width: 100%;
             }
         }
 
@@ -128,6 +233,29 @@
 
         .custom-radio-label:hover {
             color: #0056b3;
+        }
+
+        .purchase-back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            border: 1px solid #ff9f43;
+            background: #ff9f43;
+            color: #fff;
+            border-radius: 4px;
+            padding: 5px 12px;
+            font-size: 13px;
+            font-weight: 600;
+            line-height: 1;
+            height: 32px;
+            margin-left: 8px;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .purchase-back-btn:hover {
+            background: #ff9f43;
+            color: #fff;
         }
 
         .form-row {
@@ -199,7 +327,10 @@
                     <input type="radio" name="gst_option" id="with_gst" value="with" />
                     With GST
                 </label>
-
+                <a href="{{ route('purchase.lists') }}" class="purchase-back-btn">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    Back
+                </a>
             </div>
         </div>
         <div class="card">

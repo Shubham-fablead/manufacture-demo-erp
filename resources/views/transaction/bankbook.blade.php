@@ -107,12 +107,22 @@
             table.datanew tbody td:last-child {
                 display: table-cell !important;
                 text-align: center;
-                vertical-align: middle;
+                vertical-align: top;
                 width: 50px;
+                padding-top: 12px;
+            }
+
+            .toggle-details {
+                display: flex;
+                align-items: flex-start;
+                justify-content: center;
+                width: 100%;
+                text-decoration: none;
             }
 
             .toggle-details i {
                 font-size: 18px;
+                margin-top: 2px;
             }
         }
 
