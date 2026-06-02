@@ -241,9 +241,15 @@ Route::middleware(['auth.api'])->group(function () {
     Route::delete('/facebook-app-configurations/{id}', [FacebookAppConfigurationController::class, 'destroy'])->name('facebook-app-configurations.destroy');
 
     // bankbook
-    Route::get('/bankbook', [TransactionApiController::class, 'bankBook'])->name('bankbook');
+    // Route::get('/bankbook', [TransactionApiController::class, 'bankBook'])->name('bankbook');
+    // Route::get('/export-bankbook-pdf', [TransactionApiController::class, 'export_bankbook_pdf']);
+    // Route::get('/export-bankbook-excel', [TransactionApiController::class, 'export_bankbook_excel']);
+ Route::get('/bankbook', [TransactionApiController::class, 'bankBook'])->name('bankbook');
     Route::get('/export-bankbook-pdf', [TransactionApiController::class, 'export_bankbook_pdf']);
     Route::get('/export-bankbook-excel', [TransactionApiController::class, 'export_bankbook_excel']);
+     Route::get('/bankbook-payment/{id}', [TransactionApiController::class, 'getPayment'])->name('bankbook.payment.show');
+    Route::post('/bankbook-payment/{id}/update', [TransactionApiController::class, 'updatePayment'])->name('bankbook.payment.update');
+    Route::post('/bankbook-payment/{id}/delete', [TransactionApiController::class, 'deletePayment'])->name('bankbook.payment.delete');
 
 
 
@@ -437,6 +443,9 @@ Route::middleware(['auth.api'])->group(function () {
     Route::get('/cashbook/data', [TransactionController::class, 'getCashbookData'])->name('cashbook.data');
     Route::get('/export-cashbook-pdf', [TransactionController::class, 'exportCashbookPdf'])->name('cashbook.export_pdf');
     Route::get('/export-cashbook-excel', [TransactionController::class, 'exportCashbookExcel']);
+  Route::get('/payment-store/{id}', [TransactionController::class, 'getPayment'])->name('payment.show');
+    Route::post('/payment-store/{id}/update', [TransactionController::class, 'updatePayment'])->name('payment.update');
+    Route::post('/payment-store/{id}/delete', [TransactionController::class, 'deletePayment'])->name('payment.delete');
 
     Route::get('/appointments', [AppointmentController::class, 'getAllAppointments']);
     Route::post('/appointments', [AppointmentController::class, 'store']);
@@ -460,7 +469,7 @@ Route::middleware(['auth.api'])->group(function () {
     });
 
       // Follow Up API Routes
-    Route::get('/getAllFollowUps', [Fol::class, 'index'])->name('followup.index');
+    Route::get('/getAllFollowUps', [FollowUpController::class, 'index'])->name('followup.index');
     Route::post('/follow-up/store', [FollowUpController::class, 'store'])->name('followup.store.api');
     Route::put('/follow-up/{id}/update', [FollowUpController::class, 'update'])->name('followup.update.api');
     Route::get('/follow-up/{id}/show', [FollowUpController::class, 'show'])->name('followup.show.api');

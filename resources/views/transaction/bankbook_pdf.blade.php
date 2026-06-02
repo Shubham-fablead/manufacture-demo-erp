@@ -85,7 +85,7 @@
                                 $logoMime = mime_content_type($logoPath);
                             @endphp
                             <img src="data:{{ $logoMime }};base64,{{ $logoData }}" alt="Company Logo"
-                                style="height: 100px; width: auto;">
+                                style="height: 60px; width: auto;">
                         @endif
                     </td>
 
@@ -111,8 +111,8 @@
             <table class="table-bordered">
                 <thead>
                     <tr>
-                        <th style="width:5%;">Sr No</th>
-                        <th style="width:15%;">{{ $status === 'credit' ? 'Order No' : 'Invoice No' }}</th>
+                        <!-- <th style="width:5%;">Sr No</th> -->
+                        <th style="width:15%;">{{ $status === 'expense' ? 'Expense No' : ($status === 'credit' ? 'Order No' : 'Bill No') }}</th>
                         <th style="width:15%;">Date</th>
                         <th style="width:30%;">Particulars</th>
                         <th style="width:20%;">Bank Name</th>
@@ -122,7 +122,7 @@
                 <tbody>
                     @foreach($data as $index => $item)
                         <tr>
-                            <td class="text-center">{{ $index + 1 }}</td>
+                            <!-- <td class="text-center">{{ $index + 1 }}</td> -->
                             <td class="text-center">{{ $status === 'credit' ? ($item['invoice_no'] ?: '-') : ($item['order_no'] ?: '-') }}</td>
                             <td class="text-center">{{ $item['payment_date'] }}</td>
                             <td class="text-center">{{ $item['particulars'] }}</td>
