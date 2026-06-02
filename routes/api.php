@@ -71,6 +71,7 @@ Route::post('/oauth/token', [AccessTokenController::class, 'issueToken'])->middl
 Route::post('/sales/pdf-download', [SalesController::class, 'view_sales_report'])->name('sales.report.html');
 // Route::get('sales/report/view-page', [SalesController::class, 'show_sales_report_page']);
 Route::post('purchase/report/view', [PurchaseController::class, 'view_purchase_report']);
+// Route::post('/expense/report/view', [ExpenseController::class, 'view_expense_report']);
 Route::post('/expense/report/view', [ExpenseController::class, 'view_expense_report']);
 
 Route::post('login', [LoginController::class, 'login'])->name('login');
@@ -264,6 +265,7 @@ Route::middleware(['auth.api'])->group(function () {
     Route::get('/export-purchase-pdf', [PurchaseController::class, 'export_purchase_pdf']);
     Route::post('/purchases/report/export-pdf-api', [PurchaseController::class, 'export_purchases_report_pdf_api'])->name('purchase.reportapi.exportPdf');
     Route::post('/sales/report/export-pdf-api', [SalesController::class, 'export_sales_report_pdf_api'])->name('sale.reportapi.exportPdf');
+    // Route::post('/expense/report/export-pdf-api', [ExpenseController::class, 'expense_report_pdf_api'])->name('expense.reportapi.exportPdf');
     Route::post('/expense/report/export-pdf-api', [ExpenseController::class, 'expense_report_pdf_api'])->name('expense.reportapi.exportPdf');
     Route::get('/export-invoice-pdf-api', [CustomInvoiceController::class, 'exportInvoicePDFAPI'])->name('custom_invoice.pdfapi.export');
     Route::get('/export-invoice-excel-api', [CustomInvoiceController::class, 'exportCustom_invoice_api'])->name('custom_invoice.export');
@@ -291,6 +293,14 @@ Route::middleware(['auth.api'])->group(function () {
     Route::get('/purchase-product-chart', [PurchaseController::class, 'purchaseProductChart']);
 
 
+    // Route::post('/expenses/store', [ExpenseController::class, 'store'])->name('expenses.store');
+    // Route::get('/expenses/list', [ExpenseController::class, 'getExpenses'])->name('expenses.list');
+    // Route::post('/expenses/{id}', [ExpenseController::class, 'destroy'])->name('expenses.destroy');
+    // Route::get('/expenses/{id}/edit', [ExpenseController::class, 'edit'])->name('expenses.edit');
+    // Route::put('/expenses/{id}', [ExpenseController::class, 'update'])->name('expenses.update');
+    // Route::get('/expenses/report', [ExpenseController::class, 'getExpensesReport']);
+
+
     Route::post('/expenses/store', [ExpenseController::class, 'store'])->name('expenses.store');
     Route::get('/expenses/list', [ExpenseController::class, 'getExpenses'])->name('expenses.list');
     Route::post('/expenses/{id}', [ExpenseController::class, 'destroy'])->name('expenses.destroy');
@@ -298,8 +308,13 @@ Route::middleware(['auth.api'])->group(function () {
     Route::put('/expenses/{id}', [ExpenseController::class, 'update'])->name('expenses.update');
     Route::get('/expenses/report', [ExpenseController::class, 'getExpensesReport']);
 
-    // Expense-Type
-    Route::post('/expense-type/store', [ExpenseTypeController::class, 'store'])->name('expense-type.store');
+    // // Expense-Type
+    // Route::post('/expense-type/store', [ExpenseTypeController::class, 'store'])->name('expense-type.store');
+    // Route::get('/expense-types', [ExpenseTypeController::class, 'list']);
+    // Route::get('/expense-types/{id}', [ExpenseTypeController::class, 'show']);
+    // Route::put('/expense-types/{id}', [ExpenseTypeController::class, 'update']);
+    // Route::post('/expenses-type/{id}', [ExpenseTypeController::class, 'destroy'])->name('expenses-type.destroy');
+   Route::post('/expense-type/store', [ExpenseTypeController::class, 'store'])->name('expense-type.store');
     Route::get('/expense-types', [ExpenseTypeController::class, 'list']);
     Route::get('/expense-types/{id}', [ExpenseTypeController::class, 'show']);
     Route::put('/expense-types/{id}', [ExpenseTypeController::class, 'update']);

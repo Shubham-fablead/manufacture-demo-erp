@@ -71,8 +71,8 @@
             background-color: #5d6d7e;
             color: #fff;
             border: none;
-            margin: 0 4px;
-            padding: 6px 15px;
+            margin: 0 3px;
+            padding: 4px 10px;
             border-radius: 6px;
             font-weight: bold;
         }
@@ -91,6 +91,28 @@
             background-color: #e68a35 !important;
         }
 
+        .pagination .page-item:first-child .page-link,
+        .pagination .page-item:last-child .page-link {
+            background-color: #fff;
+            color: #6c757d;
+            border: 1px solid #dee2e6;
+        }
+
+        .pagination .page-item:first-child .page-link:hover,
+        .pagination .page-item:last-child .page-link:hover {
+            background-color: #f8f9fa;
+            color: #495057;
+            border-color: #dee2e6;
+        }
+
+        .pagination .page-item.disabled .page-link {
+            background-color: #fff !important;
+            color: #dee2e6 !important;
+            border: 1px solid #dee2e6 !important;
+            cursor: not-allowed !important;
+            pointer-events: none !important;
+        }
+
 
         .table.datanew tbody td:nth-child(2),
         .table.datanew thead th:nth-child(2) {
@@ -107,82 +129,6 @@
             white-space: nowrap;
         }
 
-        .expense-type-action-wrap {
-            display: flex;
-            align-items: center;
-            justify-content: flex-start;
-            gap: 10px;
-        }
-
-        .expense-type-desktop-actions {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .expense-type-toggle-btn-table {
-            display: none;
-            width: 32px;
-            height: 32px;
-            border: none;
-            border-radius: 50%;
-            background: #ff9f43;
-            color: #fff;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            font-size: 18px;
-            font-weight: 700;
-            line-height: 1;
-            flex: 0 0 auto;
-        }
-
-        .expense-type-toggle-btn-table.minus {
-            background: #dc3545;
-        }
-
-        .expense-type-details-row {
-            display: none;
-        }
-
-        .expense-type-details-row.show {
-            display: table-row;
-        }
-
-        .expense-type-details-content {
-            padding: 14px 16px;
-            background: #fff;
-            border-top: 2px solid #e6e6e6;
-        }
-
-        .expense-type-action-buttons-simple {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            align-items: center;
-            margin-top: 10px;
-        }
-
-        .btn-icon-mobile-expense-type {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            text-decoration: none;
-            background: transparent;
-            border: 2px solid #1b2850;
-            color: #1b2850;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        .btn-icon-mobile-expense-type:hover {
-            background: #1b2850;
-            color: #fff;
-        }
-
         /* Mobile responsive wrap */
         @media (max-width: 768px) {
             .table.datanew tbody td:nth-child(2) {
@@ -191,24 +137,14 @@
                 line-height: 1.4;
             }
 
-            .expense-type-action-wrap {
-                justify-content: center;
-            }
-
-            .expense-type-desktop-actions {
-                display: none;
-            }
-
-            .expense-type-toggle-btn-table {
-                display: inline-flex;
-            }
-
-            .table.datanew tbody td:nth-child(3) {
-                white-space: normal;
-            }
-
             .search-set {
                 margin-right: 1rem !important;
+            }
+
+            .pagination .page-item .page-link {
+                padding: 4px 10px;
+                margin: 0 3px;
+                font-size: 12px;
             }
         }
 
@@ -483,7 +419,6 @@
         $(document).ready(function() {
             var authToken = localStorage.getItem("authToken");
             const selectedSubAdminId = localStorage.getItem("selectedSubAdminId");
-            const expenseTypeDataMap = {};
 
             // Initialize DataTable WITHOUT built-in search/pagination
             var table = $('.datanew').DataTable({
@@ -530,71 +465,6 @@
                 return text.replace(/\b\w/g, char => char.toUpperCase());
             }
 
-            function buildExpenseTypeExpandableRowContent(item) {
-                const editButton = `
-                    <a href="/edit-expense-type/${item.id}" class="btn-icon-mobile-expense-type" title="Edit">
-                        <img src="{{ env('ImagePath') . 'admin/assets/img/icons/edit.svg' }}" alt="Edit">
-                    </a>
-                `;
-
-                let deleteButton = '';
-                if (
-                    userRole !== 'sales-manager' &&
-                    userRole !== 'purchase-manager' &&
-                    userRole !== 'inventory-manager'
-                ) {
-                    deleteButton = `
-                        <button type="button" class="btn-icon-mobile-expense-type delete-btn" data-id="${item.id}" title="Delete">
-                            <img src="{{ env('ImagePath') . 'admin/assets/img/icons/delete.svg' }}" alt="Delete">
-                        </button>
-                    `;
-                }
-
-                const createdAt = item.created_at
-                    ? `<div class="d-flex justify-content-between align-items-center py-2 border-bottom">
-                            <span class="fw-semibold text-muted">Created At:</span>
-                            <span>${moment(item.created_at).format('DD/MM/YYYY')}</span>
-                       </div>`
-                    : '';
-
-                return `
-                    <td colspan="3" class="expense-type-details-content">
-                        ${createdAt}
-                        <div class="expense-type-action-buttons-simple">
-                            ${editButton}
-                            ${deleteButton}
-                        </div>
-                    </td>
-                `;
-            }
-
-            window.toggleExpenseTypeRowDetails = function(expenseTypeId) {
-                const btn = $(`.expense-type-toggle-btn-table[data-expense-type-id="${expenseTypeId}"]`);
-                const row = btn.closest('tr');
-                let detailsRow = row.next(`tr.expense-type-details-row[data-expense-type-id="${expenseTypeId}"]`);
-
-                if (detailsRow.length) {
-                    detailsRow.remove();
-                    btn.removeClass('minus').find('.toggle-icon').text('+');
-                    return;
-                }
-
-                const expenseTypeData = expenseTypeDataMap[expenseTypeId];
-                if (!expenseTypeData) {
-                    return;
-                }
-
-                detailsRow = $(`
-                    <tr class="expense-type-details-row" data-expense-type-id="${expenseTypeId}">
-                        ${buildExpenseTypeExpandableRowContent(expenseTypeData)}
-                    </tr>
-                `);
-
-                row.after(detailsRow);
-                btn.addClass('minus').find('.toggle-icon').text('-');
-                detailsRow.addClass('show');
-            };
-
             function fetchExpenseTypes(page = 1) {
                 let url = `/api/expense-types?page=${page}&per_page=${perPage}`;
                 if (selectedSubAdminId) {
@@ -617,17 +487,12 @@
 
                             currentPage = pagination.current_page;
                             lastPage = pagination.last_page;
-                            Object.keys(expenseTypeDataMap).forEach(function(key) {
-                                delete expenseTypeDataMap[key];
-                            });
 
                             updatePaginationUI(pagination);
 
                             // Build table rows
                             let tableRows = [];
                             items.forEach(function(item, index) {
-                                expenseTypeDataMap[item.id] = item;
-
                                 // Calculate correct serial number based on current page and perPage
                                 let serial = (pagination.current_page - 1) * pagination
                                     .per_page + (index + 1);
@@ -649,19 +514,12 @@
 
                                 // Action buttons (edit always shown if permission)
                                 let actionButtons = `
-                                <div class="expense-type-action-wrap">
-                                    <span class="expense-type-desktop-actions">
-                                        @if (app('hasPermission')(5, 'view'))
-                                            <a class="me-3" href="/edit-expense-type/${item.id}">
-                                                <img src="{{ env('ImagePath') . 'admin/assets/img/icons/edit.svg' }}" alt="Edit">
-                                            </a>
-                                        @endif
-                                        ${deleteBtn}
-                                    </span>
-                                    <button type="button" class="expense-type-toggle-btn-table" onclick="toggleExpenseTypeRowDetails('${item.id}')" data-expense-type-id="${item.id}">
-                                        <span class="toggle-icon">+</span>
-                                    </button>
-                                </div>
+                                @if (app('hasPermission')(5, 'view'))
+                                    <a class="me-3" href="/edit-expense-type/${item.id}">
+                                        <img src="{{ env('ImagePath') . 'admin/assets/img/icons/edit.svg' }}" alt="Edit">
+                                    </a>
+                                @endif
+                                ${deleteBtn}
                             `;
 
                                 tableRows.push([
@@ -672,13 +530,9 @@
                             });
 
                             table.clear().rows.add(tableRows).draw();
-                            $('.expense-type-details-row').remove();
-                            $('.expense-type-toggle-btn-table').removeClass('minus').find('.toggle-icon').text('+');
                             $('.pagination-controls').show();
                         } else {
                             table.clear().draw();
-                            $('.expense-type-details-row').remove();
-                            $('.expense-type-toggle-btn-table').removeClass('minus').find('.toggle-icon').text('+');
                             $(".datanew tbody").html(
                                 '<tr><td colspan="3">No expense types found</td></tr>');
                             $('.pagination-controls').hide();
@@ -691,8 +545,6 @@
                             text: 'Failed to fetch expense types!',
                             confirmButtonColor: '#ff9f43'
                         });
-                        $('.expense-type-details-row').remove();
-                        $('.expense-type-toggle-btn-table').removeClass('minus').find('.toggle-icon').text('+');
                         $('.pagination-controls').hide();
                     }
                 });
@@ -706,19 +558,48 @@
                 $('#pagination-total').text(pagination.total);
 
                 let paginationHtml = '';
-                let startPage = Math.max(1, pagination.current_page - 2);
-                let endPage = Math.min(pagination.last_page, startPage + 4);
-                if (endPage - startPage < 4) {
-                    startPage = Math.max(1, endPage - 4);
+                const currentPage = pagination.current_page || 1;
+                const totalPages = pagination.last_page || 1;
+                paginationHtml += `
+                    <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+                        <a class="page-link" href="javascript:void(0);" data-page="${currentPage - 1}">Previous</a>
+                    </li>
+                `;
+
+                const visiblePageCount = 2;
+                let startPage = Math.floor((currentPage - 1) / visiblePageCount) * visiblePageCount + 1;
+                let endPage = Math.min(totalPages, startPage + visiblePageCount - 1);
+
+                if (startPage > 1) {
+                    paginationHtml += `
+                        <li class="page-item">
+                            <a class="page-link" href="javascript:void(0);" data-page="${startPage - 1}" data-action="prev-group">..</a>
+                        </li>
+                    `;
                 }
 
                 for (let i = startPage; i <= endPage; i++) {
                     paginationHtml += `
-                    <li class="page-item ${i === pagination.current_page ? 'active' : ''}">
-                        <a class="page-link" href="javascript:void(0);" data-page="${i}">${i}</a>
+                        <li class="page-item ${i === currentPage ? 'active' : ''}">
+                            <a class="page-link" href="javascript:void(0);" data-page="${i}">${i}</a>
+                        </li>
+                    `;
+                }
+
+                if (endPage < totalPages) {
+                    paginationHtml += `
+                        <li class="page-item">
+                            <a class="page-link" href="javascript:void(0);" data-page="${endPage + 1}" data-action="next-group">..</a>
+                        </li>
+                    `;
+                }
+
+                paginationHtml += `
+                    <li class="page-item ${currentPage === totalPages || totalPages === 0 ? 'disabled' : ''}">
+                        <a class="page-link" href="javascript:void(0);" data-page="${currentPage + 1}">Next</a>
                     </li>
                 `;
-                }
+
                 $('#pagination-numbers').html(paginationHtml);
             }
 

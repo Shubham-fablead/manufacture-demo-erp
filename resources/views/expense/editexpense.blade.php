@@ -36,6 +36,15 @@
         <div class="card">
             <div class="card-body">
                 <div class="row">
+                    <div class="col-lg-4 col-sm-6 col-6">
+                        <div class="form-group">
+                            <label>Sr No</label>
+                            <div class="input-groupicon">
+                                <input type="text" id="sr_no" disabled>
+                            </div>
+                        </div>
+                    </div>
+
                     {{-- Expense Name --}}
                     <div class="col-lg-4 col-sm-6 col-6">
                         <div class="form-group">
@@ -86,7 +95,7 @@
                         </div>
                     </div>
 
-                    <div class="col-lg-6 col-sm-6 col-6">
+                    <div class="col-lg-4 col-sm-6 col-6">
                         <div class="form-group">
                             <label>Expense Type <span class="text-danger">*</span></label>
                             <select class="select" name="expense_type_id" id="expense_type_id">
@@ -97,7 +106,19 @@
                         </div>
                     </div>
 
-                    <div class="col-lg-6 col-sm-6 col-12">
+                    <div class="col-lg-4 col-sm-6 col-6">
+                        <div class="form-group">
+                            <label>Payment Mode <span class="text-danger">*</span></label>
+                            <select class="select" name="payment_mode" id="payment_mode">
+                                <option value="">Select Payment Mode</option>
+                                <option value="Cash">Cash</option>
+                                <option value="Bank">Bank</option>
+                            </select>
+                            <span class="error text-danger" id="payment_mode_error"></span>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4 col-sm-6 col-12">
                         <div class="form-group">
                             <label>Expense for</label>
                             <textarea id="description" name="description" class="form-control" placeholder="Purpose of Expense" rows="3"></textarea>
@@ -153,9 +174,11 @@
                             `<option value="${type.id}" ${selected}>${type.type}</option>`;
                     });
                     $('#expense_type_id').html(options);
+                    $('#sr_no').val(expense.sr_no ?? expense.id);
                     $('#expense_name').val(expense.expense_name);
                     $('#expense_date').val(formatDate(expense.expense_date));
                     $('#amount').val(expense.amount);
+                    $('#payment_mode').val(expense.payment_mode).trigger('change');
                     $('#description').val(expense.description);
                     $('#expense_id').val(expense.id);
                 },
@@ -211,6 +234,7 @@
                         amount: $('#amount').val(),
                         description: $('#description').val(),
                         expense_type_id: $('#expense_type_id').val(), // <-- this was missing!
+                        payment_mode: $('#payment_mode').val(),
                     },
                     headers: {
                         Authorization: `Bearer ${authToken}`,

@@ -84,6 +84,7 @@ Route::post('/set-subadmin-session', [AuthController::class, 'subadmin_session']
 
 Route::get('sales/report/view-page', [SalesController::class, 'show_sales_report_page']);
 Route::get('purchase/report/view-page', [PurchaseController::class, 'show_purchase_report_page']);
+// Route::get('/expense/report/view-page', [ExpenseController::class, 'show_expense_report_page']);
 Route::get('/expense/report/view-page', [ExpenseController::class, 'show_expense_report_page']);
 
 Route::middleware(['guest:web'])->group(function () {
@@ -367,6 +368,14 @@ Route::middleware(['auth:web', 'auto.permission'])->group(function () {
     Route::get('/edit-purchase-return', [PurchaseReturnController::class, 'edit_purchase_return'])->name('purchase.edit');
     Route::get('/purchase-return-list', [PurchaseReturnController::class, 'purchase_return_list'])->name('purchasereturn.list');
     //expense
+    // Route::get('/create-expense', [ExpenseController::class, 'create_expense'])->name('expense.add');
+    // // Route::get('/edit-purchase/{num}', [PurchaseController::class, 'edit_purchase'])->name('purchase.edit');
+    // Route::get('/edit-expense/{num}', [ExpenseController::class, 'edit_expense'])->name('expense.edit');
+    // Route::get('/expense-category', [ExpenseController::class, 'expense_category'])->name('expense.category');
+    // Route::get('/expense-list', [ExpenseController::class, 'expense_list'])->name('expense.list');
+    // Route::get('/expense-report', [ExpenseController::class, 'expense_report'])->name('expense.report');
+    // Route::get('/expense/report/{ids}', [ExpenseController::class, 'expense_report_view']);
+    // Route::get('/expense/report/{ids}/export-pdf', [ExpenseController::class, 'expense_report_pdf'])->name('expense.report.exportPdf');
     Route::get('/create-expense', [ExpenseController::class, 'create_expense'])->name('expense.add');
     // Route::get('/edit-purchase/{num}', [PurchaseController::class, 'edit_purchase'])->name('purchase.edit');
     Route::get('/edit-expense/{num}', [ExpenseController::class, 'edit_expense'])->name('expense.edit');
@@ -375,6 +384,9 @@ Route::middleware(['auth:web', 'auto.permission'])->group(function () {
     Route::get('/expense-report', [ExpenseController::class, 'expense_report'])->name('expense.report');
     Route::get('/expense/report/{ids}', [ExpenseController::class, 'expense_report_view']);
     Route::get('/expense/report/{ids}/export-pdf', [ExpenseController::class, 'expense_report_pdf'])->name('expense.report.exportPdf');
+    Route::get('/expense/pdf/{id}', [ExpenseController::class, 'downloadSingleExpensePdf'])->name('expense.single.pdf');
+    Route::get('/export-expense', [ExpenseController::class, 'exportExpense'])->name('expense.export');
+    Route::get('/export-expense-pdf', [ExpenseController::class, 'exportExpensePdf'])->name('expense.export-pdf');
 
     //Labour Item
     Route::get('/labour-item', [LabourItemController::class, 'index'])->name('labour_item.all_labour_item');
@@ -384,7 +396,12 @@ Route::middleware(['auth:web', 'auto.permission'])->group(function () {
     Route::get('/cashbook', [transactionController::class, 'cashBook'])->name('transaction.cashbook');
 
     // Expense Type
-    Route::get('/create-expense-type', [ExpenseTypeController::class, 'create_expense_type'])->name('expensetype.add');
+    // Route::get('/create-expense-type', [ExpenseTypeController::class, 'create_expense_type'])->name('expensetype.add');
+    // Route::get('/expense-type-list', [ExpenseTypeController::class, 'expense_type_list'])->name('expensetype.list');
+    // Route::get('/expense-type/edit/{id}', [ExpenseTypeController::class, 'edit'])->name('expensetype.edit');
+    // Route::get('/edit-expense-type/{num}', [ExpenseTypeController::class, 'edit_expense_type'])->name('expensetype.edit');
+
+     Route::get('/create-expense-type', [ExpenseTypeController::class, 'create_expense_type'])->name('expensetype.add');
     Route::get('/expense-type-list', [ExpenseTypeController::class, 'expense_type_list'])->name('expensetype.list');
     Route::get('/expense-type/edit/{id}', [ExpenseTypeController::class, 'edit'])->name('expensetype.edit');
     Route::get('/edit-expense-type/{num}', [ExpenseTypeController::class, 'edit_expense_type'])->name('expensetype.edit');

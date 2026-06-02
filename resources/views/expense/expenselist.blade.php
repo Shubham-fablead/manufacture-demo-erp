@@ -70,6 +70,34 @@
 
         .pagination .page-link {
             color: #1b2850;
+            background-color: #5d6d7e;
+            border: none;
+            margin: 0 3px;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-weight: bold;
+        }
+
+        .pagination .page-item:first-child .page-link,
+        .pagination .page-item:last-child .page-link {
+            background-color: #fff;
+            color: #6c757d;
+            border: 1px solid #dee2e6;
+        }
+
+        .pagination .page-item:first-child .page-link:hover,
+        .pagination .page-item:last-child .page-link:hover {
+            background-color: #f8f9fa;
+            color: #495057;
+            border-color: #dee2e6;
+        }
+
+        .pagination .page-item.disabled .page-link {
+            background-color: #fff !important;
+            color: #dee2e6 !important;
+            border: 1px solid #dee2e6 !important;
+            cursor: not-allowed !important;
+            pointer-events: none !important;
         }
 
         /* Apply word wrap to all table columns */
@@ -84,6 +112,43 @@
             word-break: break-word;
             overflow-wrap: anywhere;
             line-height: 1.4;
+        }
+
+        .expense-mobile-summary {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 2px;
+        }
+
+        .expense-mobile-name {
+            display: none;
+            font-size: 12px;
+            color: #595b5d;
+            line-height: 1.3;
+            word-break: break-word;
+        }
+
+        /* Desktop view - show header buttons, hide filter row buttons */
+        @media screen and (min-width: 768px) {
+            .desktop-export-buttons {
+                display: flex !important;
+            }
+
+            .mobile-export-buttons {
+                display: none !important;
+            }
+        }
+
+        /* Mobile view - hide header buttons, show filter row buttons */
+        @media screen and (max-width: 767px) {
+            .desktop-export-buttons {
+                display: none !important;
+            }
+
+            .mobile-export-buttons {
+                display: flex !important;
+            }
         }
 
         /* Responsive breakpoints for all screen sizes */
@@ -175,6 +240,23 @@
                 text-align: left !important;
             }
 
+            .filter-row .export-buttons-row {
+                flex: 0 0 100%;
+                max-width: 100%;
+                margin-top: 5px;
+            }
+
+            .filter-row .export-buttons-row .d-flex {
+                justify-content: flex-start !important;
+                gap: 10px;
+            }
+
+            .filter-row .export-buttons-row button {
+                flex: 1;
+                font-size: 9px;
+                padding: 5px 50px;
+            }
+
             /* Table responsive styles */
             .table-responsive {
                 overflow-x: hidden !important;
@@ -185,19 +267,24 @@
                 font-size: 11px;
             }
 
+            .pagination .page-item .page-link {
+                padding: 4px 10px;
+                margin: 0 3px;
+                font-size: 12px;
+            }
+
             .datanew th,
             .datanew td {
                 padding: 6px 3px;
             }
 
-            .datanew tbody td:first-child {
-                white-space: normal !important;
-                word-break: break-word !important;
-                overflow-wrap: anywhere !important;
-                hyphens: auto !important;
-                min-width: 0 !important;
-                max-width: 0 !important;
-                line-height: 1.3;
+            /* .datanew thead th:nth-child(1),
+            .datanew tbody td:nth-child(1) {
+                width: calc(100% - 60px) !important;
+            } */
+
+            .expense-mobile-name {
+                display: block;
             }
 
             /* Show only Expense name and Details */
@@ -210,7 +297,11 @@
             .datanew thead th:nth-child(6),
             .datanew tbody td:nth-child(6),
             .datanew thead th:nth-child(7),
-            .datanew tbody td:nth-child(7) {
+            .datanew tbody td:nth-child(7),
+            .datanew thead th:nth-child(8),
+            .datanew tbody td:nth-child(8),
+            .datanew thead th:nth-child(9),
+            .datanew tbody td:nth-child(9) {
                 display: none;
             }
 
@@ -263,23 +354,17 @@
                 padding: 8px 4px;
             }
 
-            .datanew tbody td:first-child {
-                white-space: normal !important;
-                word-break: break-word !important;
-                overflow-wrap: anywhere !important;
-                hyphens: auto !important;
-                min-width: 0 !important;
-                max-width: 0 !important;
-                line-height: 1.3;
-            }
-
             /* Show Expense name, Details, Date, Amount */
             .datanew thead th:nth-child(5),
             .datanew tbody td:nth-child(5),
             .datanew thead th:nth-child(6),
             .datanew tbody td:nth-child(6),
             .datanew thead th:nth-child(7),
-            .datanew tbody td:nth-child(7) {
+            .datanew tbody td:nth-child(7),
+            .datanew thead th:nth-child(8),
+            .datanew tbody td:nth-child(8),
+            .datanew thead th:nth-child(9),
+            .datanew tbody td:nth-child(9) {
                 display: none;
             }
 
@@ -513,6 +598,53 @@
         .page-header {
             margin-bottom: 10px;
         }
+
+        .download-loader-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.35);
+            z-index: 1060;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .download-loader-overlay.d-none {
+            display: none !important;
+        }
+
+        .download-loader-box {
+            width: min(460px, 100%);
+            background: #fff;
+            border-radius: 8px;
+            padding: 24px 20px;
+            text-align: center;
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.2);
+        }
+
+        .download-loader-box h4 {
+            margin: 0;
+            font-size: 36px;
+            color: #2c3e50;
+            font-weight: 600;
+        }
+
+        .download-loader-box p {
+            margin: 8px 0 16px;
+            font-size: 30px;
+            color: #2c3e50;
+        }
+
+        @media (max-width: 768px) {
+            .download-loader-box h4 {
+                font-size: 28px;
+            }
+
+            .download-loader-box p {
+                font-size: 24px;
+            }
+        }
     </style>
     @if (session('error'))
         <div class="alert alert-danger" id="error-message">
@@ -544,28 +676,31 @@
         </script>
     @endif
     <div class="content">
-        <div class="page-header">
+        <div class="page-header d-flex justify-content-between align-items-center">
             <div class="page-title">
                 <h4>All Expenses</h4>
                 <!--<h6>Manage your purchases</h6>-->
             </div>
-            <div>
-                <div class="page-btn d-flex justify-content-between align-items-center">
 
-                    @if (app('hasPermission')(5, 'add'))
-                        <!-- New Expense Button (Right Side) -->
-                        <a href="{{ route('expense.add') }}" class="btn btn-added d-flex align-items-center btn-sm">
-                            <img src="{{ env('ImagePath') . 'admin/assets/img/icons/plus.svg' }}" class="me-2"
-                                alt="img">New Expense
-                        </a>
-                    @endif
+            <div class="header-actions d-flex align-items-center gap-2">
+                @if (app('hasPermission')(5, 'add'))
+                    <!-- New Expense Button (Right Side) -->
+                    <a href="{{ route('expense.add') }}" class="btn btn-added d-flex align-items-center btn-sm">
+                        <img src="{{ env('ImagePath') . 'admin/assets/img/icons/plus.svg' }}" class="me-2"
+                            alt="img">New Expense
+                    </a>
+                @endif
 
-
+                <!-- Desktop Export Buttons -->
+                <div class="desktop-export-buttons d-flex gap-2">
+                    <button class="btn btn-sm btn-success exportExcel">
+                        <i class="fas fa-file-excel"></i> Excel
+                    </button>
+                    <button class="btn btn-sm btn-danger exportPdf">
+                        <i class="fas fa-file-pdf"></i> PDF
+                    </button>
                 </div>
-
             </div>
-
-
         </div>
 
         <!-- Total Expense Amount (Left Side) -->
@@ -618,9 +753,9 @@
                                                                                             </div>
                                                                                         </div> -->
                 <div class="table-top mb-3">
-                    <div class="row g-2 col-12 align-items-end">
+                    <div class="row g-2 col-12 align-items-end filter-row">
 
-                        <div class="col-12 col-sm-3 col-lg-3">
+                        <div class="col-12 col-sm-2 col-lg-3">
                             <div class="search-set d-flex justify-content-md-start mt-2 justify-content-start w-100">
                                 <div class="search-path"></div>
                                 <div class="search-input col-12">
@@ -634,7 +769,7 @@
                             </div>
                         </div>
                         <!-- Expense Type -->
-                        <div class="col-6 col-sm-3 col-lg-3">
+                        <div class="col-6 col-sm-2 col-lg-3">
                             <div class="form-group mb-0">
                                 <label for="filter-expense-type" class="form-label">Expense Type</label>
                                 <select id="filter-expense-type" class="form-control form-control-sm select2-filter"
@@ -682,6 +817,18 @@
                                 class="datetimepicker form-control form-control-sm">
                             <!-- </div> -->
                         </div>
+
+                        <!-- Mobile Export Buttons Row (visible only on mobile) -->
+                        <div class="col-12 export-buttons-row mobile-export-buttons">
+                            <div class="d-flex gap-3 justify-content-between align-items-center w-100">
+                                <button class="btn btn-sm btn-success flex-grow-1 exportExcel">
+                                    <i class="fas fa-file-excel"></i> Excel
+                                </button>
+                                <button class="btn btn-sm btn-danger flex-grow-1 exportPdf">
+                                    <i class="fas fa-file-pdf"></i> PDF
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="mb-2">
@@ -696,10 +843,12 @@
                     <table class="table datanew" id="expense-list-table">
                         <thead>
                             <tr>
-                                <th>Expense name</th>
+                                <th>Sr No</th>
                                 <th class="details-column text-center">Details</th>
+                                <th>Expense name</th>
                                 <th>Date</th>
                                 <th>Amount</th>
+                                <th>Payment Mode</th>
                                 <th>Expense For</th>
                                 <th>Expense Type</th>
                                 <th>Action</th>
@@ -733,6 +882,14 @@
             </div>
         </div>
 
+    </div>
+
+    <div id="downloadLoaderOverlay" class="download-loader-overlay d-none" aria-live="polite" aria-busy="true">
+        <div class="download-loader-box">
+            <h4 id="downloadLoaderTitle">Generating PDF...</h4>
+            <p>Please wait</p>
+            <div class="spinner-border text-primary" role="status" aria-hidden="true"></div>
+        </div>
     </div>
 @endsection
 @push('js')
@@ -998,7 +1155,10 @@
                 `;
 
                 return [
-                    item.expense_name,
+                    `<div class="expense-mobile-summary">
+                        <span>${item.sr_no ?? item.id}</span>
+                        <span class="expense-mobile-name">${item.expense_name ?? 'N/A'}</span>
+                    </div>`,
                     detailsToggle,
                     moment(item.expense_date).format('DD MMM YYYY'),
                     displayAmount,
@@ -1072,7 +1232,7 @@
 
                     $.ajax({
                         url: `/api/expenses/${id}`,
-                        type: "DELETE",
+                        type: "POST",
                         headers: {
                             Authorization: "Bearer " + authToken,
                             "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr('content')
@@ -1228,6 +1388,11 @@
                 </a>`;
             }
 
+            actionButtons += `
+                <a href="/expense/pdf/${expense.id}" class="btn-icon-mobile-expense expense-pdf-download" title="Download PDF">
+                    <img src="{{ env('ImagePath') }}admin/assets/img/icons/download.svg" alt="Download PDF">
+                </a>`;
+
             if (canDeleteExpense && !['sales-manager', 'purchase-manager', 'inventory-manager'].includes(window.userRole)) {
                 actionButtons += `
                 <button type="button" class="btn-icon-mobile-expense delete-btn" data-id="${expense.id}" title="Delete">
@@ -1236,8 +1401,12 @@
             }
 
             return `
-            <td colspan="7" class="expense-details-content">
+            <td colspan="9" class="expense-details-content">
                 <div class="expense-details-list">
+                    <div class="expense-detail-row-simple">
+                        <span class="expense-detail-label-simple">Sr No:</span>
+                        <span class="expense-detail-value-simple">${expense.sr_no ?? expense.id}</span>
+                    </div>
                     <div class="expense-detail-row-simple">
                         <span class="expense-detail-label-simple">Date:</span>
                         <span class="expense-detail-value-simple">${moment(expense.expense_date).format('DD MMM YYYY')}</span>
@@ -1245,6 +1414,10 @@
                     <div class="expense-detail-row-simple">
                         <span class="expense-detail-label-simple">Amount:</span>
                         <span class="expense-detail-value-simple" style="font-weight: bold; color: #dc3545;">${displayAmount}</span>
+                    </div>
+                    <div class="expense-detail-row-simple">
+                        <span class="expense-detail-label-simple">Payment Mode:</span>
+                        <span class="expense-detail-value-simple">${expense.payment_mode ?? 'N/A'}</span>
                     </div>
                     <div class="expense-detail-row-simple">
                         <span class="expense-detail-label-simple">Expense For:</span>
@@ -1334,6 +1507,8 @@
             const selectedSubAdminId = localStorage.getItem("selectedSubAdminId");
             const userRole = "{{ auth()->user()->role }}";
             window.userRole = userRole; // Store globally for use in expandable row
+            const $downloadLoader = $('#downloadLoaderOverlay');
+            const $downloadLoaderTitle = $('#downloadLoaderTitle');
             let currentPage = 1;
             let lastPage = 1;
             let perPage = 10;
@@ -1494,6 +1669,11 @@
                     </a>`;
                 }
 
+                actions += `
+                    <a class="ms-2 expense-pdf-download" href="/expense/pdf/${item.id}" title="Download PDF">
+                        <img src="{{ env('ImagePath') }}admin/assets/img/icons/download.svg">
+                    </a>`;
+
                 if (canDeleteExpense && !['sales-manager', 'purchase-manager', 'inventory-manager'].includes(userRole)) {
                     actions += `
                     <a class="ms-2 delete-btn" data-id="${item.id}">
@@ -1509,10 +1689,15 @@
             `;
 
                 return [
-                    item.expense_name,
+                    `<div class="expense-mobile-summary">
+                        <span class="expense-mobile-name">${item.expense_name ?? 'N/A'}</span>
+                        <span>${item.sr_no ?? item.id}</span>
+                    </div>`,
                     detailsToggle,
+                    item.expense_name,
                     moment(item.expense_date).format('DD MMM YYYY'),
                     displayAmount,
+                    item.payment_mode ?? 'N/A',
                     item.description ?? 'N/A',
                     item.expense_type?.type ?? 'N/A',
                     actions
@@ -1554,20 +1739,47 @@
                 $('#expense-pagination-total').text(pagination.total);
 
                 let paginationHtml = '';
-                let startPage = Math.max(1, pagination.current_page - 2);
-                let endPage = Math.min(pagination.last_page, startPage + 4);
+                const current = pagination.current_page || 1;
+                const totalPages = pagination.last_page || 1;
+                paginationHtml += `
+                    <li class="page-item ${current === 1 ? 'disabled' : ''}">
+                        <a class="page-link expense-page-link" href="javascript:void(0);" data-page="${current - 1}">Previous</a>
+                    </li>
+                `;
 
-                if (endPage - startPage < 4) {
-                    startPage = Math.max(1, endPage - 4);
+                const visiblePageCount = 2;
+                let startPage = Math.floor((current - 1) / visiblePageCount) * visiblePageCount + 1;
+                let endPage = Math.min(totalPages, startPage + visiblePageCount - 1);
+
+                if (startPage > 1) {
+                    paginationHtml += `
+                        <li class="page-item">
+                            <a class="page-link expense-page-link" href="javascript:void(0);" data-page="${startPage - 1}" data-action="prev-group">..</a>
+                        </li>
+                    `;
                 }
 
                 for (let i = startPage; i <= endPage; i++) {
                     paginationHtml += `
-                        <li class="page-item ${i === pagination.current_page ? 'active' : ''}">
+                        <li class="page-item ${i === current ? 'active' : ''}">
                             <a class="page-link expense-page-link" href="javascript:void(0);" data-page="${i}">${i}</a>
                         </li>
                     `;
                 }
+
+                if (endPage < totalPages) {
+                    paginationHtml += `
+                        <li class="page-item">
+                            <a class="page-link expense-page-link" href="javascript:void(0);" data-page="${endPage + 1}" data-action="next-group">..</a>
+                        </li>
+                    `;
+                }
+
+                paginationHtml += `
+                    <li class="page-item ${current === totalPages || totalPages === 0 ? 'disabled' : ''}">
+                        <a class="page-link expense-page-link" href="javascript:void(0);" data-page="${current + 1}">Next</a>
+                    </li>
+                `;
 
                 $('#expense-pagination-numbers').html(paginationHtml);
                 $('.pagination-controls').toggle(pagination.total > 0);
@@ -1688,7 +1900,7 @@
 
                     $.ajax({
                         url: `/api/expenses/${id}`,
-                        type: "DELETE",
+                        type: "POST",
                         headers: {
                             Authorization: "Bearer " + authToken,
                             "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr('content')
@@ -1819,6 +2031,142 @@
             });
 
             window.handleExpenseResize = handleExpenseResize;
+
+            function toggleDownloadLoader(isLoading, title) {
+                if (isLoading) {
+                    $downloadLoaderTitle.text(title || 'Generating report...');
+                    $downloadLoader.removeClass('d-none');
+                } else {
+                    $downloadLoader.addClass('d-none');
+                }
+            }
+
+            function getFileNameFromDisposition(contentDisposition, fallbackName) {
+                if (!contentDisposition) return fallbackName;
+
+                const utf8Match = contentDisposition.match(/filename\*=UTF-8''([^;]+)/i);
+                if (utf8Match && utf8Match[1]) {
+                    return decodeURIComponent(utf8Match[1]);
+                }
+
+                const asciiMatch = contentDisposition.match(/filename=\"?([^\";]+)\"?/i);
+                if (asciiMatch && asciiMatch[1]) {
+                    return asciiMatch[1];
+                }
+
+                return fallbackName;
+            }
+
+            async function downloadExpenseReport(endpoint, type) {
+                const params = buildFilterParams();
+                const queryString = $.param(params);
+                const url = endpoint + (queryString ? `?${queryString}` : '');
+                const isPdf = type === 'pdf';
+                const fallbackName = isPdf ? 'expense-report.pdf' : 'expense-report.xlsx';
+                const loaderTitle = isPdf ? 'Generating PDF...' : 'Generating Excel...';
+
+                toggleDownloadLoader(true, loaderTitle);
+
+                try {
+                    const response = await fetch(url, {
+                        method: 'GET',
+                        credentials: 'same-origin'
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Download request failed');
+                    }
+
+                    const blob = await response.blob();
+                    const contentType = response.headers.get('content-type') || '';
+                    if (contentType.includes('application/json')) {
+                        throw new Error('No export data available');
+                    }
+                    const contentDisposition = response.headers.get('content-disposition');
+                    const fileName = getFileNameFromDisposition(contentDisposition, fallbackName);
+                    const downloadUrl = window.URL.createObjectURL(blob);
+
+                    const link = document.createElement('a');
+                    link.href = downloadUrl;
+                    link.download = fileName;
+                    document.body.appendChild(link);
+                    link.click();
+                    link.remove();
+
+                    window.URL.revokeObjectURL(downloadUrl);
+                } catch (error) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Download Failed',
+                        text: 'Unable to generate the file right now. Please try again.',
+                        confirmButtonColor: '#ff9f43'
+                    });
+                } finally {
+                    toggleDownloadLoader(false);
+                }
+            }
+
+            async function downloadSingleExpensePdf(url) {
+                toggleDownloadLoader(true, 'Generating PDF...');
+
+                try {
+                    const response = await fetch(url, {
+                        method: 'GET',
+                        credentials: 'same-origin'
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Download request failed');
+                    }
+
+                    const blob = await response.blob();
+                    const contentType = response.headers.get('content-type') || '';
+                    if (contentType.includes('application/json')) {
+                        throw new Error('No PDF data available');
+                    }
+                    const contentDisposition = response.headers.get('content-disposition');
+                    const fileName = getFileNameFromDisposition(contentDisposition, 'expense.pdf');
+                    const downloadUrl = window.URL.createObjectURL(blob);
+
+                    const link = document.createElement('a');
+                    link.href = downloadUrl;
+                    link.download = fileName;
+                    document.body.appendChild(link);
+                    link.click();
+                    link.remove();
+
+                    window.URL.revokeObjectURL(downloadUrl);
+                } catch (error) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Download Failed',
+                        text: 'Unable to generate the PDF right now. Please try again.',
+                        confirmButtonColor: '#ff9f43'
+                    });
+                } finally {
+                    toggleDownloadLoader(false);
+                }
+            }
+
+            // Row-level PDF download icons
+            $(document).on('click', '.expense-pdf-download', function(e) {
+                e.preventDefault();
+                const url = $(this).attr('href');
+                if (!url) return;
+                downloadSingleExpensePdf(url);
+            });
+
+            // Export Excel
+            $(document).on('click', '.exportExcel', function(e) {
+                e.preventDefault();
+                downloadExpenseReport('/export-expense', 'excel');
+            });
+
+            // Export PDF
+            $(document).on('click', '.exportPdf', function(e) {
+                e.preventDefault();
+                downloadExpenseReport('/export-expense-pdf', 'pdf');
+            });
         });
     </script>
 @endpush

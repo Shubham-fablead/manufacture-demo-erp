@@ -26,8 +26,8 @@
 
         .card-body {
             width: 95%;
-            min-height: 95%;
-            padding: 3mm;
+            min-height: 290mm;
+            padding: 2mm;
             margin: auto;
             box-sizing: border-box;
             background: white;
@@ -95,7 +95,7 @@
 
         h3,
         h4 {
-            margin: 0 0 10px 0;
+            margin: 0 0 5px 0;
             color: #343a40;
         }
 
@@ -155,7 +155,7 @@
 
 <body>
     <div class="card-body">
-        <table style="width:100%; margin-bottom: 10px; border-collapse: collapse;">
+        <table style="width:100%; margin-bottom: 5px; border-collapse: collapse;">
             <tr>
                 <td style="width: 150px; vertical-align: top;">
                     @if (isset($setting->logo) && file_exists(storage_path('app/public/' . $setting->logo)))
@@ -168,9 +168,10 @@
                             style="height: 60px; width: auto;">
                     @endif
                 </td>
-                <td style="vertical-align: middle; padding-left: 15px; text-align: right;">
+                <td
+                    style="vertical-align: middle; padding-left: 10px; text-align: right; word-wrap: break-word; white-space: normal; max-width: 300px;">
                     <h3 style="margin: 0; text-transform: uppercase;">{{ $setting->name ?? '' }}</h3>
-                    <small style="text-transform: uppercase;">
+                    <small style="text-transform: uppercase; display: block;">
                         {{ $setting->address ?? '' }}<br>
                         Phone: {{ $setting->phone ?? '' }} |
                         Email: <span style="text-transform: none;">{{ $setting->email ?? '' }}</span>
@@ -179,27 +180,27 @@
             </tr>
         </table>
 
-        <hr style="height: 2px; background-color: #d7cdcd; border: none; margin-top: 0; margin-bottom: 20px;">
+        <hr style="height: 2px; background-color: #d7cdcd; border: none; margin-top: 0; margin-bottom: 10px;">
 
-        <div class="text-center mb-1">
-            <div style="margin-bottom: 10px; width: 100%;">
-                <div style="display: inline-block; width: 100%;text-align: left;">
+        <!-- <div class="text-center mb-1">
+            <div style="margin-bottom: 10px; width: 100%; text-align: center;">
+                <div style="display: inline-block; width: 49%; text-align: left;">
                     <strong>REPORT TYPE : Expense Report</strong>
                 </div>
-                {{-- <div style="display: inline-block; width: 49%; text-align: right;">
+                <div style="display: inline-block; width: 49%; text-align: right;">
                     <strong>GST NO : {{ $setting->gst_num ?? ' -- ' }}</strong>
-                </div> --}}
+                </div>
             </div>
-        </div>
+        </div> -->
 
-        <table style="width:100%; border-collapse: collapse; font-size: 12px; margin-bottom: 10px;">
+        <table style="width:100%; border-collapse: collapse; font-size: 12px; margin-bottom: 4px;">
             <tr>
                 <!-- Company Details -->
                 <td
-                    style="width:33%; position: relative; padding: 8px 12px; vertical-align: top; background-color: #eaedf0; border-right: 1px solid #ff9f43;">
-                    <strong style="text-transform: uppercase; display: block; margin-bottom: 1rem;">Company
+                    style="width:33%; position: relative; padding: 4px 8px; vertical-align: top; background-color: #eaedf0; border-right: 1px solid #ff9f43;">
+                    <strong style="text-transform: uppercase; display: block; margin-bottom: 4px;">Company
                         Details:</strong>
-                    <table style="width:100%; border-collapse: collapse; font-size: 12px; color: inherit;">
+                    <!-- <table style="width:100%; border-collapse: collapse; font-size: 12px; color: inherit;">
                         @if (!empty($setting->name))
                             <tr>
                                 <td>Name :</td>
@@ -230,12 +231,53 @@
                                 <td style="text-align: right;">{{ $setting->gst_num }}</td>
                             </tr>
                         @endif
-                    </table>
+                    </table> -->
+                    <table style="width:100%; border-collapse: collapse; font-size: 12px;">
+    @if (!empty($setting->name))
+    <tr>
+        <td style="width:80px;">Name</td>
+        <td style="width:10px;">:</td>
+        <td>{{ $setting->name }}</td>
+    </tr>
+    @endif
+
+    @if (!empty($setting->email))
+    <tr>
+        <td>Email</td>
+        <td>:</td>
+        <td>{{ $setting->email }}</td>
+    </tr>
+    @endif
+
+    @if (!empty($setting->phone))
+    <tr>
+        <td>Phone</td>
+        <td>:</td>
+        <td>{{ $setting->phone }}</td>
+    </tr>
+    @endif
+
+    @if (!empty($setting->address))
+    <tr>
+        <td>Address</td>
+        <td>:</td>
+        <td>{{ $setting->address }}</td>
+    </tr>
+    @endif
+
+    @if (!empty($setting->gst_num))
+    <tr>
+        <td>GST</td>
+        <td>:</td>
+        <td>{{ $setting->gst_num }}</td>
+    </tr>
+    @endif
+</table>
                 </td>
 
                 <!-- Report Details -->
-                <td style="width:34%; padding: 8px 12px; vertical-align: top; background-color: #eaedf0;">
-                    <strong style="text-transform: uppercase; display: block; margin-bottom: 1rem;">Report
+                <td style="width:34%; padding: 4px 8px; vertical-align: top; background-color: #eaedf0;">
+                    <strong style="text-transform: uppercase; display: block; margin-bottom: 4px;">Expense
                         Details:</strong>
                     <table style="width:100%; border-collapse: collapse; font-size: 12px; color: inherit;">
                         <tr>
@@ -243,7 +285,7 @@
                             <td style="text-align: right;">{{ $expenses->count() }}</td>
                         </tr>
                         <tr>
-                            <td>Report Date :</td>
+                            <td>Date :</td>
                             <td style="text-align: right;">{{ \Carbon\Carbon::now()->format('d M Y') }}</td>
                         </tr>
                     </table>
@@ -251,19 +293,21 @@
             </tr>
         </table>
 
-        <div class="text-center">
-            <h4 style="text-transform: uppercase;">Expenses</h4>
+        <div class="text-center" style="margin: 2px 0;">
+            <h4 style="text-transform: uppercase; margin: 0;">Expenses</h4>
         </div>
 
         <table class="table-bordered"
-            style="width: 100%; border-collapse: collapse; font-family: DejaVu Sans, sans-serif; font-size: 12px; margin: 10px 0;">
+            style="width: 100%; border-collapse: collapse; font-family: DejaVu Sans, sans-serif; font-size: 12px; margin: 4px 0;">
             <thead>
                 <tr style="background-color:#ff9f43; color:#fff;">
-                    <td style="padding: 10px;"><strong>Expense Name</strong></td>
-                    <td style="padding: 10px;"><strong>Expense Type</strong></td>
-                    <td style="padding: 10px;"><strong>Amount</strong></td>
-                    <td style="padding: 10px;"><strong>Date</strong></td>
-                    <td style="padding: 10px;"><strong>Expense For</strong></td>
+                    <td style="padding: 6px;"><strong>Sr No</strong></td>
+                    <td style="padding: 6px;"><strong>Expense Name</strong></td>
+                    <td style="padding: 6px;"><strong>Expense Type</strong></td>
+                    <td style="padding: 6px;"><strong>Amount</strong></td>
+                    <td style="padding: 6px;"><strong>Date</strong></td>
+                    <td style="padding: 6px;"><strong>Payment Mode</strong></td>
+                    <td style="padding: 6px;"><strong>Expense For</strong></td>
                 </tr>
             </thead>
             <tbody>
@@ -271,22 +315,26 @@
                 @foreach ($expenses as $expense)
                     @php $totalAmount += $expense->amount; @endphp
                     <tr class="details" style="border-bottom: 1px solid #E9ECEF;">
-                        <td style="padding: 10px;">{{ $expense->expense_name }}</td>
-                        <td style="padding: 10px;">{{ $expense->expenseType->type ?? '-' }}</td>
-                        <td style="padding: 10px;">
+                        <td style="padding: 6px;">{{ $expense->sr_no ?? $expense->id }}</td>
+                        <td style="padding: 6px; white-space: normal; word-break: break-word; max-width: 300px;">{{ $expense->expense_name }}</td>
+                        <td style="padding: 6px;">
+                            {{ $expense->expenseType->type ?? '-' }} <!-- NEW -->
+                        </td>
+                        <td style="padding: 6px;">
                             {{ $currencyPosition === 'left' ? $currencySymbol . number_format($expense->amount, 2) : number_format($expense->amount, 2) . $currencySymbol }}
                         </td>
-                        <td style="padding: 10px;">{{ \Carbon\Carbon::parse($expense->expense_date)->format('d M Y') }}
+                        <td style="padding: 6px;">{{ \Carbon\Carbon::parse($expense->expense_date)->format('d M Y') }}
                         </td>
-                        <td style="padding: 10px; white-space: normal; word-break: break-word; max-width: 400px;">
+                        <td style="padding: 6px;">
+                            {{ $expense->payment_mode ?? '-' }}
+                        </td>
+                        <td style="padding: 6px; white-space: normal; word-break: break-word; max-width: 400px;">
                             {{ $expense->description ?? '-' }}
                         </td>
                     </tr>
                 @endforeach
             </tbody>
         </table>
-
-        <br>
 
         <table style="width: 300px; margin-left: auto; border-collapse: collapse; font-size: 12px; color: #333;">
             <tr>
