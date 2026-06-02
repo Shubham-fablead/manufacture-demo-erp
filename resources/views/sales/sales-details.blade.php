@@ -9,10 +9,6 @@
             height: auto;
         }
 
-        .invoice-box table td {
-            white-space: nowrap;
-        }
-
         /* Product Name Column - Allow Wrapping */
         .invoice-box table tbody tr.details td:first-child,
         .invoice-box table tbody tr.details td:nth-child(1) {
@@ -119,11 +115,11 @@
             </div>
 
             <div class="page-btn d-flex gap-2">
-                @if (app('hasPermission')(2, 'add'))
+                {{-- @if (app('hasPermission')(2, 'add'))
                 <a href="{{ route('sales.add') }}" class="btn btn-added">
                     <i class="fa fa-plus me-1"></i> Add Sale
                 </a>
-                @endif
+                @endif --}}
 
                 @if (app('hasPermission')(2, 'edit') && !$hasReturnStarted)
                     <a href="{{ route('sales.edit', $view_id) }}" class="btn btn-primary">
@@ -214,6 +210,11 @@
                                 foreach ($orderItems as $item) {
                                     $totalTaxAmount += $item->product_gst_total ?? 0;
                                 }
+
+                                $labourSubTotal = 0;
+                                foreach (($labour_items ?? []) as $labouritem) {
+                                    $labourSubTotal += (float) ($labouritem->price ?? 0) * (float) ($labouritem->qty ?? 0);
+                                }
                             @endphp
 
                             <div class="col-lg-6">
@@ -231,21 +232,10 @@
                                         @endphp
 
                                         <li>
-                                            <h4>Subtotal</h4>
+                                            <h4>Total (Product)</h4>
                                             <h5>{{ formatCurrency($subtotal, $setting->currency_symbol ?? '₹', $setting->currency_position ?? 'left') }}</h5>
                                         </li>
-
-                                        <li>
-                                            <h4>Discount Amount</h4>
-                                            <h5>{{ formatCurrency($totalDiscountAmount, $setting->currency_symbol ?? '₹', $setting->currency_position ?? 'left') }}</h5>
-                                        </li>
-
-                                        <li>
-                                            <h4>Price After Discount</h4>
-                                            <h5>{{ formatCurrency($afterDiscount, $setting->currency_symbol ?? '₹', $setting->currency_position ?? 'left') }}</h5>
-                                        </li>
-
-                                        @foreach ($taxDetails as $tax)
+                                          @foreach ($taxDetails as $tax)
                                             <li>
                                                 <h4>{{ $tax['name'] }} Tax</h4>
                                                 <h5>{{ $tax['rate'] }}%
@@ -254,13 +244,24 @@
                                             </li>
                                         @endforeach
 
-                                        <li>
+                                         <li id="totalGstSummaryRow" @if ($totalTaxAmount <= 0) style="display:none;" @endif>
                                             <h4>Total GST Amount</h4>
                                             <h5>{{ formatCurrency($totalTaxAmount, $setting->currency_symbol ?? '₹', $setting->currency_position ?? 'left') }}</h5>
                                         </li>
 
-                                        @if (isset($sales))
-                                            <li>
+                                        <li id="discountAmountSummaryRow" @if ($totalDiscountAmount <= 0) style="display:none;" @endif>
+                                            <h4>Discount Amount</h4>
+                                            <h5>{{ formatCurrency($totalDiscountAmount, $setting->currency_symbol ?? '₹', $setting->currency_position ?? 'left') }}</h5>
+                                        </li>
+
+                                        <li id="priceAfterDiscountSummaryRow" @if ($totalDiscountAmount <= 0) style="display:none;" @endif>
+                                            <h4>Subtotal</h4>
+                                            <h5>{{ formatCurrency($afterDiscount, $setting->currency_symbol ?? '₹', $setting->currency_position ?? 'left') }}</h5>
+                                        </li>
+
+
+                                        @if (isset($sales) && (float) ($sales->shipping ?? 0) > 0)
+                                            <li id="shippingChargeRow">
                                                 <h4>Shipping Charge</h4>
                                                 <h5>{{ formatCurrency($sales->shipping ?? 0, $setting->currency_symbol ?? '₹', $setting->currency_position ?? 'left') }}</h5>
                                             </li>
@@ -273,18 +274,18 @@
                                         </li>
 
                                         {{-- ✅ Return Status: dynamically updated by JS --}}
-                                        <li id="returnStatusRow">
+                                        <li id="returnStatusRow" style="display:none;">
                                             <h4>Return Status</h4>
                                             <h5 id="returnstatus">—</h5>
                                         </li>
 
-                                        <li class="laborcharge">
+                                        <li class="laborcharge" @if ($labourSubTotal <= 0) style="display:none;" @endif>
                                             <h4>Labour Charge</h4>
-                                            <h5 id="labourChargeText">₹0.00</h5>
+                                            <h5 id="labourChargeText">{{ formatCurrency($labourSubTotal, $setting->currency_symbol ?? '₹', $setting->currency_position ?? 'left') }}</h5>
                                         </li>
 
                                         <li class="total">
-                                            <h4>Total</h4>
+                                            <h4>Grand Total</h4>
                                             <h5>{{ formatCurrency($finalTotal, $setting->currency_symbol ?? '₹', $setting->currency_position ?? 'left') }}</h5>
                                         </li>
 
@@ -381,13 +382,14 @@
                             labourSubTotal += parseFloat(item.price || 0) * parseFloat(item.qty || 0);
                         });
                         $("#labourChargeText").text(formatCurrency(labourSubTotal, currSym, currPos));
+                        $(".laborcharge").toggle(labourSubTotal > 0);
 
                         // ── Grand total ──────────────────────────────────────
                         let grandTotal = parseFloat(response.sales.total_amount || 0);
                         $(".total h5").text(formatCurrency(grandTotal, currSym, currPos));
 
                         // ── Paid / Pending ───────────────────────────────────
-                        const sale = response.sales;
+                        const sale = response.sales || {};
                         $("#paidAmountText").text(formatCurrency(sale.paid_amount ?? 0, currSym, currPos));
                         $("#pendingAmountText").text(formatCurrency(sale.pending_amount ?? 0, currSym, currPos));
 
@@ -467,11 +469,13 @@
 
                         // Update Return Status row
                         if (totalReturnAmount === 0) {
-                            $("#returnstatus").html(`<span style="color:#28c76f; font-weight:600;">No return</span>`);
+                            $("#returnStatusRow").hide();
                         } else if (allItemsFullyReturned) {
                             $("#returnstatus").html(`<span style="color:#ea5455; font-weight:600;">Fully Returned</span>`);
+                            $("#returnStatusRow").show();
                         } else {
                             $("#returnstatus").html(`<span style="color:#ff9f43; font-weight:600;">Partially Returned</span>`);
+                            $("#returnStatusRow").show();
                         }
 
                         // ── Quotation / Labour table ─────────────────────────
@@ -510,14 +514,21 @@
 
                         if (response.error) return;
 
-                        const company_info = response.company_info;
+                        const company_info = response.company_info || {};
 
                         let hasGst = items.some(item =>
-                            Array.isArray(item.product_tax) && item.product_tax.length > 0
+                            parseFloat(item.product_gst_total || 0) > 0 ||
+                            (Array.isArray(item.product_tax) && item.product_tax.length > 0)
                         );
+                        let hasDiscount = items.some(item => parseFloat(item.discount_amount || 0) > 0);
+                        $("#discountAmountSummaryRow, #priceAfterDiscountSummaryRow").toggle(hasDiscount);
+                        $("#totalGstSummaryRow").toggle(hasGst);
 
                         const taxHeaderColumns = hasGst
                             ? `<td class="tax-col" style="padding:10px; text-align:center; white-space:normal; vertical-align:middle; font-weight:600; color:#5E5873; font-size:14px;">Product Taxes</td>`
+                            : '';
+                        const discountHeaderColumn = hasDiscount
+                            ? `<td style="padding: 5px;vertical-align: middle;font-weight: 600;color: #5E5873;font-size: 14px;padding: 10px;">Discount Amount</td>`
                             : '';
 
                         let productRows = `
@@ -526,7 +537,7 @@
                                     <table style="width: 100%;line-height: inherit;text-align: left;" class="product-list">
                                         <div class="row">
                                             <div class="col-6">
-                                                <img src="{{ $setting->logo ? env('ImagePath') . 'storage/' . $setting->logo : env('ImagePath') . '/admin/assets/img/logso.png' }}"
+                                                <img src="{{ $setting->logo ? env('ImagePath') . 'storage/' . $setting->logo : env('ImagePath') . '/admin/assets/img/logo-image.jpg' }}"
                                                     alt="logo" class="logo_img">
                                             </div>
                                             <div class="col-6 mt-4" style="text-align: end;">
@@ -583,14 +594,7 @@
                                                                 <td style="padding: 2px 0; font-size: 14px; font-weight: 400; border: none;">Order Date</td>
                                                                 <td style="padding: 2px 0; font-size: 14px; font-weight: 400; text-align: right; border: none;">${sale.created_at}</td>
                                                             </tr>
-                                                            <tr>
-                                                                <td style="padding: 2px 0; font-size: 14px; font-weight: 400; border: none;">Payment Status</td>
-                                                                <td style="padding: 2px 0; font-size: 14px; font-weight: 400; text-align: right; border: none; color:#2E7D32;" class="payment-status">${sale.payment_status.charAt(0).toUpperCase() + sale.payment_status.slice(1)}</td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td style="padding: 2px 0; font-size: 14px; font-weight: 400; border: none;">Payment Method</td>
-                                                                <td style="padding: 2px 0; font-size: 14px; font-weight: 400; text-align: right; border: none; text-transform: capitalize; color:#2E7D32;" class="order-method">${sale.payment_method}</td>
-                                                            </tr>
+
                                                             ${allItemsFullyReturned ? `
                                                                 <tr>
                                                                     <td style="padding: 2px 0; font-size: 14px; color: #ea5455;">Order Status</td>
@@ -610,13 +614,13 @@
                                 <td style="padding: 5px;vertical-align: middle;font-weight: 600;color: #5E5873;font-size: 14px;padding: 10px;">Unit</td>
                                 <td style="padding: 5px;vertical-align: middle;font-weight: 600;color: #5E5873;font-size: 14px;padding: 10px;">Qty</td>
                                 <td style="padding: 5px;vertical-align: middle;font-weight: 600;color: #5E5873;font-size: 14px;padding: 10px;">Price</td>
-                                <td style="padding: 5px;vertical-align: middle;font-weight: 600;color: #5E5873;font-size: 14px;padding: 10px;">Discount Amount</td>
+                                ${discountHeaderColumn}
                                 ${taxHeaderColumns}
                                 <td style="padding: 5px;vertical-align: middle;font-weight: 600;color: #5E5873;font-size: 14px;padding: 10px; text-align: right;">Total (Excl. GST)</td>
                             </tr>`;
 
                         items.forEach(item => {
-                            const product               = item.product;
+                            const product               = item.product || {};
                             const discountAmount        = Number(item.discount_amount ?? 0);
                             const discountPercentageVal = parseFloat(item.discount_percentage ?? 0);
                             const showDiscountPct       = discountPercentageVal > 0;
@@ -632,16 +636,22 @@
                             let imagePath = '';
                             const imageBasePath = '{{ env('ImagePath') }}';
                             try {
-                                const images = JSON.parse(product.images);
+                                const images = JSON.parse(product.images || '[]');
                                 imagePath = (images && images.length > 0 && images[0])
-                                    ? `${imageBasePath}/public/storage/${images[0]}`
-                                    : `${imageBasePath}/public/admin/assets/img/product/noimage.png`;
+                                    ? `${imageBasePath}/storage/${images[0]}`
+                                    : `${imageBasePath}/admin/assets/img/product/noimage.png`;
                             } catch (e) {
-                                imagePath = `${imageBasePath}/public/admin/assets/img/product/noimage.png`;
+                                imagePath = `${imageBasePath}/admin/assets/img/product/noimage.png`;
                             }
 
                             const taxBodyColumns = hasGst
                                 ? `<td class="tax-col" style="padding:10px; white-space:normal; text-align:center; word-wrap:break-word;">${taxesHtml && taxesHtml.trim() !== '' ? taxesHtml : 'N/A'}</td>`
+                                : '';
+                            const discountBodyColumn = hasDiscount
+                                ? `<td style="padding:10px; vertical-align:top;">
+                                        ${formatCurrency(discountAmount, company_info.currency_symbol, company_info.currency_position)}
+                                        ${showDiscountPct ? `<small>(${discountPercentageVal.toFixed(2)}%)</small>` : ''}
+                                   </td>`
                                 : '';
 
                             productRows += `
@@ -649,16 +659,13 @@
                                     <td class="text-capitalize" style="padding: 10px; align:left; vertical-align: top;">
                                         <a href="/product-view/${product.id}" class="d-flex align-items-center text-decoration-none text-dark">
                                             <img src="${imagePath}" alt="img" class="me-2" style="width:40px; height:40px;">
-                                            ${product.name}
+                                            ${product.name || 'N/A'}
                                         </a>
                                     </td>
                                     <td class="text-capitalize" style="padding: 10px;vertical-align: top;">${item.product?.unit?.unit_name ?? 'N/A'}</td>
                                     <td style="padding: 10px;vertical-align: top;">${item.quantity}</td>
                                     <td style="padding: 10px;vertical-align: top;">${formatCurrency(item.price, company_info.currency_symbol, company_info.currency_position)}</td>
-                                    <td style="padding:10px; vertical-align:top;">
-                                        ${formatCurrency(discountAmount, company_info.currency_symbol, company_info.currency_position)}
-                                        ${showDiscountPct ? `<small>(${discountPercentageVal.toFixed(2)}%)</small>` : ''}
-                                    </td>
+                                    ${discountBodyColumn}
                                     ${taxBodyColumns}
                                     <td style="padding: 10px;vertical-align: top; text-align: right;">${formatCurrency(totalWithoutGst, company_info.currency_symbol, company_info.currency_position)}</td>
                                 </tr>`;
@@ -730,7 +737,8 @@
                         $(".customer-name").text(sale.user_name || "walk-in-customer");
                         $(".customer-phone").text(sale.user_phone || "N/A");
                         $(".invoice-id").text(sale.order_number);
-                        $(".payment-status").text(sale.payment_status.charAt(0).toUpperCase() + sale.payment_status.slice(1));
+                        const paymentStatus = (sale.payment_status || 'pending').toString();
+                        $(".payment-status").text(paymentStatus.charAt(0).toUpperCase() + paymentStatus.slice(1));
                         $(".order-status").text("Completed");
                     },
 

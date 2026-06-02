@@ -31,12 +31,16 @@ use Illuminate\Support\Facades\Storage;
             'close_time',
             'invoice_size',
             'send_mail',
+            'tds_apply',
+            'financial_year',
             'created_at',
             'updated_at',
         ];
 
     protected $casts = [
         'send_mail' => 'boolean',
+        'tds_apply' => 'boolean',
+        'financial_year' => 'boolean',
     ];
 
     // Automatically append extra fields

@@ -3,6 +3,22 @@
 @section('title', 'Sale Report')
 
 @section('content')
+@php
+$fallbackSetting = new \App\Models\Setting([
+    'name' => 'Fablead Developer & Technolab',
+    'email' => 'info@gmail.com',
+    'phone' => '1234567890',
+    'address' => 'Adajan Surat',
+    'logo' => 'admin/assets/img/logo-image.jpg',
+    'currency_symbol' => '?',
+    'currency_position' => 'left',
+]);
+$setting = ($setting ?? null) ?: ($settings ?? null) ?: $fallbackSetting;
+$settings = $setting;
+$currencySymbol = $currencySymbol ?? ($setting->currency_symbol ?? '?');
+$currencyPosition = $currencyPosition ?? ($setting->currency_position ?? 'left');
+@endphp
+
     <style>
         .invoice-box tr td {
             vertical-align: middle
@@ -77,7 +93,7 @@
                     <td colspan="6">
                         <div class="row purchase_report_head">
                             <div class="col-6">
-                                <img src="{{ $settings->logo ? env('ImagePath') . 'storage/' . $settings->logo : env('ImagePath') . 'admin/assets/img/logso.png' }}"
+                                <img src="{{ $settings->logo ? env('ImagePath') . 'storage/' . $settings->logo : env('ImagePath') . 'admin/assets/img/logo-image.jpg' }}"
                                     style="max-width: 150px;">
 
                             </div>
@@ -96,7 +112,7 @@
                                 <td colspan="12">
                                     <table style="width: 100%;">
                                         <tr>
-                                            <td
+                                            <!-- <td
                                                 style="padding:5px; vertical-align:top; text-align:left; padding-bottom:20px">
                                                 <font style="vertical-align: inherit; margin-bottom:25px;">
                                                     <font
@@ -131,7 +147,7 @@
                                                     <strong>PAN No : </strong>
                                                     <font class="pan-no">{{ $user->pan_number ?? '--' }}</font>
                                                 </font><br>
-                                            </td>
+                                            </td> -->
 
                                             <td style="padding: 10px; float: left;">
                                                 <strong style="font-size:14px; color:#7367F0; font-weight:600;">Company
@@ -256,7 +272,7 @@
         function downloadPDF() {
             const element = document.querySelector('.download_pdf');
             const logoUrl =
-                "{{ $settings->logo ? env('ImagePath') . '/storage/' . $settings->logo : env('ImagePath') . '/admin/assets/img/logso.png' }}";
+                "{{ $settings->logo ? env('ImagePath') . '/storage/' . $settings->logo : env('ImagePath') . '/admin/assets/img/logo-image.jpg' }}";
 
             loadImageAsBase64(logoUrl, function(logoBase64, logoWidth, logoHeight) {
                 const opt = {

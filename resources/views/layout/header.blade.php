@@ -632,15 +632,38 @@
 @endif
 
             <!-- New Order Button -->
-            @if (in_array($user->role, ['sales-manager', 'inventory-manager', 'admin']))
+            {{-- @if (in_array($user->role, ['sales-manager', 'inventory-manager', 'admin']))
                 <a href="/add-sales"
                     class="btn btn-sm d-flex align-items-center justify-content-center me-3 header-new-order-button"
                     style="height: 38px; background-color: #ff9f43; color: white; border-radius: 6px;">
                     <i class="fa fa-plus me-1"></i> New Order
                 </a>
+            @endif --}}
+              @if (in_array($user->role, ['sales-manager', 'inventory-manager', 'admin']))
+                <div class="dropdown me-1 hide-on-ipad-pro" >
+                    <button
+                        class="btn btn-sm d-flex align-items-center justify-content-center header-new-order-button dropdown-toggle"
+                        type="button" data-bs-toggle="dropdown" aria-expanded="false"
+                        style="height: 38px; background-color: #ff9f43; color: white; border-radius: 6px; border: none;">
+                        <i class="fa fa-plus me-1"></i> Bill
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li>
+                            <a class="dropdown-item" href="{{ route('sales.add', ['sale_type' => 'sales']) }}">
+                                New Sales
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="{{ route('sales.add', ['sale_type' => 'quotation']) }}">
+                                New Quotation
+                            </a>
+                        </li>
+                    </ul>
+                </div>
             @endif
-        </div>
 
+        </div>
+            
         <li class="nav-item dropdown has-arrow main-drop">
             <a href="javascript:void(0);" class="dropdown-toggle nav-link userset" data-bs-toggle="dropdown">
                 <span class="user-img">

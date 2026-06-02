@@ -30,6 +30,7 @@ class OrderItem extends Model
 
     protected $casts = [
         'product_gst_details' => 'array',
+        'quantity' => 'decimal:2',
     ];
 
     public function product()
@@ -59,7 +60,7 @@ class OrderItem extends Model
     {
         return $this->belongsTo(User::class, 'user_id');
     }
-    
+
     protected static function boot()
     {
         parent::boot();

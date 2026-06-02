@@ -83,6 +83,8 @@ class GeneralSettingController extends Controller
             'close_time'        => 'nullable|date_format:H:i',
             'invoice_size' => 'nullable|in:small,big',
             'send_mail'         => 'nullable|boolean',
+            'tds_apply'         => 'nullable|boolean',
+            'financial_year'    => 'nullable|boolean',
             // 📊 Dashboard Settings validation
             'crm_section_enabled' => 'nullable|in:Enable,Disable',
             'hr_section_enabled' => 'nullable|in:Enable,Disable',
@@ -150,6 +152,12 @@ class GeneralSettingController extends Controller
         $settings->send_mail     = $request->has('send_mail')
             ? (int) $request->send_mail
             : ($settings->send_mail ?? 1);
+        $settings->tds_apply     = $request->has('tds_apply')
+            ? (int) $request->tds_apply
+            : ($settings->tds_apply ?? 0);
+        $settings->financial_year = $request->has('financial_year')
+            ? (int) $request->financial_year
+            : ($settings->financial_year ?? 1);
 
         // 📊 Dashboard Settings
         $settings->crm_section_enabled = $request->input('crm_section_enabled', $settings->crm_section_enabled ?? 'Enable');

@@ -21,6 +21,21 @@ use Illuminate\Support\Facades\Auth;
 
 class SalesController extends Controller
 {
+    private function fallbackSetting(?int $branchId = null): Setting
+    {
+        return Setting::where('branch_id', $branchId)->first()
+            ?? Setting::first()
+            ?? new Setting([
+                'name' => 'Fablead Developer & Technolab',
+                'email' => 'info@gmail.com',
+                'phone' => 1234567890,
+                'address' => 'Adajan Surat',
+                'logo' => 'admin/assets/img/logo-image.jpg',
+                'currency_symbol' => '₹',
+                'currency_position' => 'left',
+            ]);
+    }
+
     public function sales_list(Request $request)
     {
         $user = auth()->user();
@@ -45,7 +60,10 @@ class SalesController extends Controller
             ->where('branch_id', $branchIdToUse)
             ->get();
 
-        return view('sales/saleslist', compact('years', 'banks'));
+        $setting = $this->fallbackSetting($branchIdToUse);
+        $financialYearEnabled = (bool) ($setting->financial_year ?? true);
+
+        return view('sales/saleslist', compact('years', 'banks', 'financialYearEnabled'));
     }
 
     public function add_sales(Request $request)
@@ -81,7 +99,7 @@ class SalesController extends Controller
                 'discount_amount',
                 'total_amount'
             );
-        }, 'order_items.product'])->find($id);
+        }, 'order_items.product', 'payments.bank'])->find($id);
 
         if (! $sales) {
             return redirect()->route('sales.list')->with('error', 'Sales record not found.');
@@ -108,11 +126,16 @@ class SalesController extends Controller
             ->where('branch_id', $branchIdToUse)
             ->get();
 
-        $setting = Setting::where('branch_id', $branchIdToUse)->first();
-             $labourItems = LabourItem::where('isDeleted', false)
+        $setting = $this->fallbackSetting($branchIdToUse);
+        $labourItems = LabourItem::where('created_by', $branchIdToUse)
+            ->where('isDeleted', false)
+            ->get();
+        $banks = BankMaster::where('branch_id', $branchIdToUse)
+            ->where('status', 1)
+            ->where('isDeleted', 0)
             ->get();
 
-        return view('sales/edit-sales', compact('sales', 'TaxRate', 'category', 'usernames', 'products', 'update_id', 'setting', 'labourItems'));
+        return view('sales/edit-sales', compact('sales', 'TaxRate', 'category', 'usernames', 'products', 'update_id', 'setting', 'labourItems', 'banks'));
     }
 
     public function sales_details($id)
@@ -130,7 +153,7 @@ class SalesController extends Controller
         }
 
         // 🔹 Get branch-specific setting
-        $setting          = Setting::where('branch_id', $branchIdToUse)->first();
+        $setting          = $this->fallbackSetting($branchIdToUse);
         $currencySymbol   = $setting->currency_symbol ?? '₹';
         $currencyPosition = $setting->currency_position ?? 'left';
 
@@ -249,7 +272,7 @@ class SalesController extends Controller
         }
         $view_id = $id;
         $sales   = Order::find($view_id);
-        $setting = Setting::where('branch_id', $branchIdToUse)->first(); // Get currency info
+        $setting = $this->fallbackSetting($branchIdToUse); // Get currency info
         // dd($setting);
         if (! $sales) {
             return redirect()->route('sales.list')->with('error', 'Order not found.');
@@ -508,257 +531,260 @@ class SalesController extends Controller
     //     return $pdf->stream('invoice_' . $view_id . '.pdf');
     // }
     public function salse_invoice_pdf($id)
-{
-    $view_id    = $id;
-    $sales      = Order::find($view_id);
-    $user       = Auth::user();
-    $subAdminId = session('selectedSubAdminId') ?? $user->id;
+    {
+        $view_id    = $id;
+        $sales      = Order::find($view_id);
+        $user       = Auth::user();
+        $subAdminId = session('selectedSubAdminId') ?? $user->id;
 
-    if ($user->role === 'staff' && $user->branch_id) {
-        $setting = Setting::where('branch_id', $user->branch_id)->first();
-    } else {
-        $setting = Setting::where('branch_id', $subAdminId)->first();
-    }
-
-    if (! $sales) {
-        return redirect()->route('sales.list')->with('error', 'Order not found.');
-    }
-
-    $labourItems = Sales_Labour_Items::where('order_id', $id)
-        ->with('labourItem')
-        ->get();
-
-    $labourCost = 0;
-    if ($labourItems && $labourItems->isNotEmpty()) {
-        foreach ($labourItems as $labourItem) {
-            $labourCost += ($labourItem->qty ?? 0) * ($labourItem->price ?? 0);
+        if ($user->role === 'staff' && $user->branch_id) {
+            $setting = $this->fallbackSetting($user->branch_id);
+        } else {
+            $setting = $this->fallbackSetting($subAdminId);
         }
-    }
 
-    // Fetch user data
-    $user = $sales->user_id ? User::with('userDetail')->find($sales->user_id) : null;
+        if (! $sales) {
+            return redirect()->route('sales.list')->with('error', 'Order not found.');
+        }
 
-    // Helper function for currency formatting
-    $formatCurrency = function ($amount) use ($setting) {
-        $amount = number_format($amount, 2);
-        return $setting->currency_position === 'right'
-            ? $amount . $setting->currency_symbol
-            : $setting->currency_symbol . $amount;
-    };
+        $labourItems = Sales_Labour_Items::where('order_id', $id)
+            ->with('labourItem')
+            ->get();
 
-    // Subtotal
-    $orderItems = OrderItem::where('order_id', $view_id)->get();
-    $subtotal   = $orderItems->sum(function ($item) {
-        return $item->price * $item->quantity;
-    });
+        $labourCost = 0;
+        if ($labourItems && $labourItems->isNotEmpty()) {
+            foreach ($labourItems as $labourItem) {
+                $labourCost += ($labourItem->qty ?? 0) * ($labourItem->price ?? 0);
+            }
+        }
 
-    // Discount
-    $discountPercent = $sales->discount ?? 0;
-    $discountAmount  = ($discountPercent / 100) * $subtotal;
-    $afterDiscount   = $subtotal - $discountAmount;
+        // Fetch user data
+        $user = $sales->user_id ? User::with('userDetail')->find($sales->user_id) : null;
 
-    // Calculate GST
-    $totalGstAmount = 0;
-    $taxSummary = [];
+        // Helper function for currency formatting
+        $formatCurrency = function ($amount) use ($setting) {
+            $amount = number_format($amount, 2);
+            return $setting->currency_position === 'right'
+                ? $amount . $setting->currency_symbol
+                : $setting->currency_symbol . $amount;
+        };
 
-    foreach ($orderItems as $item) {
-        $totalGstAmount += (float) ($item->product_gst_total ?? 0);
-        $gstDetails = $item->product_gst_details;
+        // Subtotal
+        $orderItems = OrderItem::where('order_id', $view_id)->get();
+        $subtotal   = $orderItems->sum(function ($item) {
+            return $item->price * $item->quantity;
+        });
 
-        if (is_string($gstDetails)) {
-            $gstDetails = json_decode($gstDetails, true);
+        // Discount
+        $discountPercent = $sales->discount ?? 0;
+        $discountAmount  = ($discountPercent / 100) * $subtotal;
+        $afterDiscount   = $subtotal - $discountAmount;
+
+        // Calculate GST
+        $totalGstAmount = 0;
+        $taxSummary = [];
+
+        foreach ($orderItems as $item) {
+            $totalGstAmount += (float) ($item->product_gst_total ?? 0);
+            $gstDetails = $item->product_gst_details;
+
             if (is_string($gstDetails)) {
                 $gstDetails = json_decode($gstDetails, true);
+                if (is_string($gstDetails)) {
+                    $gstDetails = json_decode($gstDetails, true);
+                }
+            }
+
+            if (is_array($gstDetails) && isset($gstDetails['tax_name'])) {
+                $gstDetails = [$gstDetails];
+            }
+
+            if (!empty($gstDetails) && is_array($gstDetails)) {
+                foreach ($gstDetails as $tax) {
+                    if (!is_array($tax)) {
+                        continue;
+                    }
+
+                    $taxName = $tax['tax_name'] ?? 'GST';
+                    $taxRate = $tax['tax_rate'] ?? 0;
+                    $taxAmount = (float) ($tax['tax_amount'] ?? 0);
+                    $key = $taxName . '_' . $taxRate;
+
+                    if (!isset($taxSummary[$key])) {
+                        $taxSummary[$key] = [
+                            'name'   => $taxName,
+                            'rate'   => $taxRate,
+                            'amount' => 0,
+                        ];
+                    }
+
+                    $taxSummary[$key]['amount'] += $taxAmount;
+                }
             }
         }
 
-        if (is_array($gstDetails) && isset($gstDetails['tax_name'])) {
-            $gstDetails = [$gstDetails];
+        // Format GST summary
+        $taxDetails = [];
+        foreach ($taxSummary as $tax) {
+            $taxDetails[] = [
+                'name'             => $tax['name'],
+                'rate'             => $tax['rate'],
+                'amount'           => $tax['amount'],
+                'formatted_amount' => $formatCurrency($tax['amount']),
+            ];
         }
 
-        if (!empty($gstDetails) && is_array($gstDetails)) {
-            foreach ($gstDetails as $tax) {
-                if (!is_array($tax)) {
-                    continue;
+        // Calculate Return Amount
+        $totalReturnAmount = 0;
+        $returns = \App\Models\SalesReturn::with('items.product')
+            ->where('order_id', $view_id)
+            ->get();
+
+        $allItemsFullyReturned = false;
+
+        if ($returns->isNotEmpty()) {
+            foreach ($returns as $ret) {
+                $totalReturnAmount += (float) ($ret->total_amount ?? 0);
+            }
+
+            // Check if all items are fully returned
+            $orderItemsQuantities = [];
+            foreach ($orderItems as $item) {
+                $orderItemsQuantities[$item->id] = $item->quantity;
+            }
+
+            $returnedQuantities = [];
+            foreach ($returns as $ret) {
+                foreach ($ret->items as $retItem) {
+                    if (!isset($returnedQuantities[$retItem->order_item_id])) {
+                        $returnedQuantities[$retItem->order_item_id] = 0;
+                    }
+                    $returnedQuantities[$retItem->order_item_id] += $retItem->quantity;
                 }
+            }
 
-                $taxName = $tax['tax_name'] ?? 'GST';
-                $taxRate = $tax['tax_rate'] ?? 0;
-                $taxAmount = (float) ($tax['tax_amount'] ?? 0);
-                $key = $taxName . '_' . $taxRate;
-
-                if (!isset($taxSummary[$key])) {
-                    $taxSummary[$key] = [
-                        'name'   => $taxName,
-                        'rate'   => $taxRate,
-                        'amount' => 0,
-                    ];
+            $allItemsFullyReturned = true;
+            foreach ($orderItemsQuantities as $orderItemId => $originalQty) {
+                $returnedQty = $returnedQuantities[$orderItemId] ?? 0;
+                if ($returnedQty < $originalQty) {
+                    $allItemsFullyReturned = false;
+                    break;
                 }
-
-                $taxSummary[$key]['amount'] += $taxAmount;
             }
         }
-    }
 
-    // Format GST summary
-    $taxDetails = [];
-    foreach ($taxSummary as $tax) {
-        $taxDetails[] = [
-            'name'             => $tax['name'],
-            'rate'             => $tax['rate'],
-            'amount'           => $tax['amount'],
-            'formatted_amount' => $formatCurrency($tax['amount']),
+        // Get shipping charge
+        $shippingCharge = (float) ($sales->shipping ?? 0);
+
+        // Calculate return amount with shipping if fully returned
+        $totalReturnWithShipping = $totalReturnAmount;
+        if ($allItemsFullyReturned && $totalReturnAmount > 0) {
+            $totalReturnWithShipping = $totalReturnAmount + $shippingCharge;
+        }
+
+        // Final total
+        $finalTotal = $afterDiscount + $totalGstAmount + $shippingCharge + $labourCost;
+
+        // Calculate pending amount after returns
+        $paidAmount = PaymentStore::where('order_id', $sales->id)
+            ->where('isDeleted', 0)
+            ->sum('payment_amount');
+
+        // Pending amount = Final Total - Total Returns - Paid Amount
+        $pendingAmount = max(0, $finalTotal - $totalReturnWithShipping - $paidAmount);
+
+        // Extra Paid calculation
+        $extraPaid = max(0, $paidAmount - ($finalTotal - $totalReturnWithShipping));
+
+        // Prepare formatted values
+        $formattedSubtotal       = $formatCurrency($subtotal);
+        $formattedDiscountAmount = $formatCurrency($discountAmount);
+        $formattedAfterDiscount  = $formatCurrency($afterDiscount);
+        $formattedTotalGstAmount = $formatCurrency($totalGstAmount);
+        $formattedShippingCharge = $formatCurrency($shippingCharge);
+        $formattedLabourCost     = $formatCurrency($labourCost);
+        $formattedFinalTotal     = $formatCurrency($finalTotal);
+        $formattedReturnAmount   = $formatCurrency($totalReturnWithShipping);
+        $formattedPaidAmount     = $formatCurrency($paidAmount);
+        $formattedPendingAmount  = $formatCurrency($pendingAmount);
+        $formattedExtraPaid      = $formatCurrency($extraPaid);
+
+        // Determine return status
+        $returnStatus = 'No return';
+        $returnStatusColor = '#28c76f';
+        if ($totalReturnAmount > 0) {
+            if ($totalReturnWithShipping >= $finalTotal) {
+                $returnStatus = 'Fully Returned';
+                $returnStatusColor = '#ea5455';
+            } else {
+                $returnStatus = 'Partially Returned';
+                $returnStatusColor = '#ff9f43';
+            }
+        }
+
+        // Prepare customer data
+        $customer = $user ? [
+            'name'       => $user->name ?? 'walk-in-customer',
+            'company_name' =>$user->company_name ?? '',
+            'email'      => $user->email ?? '',
+            'phone'      => $user->phone ?? '',
+            'address'    => optional($user->userDetail)->address ?? '',
+            'gst_number' => $user->gst_number ?? '',
+            'pan_number' => $user->pan_number ?? '',
+        ] : [
+            'name'       => 'walk-in-customer',
+                'company_name' => '',
+            'email'      => '',
+            'phone'      => '',
+            'address'    => '',
+            'gst_number' => '',
+            'pan_number' => '',
         ];
-    }
 
-    // Calculate Return Amount
-    $totalReturnAmount = 0;
-    $returns = \App\Models\SalesReturn::with('items.product')
-        ->where('order_id', $view_id)
-        ->get();
+        // dd($formattedPaidAmount);
+        // Prepare data for view
+        $pdfData = [
+            'view_id'                => $view_id,
+            'sales'                  => $sales,
+            'setting'                => $setting,
+            'orderItems'             => $orderItems,
+            'salesItems'             => $orderItems,
+            'labourItems'            => $labourItems,
+            'returns'                => $returns,
+            'taxDetails1'            => $taxDetails,
+            'totalGst'               => $formattedTotalGstAmount,
+            'finalTotal'             => $formattedFinalTotal,
+            'subtotal'               => $formattedSubtotal,
+            'discountPercent'        => $discountPercent,
+            'discountAmount'         => $formattedDiscountAmount,
+            'afterDiscount'          => (float) $afterDiscount,
+            'formattedAfterDiscount' => $formattedAfterDiscount,
+            'shippingCharge'         => $formattedShippingCharge,
+            'labourCost'             => $formattedLabourCost,
+            'returnAmount'           => $formattedReturnAmount,
+            'returnStatus'           => $returnStatus,
+            'returnStatusColor'      => $returnStatusColor,
+            'totalReturnAmount'      => $totalReturnWithShipping,
+            'allItemsFullyReturned'  => $allItemsFullyReturned,
+            'customer'               => $customer,
+            'user'                   => $user ? $user->toArray() : null,
+            'paidAmount' => $paidAmount,
+            'pendingAmount'          => $formattedPendingAmount,
+            'extraPaid'              => $formattedExtraPaid,
+            'pendingAmountNumeric'   => $pendingAmount,
+        ];
 
-    $allItemsFullyReturned = false;
-
-    if ($returns->isNotEmpty()) {
-        foreach ($returns as $ret) {
-            $totalReturnAmount += (float) ($ret->total_amount ?? 0);
-        }
-
-        // Check if all items are fully returned
-        $orderItemsQuantities = [];
-        foreach ($orderItems as $item) {
-            $orderItemsQuantities[$item->id] = $item->quantity;
-        }
-
-        $returnedQuantities = [];
-        foreach ($returns as $ret) {
-            foreach ($ret->items as $retItem) {
-                if (!isset($returnedQuantities[$retItem->order_item_id])) {
-                    $returnedQuantities[$retItem->order_item_id] = 0;
-                }
-                $returnedQuantities[$retItem->order_item_id] += $retItem->quantity;
-            }
-        }
-
-        $allItemsFullyReturned = true;
-        foreach ($orderItemsQuantities as $orderItemId => $originalQty) {
-            $returnedQty = $returnedQuantities[$orderItemId] ?? 0;
-            if ($returnedQty < $originalQty) {
-                $allItemsFullyReturned = false;
-                break;
-            }
-        }
-    }
-
-    // Get shipping charge
-    $shippingCharge = (float) ($sales->shipping ?? 0);
-
-    // Calculate return amount with shipping if fully returned
-    $totalReturnWithShipping = $totalReturnAmount;
-    if ($allItemsFullyReturned && $totalReturnAmount > 0) {
-        $totalReturnWithShipping = $totalReturnAmount + $shippingCharge;
-    }
-
-    // Final total
-    $finalTotal = $afterDiscount + $totalGstAmount + $shippingCharge + $labourCost;
-
-    // Calculate pending amount after returns
-    $paidAmount = PaymentStore::where('order_id', $sales->id)
-        ->where('isDeleted', 0)
-        ->sum('payment_amount');
-
-    // Pending amount = Final Total - Total Returns - Paid Amount
-    $pendingAmount = max(0, $finalTotal - $totalReturnWithShipping - $paidAmount);
-
-    // Extra Paid calculation
-    $extraPaid = max(0, $paidAmount - ($finalTotal - $totalReturnWithShipping));
-
-    // Prepare formatted values
-    $formattedSubtotal       = $formatCurrency($subtotal);
-    $formattedDiscountAmount = $formatCurrency($discountAmount);
-    $formattedAfterDiscount  = $formatCurrency($afterDiscount);
-    $formattedTotalGstAmount = $formatCurrency($totalGstAmount);
-    $formattedShippingCharge = $formatCurrency($shippingCharge);
-    $formattedLabourCost     = $formatCurrency($labourCost);
-    $formattedFinalTotal     = $formatCurrency($finalTotal);
-    $formattedReturnAmount   = $formatCurrency($totalReturnWithShipping);
-    $formattedPaidAmount     = $formatCurrency($paidAmount);
-    $formattedPendingAmount  = $formatCurrency($pendingAmount);
-    $formattedExtraPaid      = $formatCurrency($extraPaid);
-
-    // Determine return status
-    $returnStatus = 'No return';
-    $returnStatusColor = '#28c76f';
-    if ($totalReturnAmount > 0) {
-        if ($totalReturnWithShipping >= $finalTotal) {
-            $returnStatus = 'Fully Returned';
-            $returnStatusColor = '#ea5455';
-        } else {
-            $returnStatus = 'Partially Returned';
-            $returnStatusColor = '#ff9f43';
-        }
-    }
-
-    // Prepare customer data
-    $customer = $user ? [
-        'name'       => $user->name ?? 'walk-in-customer',
-        'email'      => $user->email ?? '',
-        'phone'      => $user->phone ?? '',
-        'address'    => optional($user->userDetail)->address ?? '',
-        'gst_number' => $user->gst_number ?? '',
-        'pan_number' => $user->pan_number ?? '',
-    ] : [
-        'name'       => 'walk-in-customer',
-        'email'      => '',
-        'phone'      => '',
-        'address'    => '',
-        'gst_number' => '',
-        'pan_number' => '',
-    ];
-
-    // Prepare data for view
-    $pdfData = [
-        'view_id'                => $view_id,
-        'sales'                  => $sales,
-        'setting'                => $setting,
-        'orderItems'             => $orderItems,
-        'salesItems'             => $orderItems,
-        'labourItems'            => $labourItems,
-        'returns'                => $returns,
-        'taxDetails1'            => $taxDetails,
-        'totalGst'               => $formattedTotalGstAmount,
-        'finalTotal'             => $formattedFinalTotal,
-        'subtotal'               => $formattedSubtotal,
-        'discountPercent'        => $discountPercent,
-        'discountAmount'         => $formattedDiscountAmount,
-        'afterDiscount'          => (float) $afterDiscount,
-        'formattedAfterDiscount' => $formattedAfterDiscount,
-        'shippingCharge'         => $formattedShippingCharge,
-        'labourCost'             => $formattedLabourCost,
-        'returnAmount'           => $formattedReturnAmount,
-        'returnStatus'           => $returnStatus,
-        'returnStatusColor'      => $returnStatusColor,
-        'totalReturnAmount'      => $totalReturnWithShipping,
-        'allItemsFullyReturned'  => $allItemsFullyReturned,
-        'customer'               => $customer,
-        'user'                   => $user ? $user->toArray() : null,
-        'paidAmount'             => $formattedPaidAmount,
-        'pendingAmount'          => $formattedPendingAmount,
-        'extraPaid'              => $formattedExtraPaid,
-        'pendingAmountNumeric'   => $pendingAmount,
-    ];
-
-    // Load and render PDF
-    if ($setting && $setting->invoice_size === 'small') {
-        $pdf = PDF::loadView('sales.salse-invoice-small-pdf', $pdfData)
+        // Load and render PDF
+        if ($setting && $setting->invoice_size === 'small') {
+            $pdf = PDF::loadView('sales.salse-invoice-small-pdf', $pdfData)
                 ->setPaper('A5', 'portrait');
-    } else {
-        $pdf = PDF::loadView('sales.salse-invoice-pdf', $pdfData)
+        } else {
+            $pdf = PDF::loadView('sales.salse-invoice-pdf', $pdfData)
                 ->setPaper('A4', 'portrait');
-    }
+        }
 
-    return $pdf->stream('invoice_' . $view_id . '.pdf');
-}
+        return $pdf->stream('invoice_' . $view_id . '.pdf');
+    }
 
 
     public function sales_report(Request $request)
@@ -840,8 +866,8 @@ class SalesController extends Controller
         // 🔹 Common queries
         $categories = Category::where('isDeleted', 0)
             ->where('branch_id', $branchIdToUse)
+            ->orderBy('id', 'desc')
             ->get();
-
         $taxRates = TaxRate::where('status', 'active')->where('isDeleted', 0)
             ->where('branch_id', $branchIdToUse)
             ->get();
@@ -866,7 +892,7 @@ class SalesController extends Controller
         }
 
         $customers = $customersQuery->get();
-// dd($customers);
+        // dd($customers);
         // 🔹 Vendors only for Staff or default case
         $vendors = collect(); // empty collection if not needed
         if ($userRole === 'staff' || $userRole === 'admin' || $userRole === 'sub-admin') {
@@ -1269,4 +1295,30 @@ class SalesController extends Controller
         }
     }
 
+    public function tds_report(Request $request)
+    {
+        $user         = Auth()->user();
+        $branchId     = $user->id ?? null;
+        $userBranchId = $user->branch_id ?? null;
+        $userRole     = $user->role ?? '';
+        $subAdminId   = session('selectedSubAdminId');
+
+        if ($userRole === 'sub-admin') {
+            $branchIdToUse = $branchId;
+        } elseif ($userRole === 'admin' && $subAdminId) {
+            $branchIdToUse = $subAdminId;
+        } elseif ($userRole === 'staff') {
+            $branchIdToUse = $userBranchId;
+        } else {
+            $branchIdToUse = $branchId;
+        }
+
+        $customers = User::where('role', 'customer')
+            ->where('branch_id', $branchIdToUse)
+            ->where('isDeleted', 0)
+            ->orderBy('name')
+            ->get();
+
+        return view('sales.tdsreport', compact('customers'));
+    }
 }

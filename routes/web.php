@@ -357,7 +357,11 @@ Route::middleware(['auth:web', 'auto.permission'])->group(function () {
     Route::get('/sales/report/{ids}', [SalesController::class, 'sale_report']);
     Route::get('/sales/report/{ids}/export-pdf', [SalesController::class, 'export_sales_report_pdf'])->name('sale.report.exportPdf');
     Route::get('/sales/report/{ids}/export-pdf', [SalesController::class, 'export_sales_report_pdf'])->name('sale.report.exportPdf');
-
+// TDS page (UI)
+    Route::get('/tds', function () {
+        return view('tds.index');
+    });
+    Route::get('/tds-report', [SalesController::class, 'tds_report'])->name('tds.report');
     // //Purchase Return
     // Route::get('admin/get-vendor-name/{invoiceId}', [PurchaseReturnController::class, 'getVendorName']);
     // Route::get('admin/get-invoice-products/{invoiceId}', [PurchaseReturnController::class, 'getInvoiceProducts']);

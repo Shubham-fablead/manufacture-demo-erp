@@ -14,6 +14,8 @@ class Order extends Model
     protected $fillable = [
         'order_number',
         'shipping',
+        'tds_percentage',
+        'tds_amount',
         'user_id',
         'discount',
         'tax_id',
@@ -36,6 +38,8 @@ class Order extends Model
 
     protected $casts = [
         'tax_id' => 'array',
+        'tds_percentage' => 'decimal:2',
+        'tds_amount' => 'decimal:2',
     ];
 
     public function order_items()
@@ -75,8 +79,13 @@ class Order extends Model
         parent::boot();
 
         static::creating(function ($model) {
-            $model->created_at = Carbon::now('Asia/Kolkata');
-            $model->updated_at = Carbon::now('Asia/Kolkata');
+            if (empty($model->created_at)) {
+                $model->created_at = Carbon::now('Asia/Kolkata');
+            }
+
+            if (empty($model->updated_at)) {
+                $model->updated_at = Carbon::now('Asia/Kolkata');
+            }
         });
 
         static::updating(function ($model) {
