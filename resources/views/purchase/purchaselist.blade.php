@@ -914,7 +914,7 @@
                     <table class="table datanew" id="order-table" style="max-width: 2000px;">
                         <thead>
                             <tr>
-                                <th>Invoice Number</th>
+                                <th>Bill No</th>
                                 <th class="text-center">Details</th>
                                 <th>Date</th>
                                 <th>Vendor Name</th>
@@ -2188,16 +2188,9 @@
                     if (!dateStr) return 'N/A';
                     const d = new Date(dateStr);
                     const day = String(d.getDate()).padStart(2, '0');
-                    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct",
-                        "Nov", "Dec"
-                    ];
-                    const month = months[d.getMonth()];
+                    const month = String(d.getMonth() + 1).padStart(2, '0');
                     const year = d.getFullYear();
-                    let hours = d.getHours();
-                    const minutes = String(d.getMinutes()).padStart(2, '0');
-                    const ampm = hours >= 12 ? 'PM' : 'AM';
-                    hours = hours % 12 || 12;
-                    return `${day}-${month}-${year} ${hours}:${minutes} ${ampm}`;
+                    return `${day}-${month}-${year}`;
                 }
 
                 function badge(text, okClass, warnClass) {
@@ -2534,7 +2527,7 @@
                                     window.purchaseDataMap[o.id] = purchaseData;
 
                                     rows.push([
-                                        `<a href="/purchase-view/${o.id}" style="text-decoration: none;">${o.invoice_number || ''}</a>`,
+                                        `<a href="/purchase-view/${o.id}" style="text-decoration: none;">${o.bill_no || ''}</a>`,
                                         `<button class="mobile-toggle-btn-table" onclick="togglePurchaseRowDetails('${o.id}')" data-purchase-id="${o.id}">
                             <span class="toggle-icon">+</span>
                         </button>`,

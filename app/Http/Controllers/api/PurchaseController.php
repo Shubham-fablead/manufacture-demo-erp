@@ -1444,6 +1444,7 @@ class PurchaseController extends Controller
             ->select(
                 'purchase_invoice.id',
                 'users.name as vendor_name',
+                'purchase_invoice.bill_no',
                 'purchase_invoice.invoice_number',
                 'purchase_invoice.grand_total',
                 'purchase_invoice.remaining_amount',
@@ -1528,6 +1529,7 @@ class PurchaseController extends Controller
             ->groupBy(
                 'purchase_invoice.id',
                 'users.name',
+                'purchase_invoice.bill_no',
                 'purchase_invoice.invoice_number',
                 'purchase_invoice.grand_total',
                 'purchase_invoice.remaining_amount',
