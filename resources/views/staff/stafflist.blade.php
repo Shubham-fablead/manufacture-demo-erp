@@ -137,7 +137,7 @@
 
             /* Hide the Details toggle column on desktop */
             table.datanew thead th.details-column,
-            table.datanew tbody td:nth-child(9) {
+            table.datanew tbody td:nth-child(7) {
                 display: none !important;
             }
 
@@ -167,7 +167,7 @@
             }
 
             table.datanew thead th.details-column,
-            table.datanew tbody td:nth-child(9) {
+            table.datanew tbody td:nth-child(7) {
                 display: table-cell !important;
                 text-align: center;
                 vertical-align: top;
@@ -235,7 +235,7 @@
             }
 
             table.datanew thead th.details-column,
-            table.datanew tbody td:nth-child(9) {
+            table.datanew tbody td:nth-child(7) {
                 display: table-cell !important;
                 width: 60px !important;
                 min-width: 60px !important;
@@ -402,8 +402,6 @@
                                 <th>Email</th>
                                 {{-- <th>Staff Role</th> --}}
                                 <th>Phone</th>
-                                <th>GST Number</th>
-                                <th>PAN Number</th>
                                 <th>Country</th>
                                 <th>City</th>
                                 <th>Action</th>
@@ -548,15 +546,6 @@
                                                     <span class="detail-label">City:</span>
                                                     <span class="detail-value">${staff.city || 'N/A'}</span>
                                                 </div>
-                                                <div class="detail-item">
-                                                    <span class="detail-label">GST:</span>
-                                                    <span class="detail-value">${staff.gst_number || 'N/A'}</span>
-                                                </div>
-                                                <div class="detail-item">
-                                                    <span class="detail-label">PAN:</span>
-                                                    <span class="detail-value">${staff.pan_number || 'N/A'}</span>
-                                                </div>
-
                                                 <div class="mobile-actions">
                                                     <a href="/staff-view/${staff.id}">
                                                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -587,14 +576,6 @@
 
                                     // Column 3: Phone
                                     staff.phone || 'N/A',
-
-                                    // Column 4: GST Number
-                                    staff.gst_number || 'N/A',
-
-                                    // Column 5: PAN Number
-                                    staff.pan_number || 'N/A',
-
-
 
                                     // Column 7: Country
                                     staff.country || 'N/A',
@@ -866,14 +847,6 @@
                     <span class="detail-label">City:</span>
                     <span class="detail-value">${staff.city || 'N/A'}</span>
                 </div>
-                <div class="detail-item">
-                    <span class="detail-label">GST:</span>
-                    <span class="detail-value">${staff.gst_number || 'N/A'}</span>
-                </div>
-                <div class="detail-item">
-                    <span class="detail-label">PAN:</span>
-                    <span class="detail-value">${staff.pan_number || 'N/A'}</span>
-                </div>
                 <div class="mobile-actions">
                     @if (app('hasPermission')(8, 'view'))
                     <a href="/staff-view/${staff.id}">
@@ -907,8 +880,6 @@
                                     firstColumn,
                                     staff.email || 'N/A',
                                     staff.phone || 'N/A',
-                                    staff.gst_number || 'N/A',
-                                    staff.pan_number || 'N/A',
                                     staff.country || 'N/A',
                                     staff.city || 'N/A',
                                     actionButtons,
@@ -930,14 +901,14 @@
                             }
                         } else {
                             table.clear().draw();
-                            $(".datanew tbody").html('<tr><td colspan="9">No staff found</td></tr>');
+                            $(".datanew tbody").html('<tr><td colspan="7">No staff found</td></tr>');
                             $('.pagination-controls').hide();
                         }
                     },
                     error: function(xhr) {
                         console.error("Error fetching staff:", xhr);
                         table.clear().draw();
-                        $(".datanew tbody").html('<tr><td colspan="9">Error loading staff data</td></tr>');
+                        $(".datanew tbody").html('<tr><td colspan="7">Error loading staff data</td></tr>');
                         $('.pagination-controls').hide();
                     }
                 });

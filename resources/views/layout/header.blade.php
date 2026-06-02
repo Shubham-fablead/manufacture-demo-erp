@@ -530,6 +530,232 @@
             right: -10px;
         }
     }
+
+    @media (max-width: 575px) {
+        .header {
+            left: 50%;
+            right: auto;
+            width: 450px;
+            max-width: calc(100vw - 4px);
+            transform: translateX(-50%);
+            height: 56px;
+            display: flex;
+            align-items: center;
+            padding: 0 10px;
+            box-sizing: border-box;
+        }
+
+        .header .mobile_btn {
+            order: 1;
+            position: static;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 30px;
+            height: 56px;
+            line-height: 1;
+            padding: 0;
+            flex: 0 0 30px;
+        }
+
+        .header .mobile_btn .bar-icon {
+            width: 24px;
+            margin-top: 0;
+        }
+
+        .header .mobile_btn .bar-icon span {
+            width: 24px;
+            height: 2px;
+            margin-bottom: 6px;
+            background-color: #333;
+        }
+
+        .header .mobile_btn .bar-icon span:nth-child(2) {
+            width: 14px;
+        }
+
+        .header .header-left {
+            order: 2;
+            position: static;
+            width: 78px !important;
+            height: 56px;
+            padding: 0;
+            margin: 0 4px 0 30px;
+            border-right: 0;
+            transform: none;
+            flex: 0 0 78px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .header .header-left .logo {
+            width: auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .header .header-left .logo .logo-view {
+            width: 85px !important;
+            max-width: 85px !important;
+            margin: 0 !important;
+        }
+
+        .header .user-menu {
+            order: 3;
+            display: flex !important;
+            align-items: center;
+            justify-content: flex-end;
+            height: 56px;
+            margin: 0;
+            /* padding-right: 0; */
+            flex: 1 1 auto;
+        }
+
+        .header .header-search-container.tab-view {
+            display: flex !important;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .header .header-search,
+        .header #todayAlertToggle,
+        .header .header-new-order-button,
+        .header .hide-on-ipad-pro,
+        .header .main-drop {
+            display: none !important;
+        }
+
+        .header #subBranchContainer {
+            display: block !important;
+            position: relative;
+            width: 84px !important;
+            margin-right: 4px !important;
+            margin-left: -4px;
+        }
+
+        .header #subBranchContainer .d-flex {
+            width: 100px;
+        }
+
+        .header #subBrandSelect,
+        .header #subBranchContainer .select2-container {
+            width: 84px !important;
+        }
+
+        .header #subBranchContainer .select2-selection--single {
+            height: 30px !important;
+            min-height: 30px !important;
+            border-color: #d9dde3;
+            border-radius: 4px;
+        }
+
+        .header #subBranchContainer .select2-selection__rendered {
+            line-height: 28px !important;
+            padding-left: 8px !important;
+            padding-right: 22px !important;
+            font-size: 10px;
+            color: #1b2850;
+        }
+
+        .header #subBranchContainer .select2-selection__arrow {
+            height: 28px !important;
+            right: 2px;
+        }
+
+        .header #subBranchContainer .select2-dropdown {
+            width: 120px !important;
+            min-width: 120px;
+            z-index: 1060;
+        }
+
+        .header #subBranchContainer .select2-results__option {
+            font-size: 11px;
+            padding: 6px 8px;
+            white-space: normal;
+        }
+
+        .header .notification-wrapper {
+            margin-right: 0 !important;
+            width: 24px;
+            height: 34px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .header #notificationToggle {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 34px;
+            line-height: 1;
+            padding: 0;
+        }
+
+        .header #notificationToggle i {
+            line-height: 1;
+        }
+
+        .header .notification-bell {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 17px;
+            color: #1b2850;
+        }
+
+        .header .notification-badge {
+            top: -6px;
+            right: -9px;
+            min-width: 16px;
+            height: 16px;
+            line-height: 14px;
+            font-size: 9px;
+            padding: 1px 4px;
+            z-index: 2;
+        }
+
+        .header .mobile-user-menu {
+            order: 4;
+            position: relative;
+            display: block;
+            width: 18px;
+            height: 56px;
+            line-height: 56px;
+            padding: 0;
+            flex: 0 0 18px;
+            text-align: center;
+        }
+
+        .header .mobile-user-menu a {
+            color: #ff9f43;
+            font-size: 18px;
+        }
+
+        .header .mobile-user-menu .dropdown-menu {
+            position: absolute;
+            top: 52px !important;
+            right: 0;
+            left: auto;
+            min-width: 126px;
+            padding: 4px 0;
+            transform: none !important;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+            border: 1px solid #eef0f2;
+            border-radius: 2px;
+        }
+
+        .header .mobile-user-menu .dropdown-menu .dropdown-item {
+            line-height: 28px;
+            padding: 4px 10px;
+            font-size: 13px;
+            color: #333;
+        }
+    }
 </style>
 
 @php
@@ -645,7 +871,7 @@
                         class="btn btn-sm d-flex align-items-center justify-content-center header-new-order-button dropdown-toggle"
                         type="button" data-bs-toggle="dropdown" aria-expanded="false"
                         style="height: 38px; background-color: #ff9f43; color: white; border-radius: 6px; border: none;">
-                        <i class="fa fa-plus me-1"></i> Bill
+                        <i class="fa fa-plus me-1"></i>New Bill
                     </button>
                     <ul class="dropdown-menu dropdown-menu-end">
                         <li>
@@ -1722,6 +1948,21 @@
     });
 
     // ==================== BRANCH DROPDOWN FUNCTIONALITY ====================
+    function initializeSubBranchSelect2() {
+        if (!(window.$ && $.fn && $.fn.select2)) return;
+
+        const $select = $('#subBrandSelect');
+        const $container = $('#subBranchContainer');
+        if (!$select.length) return;
+
+        $select.select2({
+            placeholder: 'Select a branch',
+            allowClear: true,
+            width: 'resolve',
+            dropdownParent: $container.length ? $container : $(document.body)
+        });
+    }
+
     (function initializeBranchDropdown() {
         const container = document.getElementById('subBranchContainer');
         const select = document.getElementById('subBrandSelect');
@@ -1734,12 +1975,7 @@
             mainOption.value = "";
             mainOption.textContent = 'Main Branch';
             select.appendChild(mainOption);
-            if (window.$ && $.fn && $.fn.select2) {
-                $('#subBrandSelect').select2({
-                    placeholder: 'Select a branch',
-                    allowClear: true
-                });
-            }
+            initializeSubBranchSelect2();
         }
     })();
 
@@ -1774,12 +2010,7 @@
             select.appendChild(option);
         });
 
-        if (window.$ && $.fn && $.fn.select2) {
-            $('#subBrandSelect').select2({
-                placeholder: 'Select a branch',
-                allowClear: true
-            });
-        }
+        initializeSubBranchSelect2();
 
         const savedId = localStorage.getItem('selectedSubAdminId');
         if (savedId) {

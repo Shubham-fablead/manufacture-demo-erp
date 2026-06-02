@@ -97,22 +97,6 @@
                     </div>
                     <div class="col-lg-3 col-sm-6 col-6">
                         <div class="form-group">
-                            <label>PAN Number</label>
-                            <input type="text" id="pan_number" class="form-control">
-                            <span class="text-danger error-pan_number"></span>
-
-                        </div>
-                    </div>
-                    <div class="col-lg-3 col-sm-6 col-12">
-                        <div class="form-group">
-                            <label>GST Number</label>
-                            <input type="text" id="gst_number" class="form-control">
-                            <span class="text-danger error-gst_number"></span>
-
-                        </div>
-                    </div>
-                    <div class="col-lg-3 col-sm-6 col-6">
-                        <div class="form-group">
                             <label>Address</label>
                             <textarea id="address" name="address" class="form-control"></textarea>
                             <div class="text-danger error-address"></div>
@@ -285,8 +269,6 @@
                         $("#customer_name").val(customer.name);
                         $("#email").val(customer.email || ""); // Use empty string if email is null
                         $("#phone").val(customer.phone);
-                        $("#gst_number").val(customer.gst_number);
-                        $("#pan_number").val(customer.pan_number);
                         $("#staff_type").val(customer.staff_type || "");
                         $("#country").val(customer.details.country ||
                             ""); // Use empty string if country is null
@@ -478,8 +460,6 @@
                 formData.append("staff_name", $("#customer_name").val());
                 formData.append("email", $("#email").val());
                 formData.append("phone", $("#phone").val());
-                formData.append("gst_number", $("#gst_number").val());
-                formData.append("pan_number", $("#pan_number").val());
                 formData.append("staff_type", $("#staff_type").val());
                 formData.append("country", $("#country").val());
                 formData.append("city", $("#city").val());

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\admin\SalesReceiptPaymentController;
 use App\Http\Controllers\api\AdvancePaymentController;
 use App\Http\Controllers\api\AppointmentController;
 use App\Http\Controllers\api\AttendanceController;
@@ -103,6 +104,10 @@ Route::middleware(['auth.api'])->group(function () {
     Route::get('/export-product', [ProductController::class, 'export_product']);
     Route::get('/export-product-pdf', [ProductController::class, 'export_product_pdf']);
 
+
+    // Receipt Payment API
+    Route::post('/receipt-payment/store', [SalesReceiptPaymentController::class, 'apiStore'])->name('api.receipt.store');
+    Route::post('/vendor-payment/store', [SalesReceiptPaymentController::class, 'apiVendorStore'])->name('api.vendor.store');
 
     Route::get('/get-row-materials', [RowMaterialController::class, 'getAllRowMaterials'])->name('getAllRowMaterial');
     Route::post('/create-row-material', [RowMaterialController::class, 'createRowMaterial'])->name('createRowMaterial');

@@ -166,7 +166,7 @@
                             $logoMime = mime_content_type($logoPath);
                         @endphp
                         <img src="data:{{ $logoMime }};base64,{{ $logoData }}" alt="Company Logo"
-                            style="height: 100px; width: auto;"> {{-- adjust height as needed --}}
+                            style="height: 60px; width: auto;"> {{-- adjust height as needed --}}
                     @endif
                 </td>
                 <td style="vertical-align: middle; padding-left: 15px; text-align: right;">
