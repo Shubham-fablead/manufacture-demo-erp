@@ -697,7 +697,7 @@
                         </div>
                         <div class="advance-detail-row-simple">
                             <span class="advance-detail-label-simple">Date:</span>
-                            <span class="advance-detail-value-simple">${payment.date || '-'}</span>
+                            <span class="advance-detail-value-simple">${formatDisplayDate(payment.date)}</span>
                         </div>
                         <div class="advance-detail-row-simple">
                             <span class="advance-detail-label-simple">Method:</span>
@@ -754,6 +754,21 @@
                 minimumFractionDigits: 2,
                 maximumFractionDigits: 2
             });
+        }
+
+        function formatDisplayDate(dateValue) {
+            if (!dateValue) return '-';
+
+            const date = new Date(dateValue);
+            if (isNaN(date.getTime())) {
+                return dateValue;
+            }
+
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const year = date.getFullYear();
+
+            return `${day}-${month}-${year}`;
         }
 
 
@@ -892,7 +907,7 @@
                                         <td>${formatCurrencyIN(amount)}</td>
                                         <td>${formatCurrencyIN(paid)}</td>
                                         <td>${formatCurrencyIN(pending)}</td>
-                                        <td>${payment.date}</td>
+                                        <td>${formatDisplayDate(payment.date)}</td>
                                         <td>${method}</td>
                                         <td style="white-space: normal; word-wrap: break-word; word-break: break-word;">
                                             ${reason}

@@ -229,6 +229,21 @@
                 return `<span class="badges ${badgeClass}">${status || '-'}</span>`;
             }
 
+            function formatDisplayDate(dateValue) {
+                if (!dateValue) return '-';
+
+                const date = new Date(dateValue);
+                if (isNaN(date.getTime())) {
+                    return dateValue;
+                }
+
+                const day = String(date.getDate()).padStart(2, '0');
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const year = date.getFullYear();
+
+                return `${day}-${month}-${year}`;
+            }
+
             function renderMobileRowMaterialPurchases(items) {
                 const container = $('#mobile-row-material-container');
                 container.empty();
@@ -272,7 +287,7 @@
                                 </div>
                                 <div class="mobile-row-material-detail">
                                     <span class="mobile-row-material-label">Date</span>
-                                    <span class="mobile-row-material-value">${item.date || '-'}</span>
+                                    <span class="mobile-row-material-value">${formatDisplayDate(item.date)}</span>
                                 </div>
                                 <div class="mobile-row-material-actions">
                                     <a href="/view-row-material-purchase/${item.id}" title="View">
@@ -333,7 +348,7 @@
                                     <td>${parseFloat(item.remaining_amount || 0).toFixed(2)}</td>
                                     <td>${statusBadge(item.purchase_status)}</td>
                                     <td>${statusBadge(item.payment_status)}</td>
-                                    <td>${item.date || '-'}</td>
+                                    <td>${formatDisplayDate(item.date)}</td>
                                     <td>
                                         <a href="/view-row-material-purchase/${item.id}" class="me-2" title="View">
                                             <img src="{{ env('ImagePath') . '/admin/assets/img/icons/eye.svg' }}" alt="view">

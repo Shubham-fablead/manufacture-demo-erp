@@ -83,9 +83,15 @@ class CreditNoteItemApiController extends Controller
     {
         $branchId = $this->resolveBranchId($request);
         
-        $invoice = PurchaseInvoice::where('invoice_number', $invoiceNumber)
+        $invoice = PurchaseInvoice::where('bill_no', $invoiceNumber)
             ->where('isDeleted', 0)
             ->first();
+
+        if (!$invoice) {
+            $invoice = PurchaseInvoice::where('invoice_number', $invoiceNumber)
+                ->where('isDeleted', 0)
+                ->first();
+        }
 
         if (!$invoice) {
             return response()->json(['error' => 'Purchase Invoice not found'], 404);
@@ -96,6 +102,7 @@ class CreditNoteItemApiController extends Controller
         $purchaseData = [
             'id'               => $invoice->id,
             'vendor_id'        => $invoice->vendor_id,
+            'bill_no'          => $invoice->bill_no,
             'invoice_number'   => $invoice->invoice_number,
             'vendor_name'      => $vendor->name ?? 'N/A',
             'total_amount'     => $invoice->grand_total ?? 0,

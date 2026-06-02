@@ -34,6 +34,19 @@
             const selectedSubAdminId = localStorage.getItem('selectedSubAdminId');
             const purchaseId = @json($id);
 
+            function formatDateIN(value) {
+                if (!value) return '-';
+
+                const date = new Date(value);
+                if (isNaN(date.getTime())) return value;
+
+                const day = String(date.getDate()).padStart(2, '0');
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const year = date.getFullYear();
+
+                return `${day}-${month}-${year}`;
+            }
+
             $.ajax({
                 url: `/api/row-material-purchase/${purchaseId}`,
                 type: 'GET',
@@ -67,7 +80,7 @@
                         <div class="row g-3 mb-4">
                             <div class="col-md-4"><strong>Invoice No:</strong> ${invoice.invoice_number || '-'}</div>
                             <div class="col-md-4"><strong>Bill No:</strong> ${invoice.bill_no || '-'}</div>
-                            <div class="col-md-4"><strong>Date:</strong> ${invoice.created_at || '-'}</div>
+                            <div class="col-md-4"><strong>Date:</strong> ${formatDateIN(invoice.created_at)}</div>
                             <div class="col-md-4"><strong>Vendor:</strong> ${vendor.name || '-'}</div>
                             <div class="col-md-4"><strong>Phone:</strong> ${vendor.phone || '-'}</div>
                             <div class="col-md-4"><strong>Status:</strong> ${invoice.status || '-'}</div>

@@ -96,6 +96,19 @@
                   });
               }
 
+              function formatDateIN(value) {
+                  if (!value) return 'N/A';
+
+                  const date = new Date(value);
+                  if (isNaN(date.getTime())) return value;
+
+                  const day = String(date.getDate()).padStart(2, '0');
+                  const month = String(date.getMonth() + 1).padStart(2, '0');
+                  const year = date.getFullYear();
+
+                  return `${day}-${month}-${year}`;
+              }
+
               const authToken = localStorage.getItem("authToken");
               const paymentId = '{{ $id }}';
 
@@ -118,7 +131,7 @@
                       $('.payment-amount').text(
                           res.amount ? formatCurrencyIN(res.amount) : 'N/A'
                       );
-                      $('.payment-date').text(res.date ?? 'N/A');
+                      $('.payment-date').text(formatDateIN(res.date));
                       $('.payment-method').text(res.method ?? 'N/A');
                       $('.payment-reason').text(res.reason ?? 'N/A');
 

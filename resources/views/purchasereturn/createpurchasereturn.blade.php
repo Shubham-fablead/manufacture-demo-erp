@@ -32,14 +32,14 @@
         <div class="card">
             <div class="card-body">
                 <div class="row">
-                    <!-- Invoice Number Select -->
+                    <!-- Bill No Select -->
                     <div class="col-lg-6 col-sm-6 col-6">
                         <div class="form-group">
-                            <label>Invoice Number</label>
+                            <label>Bill No</label>
                             <select class="form-control select2 invoice_id" name="invoice_id" id="invoice_id" required>
-                                <option value="">Select Invoice Number</option>
+                                <option value="">Select Bill No</option>
                                 @foreach ($invoices as $invoice)
-                                    <option value="{{ $invoice->id }}">{{ $invoice->invoice_number }}</option>
+                                    <option value="{{ $invoice->id }}">{{ $invoice->bill_no }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -179,7 +179,7 @@
     <script>
         $(document).ready(function() {
             $('.invoice_id').select2({
-                placeholder: "Select Invoice Number",
+                placeholder: "Select Bill No",
                 allowClear: true,
                 width: '100%'
             });

@@ -52,7 +52,7 @@ class CreditNoteItemController extends Controller
             $purchaseInvoiceNumbers = PurchaseInvoice::where('isDeleted', 0)
                 ->where('created_by', $UserID)
                 ->orderBy('id', 'desc')
-                ->pluck('invoice_number');
+                ->pluck('bill_no');
         } else {
             $invoiceNumbers = Order::where('isDeleted', 0)
                 ->where('branch_id', $branchId)
@@ -61,7 +61,7 @@ class CreditNoteItemController extends Controller
             $purchaseInvoiceNumbers = PurchaseInvoice::where('isDeleted', 0)
                 ->where('branch_id', $branchId)
                 ->orderBy('id', 'desc')
-                ->pluck('invoice_number');
+                ->pluck('bill_no');
         }
 
         $creditNoteTypes = CreditNotesType::where('isdeleted', 0)
@@ -161,7 +161,7 @@ class CreditNoteItemController extends Controller
             $purchaseInvoiceNumbers = PurchaseInvoice::where('isDeleted', 0)
                 ->where('created_by', $UserID)
                 ->orderBy('id', 'desc')
-                ->pluck('invoice_number');
+                ->pluck('bill_no');
         } else {
             $invoiceNumbers = Order::where('isDeleted', 0)
                 ->where('branch_id', $branchId)
@@ -170,7 +170,7 @@ class CreditNoteItemController extends Controller
             $purchaseInvoiceNumbers = PurchaseInvoice::where('isDeleted', 0)
                 ->where('branch_id', $branchId)
                 ->orderBy('id', 'desc')
-                ->pluck('invoice_number');
+                ->pluck('bill_no');
         }
 
         $creditNoteTypes = CreditNotesType::where('isdeleted', 0)

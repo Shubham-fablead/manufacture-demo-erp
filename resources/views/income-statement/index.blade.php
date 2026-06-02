@@ -62,14 +62,14 @@
                         <!-- Start Date -->
                         <div class="col-6 col-md-3">
                             <label class="form-label">Start Date</label>
-                            <input type="date" name="start_date" class="form-control"
+                            <input type="text" id="start_date" name="start_date" class="form-control"
                                 value="{{ request('start_date', \Carbon\Carbon::now()->startOfMonth()->format('Y-m-d')) }}">
                         </div>
 
                         <!-- End Date -->
                         <div class="col-6 col-md-3">
                             <label class="form-label">End Date</label>
-                            <input type="date" name="end_date" class="form-control"
+                            <input type="text" id="end_date" name="end_date" class="form-control"
                                 value="{{ request('end_date', \Carbon\Carbon::now()->endOfMonth()->format('Y-m-d')) }}">
                         </div>
 
@@ -285,6 +285,36 @@
             var selectedSubAdminId = localStorage.getItem("selectedSubAdminId");
             // console.log(selectedSubAdminId);
 
+            function formatDateIN(value) {
+                if (!value) return '';
+
+                const date = new Date(value);
+                if (isNaN(date.getTime())) return value;
+
+                const day = String(date.getDate()).padStart(2, '0');
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const year = date.getFullYear();
+
+                return `${day}-${month}-${year}`;
+            }
+
+            function formatDateForSubmit(value) {
+                if (!value) return '';
+
+                const parts = value.split('-');
+                if (parts.length !== 3) return value;
+
+                if (parts[0].length === 4) {
+                    return value;
+                }
+
+                const [day, month, year] = parts;
+                return `${year}-${month}-${day}`;
+            }
+
+            $('#start_date').val(formatDateIN($('#start_date').val()));
+            $('#end_date').val(formatDateIN($('#end_date').val()));
+
             // Dynamically get start and end of the current month
             let now = new Date();
             let startDate = new Date(now.getFullYear(), now.getMonth(), 1); // first day of month
@@ -327,6 +357,11 @@
             const $downloadLoader = $("#downloadLoaderOverlay");
             const $downloadLoaderText = $("#downloadLoaderText");
             const $downloadButtons = $(".income-download-btn");
+
+            $("form[action='{{ route('income-statement.index') }}']").on("submit", function() {
+                $("#start_date").val(formatDateForSubmit($("#start_date").val()));
+                $("#end_date").val(formatDateForSubmit($("#end_date").val()));
+            });
 
             function toggleDownloadLoader(isLoading, message) {
                 if (isLoading) {
