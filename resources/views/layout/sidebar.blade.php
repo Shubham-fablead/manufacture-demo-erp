@@ -231,6 +231,15 @@
                     </li>
                 @endif
 
+                @if (app('hasPermission')(16, 'view') || app('hasPermission')(16, 'add'))
+                    <li>
+                        <a href="{{ route('sales.receipt.index') }}">
+                            <i class="fa fa-receipt"></i>
+                            <span>Receipt & Payment</span>
+                        </a>
+                    </li>
+                @endif
+
                 {{-- Invoices --}}
                 @if (app('hasPermission')(4, 'view') || app('hasPermission')(4, 'add'))
                     <li class="submenu">

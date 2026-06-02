@@ -41,6 +41,7 @@ use App\Http\Controllers\admin\VendorController;
 use App\Http\Controllers\admin\FollowUpController;
 use App\Http\Controllers\admin\MeetingController;
 use App\Http\Controllers\admin\LeadController;
+use App\Http\Controllers\admin\SalesReceiptPaymentController;
 use App\Http\Controllers\api\GstController;
 use App\Http\Controllers\api\GstSalesReportController as ApiGstSalesReportController;
 use App\Http\Controllers\api\LoginController;
@@ -122,6 +123,14 @@ Route::middleware(['auth:web', 'auto.permission'])->group(function () {
     Route::get('/income-statement', [IncomeSheetController::class, 'index'])->name('income-statement.index');
     Route::get('/income-statement/pdf', [IncomeSheetController::class, 'generatePdf'])->name('income-statement.pdf');
     Route::get('/income-statement/excel', [IncomeSheetController::class, 'generateExcel'])->name('income-statement.excel');
+
+
+    Route::get('/sales-receipt-payment', [SalesReceiptPaymentController::class, 'index'])->name('sales.receipt.index');
+    Route::get('/sales-receipt-payment/customer/{customer}/orders', [SalesReceiptPaymentController::class, 'customerOrders'])->name('sales.receipt.orders');
+    Route::get('/sales-receipt-payment/vendor/{vendor}/invoices', [SalesReceiptPaymentController::class, 'vendorInvoices'])->name('sales.receipt.vendor-invoices');
+    Route::post('/sales-receipt-payment/store', [SalesReceiptPaymentController::class, 'store'])->name('sales.receipt.store');
+    Route::delete('/sales-receipt-payment/transaction/{payment}', [SalesReceiptPaymentController::class, 'deleteTransaction'])->name('sales.receipt.transaction.delete');
+
 
     // Category
     Route::get('/categories', [CategoryController::class, 'category_list'])->name('category.list');

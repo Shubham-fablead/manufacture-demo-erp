@@ -41,8 +41,6 @@ class StaffController extends Controller
             'phone',
             'profile_image',
             'role',
-            'gst_number',
-            'pan_number',
             'staff_type'
         )
             ->where('role', 'staff')
@@ -56,8 +54,6 @@ class StaffController extends Controller
                 $q->where('name', 'LIKE', "%{$search}%")
                     ->orWhere('email', 'LIKE', "%{$search}%")
                     ->orWhere('phone', 'LIKE', "%{$search}%")
-                    ->orWhere('gst_number', 'LIKE', "%{$search}%")
-                    ->orWhere('pan_number', 'LIKE', "%{$search}%")
                     ->orWhereHas('details', function ($d) use ($search) {
                         $d->where('country', 'LIKE', "%{$search}%")
                             ->orWhere('city', 'LIKE', "%{$search}%");
@@ -76,8 +72,6 @@ class StaffController extends Controller
                 'role'              => $customer->role,
                 'email'             => $customer->email,
                 'phone'             => $customer->phone,
-                'gst_number'        => $customer->gst_number,
-                'pan_number'        => $customer->pan_number,
                 'staff_type'        => $customer->staff_type,
                 'profile_image'     => $customer->profile_image,
                 'profile_image_url' => $customer->profile_image_url,
@@ -141,8 +135,6 @@ class StaffController extends Controller
                 return $query->where('branch_id', $userBranchId)->where('isDeleted', 0);
             }),
         ],
-        'gst_number'    => 'nullable|string|max:15',
-        'pan_number'    => 'nullable|string|max:15',
         'country'       => 'nullable|string|max:100',
         'password' => [
             'required',
@@ -189,8 +181,8 @@ class StaffController extends Controller
         $customer->name          = $request->customer_name;
         $customer->email         = $request->email;
         $customer->phone         = $request->phone;
-        $customer->gst_number    = $request->gst_number;
-        $customer->pan_number    = $request->pan_number;
+        $customer->gst_number    = null;
+        $customer->pan_number    = null;
         $customer->haspermission = $request->permission_type;
         $customer->staff_type    = $request->staff_type;
         $customer->password      = Hash::make($request->password);
@@ -372,8 +364,8 @@ class StaffController extends Controller
             $customer->name          = $request->staff_name;
             $customer->email         = $request->email;
             $customer->phone         = $request->phone;
-            $customer->gst_number    = $request->gst_number;
-            $customer->pan_number    = $request->pan_number;
+            $customer->gst_number    = null;
+            $customer->pan_number    = null;
             $customer->haspermission = $request->permission_type;
             $customer->staff_type    = $request->staff_type;
             $customer->role          = 'staff';
@@ -457,7 +449,6 @@ class StaffController extends Controller
             'name'          => $user->name,
             'email'         => $user->email,
             'phone'         => $user->phone,
-            'gst_number'    => $user->gst_number,
             'role'          => $user->role,
             'profile_image' => $user->profile_image,
             'address'       => $user->userDetail->address ?? 'N/A',

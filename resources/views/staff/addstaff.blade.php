@@ -15,24 +15,6 @@
             color: #fff;
         }
 
-        .gst-input-wrap {
-            position: relative;
-        }
-
-        .gst-loader {
-            position: absolute;
-            right: 12px;
-            top: 50%;
-            transform: translateY(-50%);
-            display: none;
-            color: #ff9f43;
-            pointer-events: none;
-        }
-
-        #gst_number.loading {
-            padding-right: 36px;
-        }
-
         .staff-submit-loader {
             position: fixed;
             inset: 0;
@@ -141,29 +123,6 @@
                                 <label>City</label>
                                 <input type="text" name="city" id="city" class="form-control">
                                 <div class="text-danger error-city"></div>
-                            </div>
-                        </div>
-
-                        <!-- PAN Number -->
-                        <div class="col-lg-3 col-sm-6 col-6">
-                            <div class="form-group">
-                                <label>PAN Number</label>
-                                <input type="text" name="pan_number" id="pan_number" class="form-control">
-                                <span class="text-danger error-pan_number"></span>
-                            </div>
-                        </div>
-
-                        <!-- GST Number -->
-                        <div class="col-lg-3 col-sm-6 col-6">
-                            <div class="form-group">
-                                <label>GST Number</label>
-                                <div class="gst-input-wrap">
-                                    <input type="text" name="gst_number" id="gst_number" class="form-control">
-                                    <span id="gst-loader" class="gst-loader">
-                                        <i class="fas fa-spinner fa-spin"></i>
-                                    </span>
-                                </div>
-                                <span class="text-danger error-gst_number"></span>
                             </div>
                         </div>
 
@@ -385,7 +344,6 @@
         });
         $(document).ready(function() {
             var authToken = localStorage.getItem("authToken");
-            let $gstLoader = $('#gst-loader');
 
             const $loader = $("#staffSubmitLoader");
 
@@ -545,73 +503,6 @@
                             });
                         }
                     },
-                });
-            });
-
-              $('#gst_number').on('input', function() {
-                let $gstInput = $(this);
-                let $errorDiv = $('.error-gst_number');
-
-                var normalizedGst = $(this).val().toUpperCase().replace(/[^0-9A-Z]/g, '').substring(0, 15);
-                $(this).val(normalizedGst);
-
-                var gst = normalizedGst.trim();
-                if (!/^[0-9A-Z]{15}$/.test(gst)) {
-                    $gstLoader.hide();
-                    $gstInput.removeClass('loading');
-                    return;
-                }
-
-                $.ajax({
-                    url: '/api/fetch-gst-details',
-                    method: 'POST',
-                    dataType: 'json',
-                    data: {
-                        gst_number: gst
-                    },
-                    headers: {
-                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
-                        "Authorization": "Bearer " + authToken,
-                    },
-                    beforeSend: function() {
-                        $gstLoader.show();
-                        $gstInput.addClass('loading');
-                        $gstInput.prop('readonly', true);
-                        $errorDiv.html(
-                            '<span style="color: #1B2850;"><i class="fas fa-spinner fa-spin"></i> Fetching details...</span>'
-                        );
-                    },
-                    success: function(res) {
-                        $errorDiv.html('');
-                        if (res.error) {
-                            $errorDiv.html(
-                                '<span class="text-danger">GST details not found.</span>');
-                            return;
-                        }
-
-                        // Populate fields based on API response
-                        $('#customer_name').val(res.legal_name || '');
-                        $('#address').val(res.primary_address || '');
-                        $('#city').val(res.city || '');
-                        // $('#state_code').val(res.state || '');
-                        $('#country').val(res.country || '');
-
-                        // Extract PAN from GST (chars 3 to 12)
-                        if (gst.length >= 12) {
-                            const pan = gst.substring(2, 12);
-                            $('#pan_number').val(pan);
-                        }
-                    },
-                    error: function(xhr, status, error) {
-                        $errorDiv.html(
-                            '<span class="text-danger">Failed to fetch GST details.</span>');
-                        console.error('GST fetch failed', xhr, status, error);
-                    },
-                    complete: function() {
-                        $gstLoader.hide();
-                        $gstInput.removeClass('loading');
-                        $gstInput.prop('readonly', false);
-                    }
                 });
             });
 
