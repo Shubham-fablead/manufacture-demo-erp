@@ -505,6 +505,154 @@
             background: #ececec;
         }
 
+        .mobile-toggle-btn-table {
+            background: #ff9f43;
+            border: none;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: #fff;
+            font-size: 18px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .mobile-toggle-btn-table.minus {
+            background: #dc3545;
+        }
+
+        .rowmaterial-details-content .action-buttons a {
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            max-width: none !important;
+            line-height: 1 !important;
+            white-space: nowrap !important;
+        }
+
+        .rowmaterial-detail-row-simple {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 8px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .rowmaterial-detail-row-simple:last-child {
+            border-bottom: 0;
+        }
+
+        .rowmaterial-detail-label-simple {
+            font-weight: 600;
+            color: #595b5d;
+            font-size: 14px;
+        }
+
+        .rowmaterial-detail-value-simple {
+            color: #1b2850;
+            font-size: 14px;
+            text-align: right;
+            word-break: break-word;
+        }
+
+        .rowmaterial-mobile-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+            padding-top: 12px;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .rowmaterial-details-row {
+            display: none;
+        }
+
+        .rowmaterial-details-row.show {
+            display: table-row;
+        }
+
+        @media (max-width: 1199px) {
+            table.datanew {
+                table-layout: fixed !important;
+                width: 100% !important;
+            }
+
+            table.datanew thead th:nth-child(n+3),
+            table.datanew tbody td:nth-child(n+3) {
+                display: none !important;
+                width: 0 !important;
+                min-width: 0 !important;
+                max-width: 0 !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                overflow: hidden !important;
+            }
+
+            table.datanew thead th.details-column,
+            table.datanew tbody td:nth-child(2) {
+                display: table-cell !important;
+                text-align: center;
+                vertical-align: middle !important;
+                width: 50px !important;
+                min-width: 50px !important;
+                max-width: 50px !important;
+            }
+
+            table.datanew tbody td:first-child {
+                max-width: calc(100vw - 100px) !important;
+            }
+
+            table.datanew tbody td:first-child > div {
+                display: flex !important;
+                align-items: center !important;
+                gap: 8px !important;
+                width: 100% !important;
+                min-width: 0 !important;
+            }
+
+            table.datanew tbody td:first-child a.product-img {
+                flex: 0 0 40px !important;
+                margin: 0 !important;
+            }
+
+            table.datanew tbody td:first-child a {
+                display: flex !important;
+                align-items: center !important;
+                text-align: left !important;
+                max-width: 100% !important;
+                word-wrap: normal !important;
+                word-break: normal !important;
+                overflow-wrap: normal !important;
+                white-space: normal !important;
+                line-height: 1.3 !important;
+            }
+
+            table.datanew tbody td:first-child a[style*="font-weight: 500"] {
+                display: inline-block !important;
+                max-width: calc(100% - 70px) !important;
+                margin-left: 8px !important;
+                font-size: 14px !important;
+                word-break: normal !important;
+                overflow-wrap: break-word !important;
+                white-space: normal !important;
+            }
+
+            table.datanew tbody tr.rowmaterial-details-row td {
+                display: table-cell !important;
+                padding: 12px 10px !important;
+                background: #f8f9fb !important;
+            }
+
+            .rowmaterial-mobile-actions {
+                justify-content: flex-start;
+            }
+        }
+
         #quantityHistoryModal .modal-content {
             max-height: 85vh;
         }
@@ -797,6 +945,10 @@
                                     return char.toUpperCase();
                                 });
                             }
+                            if (!window.rowMaterialDataMap) {
+                                window.rowMaterialDataMap = {};
+                            }
+
                             $.each(products, function(index, product) {
                                 let productName = capitalizeWords(product.name || product.row_materialname || 'N/A');
                                 let sku = product.SKU || 'N/A';
@@ -808,10 +960,11 @@
                                 let brandName = capitalizeWords(product.brand ? product.brand
                                     .name : "N/A");
 
-                                let createdAt = capitalizeWords(product.product_type ? product
-                                    .product_type
-                                    .name : "N/A");
-                                let detailsToggle = ``; // no longer used as separate column
+                                let detailsToggle = `
+                                    <button type="button" class="mobile-toggle-btn-table" onclick="toggleRowMaterialRowDetails('${product.id}')" data-row-material-id="${product.id}">
+                                        <span class="toggle-icon">+</span>
+                                    </button>
+                                `;
 
                                 let productImage =
                                     '{{ env('ImagePath') . 'admin/assets/img/product/noimage.png' }}';
@@ -848,65 +1001,26 @@
                                         ` <span class="badge bg-danger ms-1">Low Stock</span>`;
                                 }
 
+                                window.rowMaterialDataMap[product.id] = {
+                                    productName: productName,
+                                    sku: sku,
+                                    categoryName: categoryName,
+                                    unitName: unitName,
+                                    brandName: brandName,
+                                    formattedPrice: formattedPrice,
+                                    quantityDisplay: quantityDisplay
+                                };
+
                                 tableBody.push([
-                                    `<div style="display: flex; align-items: center; justify-content: space-between;">
-                                    <div style="display: flex; align-items: center;">
+                                    `<div style="display: flex; align-items: center;">
                                         <a href="/row-material-detail/${product.id}" class="product-img mb-1">
                                             <img src="${productImage}" alt="product" style="max-width: 60px;">
                                         </a>
                                         <a href="/row-material-detail/${product.id}" style="color: #1b2850; font-weight: 500; margin-left: 8px;">
                                             ${productName}
                                         </a>
-                                    </div>
-                                    <!-- Inline toggle button for mobile only -->
-                                    <a href="#details-${product.id}" class="toggle-details d-xl-none ms-2" data-bs-toggle="collapse" style="flex-shrink: 0;">
-                                        <i class="fas fa-plus-circle" style="color: #ff9f43;"></i>
-                                    </a>
-                                </div>
-
-                                  <!-- Collapsible Details (visible only on mobile) -->
-    <div class="collapse mt-2 d-xl-none" id="details-${product.id}">
-        <div class="card card-body p-2 bg-light border">
-            <p class="mb-1"><strong>SKU:</strong> ${sku}</p>
-            <p class="mb-1"><strong>Category:</strong> ${categoryName}</p>
-            <p class="mb-1"><strong>Unit:</strong> ${unitName}</p>
-            <p class="mb-1"><strong>Brand:</strong> ${brandName}</p>
-            <p class="mb-1"><strong>Price:</strong> ${formattedPrice}</p>
-            <p class="mb-1"><strong>Quantity:</strong> ${quantityDisplay}</p>
-            <div class="mt-2">
-                ${`<div class="action-buttons">
-                    @if (app('hasPermission')(17, 'view'))
-                                                                                         <a class=" btn btn-sm btn-primary" style="color:white; font-size: 13px;" href="/material-inventory-view/${product.id}">
-                                                                                            History
-                                                                                        </a>
-                                                                                        @endif
-                                                                                        @if (app('hasPermission')(1, 'view'))
-                                                                                        <a class=" icon-btn" href="/row-material-detail/${product.id}">
-                                                                                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                <path d="M12 9C11.206 9.00524 10.4459 9.32299 9.88447 9.88447C9.32299 10.4459 9.00524 11.206 9 12C9 13.642 10.358 15 12 15C13.641 15 15 13.642 15 12C15 10.359 13.641 9 12 9Z" fill="#092C4C"/>
-                                                <path d="M12 5C4.36704 5 2.07304 11.617 2.05204 11.684L1.94604 12L2.05105 12.316C2.07305 12.383 4.36704 19 12 19C19.633 19 21.927 12.383 21.948 12.316L22.054 12L21.949 11.684C21.927 11.617 19.633 5 12 5ZM12 17C6.64904 17 4.57604 13.154 4.07404 12C4.57804 10.842 6.65204 7 12 7C17.351 7 19.424 10.846 19.926 12C19.422 13.158 17.348 17 12 17Z" fill="#092C4C"/>
-                                                </svg>
-                                                                                        </a>
-                                                                                        @endif
-                                                                                        @if (app('hasPermission')(1, 'edit'))
-                                                                                        <a class=" icon-btn" href="/edit-row-material/${product.id}">
-                                                                                            <svg width="16" height="20" viewBox="0 0 16 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                <path d="M15.045 5.401C15.423 5.023 15.631 4.521 15.631 3.987C15.631 3.453 15.423 2.951 15.045 2.573L13.459 0.987001C13.081 0.609001 12.579 0.401001 12.045 0.401001C11.511 0.401001 11.009 0.609001 10.632 0.986001L0 11.585V16H4.413L15.045 5.401ZM12.045 2.401L13.632 3.986L12.042 5.57L10.456 3.985L12.045 2.401ZM2 14V12.415L9.04 5.397L10.626 6.983L3.587 14H2ZM0 18H16V20H0V18Z" fill="#092C4C"/>
-                                                </svg>
-                                                                                        </a>
-                                                                                        @endif
-                                                                                        @if (app('hasPermission')(1, 'delete'))
-                                                                                        <a class="confirm-text delete-product" data-id="${product.id}" href="javascript:void(0);">
-                                                                                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                                                    <path d="M5 20C5 20.5304 5.21071 21.0391 5.58579 21.4142C5.96086 21.7893 6.46957 22 7 22H17C17.5304 22 18.0391 21.7893 18.4142 21.4142C18.7893 21.0391 19 20.5304 19 20V8H21V6H17V4C17 3.46957 16.7893 2.96086 16.4142 2.58579C16.0391 2.21071 15.5304 2 15 2H9C8.46957 2 7.96086 2.21071 7.58579 2.58579C7.21071 2.96086 7 3.46957 7 4V6H3V8H5V20ZM9 4H15V6H9V4ZM8 8H17V20H7V8H8Z" fill="#092C4C"/>
-                                                                                    <path d="M9 10H11V18H9V10ZM13 10H15V18H13V10Z" fill="#092C4C"/>
-                                                                                </svg>
-                                                                                        </a>
-                                                                                        @endif </div>`}
-            </div>
-        </div>
-    </div>`,
-                                    detailsToggle, // empty string - toggle is now inline
+                                    </div>`,
+                                    detailsToggle,
                                     sku,
                                     categoryName,
                                     unitName,
@@ -947,6 +1061,7 @@
                                                 `
                                 ]);
                             });
+                            $('tr.rowmaterial-details-row').remove();
                             table.clear().rows.add(tableBody).draw();
 
                             // Sync top scrollbar
@@ -1300,17 +1415,69 @@
         });
 
 
-        $(document).on('click', '.toggle-details', function() {
-            let icon = $(this).find('i');
-            if (icon.hasClass('fa-plus-circle')) {
-                icon.removeClass('fa-plus-circle')
-                    .addClass('fa-minus-circle')
-                    .css('color', 'red'); // or any color you want for minus icon
-            } else {
-                icon.removeClass('fa-minus-circle')
-                    .addClass('fa-plus-circle')
-                    .css('color', '#ff9f43'); // your desired orange color
+        function buildRowMaterialExpandableRowContent(product, actionButtons) {
+            return `
+                <td colspan="9" class="rowmaterial-details-content">
+                    <div class="rowmaterial-detail-row-simple">
+                        <span class="rowmaterial-detail-label-simple">SKU:</span>
+                        <span class="rowmaterial-detail-value-simple">${product.sku}</span>
+                    </div>
+                    <div class="rowmaterial-detail-row-simple">
+                        <span class="rowmaterial-detail-label-simple">Category:</span>
+                        <span class="rowmaterial-detail-value-simple">${product.categoryName}</span>
+                    </div>
+                    <div class="rowmaterial-detail-row-simple">
+                        <span class="rowmaterial-detail-label-simple">Unit:</span>
+                        <span class="rowmaterial-detail-value-simple">${product.unitName}</span>
+                    </div>
+                    <div class="rowmaterial-detail-row-simple">
+                        <span class="rowmaterial-detail-label-simple">Brand:</span>
+                        <span class="rowmaterial-detail-value-simple">${product.brandName}</span>
+                    </div>
+                    <div class="rowmaterial-detail-row-simple">
+                        <span class="rowmaterial-detail-label-simple">Price:</span>
+                        <span class="rowmaterial-detail-value-simple" style="font-weight: bold; color: #ff9f43;">${product.formattedPrice}</span>
+                    </div>
+                    <div class="rowmaterial-detail-row-simple">
+                        <span class="rowmaterial-detail-label-simple">Quantity:</span>
+                        <span class="rowmaterial-detail-value-simple">${product.quantityDisplay}</span>
+                    </div>
+                    <div class="rowmaterial-mobile-actions">
+                        ${actionButtons || ''}
+                    </div>
+                </td>
+            `;
+        }
+
+        window.toggleRowMaterialRowDetails = function(productId) {
+            const btn = $(`.mobile-toggle-btn-table[data-row-material-id="${productId}"]`);
+            if (btn.length === 0) return;
+
+            const row = btn.closest('tr');
+            let detailsRow = row.next(`tr.rowmaterial-details-row[data-row-material-id="${productId}"]`);
+            const icon = btn.find('.toggle-icon');
+
+            if (detailsRow.length === 0) {
+                const productData = window.rowMaterialDataMap && window.rowMaterialDataMap[productId];
+                if (!productData) return;
+
+                const actionButtons = row.find('td:last').html();
+                detailsRow = $('<tr>')
+                    .addClass('rowmaterial-details-row')
+                    .attr('data-row-material-id', productId)
+                    .html(buildRowMaterialExpandableRowContent(productData, actionButtons));
+                row.after(detailsRow);
             }
-        });
+
+            if (detailsRow.hasClass('show')) {
+                detailsRow.removeClass('show');
+                btn.removeClass('minus');
+                icon.text('+');
+            } else {
+                detailsRow.addClass('show');
+                btn.addClass('minus');
+                icon.text('−');
+            }
+        };
     </script>
 @endpush

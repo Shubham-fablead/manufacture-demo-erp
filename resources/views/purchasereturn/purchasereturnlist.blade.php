@@ -390,9 +390,7 @@
                 <div class="table-responsive">
                     <table class="table datanew">
                         <thead>
-                            <th>#</th>
-                            <th>Return No</th>
-                            <th>Invoice Number</th>
+                            <th>Bill No</th>
                             <th>Date</th>
                             <th>vendor</th>
                             <th>Products</th>
@@ -519,7 +517,7 @@
 
             function renderEmpty(message) {
                 table.clear().draw();
-                $(".datanew tbody").html(`<tr><td colspan="12" class="text-center">${message}</td></tr>`);
+                $(".datanew tbody").html(`<tr><td colspan="10" class="text-center">${message}</td></tr>`);
                 $('#mobile-return-container').html(`<div class="text-center p-4">${message}</div>`);
                 $('.pagination-controls').hide();
             }
@@ -649,7 +647,7 @@
                 // Header row
                 const headerHtml = `
                     <div class="mobile-order-header-row">
-                        <div class="mobile-order-header-cell">Return No</div>
+                        <div class="mobile-order-header-cell">Bill No</div>
                         <div class="mobile-order-header-cell">Details</div>
                     </div>
                 `;
@@ -666,10 +664,10 @@
                     const cardHtml = `
                         <div class="mobile-order-item" data-return-id="${item.id}">
 
-                            <!-- Always visible: Return No + toggle button -->
+                            <!-- Always visible: Bill No + toggle button -->
                             <div class="mobile-order-row">
                                 <div class="mobile-order-cell mobile-order-number">
-                                    ${escapeHtml(item.return_number) || '-'}
+                                    ${escapeHtml(item.purchase_order_number) || '-'}
                                 </div>
                                 <div class="mobile-order-cell mobile-order-details-cell">
                                     <button class="mobile-toggle-btn"
@@ -684,7 +682,7 @@
                             <div class="mobile-order-details" id="mobile-return-details-${item.id}">
 
                                 <div class="mobile-detail-row">
-                                    <span class="mobile-detail-label">Invoice Number:</span>
+                                    <span class="mobile-detail-label">Bill No:</span>
                                     <span class="mobile-detail-value">${purchaseLink}</span>
                                 </div>
                                 <div class="mobile-detail-row">
@@ -783,11 +781,7 @@
                         const rows = allReturnData.map((item, index) => {
                             const discount = Number(item.discount || 0).toFixed(2);
                             const discountAmount = formatCurrency(item.discount_amount);
-                            const serialNumber = ((currentPage - 1) * perPage) + (index + 1);
-
                             return [
-                                serialNumber,
-                                item.return_number || "-",
                                 item.purchase_order_number ?
                                 `<a href="/print-purchase/${item.purchase_id}" class="order-link">${item.purchase_order_number}</a>` :
                                 "-",

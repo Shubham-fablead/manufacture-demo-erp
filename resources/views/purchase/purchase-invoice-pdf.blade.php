@@ -187,7 +187,7 @@
         <div class="text-center mb-1">
             <div style="margin-bottom: 10px; width: 100%; text-align: center;">
                 <div style="display: inline-block; width: 49%; text-align: left;">
-                    <strong>INVOICE NO : {{ $invoice->invoice_number ?? '-' }}</strong>
+                    <strong>BILL NO : {{ $invoice->bill_no ?? '-' }}</strong>
                 </div>
                 <div style="display: inline-block; width: 49%; text-align: right;">
                     <strong>GST NO : {{ $setting->gst_num ?? ' -- ' }}</strong>
@@ -279,12 +279,12 @@
 
                 <td
                     style="width:34%; border: 0px solid #dee2e6; padding: 8px 12px; vertical-align: top; background-color: #eaedf0;">
-                    <strong style="text-transform: uppercase; display: block; margin-bottom: 1rem;">Invoice
+                    <strong style="text-transform: uppercase; display: block; margin-bottom: 1rem;">Purchase
                         Details:</strong>
                     <table style="width:100%; border-collapse: collapse; font-size: 10px; color: inherit;">
                         <tr>
-                            <td style="padding: 0 0 8px 0;">Invoice No :</td>
-                            <td style="text-align: right; padding: 0 0 8px 0;">{{ $invoice->invoice_number ?? '-' }}</td>
+                            <td style="padding: 0 0 8px 0;">Bill No :</td>
+                            <td style="text-align: right; padding: 0 0 8px 0;">{{ $invoice->bill_no ?? '-' }}</td>
                         </tr>
                         <tr>
                             <td style="padding: 0 0 8px 0;">Purchase Date :</td>

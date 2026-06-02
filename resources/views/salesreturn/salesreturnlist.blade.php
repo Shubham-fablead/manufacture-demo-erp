@@ -433,9 +433,7 @@
                     <table class="table datanew">
                         <thead>
                             <tr>
-                                <th>#</th>
-                                <th>Return No</th>
-                                <th>Order Number</th>
+                            <th>Order Number</th>
                                 <th>Date</th>
                                 <th>Customer</th>
                                 <th>Product</th>
@@ -563,7 +561,7 @@
 
             function renderEmpty(message) {
                 table.clear().draw();
-                $(".datanew tbody").html(`<tr><td colspan="12" class="text-center">${message}</td></tr>`);
+                $(".datanew tbody").html(`<tr><td colspan="10" class="text-center">${message}</td></tr>`);
                 $('#mobile-return-container').html(`<div class="text-center p-4">${message}</div>`);
                 $('.pagination-controls').hide();
             }
@@ -665,14 +663,12 @@
                 // Header row — matches Sales List mobile header pattern
                 const headerHtml = `
                     <div class="mobile-order-header-row">
-                        <div class="mobile-order-header-cell">Return No</div>
                         <div class="mobile-order-header-cell">Details</div>
                     </div>
                 `;
                 container.append(headerHtml);
 
                 data.forEach((item, index) => {
-                    const serialNumber = ((currentPage - 1) * perPage) + (index + 1);
                     const discount = Number(item.discount || 0).toFixed(2);
                     const discountAmount = formatCurrency(item.discount_amount);
                     const orderLink = item.order_number ?
@@ -682,11 +678,8 @@
                     const cardHtml = `
                         <div class="mobile-order-item" data-return-id="${item.id}">
 
-                            <!-- Always visible: Return No + toggle button -->
+                            <!-- Always visible: toggle button -->
                             <div class="mobile-order-row">
-                                <div class="mobile-order-cell mobile-order-number" style="color:black;>
-                               <a href="/sales-details/${item.order_id}"> ${escapeHtml(item.return_number) || '-'}
-                               </a> </div>
                                 <div class="mobile-order-cell mobile-order-details-cell">
                                     <button class="mobile-toggle-btn"
                                         onclick="toggleMobileReturnDetails('${item.id}')"
@@ -799,11 +792,8 @@
                         const rows = allReturnData.map((item, index) => {
                             const discount = Number(item.discount || 0).toFixed(2);
                             const discountAmount = formatCurrency(item.discount_amount);
-                            const serialNumber = ((currentPage - 1) * perPage) + (index + 1);
 
                             return [
-                                serialNumber,
-                                item.return_number || "-",
                                 item.order_number ?
                                 `<a href="/sales-details/${item.order_id}" class="order-link">${item.order_number}</a>` :
                                 "-",

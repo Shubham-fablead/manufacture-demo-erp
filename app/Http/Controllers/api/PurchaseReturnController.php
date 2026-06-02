@@ -378,10 +378,11 @@ class PurchaseReturnController extends Controller
             $branchIdToUse = $userId;
         }
 
-        // JOIN query to get invoice_number and vendor name directly
+        // JOIN query to get bill/invoice number and vendor name directly
         $query = PurchaseReturn::select(
             'purchase_returns.*',
             'purchase_invoice.invoice_number',
+            'purchase_invoice.bill_no',
             'vendors.name as supplier_name'
         )
             ->leftJoin(
@@ -414,6 +415,7 @@ class PurchaseReturnController extends Controller
         if (!empty($search)) {
             $query->where(function ($q) use ($search) {
                 $q->where('purchase_returns.return_no', 'LIKE', "%{$search}%")
+                    ->orWhere('purchase_invoice.bill_no', 'LIKE', "%{$search}%")
                     ->orWhere('purchase_invoice.invoice_number', 'LIKE', "%{$search}%")
                     ->orWhere('vendors.name', 'LIKE', "%{$search}%");
             });
@@ -464,9 +466,8 @@ class PurchaseReturnController extends Controller
 
             return [
                 'id'                    => $purchaseReturn->id,
-                'return_number'         => $purchaseReturn->return_no         ?? '-',
                 'purchase_id'           => $purchaseReturn->purchase_id,
-                'purchase_order_number' => $purchaseReturn->invoice_number    ?? '-',  // ✅ from JOIN
+                'purchase_order_number' => $purchaseReturn->bill_no ?: ($purchaseReturn->invoice_number ?? '-'),
                 'supplier' => $purchaseReturn->supplier_name ?? '-',
                 'date'                  => optional($purchaseReturn->created_at)->format('d M Y, h:i A'),
                 'items_count'           => (int)   $purchaseReturn->items->count(),

@@ -256,8 +256,8 @@
                                     alt="logo" class="logo_img">
                             </div>
                             <div class="col-6 text-end">
-                                <h1 style="margin:0;">Invoice</h1>
-                                <h4 class="mt-2">#{{ $invoice->invoice_number }}</h4>
+                                <h1 style="margin:0;">Bill</h1>
+                                <h4 class="mt-2">#{{ $invoice->bill_no ?? $invoice->invoice_number }}</h4>
                             </div>
                         </div>
 
@@ -304,8 +304,8 @@
                                         Info</div>
                                     <table style="width:100%; font-size: 14px;">
                                         <tr>
-                                            <td>Invoice Number</td>
-                                            <td style="text-align:right;">{{ $invoice->invoice_number }}</td>
+                                            <td>Bill No</td>
+                                            <td style="text-align:right;">{{ $invoice->bill_no ?? $invoice->invoice_number }}</td>
                                         </tr>
                                         <tr>
                                             <td>Purchase Date</td>
