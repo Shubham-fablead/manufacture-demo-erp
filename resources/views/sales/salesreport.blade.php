@@ -17,6 +17,57 @@
             display: none !important;
         }
 
+        /* Custom Pagination Styling */
+        .pagination .page-item .page-link {
+            background-color: #5d6d7e;
+            /* Dark gray for other pages */
+            color: #fff;
+            border: none;
+            margin: 0 3px;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-weight: bold;
+        }
+
+        /* Previous and Next buttons */
+        .pagination .page-item:first-child .page-link,
+        .pagination .page-item:last-child .page-link {
+            background-color: #fff;
+            color: #6c757d;
+            border: 1px solid #dee2e6;
+        }
+
+        .pagination .page-item:first-child .page-link:hover,
+        .pagination .page-item:last-child .page-link:hover {
+            background-color: #f8f9fa;
+            color: #495057;
+            border-color: #dee2e6;
+        }
+
+        .pagination .page-item.active .page-link {
+            background-color: #ff9f43 !important;
+            /* Orange for active page */
+            color: #fff;
+            border: none;
+        }
+
+        .pagination .page-item .page-link:hover {
+            background-color: #4a5766;
+            color: #fff;
+        }
+
+        .pagination .page-item.active .page-link:hover {
+            background-color: #e68a35 !important;
+        }
+
+        .pagination .page-item.disabled .page-link {
+            background-color: #fff !important;
+            color: #dee2e6 !important;
+            border: 1px solid #dee2e6 !important;
+            cursor: not-allowed !important;
+            pointer-events: none !important;
+        }
+
         tbody tr td:nth-child(2) {
             display: flex;
             align-items: center;
@@ -113,11 +164,11 @@
             display: table-row;
         }
 
-        .order-details-content {
+        /* .order-details-content {
             padding: 15px;
             background: #f8f9fa;
             border-top: 2px solid #ff9f43;
-        }
+        } */
 
         .order-details-content .detail-item {
             display: flex;
@@ -936,16 +987,64 @@
 
             // ✅ BUILD PAGINATION BUTTONS
             let paginationHtml = "";
+            let isMobile = $(window).width() < 576;
 
-// Only page numbers
-for (let i = 1; i <= lastPage; i++) {
-    paginationHtml += `
-        <li class="page-item ${i == currentPage ? 'active' : ''}">
-            <a class="page-link" href="#" data-page="${i}">${i}</a>
-        </li>`;
-}
+            // Previous Button
+            paginationHtml += `
+                <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+                    <a class="page-link" href="javascript:void(0);" data-page="${currentPage - 1}">Previous</a>
+                </li>
+            `;
 
-$('#pagination-numbers').html(paginationHtml);
+            if (lastPage <= (isMobile ? 3 : 5)) {
+                for (let i = 1; i <= lastPage; i++) {
+                    paginationHtml += `
+                        <li class="page-item ${i === currentPage ? 'active' : ''}">
+                            <a class="page-link" href="#" data-page="${i}">${i}</a>
+                        </li>
+                    `;
+                }
+            } else {
+                // First Page
+                paginationHtml += `
+                    <li class="page-item ${currentPage === 1 ? 'active' : ''}">
+                        <a class="page-link" href="#" data-page="1">1</a>
+                    </li>
+                `;
+
+                if (currentPage > 2) {
+                    paginationHtml += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
+                }
+
+                // Current Page (if not first or last)
+                if (currentPage !== 1 && currentPage !== lastPage) {
+                    paginationHtml += `
+                        <li class="page-item active">
+                            <a class="page-link" href="#" data-page="${currentPage}">${currentPage}</a>
+                        </li>
+                    `;
+                }
+
+                if (currentPage < lastPage - 1) {
+                    paginationHtml += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
+                }
+
+                // Last Page
+                paginationHtml += `
+                    <li class="page-item ${currentPage === lastPage ? 'active' : ''}">
+                        <a class="page-link" href="#" data-page="${lastPage}">${lastPage}</a>
+                    </li>
+                `;
+            }
+
+            // Next Button
+            paginationHtml += `
+                <li class="page-item ${currentPage === lastPage || lastPage === 0 ? 'disabled' : ''}">
+                    <a class="page-link" href="javascript:void(0);" data-page="${currentPage + 1}">Next</a>
+                </li>
+            `;
+
+            $('#pagination-numbers').html(paginationHtml);
 
             // Clear previous data map
             window.salesReportDataMap = {};

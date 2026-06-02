@@ -119,7 +119,7 @@
                 @endif
 
                 {{-- Sales and Orders --}}
-                @if (app('hasPermission')(2, 'view') || app('hasPermission')(2, 'add'))
+                {{-- @if (app('hasPermission')(2, 'view') || app('hasPermission')(2, 'add'))
                     <li class="submenu">
                         <a href="javascript:void(0);"><img
                                 src="{{ env('ImagePath') . '/admin/assets/img/icons/sales1.svg' }}"
@@ -130,6 +130,22 @@
                             @endif
                             @if (app('hasPermission')(2, 'add'))
                                 <li><a href="{{ route('sales.add') }}">New Order</a></li>
+                            @endif
+                        </ul>
+                    </li>
+                @endif --}}
+                   {{-- Sales and Orders --}}
+                @if (app('hasPermission')(2, 'view') || app('hasPermission')(2, 'add'))
+                    <li class="submenu">
+                        <a href="javascript:void(0);"><img
+                                src="{{ env('ImagePath') . '/admin/assets/img/icons/sales1.svg' }}"
+                                alt="img"><span> Sales & Bills</span> <span class="menu-arrow"></span></a>
+                        <ul>
+                            @if (app('hasPermission')(2, 'view'))
+                                <li><a href="{{ route('sales.list') }}">All Sales & Bills</a></li>
+                            @endif
+                            @if (app('hasPermission')(2, 'add'))
+                                <li><a href="{{ route('sales.add', ['new_bill' => 1]) }}">New Bill</a></li>
                             @endif
                         </ul>
                     </li>

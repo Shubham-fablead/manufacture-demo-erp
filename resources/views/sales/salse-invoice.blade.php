@@ -9,14 +9,6 @@
             height: auto;
         }
 
-        /* .invoice-box table {
-                                                                                    width: 100%;
-                                                                                    border-collapse: collapse;
-                                                                                } */
-
-        .invoice-box table td {
-            white-space: nowrap;
-        }
 
         /* Product Name Column - Allow Wrapping */
         .invoice-box table tbody tr.details td:first-child,
@@ -127,11 +119,11 @@
 
             <div class="page-btn d-flex gap-2">
                 <!-- ✅ Add Sale -->
-                @if (app('hasPermission')(2, 'add'))
+                {{-- @if (app('hasPermission')(2, 'add'))
                 <a href="{{ route('sales.add') }}" class="btn btn-added">
                     <i class="fa fa-plus me-1"></i> Add Sale
                 </a>
-                @endif
+                @endif --}}
 
                 @if (app('hasPermission')(2, 'edit') && !$hasReturnStarted)
                     <a href="{{ route('sales.edit', $view_id) }}" class="btn btn-primary">
@@ -253,16 +245,11 @@
                                     }
                                 }
 
-                                // $labourSubTotal = 0;
+                                $labourSubTotal = 0;
 
-                                // foreach ($labour_items as $labouritem) {
-                                //     $price = (float) $labouritem->price;
-                                //     $qty = (float) $labouritem->qty;
-
-                                //     $total = $price * $qty;
-
-                                //     $labourSubTotal += $total;
-                                // }
+                                foreach (($labour_items ?? []) as $labouritem) {
+                                    $labourSubTotal += (float) ($labouritem->price ?? 0) * (float) ($labouritem->qty ?? 0);
+                                }
 
                             @endphp
 
@@ -282,26 +269,11 @@
                                         @endphp
 
                                         <li>
-                                            <h4>Subtotal</h4>
+                                            <h4>Total (Product)</h4>
                                             <h5>{{ formatCurrency($subtotal, $setting->currency_symbol ?? '₹', $setting->currency_position ?? 'left') }}
                                             </h5>
                                         </li>
-
-                                        <li>
-                                            <h4>Discount Amount</h4>
-                                            <h5>
-                                                {{ formatCurrency($totalDiscountAmount, $setting->currency_symbol ?? '₹', $setting->currency_position ?? 'left') }}
-                                            </h5>
-                                        </li>
-
-                                        <li>
-                                            <h4>Price After Discount</h4>
-                                            <h5>
-                                                {{ formatCurrency($grandTotal, $setting->currency_symbol ?? '₹', $setting->currency_position ?? 'left') }}
-                                            </h5>
-                                        </li>
-
-                                        @foreach ($taxDetails as $tax)
+                                          @foreach ($taxDetails as $tax)
                                             <li>
                                                 <h4>{{ $tax['name'] }} Tax</h4>
                                                 <h5>{{ $tax['rate'] }}%
@@ -309,14 +281,30 @@
                                                 </h5>
                                             </li>
                                         @endforeach
-                                        <li>
+                                        <li id="totalGstSummaryRow" @if ($totalTaxAmount <= 0) style="display:none;" @endif>
                                             <h4>Total GST Amount</h4>
                                             <h5>{{ formatCurrency($totalTaxAmount, $setting->currency_symbol ?? '₹', $setting->currency_position ?? 'left') }}
                                             </h5>
                                         </li>
 
-                                        @if (isset($sales))
-                                            <li>
+                                        <li id="discountAmountSummaryRow" @if ($totalDiscountAmount <= 0) style="display:none;" @endif>
+                                            <h4>Discount Amount</h4>
+                                            <h5>
+                                                {{ formatCurrency($totalDiscountAmount, $setting->currency_symbol ?? '₹', $setting->currency_position ?? 'left') }}
+                                            </h5>
+                                        </li>
+
+                                        <li id="priceAfterDiscountSummaryRow" @if ($totalDiscountAmount <= 0) style="display:none;" @endif>
+                                            <h4>SubTotal</h4>
+                                            <h5>
+                                                {{ formatCurrency($grandTotal, $setting->currency_symbol ?? '₹', $setting->currency_position ?? 'left') }}
+                                            </h5>
+                                        </li>
+
+
+
+                                        @if (isset($sales) && (float) ($sales->shipping ?? 0) > 0)
+                                            <li id="shippingChargeRow">
                                                 <h4>Shipping Charge</h4>
                                                 <h5>
                                                     {{ formatCurrency($sales->shipping ?? 0, $setting->currency_symbol ?? '₹', $setting->currency_position ?? 'left') }}
@@ -324,13 +312,15 @@
                                             </li>
                                         @endif
 
-                                        <li class="laborcharge">
+                                        <li class="laborcharge" @if ($labourSubTotal <= 0) style="display:none;" @endif>
                                             <h4>Labour Charge</h4>
-                                            <h5 id="labourChargeText">₹0.00</h5>
+                                            <h5 id="labourChargeText">
+                                                {{ formatCurrency($labourSubTotal, $setting->currency_symbol ?? '₹', $setting->currency_position ?? 'left') }}
+                                            </h5>
                                         </li>
 
                                         <li class="total">
-                                            <h4>Total</h4>
+                                            <h4>Grand Total</h4>
                                             <h5>{{ formatCurrency($finalTotal, $setting->currency_symbol ?? '₹', $setting->currency_position ?? 'left') }}
                                             </h5>
                                         </li>
@@ -462,6 +452,7 @@
                                 response.currency_position
                             )
                         );
+                        $(".laborcharge").toggle(labourSubTotal > 0);
 
                         let grandTotal =
                             parseFloat(response.sales.total_amount || 0);
@@ -546,8 +537,8 @@
                         }
                         // console.log(response.company_info);
 
-                        const sale = response.sales;
-                        const company_info = response.company_info;
+                        const sale = response.sales || {};
+                        const company_info = response.company_info || {};
 
                         let totalReturnAmount = 0;
                         if (response.returns) {
@@ -561,8 +552,8 @@
                         $(".customer-name").text(sale.user_name || "walk-in-customer");
                         $(".customer-phone").text(sale.user_phone || "N/A");
                         $(".invoice-id").text(sale.order_number);
-                        $(".payment-status").text(sale.payment_status.charAt(0).toUpperCase() + sale
-                            .payment_status.slice(1));
+                        const paymentStatus = (sale.payment_status || 'pending').toString();
+                        $(".payment-status").text(paymentStatus.charAt(0).toUpperCase() + paymentStatus.slice(1));
                         $(".order-status").text("Completed"); // or dynamically from status if available
 
                         const paidAmount = formatCurrency(
@@ -602,9 +593,12 @@
                         // console.log('dsvfdg',quotationItems);
 
                         let hasGst = items.some(item => {
-                            return Array.isArray(item.product_tax) && item.product_tax.length >
-                                0;
+                            return parseFloat(item.product_gst_total || 0) > 0 ||
+                                (Array.isArray(item.product_tax) && item.product_tax.length > 0);
                         });
+                        let hasDiscount = items.some(item => parseFloat(item.discount_amount || 0) > 0);
+                        $("#discountAmountSummaryRow, #priceAfterDiscountSummaryRow").toggle(hasDiscount);
+                        $("#totalGstSummaryRow").toggle(hasGst);
 
 
 
@@ -612,6 +606,10 @@
                             `<td class="tax-col" style="padding:10px; text-align:center; white-space:normal; vertical-align:middle; font-weight:600; color:#5E5873; font-size:14px;">
                                 Product Taxes
                             </td>` : '';
+                        const discountHeaderColumn = hasDiscount ?
+                            `<td style="padding: 5px;vertical-align: middle;font-weight: 600;color: #5E5873;font-size: 14px;padding: 10px; ">
+                                                        Discount Amount
+                                                    </td>` : '';
                         let productRows = `
                                                 <tr class="top col-12">
                                                     <td colspan="12" style="padding: 10px;vertical-align: top;">
@@ -619,7 +617,7 @@
                                                         <div class="row">
                                                                 <div class="col-6">
                                                                     <img
-                                                                    src="{{ $setting->logo ? env('ImagePath') . 'storage/' . $setting->logo : env('ImagePath') . '/admin/assets/img/logso.png' }}"
+                                                                    src="{{ $setting->logo ? env('ImagePath') . 'storage/' . $setting->logo : env('ImagePath') . '/admin/assets/img/logo-image.jpg' }}"
                                                                     alt="logo"
                                                                     class="logo_img">
                                                                 </div>
@@ -750,7 +748,7 @@
                                                                                                                                             Order Number
                                                                                                                                         </td>
                                                                                                                                         <td style="padding: 2px 0; font-size: 14px; font-weight: 400; text-align: right; border: none;" class="invoice-id">
-                                                                                                                                            #${sale.order_number}
+                                                                                                                                            ${sale.order_number}
                                                                                                                                         </td>
                                                                                                                                     </tr>
                                                                                                                                     <tr>
@@ -761,22 +759,7 @@
                                                                                                                                             ${sale.created_at}
                                                                                                                                         </td>
                                                                                                                                     </tr>
-                                                                                                                                    <tr>
-                                                                                                                                        <td style="padding: 2px 0; font-size: 14px; font-weight: 400; border: none;">
-                                                                                                                                            Payment Status
-                                                                                                                                        </td>
-                                                                                                                                        <td style="padding: 2px 0; font-size: 14px; font-weight: 400; text-align: right; border: none; color:#2E7D32;" class="payment-status">
-                                                                                                                                            ${sale.payment_status.charAt(0).toUpperCase() + sale.payment_status.slice(1)}
-                                                                                                                                        </td>
-                                                                                                                                    </tr>
-                                                                                                                                    <tr>
-                                                                                                                                        <td style="padding: 2px 0; font-size: 14px; font-weight: 400; border: none;">
-                                                                                                                                            Payment Method
-                                                                                                                                        </td>
-                                                                                                                                        <td style="padding: 2px 0; font-size: 14px; font-weight: 400; text-align: right; border: none; text-transform: capitalize; color:#2E7D32;" class="order-method">
-                                                                                                                                            ${sale.payment_method}
-                                                                                                                                        </td>
-                                                                                                                                    </tr>
+
                                                                                                                                     ${isFullyReturned ? `
                                                                     <tr>
                                                                         <td style="padding: 2px 0; font-size: 14px; color: red;">
@@ -809,9 +792,7 @@
                                                     <td style="padding: 5px;vertical-align: middle;font-weight: 600;color: #5E5873;font-size: 14px;padding: 10px; ">
                                                         Price
                                                     </td>
-                                                    <td style="padding: 5px;vertical-align: middle;font-weight: 600;color: #5E5873;font-size: 14px;padding: 10px; ">
-                                                        Discount Amount
-                                                    </td>
+                                                    ${discountHeaderColumn}
                                                     ${taxHeaderColumns}
                                                     <td style="padding: 5px;vertical-align: middle;font-weight: 600;color: #5E5873;font-size: 14px;padding: 10px; text-align: right; ">
                                                         Total (Excl. GST)
@@ -819,7 +800,7 @@
                                                 </tr>`;
 
                         items.forEach((item) => {
-                            const product = item.product;
+                            const product = item.product || {};
                             const taxAmount =
                                 0; // You can calculate tax if required from tax_ids
                             const discount = sale.discount || 0;
@@ -867,18 +848,18 @@
                                 '{{ env('ImagePath ') }}'; // inject from .env
 
                             try {
-                                const images = JSON.parse(product.images);
+                                const images = JSON.parse(product.images || '[]');
                                 // console.log(images);
 
                                 if (images && images.length > 0 && images[0]) {
-                                    imagePath = `${imageBasePath}/public/storage/${images[0]}`;
+                                    imagePath = `${imageBasePath}/storage/${images[0]}`;
                                 } else {
                                     imagePath =
-                                        `${imageBasePath}/public/admin/assets/img/product/noimage.png`;
+                                        `${imageBasePath}/admin/assets/img/product/noimage.png`;
                                 }
                             } catch (e) {
                                 imagePath =
-                                    `${imageBasePath}/public/admin/assets/img/product/noimage.png`;
+                                    `${imageBasePath}/admin/assets/img/product/noimage.png`;
                             }
                             const unitPrice = formatCurrency(item.price, company_info
                                 .currency_symbol, company_info.currency_position);
@@ -898,18 +879,8 @@
                                 `<td class="tax-col" style="padding:10px; white-space:normal; text-align:center; word-wrap:break-word;">
                                     ${taxesHtml && taxesHtml.trim() !== '' ? taxesHtml : 'N/A'}
                                 </td>` : '';
-                            productRows += `
-                                                <tr class="product-row">
-                                               <td class="text-capitalize" style="padding: 10px; align:left; vertical-align: top;">
-                                                <a href="/product-view/${product.id}" class="d-flex align-items-center text-decoration-none text-dark">
-                                                    <img src="${imagePath}" alt="img" class="me-2" style="width:40px; height:40px;">
-                                                    ${product.name}
-                                                </a>
-                                                </td>
-                                                <td class="text-capitalize" style="padding: 10px;vertical-align: top;">  ${item.product?.unit?.unit_name ?? 'N/A'}</td>
-                                                <td style="padding: 10px;vertical-align: top;">${item.quantity}</td>
-                                                    <td style="padding: 10px;vertical-align: top;">${unitPrice}</td>
-                                               <td style="padding:10px; vertical-align:top;">
+                            const discountBodyColumn = hasDiscount ?
+                                `<td style="padding:10px; vertical-align:top;">
                                                         ${formatCurrency(
                                                             discountAmount,
                                                             company_info.currency_symbol,
@@ -919,7 +890,19 @@
                                                             ? `<small>(${discountPercentageValue.toFixed(2)}%)</small>`
                                                             : ''
                                                         }
+                                                </td>` : '';
+                            productRows += `
+                                                <tr class="product-row">
+                                               <td class="text-capitalize" style="padding: 10px; align:left; vertical-align: top;">
+                                                <a href="/product-view/${product.id}" class="d-flex align-items-center text-decoration-none text-dark">
+                                                    <img src="${imagePath}" alt="img" class="me-2" style="width:40px; height:40px;">
+                                                    ${product.name || 'N/A'}
+                                                </a>
                                                 </td>
+                                                <td class="text-capitalize" style="padding: 10px;vertical-align: top;">  ${item.product?.unit?.unit_name ?? 'N/A'}</td>
+                                                <td style="padding: 10px;vertical-align: top;">${item.quantity}</td>
+                                                    <td style="padding: 10px;vertical-align: top;">${unitPrice}</td>
+                                               ${discountBodyColumn}
 
                                                     ${taxBodyColumns}
                                                     <td style="padding: 10px;vertical-align: top; text-align: right;">${totalAmount}</td>

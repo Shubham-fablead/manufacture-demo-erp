@@ -235,7 +235,7 @@
             font-size: 12px;
             font-weight: 600;
             line-height: 1;
-            height: 28px;
+            height: 30px;
         }
 
         .pos-back-btn:hover {
@@ -299,6 +299,10 @@
             margin: 0;
             font-weight: 500;
         }
+        .card .card-body {
+    padding: 20px;
+    padding-bottom: 280px !important;
+}
 
         @media screen and (max-width: 992px) {
             .pos-top-controls {
@@ -306,15 +310,205 @@
             }
         }
 
-        @media screen and (max-width: 768px) {
-            .payment_panel {
-                position: fixed;
-                bottom: 50px;
-                background-color: white;
-                width: 90%;
-                margin-left: -6px;
+        @media screen and (min-width: 768px) and (max-width: 992px) {
+            .tabs_container .row {
+                --bs-gutter-x: 12px;
+                --bs-gutter-y: 12px;
             }
 
+            .tabs_container .row > .col-lg-3.d-flex.position-relative {
+                padding-left: calc(var(--bs-gutter-x) * 0.5);
+                padding-right: calc(var(--bs-gutter-x) * 0.5);
+            }
+
+            .tabs_container .productset {
+                width: 100%;
+                min-height: 100%;
+            }
+
+            .payment_panel {
+                position: fixed;
+                left: 16px;
+                right: 16px;
+                bottom: 60px;
+                width: auto;
+                margin-left: 0;
+                border-radius: 14px 14px 0 0;
+                background-color: white;
+                overflow: hidden;
+                box-sizing: border-box;
+            }
+
+            .card-order .card-body {
+                padding-bottom: 300px;
+            }
+        }
+
+        @media screen and (min-width: 993px) and (max-width: 1199px) {
+            .tabs_container .row > .col-lg-3.d-flex.position-relative {
+                flex: 0 0 33.333333%;
+                max-width: 33.333333%;
+            }
+
+            .tabs_container .productset {
+                min-height: 100%;
+            }
+
+            .payment_panel {
+                position: fixed;
+                right: 16px;
+                left: auto;
+                bottom: 220px;
+                width: min(360px, calc(50vw - 32px));
+                margin-left: 0;
+                border-radius: 14px;
+                background-color: white;
+                overflow: visible;
+                box-sizing: border-box;
+                z-index: 999;
+            }
+
+            .payment_panel .setvaluecash {
+                display: block !important;
+                margin: 0 0 12px;
+            }
+
+            .payment_panel .setvaluecash ul {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 8px;
+                margin: 0;
+                padding: 0;
+            }
+
+            .payment_panel .setvaluecash ul li {
+                width: calc(33.33% - 8px);
+                margin: 0;
+                list-style: none;
+            }
+
+            .payment_panel .setvaluecash ul li a {
+                min-height: 38px;
+                height: 100%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 4px;
+                padding: 4px 8px;
+                text-align: center;
+                font-size: 11px;
+            }
+
+            .payment_panel .setvaluecash ul li a i {
+                font-size: 14px !important;
+                margin-bottom: 0 !important;
+            }
+
+            .payment_panel .btn-totallabel {
+                margin: 0;
+            }
+
+            .card-order .card-body {
+                padding-bottom: 300px;
+            }
+        }
+
+        @media screen and (device-width: 1024px) and (device-height: 1366px) and (orientation: portrait) {
+            .tabs_container .row {
+                --bs-gutter-x: 12px;
+                --bs-gutter-y: 12px;
+            }
+
+            .tabs_container .row > .col-lg-3.d-flex.position-relative {
+                flex: 0 0 50%;
+                max-width: 50%;
+            }
+
+            /* iPad Pro portrait: payment panel sits at the bottom of the right column,
+               not floating over the totals */
+            .payment_panel {
+                position: static !important;
+                width: 100% !important;
+                bottom: auto !important;
+                right: auto !important;
+                left: auto !important;
+                border-radius: 0 !important;
+                margin-top: 12px;
+            }
+
+            .card-order .card-body {
+                padding-bottom: 300px !important;
+            }
+        }
+
+        /* iPad Pro landscape (1366x1024) */
+        @media screen and (device-width: 1366px) and (device-height: 1024px) and (orientation: landscape) {
+            .payment_panel {
+                position: static !important;
+                width: 100% !important;
+                bottom: auto !important;
+                right: auto !important;
+                left: auto !important;
+                border-radius: 0 !important;
+                margin-top: 12px;
+            }
+
+            .card-order .card-body {
+                padding-bottom: 300px !important;
+            }
+        }
+
+        /* iPad Pro viewport-based fix (1024px wide, portrait) — covers modern browsers
+           where device-width queries may not fire */
+        @media screen and (min-width: 1024px) and (max-width: 1024px) {
+            .payment_panel {
+                position: static !important;
+                width: 100% !important;
+                bottom: auto !important;
+                right: auto !important;
+                left: auto !important;
+                border-radius: 8px !important;
+                margin-top: 12px;
+                box-shadow: 0 -2px 8px rgba(0,0,0,0.06);
+            }
+
+            .card-order .card-body {
+                padding-bottom: 300px !important;
+            }
+        }
+
+        @media screen and (max-width: 767px) {
+            .payment_panel {
+                position: fixed;
+                left: 0px;
+                right: 0px;
+                bottom: 50px;
+                background-color: white;
+                width: auto;
+                margin-left: 0;
+                border-radius: 14px 14px 0 0;
+                /* box-shadow: 0 10px 30px rgba(15, 23, 42, 0.12); */
+                overflow: hidden;
+            }
+            .gst-info {
+                margin: 4px 0 !important;
+                padding: 3px 8px !important;
+                background: #f8f9fa !important;
+                border-radius: 4px !important;
+                border-left: 3px solid #4caf50 !important;
+                width:80% !important;
+            }
+            .product-lists .gst-no-message {
+            margin: 4px 0 !important;
+            padding: 6px 8px !important;
+            background: #fff8e1 !important;
+            border-left: 3px solid #ff9f43 !important;
+            border-radius: 4px !important;
+            color: #640a06 !important;
+            font-size: 12px !important;
+            line-height: 1.4 !important;
+            width: 80% !important;
+        }
 
             .responsive-mobile-view {
                 display: none !important;
@@ -368,7 +562,132 @@
             }
 
             .product-lists {
-                flex-direction: row !important;
+                display: grid;
+                grid-template-columns: minmax(0, 1fr) auto;
+                grid-template-areas:
+                    "details delete"
+                    "discount discount"
+                    "price price";
+                align-items: flex-start;
+                position: relative;
+                overflow: hidden;
+                gap: 10px;
+                padding: 10px 42px 10px 0;
+            }
+
+            .product-lists>li:first-child {
+                grid-area: details;
+                min-width: 0;
+            }
+
+            .product-lists>li:nth-child(2) {
+                grid-area: discount;
+                width: 100%;
+            }
+
+            .product-lists>li.price {
+                grid-area: price;
+                width: 100%;
+                margin-top: 0;
+                padding: 8px 10px;
+                border-radius: 10px;
+                background: #f8f9fa;
+            }
+
+            .product-lists>li.delete-col {
+                grid-area: delete;
+                width: 32px;
+                margin-left: 0;
+                text-align: right;
+                flex-shrink: 0;
+                position: absolute;
+                top: 110px;
+                right: 0px;
+                z-index: 2;
+            }
+
+            .productimg {
+                display: flex;
+                align-items: flex-start;
+                gap: 5px;
+            }
+
+            .productimgs {
+                flex: 0 0 72px;
+            }
+
+            .productimgs img {
+                width: 72px;
+                height: 72px;
+                object-fit: cover;
+                border-radius: 10px;
+            }
+
+            .productcontet {
+                flex: 1 1 auto;
+                min-width: 0;
+            }
+
+            .productcontet h4 {
+                max-width: none;
+                margin-bottom: 8px;
+            }
+
+            .increment-decrement {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 8px;
+            }
+
+            .increment-decrement .input-groups {
+                width: 60%;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 8px;
+            }
+            .increment-decrement .input-groups input[type=button] {
+                width: 75px;
+                height: 25px;
+            }
+
+            .increment-decrement .quantity-field {
+                flex: 1 1 auto;
+                width: 100% !important;
+                min-width: 0;
+            }
+
+            .increment-decrement>div:last-child {
+                order: 0;
+                margin: 0 !important;
+                width: 100%;
+                padding-left: 40px;
+                padding-right: 46px;
+            }
+
+            .increment-decrement .product-price-input {
+                width: 100%;
+            }
+
+            .price {
+                width: 100%;
+            }
+
+            .price-row {
+                margin-bottom: 4px;
+            }
+
+            .product-table {
+                max-height: none;
+                overflow: visible;
+                -ms-overflow-style: none;
+                scrollbar-width: none;
+                padding-bottom: 8px;
+            }
+
+            .product-table::-webkit-scrollbar {
+                display: none;
             }
 
             /* .body_space_two {
@@ -398,6 +717,7 @@
             /* Give space below so content not hide */
             .card-order .card-body {
                 margin-top: 10px;
+                padding: 12px 12px 275px;
             }
 
             /* Make radio inline properly */
@@ -412,46 +732,94 @@
                 margin-right: 4px;
             }
 
-        }
-
-        @media screen and (min-width: 993px) and (max-width: 1180px) {
-            .tabs_container .row {
-                margin-left: -6px;
-                margin-right: -6px;
+            .totalitem {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 8px;
+                flex-wrap: wrap;
+                margin-bottom: 10px;
             }
 
-            .tabs_container .row > [class*="col-"] {
-                padding-left: 6px;
-                padding-right: 6px;
+            .product-discount-box {
+                width: 100%;
+                gap: 10px;
+                margin-top: 0;
             }
 
-            .tabs_container .col-lg-3 {
-                flex: 0 0 50%;
-                max-width: 50%;
+            .discount-field {
+                flex: 1 1 0;
             }
 
-            .productsetimgin {
-                height: 86px;
-                margin: 0.75rem auto 0;
+            .product-discount-percentage,
+            .product-discount-amount {
+                width: 100%;
+                min-width: 145px;
             }
 
-            .productsetcontent {
-                padding: 0.4rem !important;
+            .price-row {
+                gap: 10px;
             }
 
-            .productsetcontent h4 {
-                font-size: 13px;
-                line-height: 1.25;
+            .price-row span:last-child {
+                text-align: right;
             }
 
-            .productsetcontent h5 {
-                font-size: 11px;
+            .setvalue {
+                padding: 0 0 16px 0 !important;
             }
 
-            .productsetbtn {
-                right: 8px;
-                top: 38px;
+            .setvalue ul li {
+                padding: 8px 0;
             }
+
+            .setvaluecash ul {
+                display: flex;
+                flex-wrap: nowrap;
+                gap: 4px;
+                margin: 0;
+                padding: 0 10px 10px;
+                overflow-x: auto;
+            }
+
+            .setvaluecash ul::-webkit-scrollbar {
+                display: none;
+            }
+
+            .setvaluecash ul li {
+                margin: 0;
+                flex: 1;
+                width: auto !important;
+            }
+
+            .setvaluecash ul li a {
+                min-height: 40px;
+                height: 100%;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                gap: 2px;
+                text-align: center;
+                padding: 4px 6px;
+                font-size: 10px;
+            }
+
+            .setvaluecash ul li a i {
+                font-size: 14px !important;
+                margin-bottom: 0 !important;
+            }
+
+            #posPaidTypeBox,
+            #cashOnlineBox,
+            #bankSelectionBox {
+                padding: 0 12px 12px;
+            }
+
+            .btn-totallabel {
+                margin: 0;
+            }
+
         }
 
         .gst-info {
@@ -460,11 +828,24 @@
             background: #f8f9fa;
             border-radius: 4px;
             border-left: 3px solid #4caf50;
+            width:135px;
         }
 
         .product-lists .gst-info small {
             display: block;
             line-height: 1.3;
+        }
+
+        .product-lists .gst-no-message {
+            margin: 4px 0;
+            padding: 6px 8px;
+            background: #fff8e1;
+            border-left: 3px solid #ff9f43;
+            border-radius: 4px;
+            color: #640a06;
+            font-size: 12px;
+            line-height: 1.4;
+            width: 135px;
         }
 
         .productset .productsetimg .gst-hover-badge {
@@ -532,6 +913,24 @@
             box-shadow: 0 0 3px rgba(255, 159, 67, 0.3);
         }
 
+        .product-price-input {
+            width: 90px;
+            height: 34px;
+            padding: 4px 8px;
+            font-size: 14px;
+            font-weight: 700;
+            border: 1px solid #7a7979;
+            border-radius: 5px;
+            background: #fff;
+            text-align: center;
+        }
+
+        .product-price-input:focus {
+            outline: none;
+            border-color: #ff9f43;
+            box-shadow: 0 0 0 2px rgba(255, 159, 67, 0.15);
+        }
+
         .product-lists {
             display: flex;
             align-items: center;
@@ -539,7 +938,7 @@
             padding: 4px 10px 4px 0;
             border-bottom: 1px solid #eee;
             /* width: 600px; */
-            gap: 10px;
+            gap: 5px;
         }
 
         .product-lists>li {
@@ -547,14 +946,14 @@
         }
 
         .product-lists li:last-child {
-            width: 50px;
+            width: 40px;
             text-align: center;
             flex-shrink: 0;
         }
 
         .remove-item img {
-            width: 18px;
-            height: 18px;
+            width: 25px;
+            height: 25px;
             cursor: pointer;
             transition: 0.2s ease;
         }
@@ -654,8 +1053,37 @@
 
         /* Improve input/select appearance */
         #customer_name,
-        #customer_phone {
+        #customer_phone,
+        #order_date,
+        #order_date_display {
             width: 100%;
+        }
+
+        .pos-order-date-group .input-groupicon {
+            position: relative;
+        }
+
+        .pos-order-date-group .addonset {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        .pos-order-date-group .addonset img {
+            width: 16px;
+            height: 16px;
+        }
+
+        #order_date_display {
+            padding-right: 38px;
+            background-color: #fff;
+            cursor: pointer;
         }
 
         /* Fix for labour items select */
@@ -691,9 +1119,367 @@
             line-height: 1.3;
             max-width: 150px;
         }
+        /* ===== POS PAYMENT PANEL FIELDS FIX ===== */
+#posPaidTypeBox,
+#cashOnlineBox,
+#bankSelectionBox {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+#posPaidTypeBox .form-group,
+#cashOnlineBox .form-group,
+#bankSelectionBox .form-group {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+#posPaidTypeBox .form-group label,
+#cashOnlineBox .form-group label,
+#bankSelectionBox .form-group label {
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 4px;
+    color: #444;
+    width: 100%;
+}
+
+#posPaidTypeBox .form-group select,
+#posPaidTypeBox .form-group input,
+#cashOnlineBox .form-group input,
+#bankSelectionBox .form-group select {
+    width: 100% !important;
+    box-sizing: border-box;
+    height: 36px;
+    font-size: 13px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 4px 10px;
+    background: #fff;
+}
+
+#posPaidAmountFields {
+    width: 100%;
+}
+
+#cashOnlineBox .row,
+#bankSelectionBox .row {
+    margin-left: -6px;
+    margin-right: -6px;
+}
+
+#cashOnlineBox .row > [class*="col-"],
+#bankSelectionBox .row > [class*="col-"] {
+    padding-left: 6px;
+    padding-right: 6px;
+}
+
+.bank-label-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 4px;
+}
+
+.bank-add-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+    border: 1px solid #ff9f43;
+    background: #fff7ed;
+    color: #ff9f43;
+    border-radius: 4px;
+    padding: 3px 10px;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.2;
+    text-decoration: none;
+}
+
+.bank-add-btn:hover {
+    color: #fff;
+    background: #ff9f43;
+}
+
+#posPaidAmountFields .form-group {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+#posPaidAmountFields .form-group label {
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 4px;
+    color: #444;
+}
+
+#posPaidAmountFields .form-group input {
+    width: 100% !important;
+    box-sizing: border-box;
+    height: 36px;
+    font-size: 13px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 4px 10px;
+    background: #fff;
+}
+
+#posPendingAmount {
+    background: #f8f9fa !important;
+    color: #555;
+}
+
+/* Readonly/computed fields */
+#posPaidAmount[readonly],
+#posCashOnlineOnlineAmount[readonly] {
+    background: #f8f9fa !important;
+    color: #555;
+    cursor: not-allowed;
+}
+/* ===== POS PAYMENT PANEL - TWO COLUMN LAYOUT FOR FIELDS ===== */
+
+/* Make the payment panel containers use grid layout */
+.payment_panel #posPaidTypeBox,
+.payment_panel #cashOnlineBox,
+.payment_panel #bankSelectionBox {
+    display: block;
+    width: 100%;
+}
+
+/* Apply grid to form groups inside payment boxes */
+.payment_panel #posPaidTypeBox .form-group,
+.payment_panel #cashOnlineBox .form-group,
+.payment_panel #bankSelectionBox .form-group {
+    display: block;
+    width: 100%;
+    margin-bottom: 12px;
+}
+
+/* For the Paid Type Box - keep select full width, but amount fields in 2 columns */
+#posPaidTypeBox #posPaidAmountFields {
+    display: grid;
+    /* grid-template-columns: repeat(2, 1fr); */
+    gap: 12px;
+    margin-top: 8px;
+}
+
+#posPaidTypeBox #posPaidAmountFields .form-group {
+    margin-bottom: 0;
+}
+
+#posPaidTypeBox #posPaidAmountFields .form-group:first-child {
+    grid-column: 1 / 2;
+}
+
+#posPaidTypeBox #posPaidAmountFields .form-group:last-child {
+    grid-column: 2 / 3;
+}
+
+/* For Cash+Online box - cash and online amounts in 2 columns */
+/* #cashOnlineBox {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-top: 10px;
+} */
+
+#cashOnlineBox .form-group {
+    margin-bottom: 0;
+}
+
+/* For Bank Selection box - keep full width (but can be full width) */
+#bankSelectionBox .form-group {
+    width: 100%;
+}
+
+/* Make all inputs inside payment panel have consistent styling */
+.payment_panel input,
+.payment_panel select {
+    width: 100% !important;
+    box-sizing: border-box;
+}
+
+/* Responsive adjustments for mobile */
+@media screen and (max-width: 767px) {
+    /* On mobile, stack them vertically */
+    #posPaidTypeBox #posPaidAmountFields {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    #cashOnlineBox {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    .bank-label-row {
+        align-items: flex-start;
+        /* flex-direction: column; */
+        gap: 6px;
+    }
+
+    #posPaidTypeBox #posPaidAmountFields .form-group:first-child,
+    #posPaidTypeBox #posPaidAmountFields .form-group:last-child {
+        grid-column: auto;
+    }
+
+    /* Mobile validation message styling */
+    .error_total {
+        display: block !important;
+        width: 100% !important;
+        min-height: auto !important;
+        height: auto !important;
+        /* padding: 12px !important; */
+        margin-bottom: 15px !important;
+        margin-top: 10px !important;
+        box-sizing: border-box !important;
+        line-height: 1.4 !important;
+        white-space: normal !important;
+        word-wrap: break-word !important;
+    }
+}
+
+/* For tablet devices */
+@media screen and (min-width: 768px) and (max-width: 1024px) {
+    #posPaidTypeBox #posPaidAmountFields {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+    }
+
+    #cashOnlineBox {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+    }
+
+    .pos-customer-row {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+    }
+
+    .pos-customer-row > .pos-customer-field {
+        width: 100%;
+        max-width: none;
+        padding: 0;
+        flex: none;
+    }
+
+    .pos-customer-row > .pos-customer-field--date {
+        grid-column: 1 / -1;
+    }
+}
     </style>
     <div class="content">
-        <input type="hidden" id="quotation_status" name="quotation_status" value="sales">
+        @php
+            $isQuotationMode = request('sale_type') === 'quotation';
+            $showNewBillModal = request('new_bill') == 1;
+        @endphp
+        <input type="hidden" id="quotation_status" name="quotation_status"
+            value="{{ $isQuotationMode ? 'quotation' : 'sales' }}">
+
+        <div class="page-header">
+            <div class="page-title">
+                <h4 id="posPageTitle">{{ $isQuotationMode ? 'Add Quotation' : 'Add Sale' }}</h4>
+            </div>
+            <div class="page-btn">
+                 <a href="{{ route('sales.list') }}" class="pos-back-btn">
+                                <i class="fa-solid fa-arrow-left"></i>
+                                Back
+                            </a>
+            </div>
+        </div>
+
+        @if ($showNewBillModal)
+            <div class="modal fade" id="newBillTypeModal" tabindex="-1" aria-labelledby="newBillTypeModalLabel"
+                aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content border-0 shadow">
+                        <div class="modal-body text-center py-4 px-3">
+                            <h3 id="newBillTypeModalLabel" class="mb-3" style="font-size: 18px; font-weight: 700;">
+                                Create New Bill
+                            </h3>
+                            <p class="mb-4" style="font-size: 14px; color: #555;">
+                                Choose bill type for this new entry.
+                            </p>
+                            <div class="d-flex align-items-center justify-content-center gap-3 flex-wrap">
+                                <a href="{{ route('sales.add', ['sale_type' => 'sales']) }}"
+                                    class="btn px-4 py-2 text-white"
+                                    style="background-color:#22c55e; border-color:#22c55e;">Sales</a>
+                                <a href="{{ route('sales.add', ['sale_type' => 'quotation']) }}"
+                                    class="btn px-4 py-2 text-white"
+                                    style="background-color:#ff9f43; border-color:#ff9f43;">Quotation</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @endif
+
+        <div class="modal fade" id="addBankModal" tabindex="-1" aria-labelledby="addBankModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <form id="addBankForm">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="addBankModalLabel">Add Bank</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                aria-label="Close">x</button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col-6 mb-3">
+                                    <label for="add_bank_name" class="form-label">Bank Name</label>
+                                    <input type="text" class="form-control" id="add_bank_name" name="bank_name">
+                                    <div class="text-danger small" id="addBankNameError"></div>
+                                </div>
+                                <div class="col-6 mb-3">
+                                    <label for="add_account_number" class="form-label">Account Number</label>
+                                    <input type="text" class="form-control" id="add_account_number"
+                                        name="account_number">
+                                    <div class="text-danger small" id="addAccountNumberError"></div>
+                                </div>
+                                <div class="col-6 mb-3">
+                                    <label for="add_ifsc_code" class="form-label">IFSC Code</label>
+                                    <input type="text" class="form-control" id="add_ifsc_code" name="ifsc_code">
+                                    <div class="text-danger small" id="addIfscCodeError"></div>
+                                </div>
+                                <div class="col-6 mb-3">
+                                    <label for="add_branch_name" class="form-label">Branch Name</label>
+                                    <input type="text" class="form-control" id="add_branch_name" name="branch_name">
+                                    <div class="text-danger small" id="addBranchNameError"></div>
+                                </div>
+                                <div class="col-6 mb-3">
+                                    <label for="add_opening_balance" class="form-label">Opening Balance</label>
+                                    <input type="number" class="form-control" id="add_opening_balance"
+                                        name="opening_balance" min="0" step="0.01" value="0">
+                                    <div class="text-danger small" id="addOpeningBalanceError"></div>
+                                </div>
+                                <div class="col-6 mb-3">
+                                    <label for="add_bank_status" class="form-label">Status</label>
+                                    <select class="form-select" id="add_bank_status" name="status">
+                                        <option value="1" selected>Active</option>
+                                        <option value="0">Inactive</option>
+                                    </select>
+                                    <div class="text-danger small" id="addBankStatusError"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-submit text-white" id="saveBankBtn"
+                                style="background-color: #ff9f43;">Save Bank</button>
+                            <button type="button" class="btn btn-secondary btn-cancel"
+                                data-bs-dismiss="modal">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
 
         <div class="d-flex align-items-center justify-content-between mb-3  responsive-mobile-view-1">
 
@@ -705,19 +1491,20 @@
             <div class=" d-flex justify-content-between ">
 
                 <div class="form-check m-0">
-                    <input class="form-check-input quotationToggle" type="checkbox" id="quotationToggle1" value="quotation">
+                    <input class="form-check-input quotationToggle" type="checkbox" id="quotationToggle1" value="quotation"
+                        {{ $isQuotationMode ? 'checked' : '' }}>
                     <label class="form-check-label" for="quotationToggle1">Quotation</label>
                 </div>
                 <div class="d-flex gap-3">
-                    <label class="custom-radio-label m-0">
-                        <input type="radio" name="gst_option" value="without" checked>
-                        Without GST
-                    </label>
-                    <label class="custom-radio-label m-0">
-                        <input type="radio" name="gst_option" value="with">
-                        With GST
-                    </label>
-                </div>
+    <label class="custom-radio-label m-0">
+        <input type="radio" name="gst_option_mobile" id="without_gst_mobile" value="without" checked>
+        Without GST
+    </label>
+    <label class="custom-radio-label m-0">
+        <input type="radio" name="gst_option_mobile" id="with_gst_mobile" value="with">
+        With GST
+    </label>
+</div>
 
             </div>
 
@@ -734,7 +1521,7 @@
                 <ul class="tabs border-0 mb-4">
                     @foreach ($categories as $cat)
                         @php
-                            $availableProducts = $cat->products->where('quantity', '>', 0);
+                            $availableProducts = $cat->products;
                         @endphp
 
                         @if ($availableProducts->count() > 0)
@@ -782,7 +1569,7 @@
                                 @if ($role == 'admin' || $role == 'staff' || $role == 'sub-admin')
                                     <div class="form-check pos-quotation-toggle">
                                         <input class="form-check-input quotationToggle" type="checkbox" id="quotationToggle2"
-                                            value="quotation">
+                                            value="quotation" {{ $isQuotationMode ? 'checked' : '' }}>
                                         <label class="form-check-label" for="quotationToggle2">Quotation</label>
                                     </div>
                                 @endif
@@ -798,10 +1585,7 @@
                                     </label>
                                 </div>
                             </div>
-                            <a href="{{ route('sales.list') }}" class="pos-back-btn">
-                                <i class="fa-solid fa-arrow-left"></i>
-                                Back
-                            </a>
+
                         </div>
                         <div class="row">
 
@@ -864,9 +1648,9 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="row select-group w-100">
+                                <div class="row w-105 pos-customer-row">
                                     <!-- Customer Name -->
-                                    <div class="col-md-6 col-6">
+                                    <div class="col-md-4 col-6 pos-customer-field">
                                         <div class="select-split select-group w-100">
                                             <div class="select-group w-100">
                                                 <label>Customer Name</label>
@@ -886,13 +1670,30 @@
                                     </div>
 
                                     <!-- Customer Phone -->
-                                    <div class="col-md-6 col-6">
+                                    <div class="col-md-4 col-6 pos-customer-field">
                                         <div class="select-split">
                                             <div class="select-group w-100">
                                                 <label>Customer Phone</label>
                                                 <input type="tel" id="customer_phone" class="form-control"
                                                     placeholder="Customer number" name="customer_phone">
                                                 <span class="error_customerphone text-danger"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 col-12 pos-customer-field pos-customer-field--date">
+                                        <div class="select-split pos-order-date-group">
+                                            <div class="select-group w-100">
+                                                <label>Order Date</label>
+                                                <input type="hidden" id="order_date" name="order_date"
+                                                    value="{{ now()->format('Y-m-d') }}">
+                                                <div class="input-groupicon">
+                                                    <input type="text" id="order_date_display" class="form-control"
+                                                        value="{{ now()->format('d/m/Y') }}" autocomplete="off">
+                                                    <a class="addonset">
+                                                        <img src="{{ env('ImagePath') . 'admin/assets/img/icons/calendars.svg' }}"
+                                                            alt="Calendar">
+                                                    </a>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -911,7 +1712,7 @@
                         </div>
                         <div class="pt-0">
                             <div class="totalitem">
-                                <h4>Total items : 4</h4>
+                                <h4>Total items : 0</h4>
                                 <a href="javascript:void(0);" class="clear_items">Clear all</a>
                             </div>
                             <div class="product-table">
@@ -955,6 +1756,24 @@
                                     </div>
                                 </div>
                             </div>
+                            @if ((bool) ($setting->tds_apply ?? false))
+                                <div class="row mt-2">
+                                    <div class="col-lg-6 col-6">
+                                        <div class="select-group w-100">
+                                            <label for="tds_percentage">TDS Percentage (%)</label>
+                                            <input type="text" class="form-control" name="tds_percentage"
+                                                id="tds_percentage" >
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6 col-6">
+                                        <div class="select-group w-100 ">
+                                            <label for="tds_amount">TDS Amount</label>
+                                            <input type="text" class="form-control" name="tds_amount" id="tds_amount"
+                                                min="0"  value="0.00" readonly>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endif
                         </div>
                         <div class="col-lg-12 ">
                             <div class="select-split ">
@@ -969,7 +1788,7 @@
                             <ul>
                                 <li>
 
-                                    <h5>Subtotal</h5>
+                                    <h5>Total (Product)</h5>
                                     <h6 style="color: green;">
                                         @if ($currency_position === 'right')
                                             <span class="subtotal-value">0.00</span>{{ $currency_symbol }}
@@ -980,7 +1799,18 @@
                                     <input type="hidden" name="subtotal" value="" class="tax-hidden">
                                 </li>
 
-                                <li>
+                                <li class="gst-summary-row" style="display: none;">
+                                    <h5>Total GST Amount</h5>
+                                    <h6 class="gst-total-amount">
+                                        @if ($currency_position === 'right')
+                                            <span>0.00</span>{{ $currency_symbol }}
+                                        @else
+                                            {{ $currency_symbol }}<span>0.00</span>
+                                        @endif
+                                    </h6>
+                                </li>
+
+                                <li class="discount-summary-row" style="display: none;">
                                     <h5>Discount Amount</h5>
                                     <h6 class="discount-amount">
                                         @if ($currency_position === 'right')
@@ -992,21 +1822,43 @@
                                     <input type="hidden" name="discount_amount" value="0.00" class="tax-hidden">
                                 </li>
 
-                                <li>
-                                    <h5>Price After Discount</h5>
+                                <li class="subtotal-summary-row" style="display: none;">
+                                    <h5>SubTotal</h5>
                                     <h6 class="price-after-discount">
+                                        {{-- @if ($currency_position === 'right')
+                                            0.00{{ $currency_symbol }} + 0.00{{ $currency_symbol }} - 0.00{{ $currency_symbol }} = 0.00{{ $currency_symbol }}
+                                        @else
+                                            {{ $currency_symbol }}0.00 + {{ $currency_symbol }}0.00 - {{ $currency_symbol }}0.00 = {{ $currency_symbol }}0.00
+                                        @endif --}}
+                                    </h6>
+                                    <input type="hidden" name="price_after_discount" value="0.00" class="tax-hidden">
+                                </li>
+
+                                <li class="shipping-summary-row" style="display: none;">
+                                    <h5>Shipping Cost</h5>
+                                    <h6 class="shipping-cost-summary">
                                         @if ($currency_position === 'right')
                                             <span>0.00</span>{{ $currency_symbol }}
                                         @else
                                             {{ $currency_symbol }}<span>0.00</span>
                                         @endif
                                     </h6>
-                                    <input type="hidden" name="price_after_discount" value="0.00" class="tax-hidden">
                                 </li>
 
-                                <li>
-                                    <h5>Shipping Cost</h5>
-                                    <h6 class="shipping-cost-summary">
+                                <li class="labour-summary-row" style="display: none;">
+                                    <h5>Labour Charge</h5>
+                                    <h6 class="labour-total-amount">
+                                        @if ($currency_position === 'right')
+                                            <span>0.00</span>{{ $currency_symbol }}
+                                        @else
+                                            {{ $currency_symbol }}<span>0.00</span>
+                                        @endif
+                                    </h6>
+                                </li>
+
+                                <li class="tds-summary-row" style="display: none;">
+                                    <h5>TDS (<span class="tds-percentage-summary">0.00</span>%)</h5>
+                                    <h6 class="tds-amount-summary">
                                         @if ($currency_position === 'right')
                                             <span>0.00</span>{{ $currency_symbol }}
                                         @else
@@ -1030,35 +1882,28 @@
                                         </li>
                                     @endforeach --}}
 
-                                <li class="gst-summary-row" style="display: none;">
-                                    <h5>Total GST Amount</h5>
-                                    <h6 class="gst-total-amount">
-                                        @if ($currency_position === 'right')
-                                            <span>0.00</span>{{ $currency_symbol }}
-                                        @else
-                                            {{ $currency_symbol }}<span>0.00</span>
-                                        @endif
-                                    </h6>
-                                </li>
 
-                                <li class="labour-summary-row" style="display: none;">
-                                    <h5>Labour Charge</h5>
-                                    <h6 class="labour-total-amount">
+
+
+                                <li class="round-off-row d-none">
+                                    <h5>Round Off</h5>
+                                    <h6 class="round-off-amount">
                                         @if ($currency_position === 'right')
                                             <span>0.00</span>{{ $currency_symbol }}
                                         @else
                                             {{ $currency_symbol }}<span>0.00</span>
                                         @endif
                                     </h6>
+                                    <input type="hidden" name="round_off" value="0.00" class="tax-hidden">
                                 </li>
 
                                 <li class="total-value">
                                     <h5>Total</h5>
                                     <h6>
                                         @if ($currency_position === 'right')
-                                            <span class="total-amount">0.00</span>{{ $currency_symbol }}
+                                            <span class="total-amount">0</span>{{ $currency_symbol }}
                                         @else
-                                            {{ $currency_symbol }}<span class="total-amount">0.00</span>
+                                            {{ $currency_symbol }}<span class="total-amount">0</span>
                                         @endif
                                     </h6>
                                     <input type="hidden" name="total" value="" class="tax-hidden">
@@ -1075,49 +1920,28 @@
                                     <li>
                                         <a href="javascript:void(0);" class="paymentmethod">
                                             <input type="radio" name="payment_method" value="pending" hidden>
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-                                                fill="#1b2850" class="bi bi-cash" viewBox="0 0 16 16">
-                                                <path d="M8 10a2 2 0 1 0 0-4 2 2 0 0 0 0 4" />
-                                                <path
-                                                    d="M0 4a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H1a1 1 0 0 1-1-1zm3 0a2 2 0 0 1-2 2v4a2 2 0 0 1 2 2h10a2 2 0 0 1 2-2V6a2 2 0 0 1-2-2z" />
-                                            </svg>
+                                            <i class="fas fa-history" style="font-size: 16px; display: block; margin-bottom: 4px;"></i>
                                             Pay Later
                                         </a>
                                     </li>
                                     <li>
                                         <a href="javascript:void(0);" class="paymentmethod">
                                             <input type="radio" name="payment_method" value="cash" hidden>
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-                                                fill="#1b2850" class="bi bi-cash" viewBox="0 0 16 16">
-                                                <path d="M8 10a2 2 0 1 0 0-4 2 2 0 0 0 0 4" />
-                                                <path
-                                                    d="M0 4a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H1a1 1 0 0 1-1-1zm3 0a2 2 0 0 1-2 2v4a2 2 0 0 1 2 2h10a2 2 0 0 1 2-2V6a2 2 0 0 1-2-2z" />
-                                            </svg>
+                                            <i class="fas fa-money-bill-wave" style="font-size: 16px; display: block; margin-bottom: 4px;"></i>
                                             Cash
                                         </a>
                                     </li>
                                     <li>
                                         <a href="javascript:void(0);" class="paymentmethod">
                                             <input type="radio" name="payment_method" value="debit card" hidden>
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-                                                fill="#1b2850" class="bi bi-credit-card" viewBox="0 0 16 16">
-                                                <path
-                                                    d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2zm2-1a1 1 0 0 0-1 1v1h14V4a1 1 0 0 0-1-1zm13 4H1v5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1z" />
-                                                <path
-                                                    d="M2 10a1 1 0 0 1 1-1h1a1 1 0 0 1 1 1v1a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1z" />
-                                            </svg>
+                                            <i class="fas fa-credit-card" style="font-size: 16px; display: block; margin-bottom: 4px;"></i>
                                             Debit
                                         </a>
                                     </li>
                                     <li>
                                         <a href="javascript:void(0);" class="paymentmethod">
                                             <input type="radio" name="payment_method" value="cash+online" hidden>
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-                                                fill="#1b2850" class="bi bi-cash" viewBox="0 0 16 16">
-                                                <path d="M8 10a2 2 0 1 0 0-4 2 2 0 0 0 0 4" />
-                                                <path
-                                                    d="M0 4a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H1a1 1 0 0 1-1-1zm3 0a2 2 0 0 1-2 2v4a2 2 0 0 1 2 2h10a2 2 0 0 1 2-2V6a2 2 0 0 1-2-2z" />
-                                            </svg>
+                                            <i class="fas fa-money-check-alt" style="font-size: 16px; display: block; margin-bottom: 4px;"></i>
                                             Cash+Online
                                         </a>
                                     </li>
@@ -1125,45 +1949,87 @@
                                     <li>
                                         <a href="javascript:void(0);" class="paymentmethod">
                                             <input type="radio" name="payment_method" value="scan" hidden>
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-                                                fill="#1b2850" class="bi bi-qr-code-scan" viewBox="0 0 16 16">
-                                                <path
-                                                    d="M0 .5A.5.5 0 0 1 .5 0h3a.5.5 0 0 1 0 1H1v2.5a.5.5 0 0 1-1 0zm12 0a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-1 0V1h-2.5a.5.5 0 0 1-.5-.5M.5 12a.5.5 0 0 1 .5.5V15h2.5a.5.5 0 0 1 0 1h-3a.5.5 0 0 1-.5-.5v-3a.5.5 0 0 1 .5-.5m15 0a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1 0-1H15v-2.5a.5.5 0 0 1 .5-.5M4 4h1v1H4z" />
-                                                <path d="M7 2H2v5h5zM3 3h3v3H3zm2 8H4v1h1z" />
-                                                <path d="M7 9H2v5h5zm-4 1h3v3H3zm8-6h1v1h-1z" />
-                                                <path
-                                                    d="M9 2h5v5H9zm1 1v3h3V3zM8 8v2h1v1H8v1h2v-2h1v2h1v-1h2v-1h-3V8zm2 2H9V9h1zm4 2h-1v1h-2v1h3zm-4 2v-1H8v1z" />
-                                                <path d="M12 9h2V8h-2z" />
-                                            </svg>
+                                            <i class="fas fa-qrcode" style="font-size: 16px; display: block; margin-bottom: 4px;"></i>
                                             Scan
                                         </a>
                                     </li>
 
                                 </ul>
-                                <div id="cashOnlineBox" style="display:none; margin-top:10px;">
-                                    <div class="form-group">
-                                        <label>Cash Amount</label>
-                                        <input type="number" class="form-control" id="cashAmount"
-                                            placeholder="Enter Cash Amount" placeholder="0">
+                                <div id="posPaidTypeBox" style="display:none; margin-top:10px;">
+                                    <div class="form-group mb-2">
+                                        <label for="posPaidType">Paid Type</label>
+                                        <select id="posPaidType" class="form-control">
+                                            <option value="" selected disabled>Select Paid Type</option>
+                                            <option value="fully">Fully</option>
+                                            <option value="partially">Partially</option>
+                                        </select>
+                                        <span class="error_paidtype text-danger"></span>
                                     </div>
-                                    <div class="form-group">
-                                        <label>Online Amount</label>
-                                        <input type="number" class="form-control" id="onlineAmount"
-                                            placeholder="Enter Online Amount" value="0" readonly>
+                                    <div id="posPaidAmountFields" style="display:none;">
+                                        <div class="row g-2">
+                                            <div class="col-md-6 col-6">
+                                                <div class="form-group mb-2">
+                                                    <label for="posPaidAmount">Enter Amount</label>
+                                                    <input type="number" class="form-control" id="posPaidAmount"
+                                                        placeholder="0.00" min="0" step="0.01">
+                                                    <span class="error_paidamount text-danger"></span>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 col-6">
+                                                <div class="form-group">
+                                                    <label for="posPendingAmount">Pending Amount</label>
+                                                    <input type="number" class="form-control" id="posPendingAmount"
+                                                        placeholder="0.00" readonly>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="cashOnlineBox" style="display:none; margin-top:10px;">
+                                    <div class="row g-2">
+                                        <div class="col-md-6 col-6">
+                                            <div class="form-group">
+                                                <label>Cash Amount</label>
+                                                <input type="number" class="form-control" id="posCashOnlineCashAmount"
+                                                    placeholder="Enter Cash Amount">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 col-6">
+                                            <div class="form-group">
+                                                <label>Online Amount</label>
+                                                <input type="number" class="form-control" id="posCashOnlineOnlineAmount"
+                                                    placeholder="Enter Online Amount" value="0" readonly>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                                 <div id="bankSelectionBox" style="display:none; margin-top:10px;">
-                                    <div class="form-group">
-                                        <label>Select Bank</label>
-                                        <select name="bank_id" id="bank_id" class="form-control">
-                                            <option value="">Select Bank</option>
-                                            @foreach ($banks as $bank)
-                                                <option value="{{ $bank->id }}">{{ $bank->bank_name }}
-                                                    ({{ $bank->account_number }})
-                                                </option>
-                                            @endforeach
-                                        </select>
-                                        <span class="error_bank text-danger"></span>
+                                    <div class="row g-2">
+                                        <div class="col-md-6 col-6">
+                                            <div class="form-group">
+                                                <div class="bank-label-row">
+                                                    <label>Select Bank</label>
+                                                    <button type="button" id="openAddBankModal"
+                                                        class="bank-add-btn">Add Bank</button>
+                                                </div>
+                                                <select name="bank_id" id="bank_id" class="form-control">
+                                                    <option value="">Select Bank</option>
+                                                    @foreach ($banks as $bank)
+                                                        <option value="{{ $bank->id }}">{{ $bank->bank_name }}
+                                                            ({{ $bank->account_number }})
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                                <span class="error_bank text-danger"></span>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 col-6">
+                                            <div class="form-group">
+                                                <label for="posPaymentRemark">Remark</label>
+                                                <input type="text" class="form-control" id="posPaymentRemark"
+                                                    placeholder="Enter remark">
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                                 <span class="error_peymentmethod"></span>
@@ -1171,7 +2037,7 @@
 
                             <div class="btn-totallabel">
                                 <h6>Total Amount : 60.00$</h6>
-                                <h5>Pay Now <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                <h5>Generate Bill <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                         fill="currentColor" class="bi bi-arrow-right" viewBox="0 0 16 16"
                                         style="margin-bottom: 0.1rem;">
                                         <path fill-rule="evenodd"
@@ -1535,6 +2401,11 @@
             });
         }
 
+        function isQuotationModeEnabled() {
+            return $('.quotationToggle:checked').length > 0 ||
+                new URLSearchParams(window.location.search).get('sale_type') === 'quotation';
+        }
+
         /**
          * Add product to cart (works for both barcode and manual search)
          * FIX: Ensure product ID is stored as a string so that Map keys match
@@ -1628,19 +2499,29 @@
             // 7. Stock and category
             //    NOTE: If your API uses 'stock' instead of 'quantity', change here
             // ----------------------------------------------------------------------
-            const stock = parseInt(product.quantity) || 0; // adjust field name if needed
+            const stock = parseQuantityValue(product.quantity); // adjust field name if needed
             const categoryId = product.category_id || 0;
+
+            if (!isQuotationModeEnabled() && stock <= 0) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Out of Stock',
+                    text: 'This product is currently out of stock.'
+                });
+                return;
+            }
 
             // ----------------------------------------------------------------------
             // 8. Check if product already exists in cart (use string ID as key)
             // ----------------------------------------------------------------------
             if (selectedItems.has(stringId)) {
                 let item = selectedItems.get(stringId);
+                const nextQuantity = parseQuantityValue(item.quantity) + 1;
 
-                if (item.quantity < item.stock) {
-                    item.quantity++;
+                if (isQuotationModeEnabled() || nextQuantity <= parseQuantityValue(item.stock)) {
+                    item.quantity = nextQuantity;
 
-                    let price = parseFloat(item.price.replace(/[^0-9.-]+/g, ""));
+                    let price = parseItemPriceValue(item.price);
                     let baseAmount = price * item.quantity;
 
                     if (item.discount_percentage > 0) {
@@ -1649,7 +2530,6 @@
 
                     selectedItems.set(stringId, item);
                     updateTotalItems();
-
                 } else {
                     Swal.fire({
                         icon: 'warning',
@@ -1860,11 +2740,11 @@
                     </div>
                     <div class="col-3">
                         <input type="number" class="form-control form-control labour-qty"
-                            value="1" min="1">
+                            value="1" min="1" disabled>
                     </div>
                     <div class="col-3">
                         <input type="number" class="form-control form-control labour-price"
-                            placeholder="Price">
+                            placeholder="Price" disabled>
                     </div>
                     <div class="col-1">
                         <button type="button" class="btn btn-danger  remove-labour" style="display:none; width: 40px; height: 38px; padding: 0;">×</button>
@@ -1904,22 +2784,165 @@
 
         $(document).on("change", ".labour-select", function() {
 
+            let labourId = $(this).val();
             let price = $(this).find(":selected").data("price") || 0;
+            let $row = $(this).closest(".labour-row");
+            let $qtyInput = $row.find(".labour-qty");
+            let $priceInput = $row.find(".labour-price");
 
-            $(this)
-                .closest(".labour-row")
-                .find(".labour-price")
-                .val(price);
+            if (!labourId) {
+                $qtyInput.val(1).prop("disabled", true);
+                $priceInput.val("").prop("disabled", true);
+                calculateTotals();
+                return;
+            }
+
+            $qtyInput.prop("disabled", false);
+            $priceInput.val(price).prop("disabled", false);
+
+            const isLastRow = $row.is($(".labour-row").last());
+            const allRowsSelected = $(".labour-row").toArray().every(function(rowEl) {
+                return $(rowEl).find(".labour-select").val();
+            });
+
+            if (isLastRow && allRowsSelected) {
+                addLabourRow();
+            } else {
+                updateLabourButtons();
+            }
 
             calculateTotals(); // recalc bill
         });
         $(document).on("click", ".add-labour", function() {
+            let $currentRow = $(this).closest(".labour-row");
+            let selectedLabourId = $currentRow.find(".labour-select").val();
+
+            if (!selectedLabourId) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Select Labour Item',
+                    text: 'Please select a labour item before adding a new labour row.'
+                });
+                return;
+            }
+
             addLabourRow();
         });
         loadLabourItems();
     </script>
     <script>
         let selectedItems = new Map();
+        const isTdsEnabled = @json((bool) ($setting->tds_apply ?? false));
+
+        function updatePosPageTitle(isQuotationMode) {
+            const titleText = isQuotationMode ? 'Add Quotation' : 'Add Sale';
+            $('#posPageTitle').text(titleText);
+            document.title = titleText;
+        }
+
+        function resetPosAddBankForm() {
+            if ($('#addBankForm').length) {
+                $('#addBankForm')[0].reset();
+            }
+            $('#add_opening_balance').val('0');
+            $('#add_bank_status').val('1');
+            $('#addBankForm .text-danger').text('');
+        }
+
+        function upsertPosBankOption(bank) {
+            if (!bank || !bank.id) {
+                return;
+            }
+
+            const bankId = String(bank.id);
+            const bankName = bank.bank_name || 'Unnamed Bank';
+            const accountNumber = bank.account_number ? ` (${bank.account_number})` : '';
+            const optionLabel = `${bankName}${accountNumber}`;
+            const existingOption = $('#bank_id option[value="' + bankId + '"]');
+
+            if (existingOption.length) {
+                existingOption.text(optionLabel);
+            } else {
+                $('#bank_id').append(new Option(optionLabel, bankId));
+            }
+
+            $('#bank_id').val(bankId).trigger('change');
+        }
+
+        function formatPosOrderDateForDisplay(value) {
+            if (!value) {
+                return '';
+            }
+
+            if (/^\d{2}\/\d{2}\/\d{4}$/.test(value)) {
+                return value;
+            }
+
+            if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+                const parts = value.split('-');
+                return `${parts[2]}/${parts[1]}/${parts[0]}`;
+            }
+
+            const parsed = moment(value, ['YYYY-MM-DD', 'DD/MM/YYYY', moment.ISO_8601], true);
+            return parsed.isValid() ? parsed.format('DD/MM/YYYY') : value;
+        }
+
+        function formatPosOrderDateForApi(value) {
+            if (!value) {
+                return '';
+            }
+
+            if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+                return value;
+            }
+
+            if (/^\d{2}\/\d{2}\/\d{4}$/.test(value)) {
+                const parts = value.split('/');
+                return `${parts[2]}-${parts[1]}-${parts[0]}`;
+            }
+
+            const parsed = moment(value, ['DD/MM/YYYY', 'YYYY-MM-DD', moment.ISO_8601], true);
+            return parsed.isValid() ? parsed.format('YYYY-MM-DD') : value;
+        }
+
+        function setPosOrderDate(value) {
+            const apiValue = formatPosOrderDateForApi(value);
+            $('#order_date').val(apiValue);
+            $('#order_date_display').val(formatPosOrderDateForDisplay(apiValue));
+        }
+
+        function initPosOrderDatePicker() {
+            const $orderDateDisplay = $('#order_date_display');
+
+            if (!$orderDateDisplay.length || typeof $orderDateDisplay.datetimepicker !== 'function') {
+                return;
+            }
+
+            $orderDateDisplay.val(formatPosOrderDateForDisplay($('#order_date').val()));
+            $orderDateDisplay.datetimepicker({
+                format: 'DD/MM/YYYY',
+                useCurrent: true,
+                showTodayButton: true,
+                icons: {
+                    date: 'fa fa-calendar',
+                    previous: 'fa fa-chevron-left',
+                    next: 'fa fa-chevron-right',
+                    today: 'fa fa-crosshairs',
+                    clear: 'fa fa-trash',
+                    close: 'fa fa-times'
+                }
+            });
+
+            $orderDateDisplay.on('dp.change', function(e) {
+                const formattedDate = e.date ? e.date.format('YYYY-MM-DD') : formatPosOrderDateForApi($(this)
+                    .val());
+                setPosOrderDate(formattedDate);
+            });
+
+            $orderDateDisplay.on('blur', function() {
+                setPosOrderDate($(this).val());
+            });
+        }
 
         document.querySelectorAll('.paymentmethod').forEach(el => {
             el.addEventListener('click', function() {
@@ -1932,28 +2955,197 @@
             });
         });
         $(document).ready(function() {
+            initPosOrderDatePicker();
+
+            function toAmount(value) {
+                const parsed = parseFloat(value);
+                return Number.isFinite(parsed) ? parsed : 0;
+            }
+
+            function clampAmount(value, min, max) {
+                return Math.min(Math.max(value, min), max);
+            }
+
+            function getCurrentSaleTotal() {
+                return toAmount($("input[name='total']").val());
+            }
+
+            function getSelectedPaymentMethod() {
+                return $("input[name='payment_method']:checked").val() || "";
+            }
+
+            function refreshPosPaymentUi(resetAmounts = false) {
+                const selectedPayment = getSelectedPaymentMethod();
+                const total = getCurrentSaleTotal();
+                const $paidType = $("#posPaidType");
+
+                $(".error_bank, .error_paidtype, .error_paidamount").text("");
+
+                if (!selectedPayment || selectedPayment === "pending") {
+                    $("#posPaidTypeBox, #posPaidAmountFields, #cashOnlineBox, #bankSelectionBox").slideUp();
+                    $("#posPaidAmount, #posPendingAmount, #posCashOnlineCashAmount, #posCashOnlineOnlineAmount")
+                        .val("");
+                    $("#posPaidType").val("");
+                    return;
+                }
+
+                $("#posPaidTypeBox").slideDown();
+                const paidType = $paidType.val();
+
+                if (!paidType) {
+                    $("#posPaidAmountFields, #cashOnlineBox, #bankSelectionBox").slideUp();
+                    $("#posPaidAmount, #posPendingAmount, #posCashOnlineCashAmount, #posCashOnlineOnlineAmount")
+                        .val("");
+                    return;
+                }
+
+                if (selectedPayment === "debit card" || selectedPayment === "scan" || selectedPayment ===
+                    "cash+online") {
+                    $("#bankSelectionBox").slideDown();
+                } else {
+                    $("#bankSelectionBox").slideUp();
+                    $("#bank_id").val("");
+                }
+
+                $("#posPaidAmountFields").slideDown();
+                let paidAmount = 0;
+                let cashAmount = 0;
+                let onlineAmount = 0;
+
+                if (selectedPayment === "cash+online") {
+                    $("#cashOnlineBox").slideDown();
+
+                    const rawCashAmount = ($("#posCashOnlineCashAmount").val() || "").trim();
+                    const rawOnlineAmount = ($("#posCashOnlineOnlineAmount").val() || "").trim();
+                    const enteredCashAmount = toAmount(rawCashAmount);
+                    const enteredOnlineAmount = toAmount(rawOnlineAmount);
+
+                    cashAmount = clampAmount(enteredCashAmount, 0, total);
+                    onlineAmount = enteredOnlineAmount;
+
+                    if (paidType === "fully") {
+                        onlineAmount = Math.max(total - cashAmount, 0);
+                        $("#posCashOnlineOnlineAmount").prop("readonly", true).addClass("bg-light");
+                        $("#posCashOnlineOnlineAmount").val(onlineAmount.toFixed(2));
+                    } else {
+                        onlineAmount = clampAmount(onlineAmount, 0, total);
+                        if (cashAmount + onlineAmount > total) {
+                            onlineAmount = Math.max(total - cashAmount, 0);
+                        }
+                        $("#posCashOnlineOnlineAmount").prop("readonly", false).removeClass("bg-light");
+
+                        if (rawOnlineAmount === "") {
+                            $("#posCashOnlineOnlineAmount").val("");
+                        } else if (enteredOnlineAmount !== onlineAmount) {
+                            $("#posCashOnlineOnlineAmount").val(onlineAmount.toFixed(2));
+                        }
+                    }
+
+                    paidAmount = clampAmount(cashAmount + onlineAmount, 0, total);
+
+                    if (rawCashAmount === "") {
+                        $("#posCashOnlineCashAmount").val("");
+                    } else if (enteredCashAmount !== cashAmount) {
+                        $("#posCashOnlineCashAmount").val(cashAmount.toFixed(2));
+                    }
+
+                    $("#posPaidAmount").val(paidAmount.toFixed(2)).prop("readonly", true).addClass("bg-light");
+                } else {
+                    $("#cashOnlineBox").slideUp();
+                    $("#posCashOnlineCashAmount, #posCashOnlineOnlineAmount").val("");
+
+                    if (paidType === "fully") {
+                        paidAmount = total;
+                        $("#posPaidAmount").val(total.toFixed(2)).prop("readonly", true).addClass("bg-light");
+                    } else {
+                        const rawPaidAmount = ($("#posPaidAmount").val() || "").trim();
+                        const entered = toAmount(rawPaidAmount);
+                        paidAmount = clampAmount(entered, 0, total);
+
+                        if (resetAmounts) {
+                            $("#posPaidAmount").val("");
+                        } else if (rawPaidAmount === "") {
+                            $("#posPaidAmount").val("");
+                        } else if (entered !== paidAmount) {
+                            $("#posPaidAmount").val(paidAmount.toFixed(2));
+                        }
+
+                        $("#posPaidAmount").prop("readonly", false).removeClass("bg-light");
+                    }
+                }
+
+                const pendingAmount = Math.max(total - paidAmount, 0);
+                $("#posPendingAmount").val(pendingAmount.toFixed(2));
+            }
+
+            function getPosPaymentMeta() {
+                const selectedPayment = getSelectedPaymentMethod();
+                const paidType = $("#posPaidType").val();
+                const paidAmount = toAmount($("#posPaidAmount").val());
+                const pendingAmount = toAmount($("#posPendingAmount").val());
+                const cashAmount = toAmount($("#posCashOnlineCashAmount").val());
+                const onlineAmount = toAmount($("#posCashOnlineOnlineAmount").val());
+
+                return {
+                    selectedPayment,
+                    paidType,
+                    paidAmount,
+                    pendingAmount,
+                    cashAmount,
+                    onlineAmount
+                };
+            }
+
+            function resetPosPaymentUi() {
+                $("#posPaidType").val("");
+                $("#posPaidAmount, #posPendingAmount, #posCashOnlineCashAmount, #posCashOnlineOnlineAmount, #posPaymentRemark")
+                    .val("");
+                $("#bank_id").val("");
+                $("#posPaidTypeBox, #posPaidAmountFields, #cashOnlineBox, #bankSelectionBox").hide();
+            }
+
+            window.refreshPosPaymentUi = refreshPosPaymentUi;
+            window.getPosPaymentMeta = getPosPaymentMeta;
+            window.resetPosPaymentUi = resetPosPaymentUi;
+
+    // Mobile → Desktop
+    $(document).on('change', 'input[name="gst_option_mobile"]', function () {
+        var val = $(this).val();
+        $('input[name="gst_option"][value="' + val + '"]').prop('checked', true).trigger('change');
+    });
+
+    // Desktop → Mobile
+    $(document).on('change', 'input[name="gst_option"]', function () {
+        var val = $(this).val();
+        $('input[name="gst_option_mobile"][value="' + val + '"]').prop('checked', true);
+    });
+
+    // On page load: make sure mobile reflects desktop default (without = checked)
+    var currentGst = $('input[name="gst_option"]:checked').val() || 'without';
+    $('input[name="gst_option_mobile"][value="' + currentGst + '"]').prop('checked', true);
+
+
             $(".paymentmethod").on("click", function() {
-                let value = $(this).find("input[name='payment_method']").val();
+                const value = $(this).find("input[name='payment_method']").val();
 
                 $("input[name='payment_method']").prop("checked", false);
                 $(this).find("input[name='payment_method']").prop("checked", true);
 
-                // Clear bank error when switching payment methods
-                $(".error_bank").text("");
-
-                if (value === "cash+online") {
-                    $("#cashOnlineBox").slideDown(); // show textboxes
-                } else {
-                    $("#cashOnlineBox").slideUp(); // hide textboxes
+                if (value !== "pending") {
+                    $("#posPaidType").val("");
                 }
-
-                if (value === "debit card" || value === "scan" || value === "cash+online") {
-                    $("#bankSelectionBox").slideDown();
-                } else {
-                    $("#bankSelectionBox").slideUp();
-                }
+                refreshPosPaymentUi(true);
             });
 
+            $("#posPaidType").on("change", function() {
+                refreshPosPaymentUi(false);
+            });
+
+            $("#posPaidAmount, #posCashOnlineCashAmount, #posCashOnlineOnlineAmount").on("input", function() {
+                refreshPosPaymentUi(false);
+            });
+
+            refreshPosPaymentUi(true);
         });
 
         $(document).ready(function() {
@@ -1996,8 +3188,12 @@
                         $("input[name='payment_method']").prop("checked", false);
                         $(".paymentmethod").removeClass("active");
 
-                        $("#cashOnlineBox").hide();
-                        $("#bankSelectionBox").hide();
+                        if (typeof window.resetPosPaymentUi === "function") {
+                            window.resetPosPaymentUi();
+                        } else {
+                            $("#posPaidTypeBox, #posPaidAmountFields, #cashOnlineBox, #bankSelectionBox")
+                                .hide();
+                        }
 
                     } else {
 
@@ -2027,6 +3223,46 @@
                 return position === 'right' ? amount + symbol : symbol + amount;
             }
 
+            function parseItemPriceValue(price) {
+                return parseFloat(String(price).replace(/[^0-9.-]+/g, "")) || 0;
+            }
+
+            function parseQuantityValue(quantity) {
+                const parsedQuantity = parseFloat(String(quantity).replace(/[^0-9.-]+/g, ""));
+                return Number.isFinite(parsedQuantity) ? parsedQuantity : 0;
+            }
+
+            // Share quantity parser across script blocks.
+            window.parseQuantityValue = parseQuantityValue;
+
+            // Share stock availability UI updater across script blocks.
+            window.refreshProductAvailabilityUI = function() {
+                const allowOutOfStockForQuotation = isQuotationModeEnabled();
+
+                $('.productset').each(function() {
+                    const $product = $(this);
+                    const stock = window.parseQuantityValue($product.data('stock'));
+                    const $button = $product.find('.productsetbtn button');
+
+                    if (stock <= 0) {
+                        $product.toggleClass('disabled-product', !allowOutOfStockForQuotation);
+                        if ($button.length) {
+                            $button.prop('disabled', !allowOutOfStockForQuotation);
+                        }
+                    } else {
+                        $product.removeClass('disabled-product');
+                        if ($button.length) {
+                            $button.prop('disabled', false);
+                        }
+                    }
+                });
+            };
+
+            function formatQuantityValue(quantity) {
+                const parsedQuantity = parseQuantityValue(quantity);
+                return Number.isInteger(parsedQuantity) ? String(parsedQuantity) : String(parsedQuantity);
+            }
+
             window.calculateTotals = function() {
 
                 const firstTaxElement = $(".tax-value").first();
@@ -2050,7 +3286,7 @@
 
                 selectedItems.forEach(function(item) {
 
-                    let price = parseFloat(item.price.replace(/[^0-9.-]+/g, ""));
+                    let price = parseItemPriceValue(item.price);
                     let baseAmount = price * item.quantity;
 
                     let productGst = 0;
@@ -2100,7 +3336,16 @@
 
                 // ================= FINAL TOTAL =================
                 let shipping = parseFloat($("#shipping").val()) || 0;
-                let finalTotal = priceAfterGlobalDiscount + totalProductGst + shipping + labourTotal;
+                const rawTdsPercentage = isTdsEnabled ? ($("#tds_percentage").val() || "").trim() : "";
+                const tdsPercentageInput = isTdsEnabled ? (parseFloat(rawTdsPercentage) || 0) : 0;
+                const tdsPercentage = Math.max(0, Math.min(100, tdsPercentageInput));
+
+                const preTdsTotal = priceAfterGlobalDiscount + totalProductGst + shipping + labourTotal;
+                const tdsAmount = isTdsEnabled ? (preTdsTotal * tdsPercentage) / 100 : 0;
+
+                let finalTotal = preTdsTotal - tdsAmount;
+                let roundedTotal = Math.round(finalTotal);
+                let roundOffAmount = roundedTotal - finalTotal;
 
                 // ================= UI UPDATE =================
 
@@ -2114,28 +3359,47 @@
                 );
 
                 $(".price-after-discount").html(
-                    formatCurrency(priceAfterGlobalDiscount.toFixed(2), currencySymbol, currencyPosition)
+                    `${formatCurrency((priceAfterGlobalDiscount + totalProductGst).toFixed(2), currencySymbol, currencyPosition)}`
                 );
 
                 $(".shipping-cost-summary").html(
                     formatCurrency(shipping.toFixed(2), currencySymbol, currencyPosition)
                 );
 
+                if (isTdsEnabled) {
+                    $("#tds_amount").val(tdsAmount.toFixed(2));
+                    $(".tds-percentage-summary").text(tdsPercentage.toFixed(2));
+                    $(".tds-amount-summary").html(
+                        `- ${formatCurrency(tdsAmount.toFixed(2), currencySymbol, currencyPosition)}`
+                    );
+                    $(".tds-summary-row").show();
+                } else {
+                    $(".tds-summary-row").hide();
+                }
+
+                $(".round-off-amount").html(
+                    formatCurrency(roundOffAmount.toFixed(2), currencySymbol, currencyPosition)
+                );
+
                 $(".total-value h6").html(
-                    formatCurrency(finalTotal.toFixed(2), currencySymbol, currencyPosition)
+                    formatCurrency(roundedTotal.toFixed(0), currencySymbol, currencyPosition)
                 );
 
                 $(".btn-totallabel h6").html(
-                    'Total Amount : ' + formatCurrency(finalTotal.toFixed(2), currencySymbol,
+                    'Total Amount : ' + formatCurrency(roundedTotal.toFixed(0), currencySymbol,
                         currencyPosition)
                 );
 
                 $("input[name='subtotal']").val(baseSubtotal.toFixed(2));
                 $("input[name='discount_amount']").val((totalProductDiscount + globalDiscountAmount).toFixed(
                     2));
-                $("input[name='price_after_discount']").val(priceAfterGlobalDiscount.toFixed(2));
-                $("input[name='total']").val(finalTotal.toFixed(2));
-                $("#onlineAmount").val(finalTotal.toFixed(2));
+                $("input[name='price_after_discount']").val((priceAfterGlobalDiscount + totalProductGst)
+                    .toFixed(2));
+                $("input[name='round_off']").val(roundOffAmount.toFixed(2));
+                $("input[name='total']").val(roundedTotal.toFixed(0));
+                if (typeof window.refreshPosPaymentUi === "function") {
+                    window.refreshPosPaymentUi(false);
+                }
 
                 // ================= GST DISPLAY =================
 
@@ -2148,6 +3412,20 @@
                     }
                 } else {
                     $(".gst-summary-row").hide();
+                }
+
+                if ((totalProductDiscount + globalDiscountAmount) > 0) {
+                    $(".discount-summary-row").show();
+                    $(".subtotal-summary-row").show();
+                } else {
+                    $(".discount-summary-row").hide();
+                    $(".subtotal-summary-row").hide();
+                }
+
+                if (shipping > 0) {
+                    $(".shipping-summary-row").show();
+                } else {
+                    $(".shipping-summary-row").hide();
                 }
 
                 // ================= LABOUR DISPLAY =================
@@ -2166,9 +3444,9 @@
             window.updateTotalItems = function() {
                 let totalQty = 0;
                 selectedItems.forEach(item => {
-                    totalQty += parseInt(item.quantity) || 0;
+                    totalQty += parseQuantityValue(item.quantity);
                 });
-                $(".totalitem h4").text("Total items : " + totalQty);
+                $(".totalitem h4").text("Total items : " + formatQuantityValue(totalQty));
                 renderSelectedItems();
                 calculateTotals();
             }
@@ -2184,12 +3462,13 @@
                     selectedItems.forEach(function(item) {
                         const hasProductGST = item.gst_option === "with_gst";
                         const gstRate = item.product_gst || null;
+                        const showNoGstMessage = globalGstOption === "with" && !hasProductGST;
 
                         // Parse GST data if available AND global option is "with"
                         let gstDisplay = '';
                         let productGstTotal = 0;
 
-                        const price = parseFloat(item.price.replace(/[^0-9.-]+/g, ""));
+                        const price = parseItemPriceValue(item.price);
                         const productTotal = price * item.quantity;
 
                         let gstIncludedTotal = productTotal;
@@ -2252,7 +3531,7 @@
                                                     </h4>
 
                                                     ${(globalGstOption === "with" && hasProductGST && gstDisplay) ?
-                                                        `<div class="gst-info" style="margin: 4px 0; padding: 8px; background: #f8f9fa; border-radius: 6px;">
+                                                        `<div class="gst-info" style="margin: 4px 0; padding: 8px; background: #f8f9fa; border-radius: 6px;width:135px;">
                                                                                                                           ${gstDisplay}
                                                                                                                                      <small class="d-block" id="gstrates"
                                                                                                                                     data-value="${productGstTotal.toFixed(2)}" style="font-weight: bold; color: #333; margin-top: 4px; font-size: 12px;">
@@ -2271,14 +3550,25 @@
                                                         : ''
                                                     }
 
+                                                    ${showNoGstMessage ?
+                                                        `<div class="gst-no-message">This product has no GST.</div>`
+                                                        : ''
+                                                    }
+
                                                     <div class="increment-decrement">
                                                         <div class="input-groups">
                                                             <input type="button" value="-" class="button-minus dec button" data-id="${item.id}">
-                                                            <input type="text" name="quantity" value="${item.quantity}" class="quantity-field" data-id="${item.id}" data-stock="${item.stock}">
+                                                            <input type="text" name="quantity" value="${formatQuantityValue(item.quantity)}" class="quantity-field" data-id="${item.id}" data-stock="${item.stock}" inputmode="decimal" style="width: 50px;">
                                                             <input type="button" value="+" class="button-plus inc button" data-id="${item.id}">
                                                         </div>
                                                         <div style="font-size: 14px; color: #333; margin-bottom: 5px; margin-top:5px;">
-                                                            <h4> ${item.price} </h4>
+                                                            <input
+                                                                type="text"
+                                                                class="product-price-input product-price-field"
+                                                                data-id="${item.id}"
+                                                                value="${price.toFixed(2)}"
+                                                                min="0"
+                                                                step="0.01">
                                                         </div>
                                                     </div>
                                                 </div>
@@ -2369,6 +3659,37 @@
                 updateTotalItems();
             });
 
+            $(document).on("change", ".product-price-field", function() {
+
+                let id = $(this).attr('data-id');
+                let amount = parseFloat($(this).val());
+
+                if (!selectedItems.has(id)) return;
+
+                let item = selectedItems.get(id);
+
+                if (isNaN(amount) || amount < 0) {
+                    amount = 0;
+                }
+
+                item.price = formatCurrency(amount.toFixed(2), '{{ $currency_symbol }}', '{{ $currency_position }}');
+
+                let baseTotal = getItemBaseAmount(item);
+
+                if (item.discount_percentage > 0) {
+                    item.discount_amount = (baseTotal * item.discount_percentage) / 100;
+                } else if (item.discount_amount > 0) {
+                    item.discount_amount = Math.min(item.discount_amount, baseTotal);
+                    item.discount_percentage = baseTotal > 0 ? (item.discount_amount / baseTotal) * 100 : 0;
+                }
+
+                selectedItems.set(id, item);
+
+                $(this).val(amount.toFixed(2));
+
+                updateTotalItems();
+            });
+
             // Product Discount Amount
             $(document).on("change", ".product-discount-amount", function() {
 
@@ -2420,8 +3741,17 @@
                 var categoryId = $product.find(".productsetcontent h1").text().trim();
                 var productImage = $product.find("img").attr("src");
                 var $checkIcon = $product.find(".check-product i");
-                var productStock = parseInt($product.data("stock"));
+                var productStock = parseQuantityValue($product.data("stock"));
                 var gstOption = $product.data("gst-option") || "without_gst";
+
+                if (!isQuotationModeEnabled() && productStock <= 0) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Out of Stock',
+                        text: 'This product is currently out of stock.'
+                    });
+                    return;
+                }
 
                 // Get product GST data and parse it
                 var productGst = $product.data("product-gst");
@@ -2438,8 +3768,10 @@
                 // Check if product already exists in cart
                 if (selectedItems.has(productIdStr)) {
                     let item = selectedItems.get(productIdStr);
-                    if (item.quantity < item.stock) {
-                        item.quantity++;
+                    const nextQuantity = parseQuantityValue(item.quantity) + 1;
+
+                    if (isQuotationModeEnabled() || nextQuantity <= parseQuantityValue(item.stock)) {
+                        item.quantity = nextQuantity;
 
                         // Recalculate discount
                         let baseAmount = getItemBaseAmount(item);
@@ -2490,7 +3822,7 @@
 
             function getItemBaseAmount(item) {
 
-                let price = parseFloat(item.price.replace(/[^0-9.-]+/g, ""));
+                let price = parseItemPriceValue(item.price);
                 let productTotal = price * item.quantity;
 
                 const globalGstOption = $("input[name='gst_option']:checked").val();
@@ -2530,7 +3862,9 @@
 
                 let item = selectedItems.get(itemId);
 
-                if (item.quantity >= item.stock) {
+                const nextQuantity = parseQuantityValue(item.quantity) + 1;
+
+                if (!isQuotationModeEnabled() && nextQuantity > parseQuantityValue(item.stock)) {
                     Swal.fire({
                         icon: 'warning',
                         title: 'Stock Limit Reached',
@@ -2542,7 +3876,7 @@
                 }
 
                 // Increase quantity
-                item.quantity++;
+                item.quantity = nextQuantity;
 
                 // 🔥 Recalculate discount properly
                 let baseAmount = getItemBaseAmount(item);
@@ -2562,17 +3896,17 @@
 
                 // var itemId = $(this).data("id");
                 var itemId = $(this).attr('data-id');
-                var newQty = parseInt($(this).val());
+                var newQty = parseQuantityValue($(this).val());
 
                 if (!selectedItems.has(itemId)) return;
 
                 let item = selectedItems.get(itemId);
 
-                if (isNaN(newQty) || newQty < 1) {
+                if (newQty < 0.01) {
                     newQty = 1;
                 }
 
-                if (newQty > item.stock) {
+                if (!isQuotationModeEnabled() && newQty > item.stock) {
                     Swal.fire({
                         icon: 'warning',
                         title: 'Stock Quantity Exceeded',
@@ -2596,7 +3930,7 @@
 
                 selectedItems.set(itemId, item);
 
-                $(this).val(newQty);
+                $(this).val(formatQuantityValue(newQty));
 
                 updateTotalItems();
             });
@@ -2610,10 +3944,10 @@
 
                 let item = selectedItems.get(itemId);
 
-                if (item.quantity <= 1) return;
+                if (parseQuantityValue(item.quantity) <= 1) return;
 
                 // Decrease quantity
-                item.quantity--;
+                item.quantity = Math.max(1, parseQuantityValue(item.quantity) - 1);
 
                 // 🔥 Recalculate discount properly
                 let baseAmount = getItemBaseAmount(item);
@@ -2648,6 +3982,25 @@
             });
 
             $("#shipping").on("input", function() {
+                calculateTotals();
+            });
+            $("#tds_percentage").on("input", function() {
+                calculateTotals();
+            });
+            $("#tds_percentage").on("blur", function() {
+                if (!isTdsEnabled) {
+                    return;
+                }
+
+                const rawValue = ($(this).val() || "").trim();
+                if (rawValue === "") {
+                    $("#tds_amount").val("0.00");
+                    calculateTotals();
+                    return;
+                }
+
+                const normalizedValue = Math.max(0, Math.min(100, parseFloat(rawValue) || 0));
+                $(this).val(normalizedValue.toFixed(2));
                 calculateTotals();
             });
 
@@ -2716,7 +4069,7 @@
                 ).prop('disabled', true);
 
                 // Reset errors
-                $(".error_customername, .error_customerphone, .error_peymentmethod, .error_discount, .error_bank")
+                $(".error_customername, .error_customerphone, .error_peymentmethod, .error_discount, .error_bank, .error_paidtype, .error_paidamount")
                     .text(
                         "");
                 $(".total-value .error_total").remove();
@@ -2725,13 +4078,19 @@
                 // let name = $("input[name='customer_name']").val().trim();
                 let name = $("#customer_name option:selected").val();
                 let phone = $("input[name='customer_phone']").val().trim();
+                let orderDate = $("#order_date").val();
                 let selectedPayment = $("input[name='payment_method']:checked").val();
                 let bank_id = $("#bank_id").val();
                 let subtotal = parseFloat($("input[name='subtotal']").val()) || 0;
                 let total = parseFloat($("input[name='total']").val()) || 0;
                 let discount_amount = parseFloat($("input[name='discount_amount']").val()) || 0;
                 let remarks = $("#remarks").val().trim();
+                let paymentRemarks = $("#posPaymentRemark").val().trim();
                 let shipping = parseFloat($("#shipping").val()) || 0;
+                let tds_percentage = parseFloat($("#tds_percentage").val()) || 0;
+                let tds_amount = parseFloat($("#tds_amount").val()) || 0;
+                let posPaymentMeta = (typeof window.getPosPaymentMeta === "function") ? window
+                    .getPosPaymentMeta() : null;
                 // Validation
                 let isValid = true;
 
@@ -2758,6 +4117,34 @@
                         $(".error_peymentmethod").text("Please select a payment method").css("color",
                             "red");
                         isValid = false;
+                    }
+                }
+
+                if (quotationStatus !== 'quotation' && selectedPayment && selectedPayment !== "pending") {
+                    if (!posPaymentMeta || !posPaymentMeta.paidType) {
+                        $(".error_paidtype").text("Please select paid type.");
+                        isValid = false;
+                    } else if (posPaymentMeta.paidAmount <= 0) {
+                        $(".error_paidamount").text("Enter a valid payment amount.");
+                        isValid = false;
+                    } else if (posPaymentMeta.paidType === "partially" && posPaymentMeta.paidAmount >=
+                        total) {
+                        $(".error_paidamount").text(
+                            "Partial amount must be less than total amount.");
+                        isValid = false;
+                    }
+
+                    if (selectedPayment === "cash+online") {
+                        if (posPaymentMeta.cashAmount < 0 || posPaymentMeta.onlineAmount < 0) {
+                            $(".error_paidamount").text("Negative amount is not allowed.");
+                            isValid = false;
+                        }
+
+                        if ((posPaymentMeta.cashAmount + posPaymentMeta.onlineAmount) > total) {
+                            $(".error_paidamount").text(
+                                "Cash + Online total cannot exceed total amount.");
+                            isValid = false;
+                        }
                     }
                 }
 
@@ -2803,7 +4190,7 @@
                 // In the order submission section
                 let orderItems = [];
                 selectedItems.forEach(function(item) {
-                    const price = parseFloat(item.price.replace(/[^0-9.-]+/g, ""));
+                    const price = parseItemPriceValue(item.price);
                     const itemTotal = price * item.quantity;
 
                     // Calculate product GST if applicable
@@ -2879,12 +4266,6 @@
                     taxes = []; // ✅ explicitly empty when "without GST"
                 }
 
-
-                let cash = parseFloat($("#cashAmount").val()) || 0;
-                let online = parseFloat($("#onlineAmount").val()) || 0;
-
-
-
                 // Prepare order data
                 // In the order submission section, add gst_total to orderData
                 // build base payload
@@ -2892,6 +4273,7 @@
                     selectedSubAdminId: selectedSubAdminId,
                     customer_id: name,
                     customer_phone: phone,
+                    order_date: orderDate,
                     subtotal: subtotal,
                     discount: 0,
                     discount_amount: discount_amount,
@@ -2901,6 +4283,8 @@
                     items: orderItems,
                     remarks: remarks,
                     shipping: shipping,
+                    tds_percentage: tds_percentage,
+                    tds_amount: tds_amount,
                     labour_items: labourItems,
                     quotation_status: quotationStatus, // ✅ IMPORTANT
                 };
@@ -2909,8 +4293,24 @@
                 if (quotationStatus === 'sales') {
                     orderData.payment_method = selectedPayment;
                     orderData.bank_id = bank_id;
-                    orderData.cash_amount = cash;
-                    orderData.online_amount = online;
+                    orderData.payment_amount = posPaymentMeta ? posPaymentMeta.paidAmount : 0;
+                    orderData.pending_amount = posPaymentMeta ? posPaymentMeta.pendingAmount : total;
+                    orderData.payment_remarks = paymentRemarks;
+
+                    if (selectedPayment === "cash") {
+                        orderData.paid_type = (posPaymentMeta && posPaymentMeta.paidType === "partially") ?
+                            "cash_partially" : "cash_fully";
+                        orderData.amount = posPaymentMeta ? posPaymentMeta.paidAmount : 0;
+                    } else if (selectedPayment === "debit card" || selectedPayment === "scan") {
+                        orderData.online_type = (posPaymentMeta && posPaymentMeta.paidType === "partially") ?
+                            "online_partially" : "online_fully";
+                        orderData.amount = posPaymentMeta ? posPaymentMeta.paidAmount : 0;
+                    } else if (selectedPayment === "cash+online") {
+                        orderData.cash_online_type = (posPaymentMeta && posPaymentMeta.paidType ===
+                            "partially") ? "cash_online_partially" : "cash_online_fully";
+                        orderData.cash_amount = posPaymentMeta ? posPaymentMeta.cashAmount : 0;
+                        orderData.online_amount = posPaymentMeta ? posPaymentMeta.onlineAmount : 0;
+                    }
                 }
 
 
@@ -2954,10 +4354,13 @@
                             // Reset form
                             selectedItems.clear();
                             $(".check-product i").removeClass("selected");
-                            $("input[name='customer_name'], input[name='customer_phone']").val(
-                                "");
+                            $("input[name='customer_name'], input[name='customer_phone']").val("");
+                            setPosOrderDate("{{ now()->format('Y-m-d') }}");
                             $("input[name='payment_method']").prop("checked", false);
                             $(".paymentmethod").removeClass("active");
+                            if (typeof window.resetPosPaymentUi === "function") {
+                                window.resetPosPaymentUi();
+                            }
                             updateTotalItems();
                         } else {
                             alert("Error: " + response.message);
@@ -3147,8 +4550,10 @@
                 z-index: 10;
                 ">Out of Stock</div>`;
 
-                            disabledClass = 'disabled-product';
-                            addButtonDisabled = 'disabled';
+                            if (!isQuotationModeEnabled()) {
+                                disabledClass = 'disabled-product';
+                                addButtonDisabled = 'disabled';
+                            }
                         }
 
                         // ✅ ADD data-gst-option and data-product-gst ATTRIBUTES HERE
@@ -3172,7 +4577,6 @@
                             </h4>
                              <h5 class="text-dark" style="text-transform: capitalize; ">${product.unit || ''}</h5>
                             <h1 class="d-none">${product.categoryId || 'Uncategorized'}</h1>
-                            <h5 style="text-transform: capitalize;">${product.category_name || 'Uncategorized'}</h5>
 
                             <h6>${displayPrice}</h6>
                         </div>
@@ -3189,6 +4593,7 @@
                 var $tabContent = $('.tab_content[data-tab="' + categoryId + '"]');
                 if ($tabContent.length) {
                     $tabContent.html('<div class="row">' + productsHtml + '</div>');
+                    window.refreshProductAvailabilityUI();
 
                 } else {
 
@@ -3233,6 +4638,93 @@
         $(document).ready(function() {
             const $searchInput = $('#customerSearch1');
             const $resultBox = $('#searchResults1');
+            const addBankModalElement = document.getElementById('addBankModal');
+            const addBankModal = addBankModalElement ? new bootstrap.Modal(addBankModalElement) : null;
+
+            @if ($showNewBillModal)
+                const newBillTypeModalElement = document.getElementById('newBillTypeModal');
+                if (newBillTypeModalElement) {
+                    const newBillTypeModal = new bootstrap.Modal(newBillTypeModalElement, {
+                        backdrop: 'static',
+                        keyboard: false
+                    });
+                    newBillTypeModal.show();
+                }
+            @endif
+
+            $('#openAddBankModal').on('click', function() {
+                resetPosAddBankForm();
+                if (addBankModal) {
+                    addBankModal.show();
+                }
+            });
+
+            $('#addBankForm').on('submit', function(e) {
+                e.preventDefault();
+
+                $('#addBankForm .text-danger').text('');
+
+                const formData = new FormData(this);
+                if (selectedSubAdminId && selectedSubAdminId !== "null" && selectedSubAdminId !==
+                    "undefined") {
+                    formData.append('selectedSubAdminId', selectedSubAdminId);
+                }
+
+                const saveButton = $('#saveBankBtn');
+                saveButton.prop('disabled', true).text('Saving...');
+
+                $.ajax({
+                    url: '/api/banks',
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    headers: {
+                        'X-CSRF-TOKEN': "{{ csrf_token() }}",
+                        "Authorization": "Bearer " + authToken
+                    },
+                    success: function(response) {
+                        upsertPosBankOption(response.data || null);
+                        $(".error_bank").text("");
+
+                        if (addBankModal) {
+                            addBankModal.hide();
+                        }
+
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success',
+                            text: response.message || 'Bank added successfully.',
+                            confirmButtonText: 'OK'
+                        });
+                    },
+                    error: function(xhr) {
+                        const errors = xhr.responseJSON?.errors || {};
+
+                        $('#addBankNameError').text(errors.bank_name ? errors.bank_name[0] : '');
+                        $('#addAccountNumberError').text(errors.account_number ? errors
+                            .account_number[0] : '');
+                        $('#addIfscCodeError').text(errors.ifsc_code ? errors.ifsc_code[0] : '');
+                        $('#addBranchNameError').text(errors.branch_name ? errors.branch_name[0] :
+                            '');
+                        $('#addOpeningBalanceError').text(errors.opening_balance ? errors
+                            .opening_balance[0] : '');
+                        $('#addBankStatusError').text(errors.status ? errors.status[0] : '');
+
+                        if (!Object.keys(errors).length) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: xhr.responseJSON?.message || 'Failed to add bank.',
+                                confirmButtonText: 'OK'
+                            });
+                        }
+                    },
+                    complete: function() {
+                        saveButton.prop('disabled', false).text('Save Bank');
+                    }
+                });
+            });
 
             $searchInput.on('input', function() {
                 const query = $(this).val().trim();
@@ -3264,7 +4756,10 @@
                         if (data.products && data.products.length > 0) {
                             hasResults = true;
                             $resultBox.append(
-                                `<div class="list-group-item fw-bold mt-2">Products</div>`);
+                                `<div class="list-group-item fw-bold mt-2 d-flex justify-content-between align-items-center">
+            <span>Products</span>
+            <button type="button" class="btn-close close-search-result"></button>
+        </div>`);
                             data.products.forEach(product => {
                                 // In the search AJAX success handler, update the product button:
                                 $resultBox.append(`
@@ -3273,7 +4768,7 @@
                                         <img src="${product.image}" alt="Product Image" class="rounded me-2" style="width:30px; height:30px; object-fit: cover;">
                                         <div>
                                             <strong>${product.name ?? 'N/A'}</strong><br>
-                                            <small>Price: ${product.price ?? 'N/A'}</small>
+                                            <small>Price: ${product.price_formatted ?? product.price ?? 'N/A'}</small>
                                             ${product.gst_option === 'with_gst' ?
                                                 `<br><small style="color: green;">With GST</small>` :
                                                 `<br><small style="color: gray;">Without GST</small>`
@@ -3285,7 +4780,7 @@
                                         data-name="${product.name}"
                                         data-price="${product.price}"
                                         data-image="${product.image}"
-                                        data-stock="${product.stock ?? 10}"
+                                        data-stock="${product.quantity ?? product.stock ?? product.current_stock ?? product.available_qty ?? 0}"
                                         data-category="${product.category_id ?? 0}"
                                         data-gst-option="${product.gst_option || 'without_gst'}"
                                         data-product-gst='${product.product_gst || ''}'>+ Add</button>
@@ -3311,6 +4806,10 @@
                 });
             });
 
+                $(document).on('click', '.close-search-result', function () {
+                    $resultBox.hide().empty();
+                });
+
             $(document).on("click", ".add-product", function() {
                 const $btn = $(this);
                 const productIdNum = $btn.data("id"); // number
@@ -3318,10 +4817,19 @@
                 const productName = $btn.data("name");
                 const productPrice = $btn.data("price");
                 const productImage = $btn.data("image");
-                const productStock = parseInt($btn.data("stock"));
+                const productStock = parseQuantityValue($btn.data("stock"));
                 const categoryId = $btn.data("category");
                 const gstOptionItem = $btn.data("gst-option") || "without_gst";
                 let productGst = $btn.data("product-gst") || null;
+
+                if (!isQuotationModeEnabled() && productStock <= 0) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Out of Stock',
+                        text: 'This product is currently out of stock.'
+                    });
+                    return;
+                }
 
                 if (productGst && productGst !== "null" && typeof productGst === 'string' && productGst
                     .startsWith('[')) {
@@ -3351,28 +4859,61 @@
                     $btn.prop("disabled", true).text("Added");
                     updateTotalItems();
                 } else {
-                    Swal.fire({
-                        icon: 'info',
-                        title: 'Already Added',
-                        text: 'This product is already in the list!',
-                        confirmButtonColor: '#3085d6',
-                        confirmButtonText: 'OK'
-                    });
+                    let item = selectedItems.get(productIdStr);
+
+                    const nextQuantity = parseQuantityValue(item.quantity) + 1;
+
+                    if (isQuotationModeEnabled() || nextQuantity <= parseQuantityValue(item.stock)) {
+                        item.quantity = nextQuantity;
+                        selectedItems.set(productIdStr, item);
+                        updateTotalItems();
+                    } else {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Stock Limit',
+                            text: 'Cannot add more than available stock (' + item.stock + ')',
+                            confirmButtonColor: '#3085d6',
+                            confirmButtonText: 'OK'
+                        });
+                    }
                 }
             });
 
-            $(document).on('change', '.quotationToggle', function() {
-
-                let isChecked = $(this).is(':checked');
-
+            function syncQuotationMode(isChecked) {
                 $('.quotationToggle').prop('checked', isChecked);
+                $('#quotation_status').val(isChecked ? 'quotation' : 'sales');
+                updatePosPageTitle(isChecked);
+
+                const currentUrl = new URL(window.location.href);
+                currentUrl.searchParams.set('sale_type', isChecked ? 'quotation' : 'sales');
+                window.history.replaceState({}, '', currentUrl.toString());
 
                 if (isChecked) {
+                    $('#paymentSection').hide();
+                    $("input[name='payment_method']").prop('checked', false);
+                    $('.paymentmethod').removeClass('active');
+                    if (typeof window.resetPosPaymentUi === "function") {
+                        window.resetPosPaymentUi();
+                    } else {
+                        $('#posPaidTypeBox, #posPaidAmountFields, #cashOnlineBox, #bankSelectionBox').hide();
+                    }
                     $('.setvaluecash').hide();
                 } else {
+                    $('#paymentSection').show();
                     $('.setvaluecash').show();
+                    if (typeof window.refreshPosPaymentUi === "function") {
+                        window.refreshPosPaymentUi(true);
+                    }
                 }
 
+                window.refreshProductAvailabilityUI();
+            }
+
+            syncQuotationMode(new URLSearchParams(window.location.search).get('sale_type') === 'quotation' ||
+                $('.quotationToggle:checked').length > 0);
+
+            $(document).on('change', '.quotationToggle', function() {
+                syncQuotationMode($(this).is(':checked'));
             });
             // Optional: Hide dropdown on outside click
             $(document).on('click', function(e) {
@@ -3383,4 +4924,3 @@
         });
     </script>
 @endpush
- 

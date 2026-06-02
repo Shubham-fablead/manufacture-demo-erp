@@ -104,7 +104,7 @@
         }
 
         /* For Biller column */
-        .datanew td:nth-child(10) {
+        .datanew td:nth-child(9) {
             max-width: 260px;
         }
 
@@ -117,11 +117,6 @@
             line-height: 1.3;
         }
 
-        @media screen and (max-width: 768px) {
-            .table-scroll-top {
-                display: block;
-            }
-        }
 
         .form-control {
             color: #595b5d !important;
@@ -170,6 +165,26 @@
             display: none;
         }
 
+        .order-mobile-summary {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 2px;
+        }
+
+        .order-mobile-link {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        .order-mobile-customer {
+            display: none;
+            font-size: 12px;
+            color: #595b5d;
+            line-height: 1.3;
+            word-break: break-word;
+        }
+
 
 
 
@@ -180,21 +195,45 @@
         @media screen and (max-width: 575.98px) {
             .table-responsive {
                 display: block !important;
-                overflow-x: auto;
+                overflow-x: hidden;
                 -webkit-overflow-scrolling: touch;
+                width: 100% !important;
             }
 
             .mobile-order-card {
                 display: none;
             }
 
+            #order-table,
+            #order-table_wrapper,
             .datanew {
                 font-size: 11px;
+                width: 100% !important;
+                max-width: 100% !important;
+                table-layout: fixed;
             }
 
             .datanew th,
             .datanew td {
                 padding: 6px 3px;
+            }
+
+            .datanew th:nth-child(1),
+            .datanew td:nth-child(1) {
+                width: calc(100% - 56px) !important;
+            }
+
+            .order-mobile-customer {
+                display: block;
+            }
+
+            .datanew th:nth-child(2),
+            .datanew td:nth-child(2) {
+                width: 100% !important;
+                min-width: 100% !important;
+                max-width: 100% !important;
+                /* text-align: center; */
+                display: table-cell !important;
             }
 
             /* Show only Order Number and Details */
@@ -219,34 +258,63 @@
 
             .datanew th:nth-child(n+3),
             .datanew td:nth-child(n+3) {
-                display: none;
+                display: none !important;
+                width: 0 !important;
+                min-width: 0 !important;
+                max-width: 0 !important;
+                padding: 0 !important;
+                border: 0 !important;
             }
         }
 
         /* Center Details column */
         .datanew th:nth-child(2),
         .datanew td:nth-child(2) {
-            text-align: center;
+            text-align: right;
         }
 
         /* Small devices (landscape phones, 576px and up) */
         @media screen and (min-width: 576px) and (max-width: 767.98px) {
             .table-responsive {
                 display: block !important;
-                overflow-x: auto;
+                overflow-x: hidden;
+                width: 100% !important;
             }
 
             .mobile-order-card {
                 display: none;
             }
 
+            #order-table,
+            #order-table_wrapper,
             .datanew {
                 font-size: 12px;
+                width: 100% !important;
+                max-width: 100% !important;
+                table-layout: fixed;
             }
 
             .datanew th,
             .datanew td {
                 padding: 8px 4px;
+            }
+
+            .datanew th:nth-child(1),
+            .datanew td:nth-child(1) {
+                width: calc(100% - 56px) !important;
+            }
+
+            .order-mobile-customer {
+                display: block;
+            }
+
+            .datanew th:nth-child(2),
+            .datanew td:nth-child(2) {
+                width: 56px !important;
+                min-width: 56px !important;
+                max-width: 56px !important;
+                /* text-align: center; */
+                display: table-cell !important;
             }
 
             /* Show only Order Number and Details */
@@ -266,13 +334,28 @@
             .datanew td:nth-child(9),
             .datanew th:nth-child(10),
             .datanew td:nth-child(10) {
-                display: none;
+                display: none !important;
+                width: 0 !important;
+                min-width: 0 !important;
+                max-width: 0 !important;
+                padding: 0 !important;
+                border: 0 !important;
+            }
+
+            .datanew th:nth-child(11),
+            .datanew td:nth-child(11) {
+                display: none !important;
+                width: 0 !important;
+                min-width: 0 !important;
+                max-width: 0 !important;
+                padding: 0 !important;
+                border: 0 !important;
             }
 
             /* Center Details column */
             .datanew th:nth-child(2),
             .datanew td:nth-child(2) {
-                text-align: center;
+                /* text-align: center; */
             }
         }
 
@@ -281,10 +364,18 @@
             .table-responsive {
                 display: block !important;
                 overflow-x: auto;
+                overflow-y: hidden;
+                -webkit-overflow-scrolling: touch;
             }
 
             .mobile-order-card {
                 display: none;
+            }
+
+            #order-table,
+            #order-table_wrapper,
+            .datanew {
+                min-width: 980px;
             }
 
             .datanew {
@@ -313,6 +404,8 @@
             .table-responsive {
                 display: block !important;
                 overflow-x: auto;
+                overflow-y: hidden;
+                -webkit-overflow-scrolling: touch;
             }
 
             .mobile-order-card {
@@ -395,7 +488,24 @@
             color: white;
             font-size: 18px;
             font-weight: bold;
+            line-height: 1;
+            padding: 0;
+            flex-shrink: 0;
+            appearance: none;
             transition: all 0.3s;
+        }
+
+        .mobile-toggle-btn-table .toggle-icon {
+            display: inline-block;
+            width: 100%;
+            text-align: center;
+            line-height: 1;
+            font-size: 20px;
+            font-weight: 700;
+            font-family: Arial, sans-serif;
+            color: inherit;
+            pointer-events: none;
+            transform: translateY(-1px);
         }
 
         .mobile-toggle-btn-table:hover {
@@ -733,10 +843,236 @@
             font-weight: 600;
         }
 
-        @media (max-width: 768px) {
+
+        .sales-filter-toolbar .filter-field,
+        .sales-filter-toolbar .filter-field .custom-select2,
+        .sales-filter-toolbar .filter-field .form-group,
+        .sales-filter-toolbar .filter-field .search-set {
+            margin-bottom: 0 !important;
+        }
+
+        .sales-filter-toolbar .filter-field .form-control,
+        .sales-filter-toolbar .filter-field .select2-container,
+        .sales-filter-toolbar .filter-field .search-input,
+        .sales-filter-toolbar .filter-field .filter-total-box,
+        .sales-filter-toolbar .filter-field .filter-date-input {
+            width: 100% !important;
+        }
+
+        .sales-filter-toolbar .filter-export-group {
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+            width: 100%;
+        }
+
+        .sales-filter-toolbar .filter-export-group .btn {
+            min-width: 74px;
+        }
+
+        @media screen and (min-width: 992px) and (max-width: 1199.98px) {
+            .content,
+            .card,
+            .card-body,
+            .sales-filter-toolbar {
+                max-width: 100%;
+                overflow-x: hidden;
+            }
+
+            .sales-filter-toolbar .row {
+                display: grid;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 10px;
+                /* width: auto !important; */
+                margin: 0;
+            }
+
+            .sales-filter-toolbar .filter-field {
+                max-width: 100%;
+                width: 100%;
+                padding: 0 5px;
+            }
+
+            .sales-filter-toolbar .filter-field.filter-search,
+            .sales-filter-toolbar .filter-field.filter-export {
+                grid-column: span 2;
+            }
+
+            .sales-filter-toolbar .filter-export-group {
+                justify-content: flex-start;
+            }
+
+            .table-responsive {
+                width: 100%;
+                max-width: 100%;
+                overflow-x: auto !important;
+                overflow-y: hidden;
+            }
+        }
+
+        @media screen and (min-width: 768px) and (max-width: 991.98px) {
+            .content,
+            .card,
+            .card-body,
+            .sales-filter-toolbar {
+                max-width: 100%;
+                overflow-x: hidden;
+            }
+
+            .sales-filter-toolbar .row {
+                display: grid;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 10px;
+                /* width: auto !important; */
+                margin: 0;
+            }
+
+            .sales-filter-toolbar .filter-field {
+                max-width: 100%;
+                width: 100%;
+                padding: 0 5px;
+            }
+
+            .sales-filter-toolbar .filter-field.filter-search,
+            .sales-filter-toolbar .filter-field.filter-export {
+                grid-column: span 2;
+            }
+
+            .table-responsive {
+                width: 100%;
+                max-width: 100%;
+                overflow-x: auto !important;
+                overflow-y: hidden;
+            }
+        }
+
+
+        @media (max-width: 767.98px) {
+            html,
+            body {
+                overflow-x: hidden;
+            }
+
+            .content,
+            .page-header,
+            .card,
+            .card-body,
+            .sales-filter-toolbar,
+            .sales-filter-toolbar .row,
+            .table-scroll-top,
+            .table-responsive,
+            #order-table_wrapper,
+            #order-table,
+            .datanew,
+            .pagination-controls {
+                width: 100% !important;
+                max-width: 100% !important;
+                min-width: 0 !important;
+            }
+
+            .content,
+            .card,
+            .card-body,
+            .sales-filter-toolbar,
+            .table-responsive {
+                overflow-x: hidden !important;
+            }
+
+            .sales-filter-toolbar .row {
+                margin-left: 0 !important;
+                margin-right: 0 !important;
+            }
+
+            .sales-filter-toolbar .filter-field {
+                padding-left: 6px;
+                padding-right: 6px;
+            }
+
             .download-loader-box h4 {
                 font-size: 28px;
             }
+        }
+
+        /* Custom Pagination Styling */
+        .pagination .page-item .page-link {
+            background-color: #5d6d7e;
+            /* Dark gray for other pages */
+            color: #fff;
+            border: none;
+              margin: 0 3px;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-weight: bold;
+        }
+
+        /* Previous and Next buttons */
+        .pagination .page-item:first-child .page-link,
+        .pagination .page-item:last-child .page-link {
+            background-color: #fff;
+            color: #6c757d;
+            border: 1px solid #dee2e6;
+        }
+
+        .pagination .page-item:first-child .page-link:hover,
+        .pagination .page-item:last-child .page-link:hover {
+            background-color: #f8f9fa;
+            color: #495057;
+            border-color: #dee2e6;
+        }
+
+        .pagination .page-item.active .page-link {
+            background-color: #ff9f43 !important;
+            /* Orange for active page */
+            color: #fff;
+        }
+
+        .pagination .page-item .page-link:hover {
+            background-color: #4a5766;
+            color: #fff;
+        }
+
+        .pagination .page-item.active .page-link:hover {
+            background-color: #e68a35 !important;
+        }
+
+        .pagination .page-item.disabled .page-link {
+            background-color: #fff !important;
+            color: #dee2e6 !important;
+            border: 1px solid #dee2e6 !important;
+            cursor: not-allowed !important;
+            pointer-events: none !important;
+        }
+
+        .summary-badges-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        .summary-badge-box {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            min-height: 34px;
+            padding: 6px 12px;
+            border-radius: 6px;
+            border: 1px solid;
+            font-size: 14px;
+            font-weight: 600;
+            background: #fff;
+        }
+
+        .summary-badge-box.pending {
+            color: #ea5455;
+            border-color: #f5c2c7;
+            background: #fff5f5;
+        }
+
+        .summary-badge-box.paid {
+            color: #28c76f;
+            border-color: #b7ebcd;
+            background: #effcf4;
         }
     </style>
     @if (session('error'))
@@ -753,6 +1089,7 @@
             .fade-out.hidden {
                 opacity: 0;
             }
+
         </style>
 
         <script>
@@ -771,14 +1108,14 @@
     <div class="content">
         <div class="page-header">
             <div class="page-title">
-                <h4>All Orders</h4>
+                <h4>All Sales & Bills</h4>
                 <!-- <h6>Manage your sales</h6> -->
             </div>
             <div class="page-btn">
-                @if (app('hasPermission')(2, 'add'))
-                    <a href="{{ route('sales.add') }}" class="btn btn-sm btn-added"><img
+                 @if (app('hasPermission')(2, 'add'))
+                    <a href="{{ route('sales.add', ['new_bill' => 1]) }}" class="btn btn-sm btn-added"><img
                             src="{{ env('ImagePath') . 'admin/assets/img/icons/plus.svg' }}" alt="img" class="me-1">New
-                        Order</a>
+                        Bill</a>
                 @endif
             </div>
         </div>
@@ -788,10 +1125,10 @@
 
                 <!-- Top Search and Date Filter Row -->
 
-                <div class="table-top mb-3">
+                <div class="table-top mb-3 sales-filter-toolbar">
                     <div class="row w-100 align-items-center">
                         <!-- Search -->
-                        <div class="col-md-2 col-12 mb-1 mb-md-0">
+                        <div class="col-md-2 col-12 mb-1 mb-md-0 filter-field filter-search">
                             {{-- <div class="search-set w-100">
                                 <div class="search-path"></div>
                                 <div class="search-input d-flex align-items-center" style="width:170px;">
@@ -805,21 +1142,21 @@
                             </div> --}}
                             <div class="search-set">
                                 <!-- Your existing filters -->
-                                <div class="search-input">
+                                <div class="search-input mb-2">
                                     <a class="btn btn-searchset">
                                         <img src="{{ env('ImagePath') . 'admin/assets/img/icons/search-white.svg' }}"
                                             alt="img">
                                     </a>
                                     <input type="text" id="search-input" class="form-control" placeholder="Search..."
-                                        style="height: 30px;width:100%;">
+                                        style="height: 30px;">
                                 </div>
                             </div>
                         </div>
 
                         <!-- Total Filter -->
-                        <div class="col-md-2 col-6">
+                        <div class="col-md-2 col-12 filter-field">
                             @if (in_array(auth()->user()->role, ['admin', 'sub-admin']))
-                                <div class="mb-1 d-flex align-items-center"
+                                <div class="mb-1 d-flex align-items-center filter-total-box"
                                     style="color: #1b2850; border: 1px solid #ced4da; border-radius: 4px; padding: 0 8px; font-size: 14px; font-weight: bold; height: 31px; background: #fff;">
                                     Total: <span style="color: #ff9f43" class="ms-1" id="filtered-total">₹0.00</span>
                                 </div>
@@ -828,7 +1165,7 @@
 
 
                         <!-- Month Filter -->
-                        <div class="col-md-2 col-6">
+                        <div class="col-md-2 col-6 filter-field">
                             <div class="mb-1 custom-select2">
                                 <!-- <label for="filter-month" class="form-label">Month</label> -->
                                 <select id="filter-month" data-placeholder="All Months"
@@ -844,7 +1181,7 @@
                         </div>
 
                         <!-- Year Filter -->
-                        <div class="col-md-2 col-6">
+                        <div class="col-md-2 col-6 filter-field">
                             <div class="mb-1 custom-select2">
                                 <!-- <label for="filter-year" class="form-label">Year</label> -->
                                 <select id="filter-year" data-placeholder="All Years"
@@ -853,6 +1190,15 @@
                                     @foreach ($years as $year)
                                         <option value="{{ $year }}">{{ $year }}</option>
                                     @endforeach
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="col-md-2 col-6 filter-field {{ ($financialYearEnabled ?? true) ? '' : 'd-none' }}"
+                            id="sales-financial-year-filter">
+                            <div class="mb-1">
+                                <select id="filter-financial-year" class="form-control form-control-sm">
+                                    <option value="all">All Financial Years</option>
                                 </select>
                             </div>
                         </div>
@@ -866,17 +1212,17 @@
                                                                                                             </div>
                                                                                                         </div> -->
                         <!-- Date -->
-                        <div class="col-md-2 col-6">
+                        <div class="col-md-2 col-6 filter-field">
                             <!-- <div class="form-group mb-0"> -->
                             <!-- <label for="filter-date" class="form-label">Date</label> -->
                             <input type="text" id="filter-date" placeholder="Choose Date"
-                                class="datetimepicker form-control form-control-sm" style="width: 145px;">
+                                class="datetimepicker form-control form-control-sm filter-date-input">
                             <!-- </div> -->
                         </div>
 
                         <!-- Export Buttons -->
-                        <div class="col-md-2 col-12 mb-1">
-                            <div class="d-flex justify-content-md-end gap-2 mt-1">
+                        <div class="col-md-2 col-12 mb-1 filter-field filter-export">
+                            <div class="filter-export-group mt-1">
                                 <button id="exportAllChallan" class="btn btn-sm btn-success flex-fill">
                                     <i class="fas fa-file-excel"></i> Excel
                                 </button>
@@ -888,8 +1234,21 @@
                     </div>
                 </div>
 
+                @if (in_array(auth()->user()->role, ['admin', 'sub-admin']))
+                    <div class="summary-badges-row">
+                        <div class="summary-badge-box pending">
+                            <span>Total Pending:</span>
+                            <span id="filtered-pending-total">₹0.00</span>
+                        </div>
+                        <div class="summary-badge-box paid">
+                            <span>Total Paid:</span>
+                            <span id="filtered-paid-total">₹0.00</span>
+                        </div>
+                    </div>
+                @endif
+
                 <!-- Filter Inputs Card -->
-                <div class="card" id="filter_inputs">
+                {{-- <div class="card" id="filter_inputs">
                     <div class="card-body pb-0">
                         <div class="row">
                             <div class="col-lg-3 col-sm-6 col-12">
@@ -919,24 +1278,23 @@
                             </div>
                         </div>
                     </div>
-                </div>
+                </div> --}}
                 <div class="table-scroll-top"
                     style="overflow-x: auto; overflow-y: hidden; height: 20px; margin-bottom: 5px;">
                     <div style="height: 1px;"></div> <!-- Adjust width to match your table width -->
                 </div>
                 <!-- Orders Table -->
                 <div class="table-responsive mt-3" style="overflow-x: auto;">
-                    <table class="table datanew" id="order-table" style="max-width: 2000px;">
+                    <table class="table datanew" id="order-table" style="width: 100%;">
                         <thead>
                             <tr>
                                 <th>Order Number</th>
-                                <th class="text-center">Details</th>
+                                <th class="">Details</th>
                                 <th>Date</th>
                                 <th>Customer Name</th>
                                 <th>Quotation/Sale</th>
                                 <th>Payment Status</th>
-                                <th>Payment Method</th>
-                                <th>Return Status</th>
+                                {{-- <th>Return Status</th> --}}
                                 <th>Total</th>
                                 <th>Biller</th>
                                 <th class="text-center">Action</th>
@@ -1129,7 +1487,12 @@
                         </div>
 
                         <div class="mb-3 d-none" id="bank_container">
-                            <label for="bank_id" class="form-label">Select Bank</label>
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <label for="bank_id" class="form-label mb-0">Select Bank</label>
+                                <button type="button" class="btn btn-sm btn-outline-primary" id="openAddBankModal">
+                                    Add Bank
+                                </button>
+                            </div>
                             <select name="bank_id" id="bank_id" class="form-select">
                                 <option value="">Select Bank</option>
                                 @foreach ($banks as $bank)
@@ -1145,6 +1508,13 @@
                             <input type="number" class="form-control" id="cashAmount" name="cashAmount" min="0"
                                 step="0.01">
                             <div class="text-danger" id="cashAmountError"></div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="paymentRemarks" class="form-label">Remark</label>
+                            <input type="text" class="form-control" id="paymentRemarks" name="remarks"
+                                placeholder="Enter remark">
+                            <div class="text-danger" id="paymentRemarksError"></div>
                         </div>
 
 
@@ -1178,6 +1548,63 @@
             </div>
         </div>
     </form>
+    <div class="modal fade" id="addBankModal" tabindex="-1" aria-labelledby="addBankModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form id="addBankForm">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addBankModalLabel">Add Bank</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">x</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-6 mb-3">
+                                <label for="add_bank_name" class="form-label">Bank Name</label>
+                                <input type="text" class="form-control" id="add_bank_name" name="bank_name">
+                                <div class="text-danger small" id="addBankNameError"></div>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <label for="add_account_number" class="form-label">Account Number</label>
+                                <input type="text" class="form-control" id="add_account_number" name="account_number">
+                                <div class="text-danger small" id="addAccountNumberError"></div>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <label for="add_ifsc_code" class="form-label">IFSC Code</label>
+                                <input type="text" class="form-control" id="add_ifsc_code" name="ifsc_code">
+                                <div class="text-danger small" id="addIfscCodeError"></div>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <label for="add_branch_name" class="form-label">Branch Name</label>
+                                <input type="text" class="form-control" id="add_branch_name" name="branch_name">
+                                <div class="text-danger small" id="addBranchNameError"></div>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <label for="add_opening_balance" class="form-label">Opening Balance</label>
+                                <input type="number" class="form-control" id="add_opening_balance"
+                                    name="opening_balance" min="0" step="0.01" value="0">
+                                <div class="text-danger small" id="addOpeningBalanceError"></div>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <label for="add_bank_status" class="form-label">Status</label>
+                                <select class="form-select" id="add_bank_status" name="status">
+                                    <option value="1" selected>Active</option>
+                                    <option value="0">Inactive</option>
+                                </select>
+                                <div class="text-danger small" id="addBankStatusError"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-submit text-white" id="saveBankBtn"
+                            style="background-color: #ff9f43;">Save Bank</button>
+                        <button type="button" class="btn btn-secondary btn-cancel"
+                            data-bs-dismiss="modal">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
     <!-- Global Payment History Modal -->
     <div class="modal fade" id="paymentHistoryModal" tabindex="-1" aria-labelledby="paymentHistoryLabel"
         aria-hidden="true">
@@ -1216,6 +1643,27 @@
         // In your JavaScript code, update the getStatusBadge and getMobileStatusBadge functions:
 
         // Helper function to get status badge HTML
+        function formatPaymentHistoryDate(value) {
+            if (!value) return 'N/A';
+
+            const datePart = String(value).split(' ')[0];
+
+            if (/^\d{4}-\d{2}-\d{2}$/.test(datePart)) {
+                const [year, month, day] = datePart.split('-');
+                return `${day}-${month}-${year}`;
+            }
+
+            const parsedDate = new Date(value);
+            if (!isNaN(parsedDate.getTime())) {
+                const day = String(parsedDate.getDate()).padStart(2, '0');
+                const month = String(parsedDate.getMonth() + 1).padStart(2, '0');
+                const year = parsedDate.getFullYear();
+                return `${day}-${month}-${year}`;
+            }
+
+            return value;
+        }
+
         function getStatusBadge(status, type = 'payment', extraPaid = 0) {
             status = status ? status.toLowerCase() : '';
 
@@ -1516,7 +1964,7 @@
             } else {
                 details.addClass('active');
                 btn.addClass('minus');
-                icon.text('−');
+                icon.text('-');
             }
         }
 
@@ -1557,7 +2005,7 @@
             // Download icon button (Invoice)
             @if (app('hasPermission')(2, 'view'))
                 actionBtns += `<a class="btn-icon-mobile btn-download" href="/sales-invoice/${order.id}" title="Download Invoice">
-                    <i class="fas fa-download"></i>
+                    <i class="fas fa-file-invoice"></i>
                 </a>`;
             @endif
 
@@ -1694,15 +2142,27 @@
             } else {
                 detailsRow.addClass('show');
                 btn.addClass('minus');
-                icon.text('−');
+                icon.text('-');
             }
         }
 
         // Global variables
         var table;
+        window.salesSummaryTotals = window.salesSummaryTotals || null;
 
         // Function to calculate total for visible rows - must be global
         function calculateFilteredTotal() {
+            if (window.salesSummaryTotals) {
+                updateSalesSummaryTotals(
+                    window.salesSummaryTotals.total_amount || 0,
+                    window.salesSummaryTotals.total_pending_amount || 0,
+                    window.salesSummaryTotals.total_paid_amount || 0,
+                    window.salesSummaryTotals.currency_symbol || '₹',
+                    window.salesSummaryTotals.currency_position || 'left'
+                );
+                return;
+            }
+
             if (!table) {
                 table = $('.datanew').DataTable();
             }
@@ -1745,6 +2205,57 @@
         function normalizeFilterValue(val) {
             if (typeof val === 'undefined' || val === null) return '';
             return (String(val) === '' || String(val) === 'all') ? '' : val;
+        }
+
+        function formatSummaryAmount(amount, currencySymbol, currencyPosition) {
+            const numericAmount = parseFloat(amount || 0);
+            const formattedAmount = numericAmount.toLocaleString(undefined, {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+
+            return currencyPosition === 'right' ?
+                `${formattedAmount}${currencySymbol}` :
+                `${currencySymbol}${formattedAmount}`;
+        }
+
+        function updateSalesSummaryTotals(totalAmount, totalPendingAmount, totalPaidAmount, currencySymbol,
+            currencyPosition) {
+            $('#filtered-total').text(formatSummaryAmount(totalAmount, currencySymbol, currencyPosition));
+            $('#filtered-pending-total').text(formatSummaryAmount(totalPendingAmount, currencySymbol,
+                currencyPosition));
+            $('#filtered-paid-total').text(formatSummaryAmount(totalPaidAmount, currencySymbol,
+                currencyPosition));
+        }
+
+        const salesCalendarYears = @json($years ?? []);
+
+        function buildFinancialYearOptions(yearValues) {
+            const fyStartYears = new Set();
+            (Array.isArray(yearValues) ? yearValues : []).forEach((yearVal) => {
+                const year = parseInt(yearVal, 10);
+                if (!Number.isNaN(year)) {
+                    fyStartYears.add(year - 1);
+                    fyStartYears.add(year);
+                }
+            });
+
+            const currentYear = new Date().getFullYear();
+            fyStartYears.add(currentYear - 1);
+            fyStartYears.add(currentYear);
+
+            return Array.from(fyStartYears)
+                .sort((a, b) => b - a)
+                .map((startYear) => `${startYear}-${startYear + 1}`);
+        }
+
+        function populateSalesFinancialYears() {
+            const $financialYear = $('#filter-financial-year');
+            const options = buildFinancialYearOptions(salesCalendarYears);
+            $financialYear.empty().append('<option value="all">All Financial Years</option>');
+            options.forEach((financialYear) => {
+                $financialYear.append(`<option value="${financialYear}">${financialYear}</option>`);
+            });
         }
 
         // Helper function to update Select2 display for filters
@@ -1809,11 +2320,51 @@
 
             var authToken = localStorage.getItem("authToken");
             const selectedSubAdminId = localStorage.getItem('selectedSubAdminId');
+            const addBankModalElement = document.getElementById('addBankModal');
+            const addBankModal = addBankModalElement ? new bootstrap.Modal(addBankModalElement) : null;
             let currentPage = 1;
             let lastPage = 1;
             let perPage = 10;
             let searchQuery = '';
+            let isFinancialYearEnabled = false;
             table = $('.datanew').DataTable();
+            populateSalesFinancialYears();
+
+            function resetAddBankForm() {
+                $('#addBankForm')[0].reset();
+                $('#add_opening_balance').val('0');
+                $('#add_bank_status').val('1');
+                $('#addBankForm .text-danger').text('');
+            }
+
+            function upsertBankOption(bank) {
+                if (!bank || !bank.id) {
+                    return;
+                }
+
+                const bankId = String(bank.id);
+                const bankName = bank.bank_name || 'Unnamed Bank';
+                const existingOption = $('#bank_id option[value="' + bankId + '"]');
+
+                if (existingOption.length) {
+                    existingOption.text(bankName);
+                } else {
+                    $('#bank_id').append(new Option(bankName, bankId));
+                }
+
+                $('#bank_id').val(bankId).trigger('change');
+            }
+
+            function toggleSalesFinancialYearFilter(enabled) {
+                isFinancialYearEnabled = Boolean(Number(enabled));
+                const $financialYearWrapper = $('#sales-financial-year-filter');
+                if (isFinancialYearEnabled) {
+                    $financialYearWrapper.removeClass('d-none');
+                } else {
+                    $financialYearWrapper.addClass('d-none');
+                    $('#filter-financial-year').val('all');
+                }
+            }
 
             $('#search-input').on('keyup', function() {
                 searchQuery = $(this).val();
@@ -1879,21 +2430,47 @@
                                 $('#paymentHistoryList').html(
                                     '<li>No payment history found.</li>');
                             } else {
-                                let historyHtml = '';
-                                history.forEach(function(payment) {
-                                    historyHtml += `
-                                                            <li class="mb-2">
-                                                                <strong>Amount:</strong> ₹${parseFloat(payment.payment_amount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}<br>
-                                                                <strong>Date:</strong> ${payment.payment_date}<br>
-                                                                <strong>Method:</strong> ${payment.payment_method}<br>
-                                                                <strong>Payment Type:</strong> ${payment.payment_type ? payment.payment_type : 'N/A'}<br>
-                                                                ${payment.payment_type === 'emi' ? `<strong>EMI Months:</strong> ${payment.emi_month || 0}<br>` : ''}
-                                                            </li>
-                                                            <hr class="my-1"/>
-                                                        `;
-                                });
-                                $('#paymentHistoryList').html(historyHtml);
+                            historyHtml = '';
 
+history.forEach(function(payment) {
+
+    const paymentMethod = payment.payment_method
+        ? payment.payment_method.charAt(0).toUpperCase() + payment.payment_method.slice(1).toLowerCase()
+        : 'N/A';
+
+    const paymentType = payment.payment_type
+        ? payment.payment_type.charAt(0).toUpperCase() + payment.payment_type.slice(1).toLowerCase()
+        : 'N/A';
+
+    const paymentRemark = payment.remarks && String(payment.remarks).trim() !== ''
+        ? payment.remarks
+        : 'N/A';
+
+    historyHtml += `
+        <li class="mb-2">
+            <strong>Amount:</strong> ₹${parseFloat(payment.payment_amount).toLocaleString(undefined, {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            })}<br>
+
+            <strong>Date:</strong> ${formatPaymentHistoryDate(payment.payment_date || payment.created_at)}<br>
+
+            <strong>Method:</strong> ${paymentMethod}<br>
+
+            <strong>Payment Type:</strong> ${paymentType}<br>
+
+            <strong>Remark:</strong> ${paymentRemark}<br>
+
+            ${payment.payment_type === 'emi'
+                ? `<strong>EMI Months:</strong> ${payment.emi_month || 0}<br>`
+                : ''}
+        </li>
+
+        <hr class="my-1"/>
+    `;
+});
+
+$('#paymentHistoryList').html(historyHtml);
                                 // Add Summary
                                 if (response.summary) {
                                     let summaryHtml = `
@@ -1950,6 +2527,82 @@
                 if ($(this).val()) {
                     $("#bankError").text("");
                 }
+            });
+
+            $('#openAddBankModal').on('click', function() {
+                resetAddBankForm();
+                if (addBankModal) {
+                    addBankModal.show();
+                }
+            });
+
+            $('#addBankModal').on('hidden.bs.modal', function() {
+                if ($('#makePaymentModal').hasClass('show')) {
+                    $('body').addClass('modal-open');
+                }
+            });
+
+            $('#addBankForm').on('submit', function(e) {
+                e.preventDefault();
+
+                $('#addBankForm .text-danger').text('');
+
+                const formData = new FormData(this);
+                if (selectedSubAdminId) {
+                    formData.append('selectedSubAdminId', selectedSubAdminId);
+                }
+
+                const saveButton = $('#saveBankBtn');
+                saveButton.prop('disabled', true).text('Saving...');
+
+                $.ajax({
+                    url: '/api/banks',
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    headers: {
+                        'X-CSRF-TOKEN': "{{ csrf_token() }}",
+                        "Authorization": "Bearer " + authToken
+                    },
+                    success: function(response) {
+                        upsertBankOption(response.data || null);
+                        $("#bankError").text("");
+
+                        if (addBankModal) {
+                            addBankModal.hide();
+                        }
+
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success',
+                            text: response.message || 'Bank added successfully.',
+                            confirmButtonText: 'OK'
+                        });
+                    },
+                    error: function(xhr) {
+                        const errors = xhr.responseJSON?.errors || {};
+
+                        $('#addBankNameError').text(errors.bank_name ? errors.bank_name[0] : '');
+                        $('#addAccountNumberError').text(errors.account_number ? errors.account_number[0] : '');
+                        $('#addIfscCodeError').text(errors.ifsc_code ? errors.ifsc_code[0] : '');
+                        $('#addBranchNameError').text(errors.branch_name ? errors.branch_name[0] : '');
+                        $('#addOpeningBalanceError').text(errors.opening_balance ? errors.opening_balance[0] : '');
+                        $('#addBankStatusError').text(errors.status ? errors.status[0] : '');
+
+                        if (!Object.keys(errors).length) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: xhr.responseJSON?.message || 'Failed to add bank.',
+                                confirmButtonText: 'OK'
+                            });
+                        }
+                    },
+                    complete: function() {
+                        saveButton.prop('disabled', false).text('Save Bank');
+                    }
+                });
             });
 
             $('#paidTypeSelect').on('change', function() {
@@ -2442,6 +3095,16 @@
 
             function loadOrders(page = 1) {
                 currentPage = page;
+                const selectedMonth = normalizeFilterValue($('#filter-month').val() || '');
+                const selectedYear = normalizeFilterValue($('#filter-year').val() || '');
+                let selectedDate = ($('#filter-date').val() || '').trim();
+                if (selectedDate && selectedDate.includes('-')) {
+                    const parts = selectedDate.split('-');
+                    if (parts.length === 3 && parts[0].length <= 2 && parts[2].length === 4) {
+                        selectedDate = `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
+                    }
+                }
+
                 $.ajax({
                     url: "/api/get_orders",
                     method: "GET",
@@ -2449,6 +3112,10 @@
                         page: currentPage,
                         per_page: perPage,
                         search: searchQuery,
+                        month: selectedMonth,
+                        year: selectedYear,
+                        date: selectedDate,
+                        financial_year: normalizeFilterValue($('#filter-financial-year').val() || ''),
                         selectedSubAdminId: selectedSubAdminId || ''
                     },
                     headers: {
@@ -2459,6 +3126,7 @@
 
                         // console.log('response ', response);
                         if (response.status) {
+                            toggleSalesFinancialYearFilter(response.financial_year_enabled);
                             currentPage = response.pagination?.current_page || 1;
                             lastPage = response.pagination?.last_page || 1;
                             updateSalesPaginationUI(response.pagination || {
@@ -2470,15 +3138,20 @@
                             let tableBody = [];
                             const currencySymbol = response.currency_symbol || '₹';
                             const currencyPosition = response.currency_position || 'left';
-                            const totalAmount = parseFloat(response.total_amount || 0).toLocaleString(
-                                undefined, {
-                                    minimumFractionDigits: 2,
-                                    maximumFractionDigits: 2
-                                });
-                            const totalDisplay = currencyPosition === 'right' ?
-                                totalAmount + currencySymbol :
-                                currencySymbol + totalAmount;
-                            $('#filtered-total').text(totalDisplay);
+                            updateSalesSummaryTotals(
+                                response.total_amount || 0,
+                                response.total_pending_amount || 0,
+                                response.total_paid_amount || 0,
+                                currencySymbol,
+                                currencyPosition
+                            );
+                            window.salesSummaryTotals = {
+                                total_amount: response.total_amount || 0,
+                                total_pending_amount: response.total_pending_amount || 0,
+                                total_paid_amount: response.total_paid_amount || 0,
+                                currency_symbol: currencySymbol,
+                                currency_position: currencyPosition
+                            };
 
 
                             response.data.forEach(order => {
@@ -2551,7 +3224,9 @@
                                         <a class="me-3" href="/sales-invoice/${order.id}">
 
 
-            <svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" width="25" height="25" x="0" y="0" viewBox="0 0 32 32" style="enable-background:new 0 0 512 512" xml:space="preserve" class=""><g><path d="M28 24v-4a1 1 0 0 0-2 0v4a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1v-4a1 1 0 0 0-2 0v4a3 3 0 0 0 3 3h18a3 3 0 0 0 3-3zm-6.38-5.22-5 4a1 1 0 0 1-1.24 0l-5-4a1 1 0 0 1 1.24-1.56l3.38 2.7V6a1 1 0 0 1 2 0v13.92l3.38-2.7a1 1 0 1 1 1.24 1.56z" data-name="Download" fill="#092C4C" opacity="1" data-original="#092C4C" class=""></path></g></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="#092C4C" viewBox="0 0 24 24">
+                <path d="M14 2H7a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7zm0 2.5L16.5 7H14zM8 11h8v1.5H8zm0 3h8v1.5H8zm0 3h5v1.5H8z"/>
+            </svg>
                                         </a>
                                         <a class="me-3" href="javascript:void(0);" onclick="window.open('/sales/invoice/pdf/' + ${order.id});"  title="Print Invoice">
             <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="#092C4C" viewBox="0 0 24 24">
@@ -2586,7 +3261,11 @@
                                 };
 
                                 tableBody.push([
-                                    `<a href="/sales-details/${order.id}" class="">${order.order_number || ''}</a>`,
+                                    `<div class="order-mobile-summary">
+                                        <span class="order-mobile-customer">${order.user?.name || 'N/A'}</span>
+
+                                        <a href="/sales-details/${order.id}" class="order-mobile-link">${order.order_number || ''}</a>
+                                    </div>`,
                                     `<button class="mobile-toggle-btn-table" onclick="toggleTableRowDetails('${order.id}')" data-order-id="${order.id}">
                                     <span class="toggle-icon">+</span>
                                 </button>`,
@@ -2597,10 +3276,6 @@
                                     getStatusBadge(order.payment_status, 'payment',
                                         order
                                         .extra_paid || 0),
-                                    getStatusBadge(order.payment_method, 'method'),
-                                    getStatusBadge(parseFloat(order.total_return || 0) >
-                                        0 ?
-                                        'returned' : '', 'return'),
                                     displayAmount || '0.00',
                                     `<span class="biller-wrap">${order.biller || 'Admin'}</span>`,
                                     actionBtns
@@ -2680,7 +3355,14 @@
                         } else {
                             table.clear().draw();
                             $(".datanew tbody").html('<tr><td colspan="9">No order found</td></tr>');
-                            $('#filtered-total').text('₹0.00');
+                            updateSalesSummaryTotals(0, 0, 0, '₹', 'left');
+                            window.salesSummaryTotals = {
+                                total_amount: 0,
+                                total_pending_amount: 0,
+                                total_paid_amount: 0,
+                                currency_symbol: '₹',
+                                currency_position: 'left'
+                            };
                             $('#mobile-order-container').html(
                                 '<div class="text-center p-4">No orders found</div>');
                         }
@@ -2708,13 +3390,28 @@
                 $('#sales-pagination-total').text(pagination.total);
 
                 let paginationHtml = '';
-                let startPage = Math.max(1, pagination.current_page - 2);
-                let endPage = Math.min(pagination.last_page, startPage + 4);
 
-                if (endPage - startPage < 4) {
-                    startPage = Math.max(1, endPage - 4);
+                paginationHtml += `
+                    <li class="page-item ${pagination.current_page === 1 ? 'disabled' : ''}">
+                        <a class="page-link sales-page-link" href="javascript:void(0);" data-page="${pagination.current_page - 1}">Previous</a>
+                    </li>
+                `;
+
+                // Show only 3 page numbers at a time
+                const visiblePageCount = 2;
+                let startPage = Math.floor((pagination.current_page - 1) / visiblePageCount) * visiblePageCount + 1;
+                let endPage = Math.min(pagination.last_page, startPage + visiblePageCount - 1);
+
+                // Show previous ellipsis if there are pages before startPage
+                if (startPage > 1) {
+                    paginationHtml += `
+                        <li class="page-item">
+                            <a class="page-link sales-page-link" href="javascript:void(0);" data-page="${startPage - 1}" data-action="prev-group">..</a>
+                        </li>
+                    `;
                 }
 
+                // Generate page numbers
                 for (let i = startPage; i <= endPage; i++) {
                     paginationHtml += `
                         <li class="page-item ${i === pagination.current_page ? 'active' : ''}">
@@ -2723,13 +3420,50 @@
                     `;
                 }
 
+                // Show next ellipsis if there are more pages after endPage
+                if (endPage < pagination.last_page) {
+                    paginationHtml += `
+                        <li class="page-item">
+                            <a class="page-link sales-page-link" href="javascript:void(0);" data-page="${endPage + 1}" data-action="next-group">..</a>
+                        </li>
+                    `;
+                }
+
+                paginationHtml += `
+                    <li class="page-item ${pagination.current_page === pagination.last_page || pagination.last_page === 0 ? 'disabled' : ''}">
+                        <a class="page-link sales-page-link" href="javascript:void(0);" data-page="${pagination.current_page + 1}">Next</a>
+                    </li>
+                `;
+
                 $('#sales-pagination-numbers').html(paginationHtml);
                 $('.pagination-controls').toggle(pagination.total > 0);
             }
 
+            // Handle page number clicks with ellipsis support
             $(document).on('click', '.sales-page-link', function(e) {
                 e.preventDefault();
-                const page = $(this).data('page');
+                let page = $(this).data('page');
+                let action = $(this).data('action');
+
+                // Handle ellipsis clicks to load next/previous groups
+                if (action === 'next-group') {
+                    // Load the page that starts the next group
+                    if (page && page <= lastPage) {
+                        loadOrders(page);
+                    }
+                    return;
+                }
+
+                if (action === 'prev-group') {
+                    // Load the previous group's starting page
+                    let prevStartPage = Math.max(1, page - 2);
+                    if (prevStartPage >= 1 && prevStartPage <= lastPage) {
+                        loadOrders(prevStartPage);
+                    }
+                    return;
+                }
+
+                // Regular page navigation
                 if (page && page !== currentPage && page >= 1 && page <= lastPage) {
                     loadOrders(page);
                 }
@@ -2790,6 +3524,7 @@
                     method: 'GET',
                     data: {
                         date: selectedDate,
+                        financial_year: normalizeFilterValue($('#filter-financial-year').val() || ''),
                         selectedSubAdminId: selectedSubAdminId
                     },
                     headers: {
@@ -2797,6 +3532,9 @@
                     },
                     success: function(response) {
                         if (response.status) {
+                            if (typeof response.financial_year_enabled !== 'undefined') {
+                                toggleSalesFinancialYearFilter(response.financial_year_enabled);
+                            }
                             $('.pagination-controls').hide();
                             renderOrders(response.data, selectedDate);
                             calculateFilteredTotal();
@@ -2848,10 +3586,14 @@
                         data: {
                             month: selectedMonth,
                             year: selectedYear,
+                            financial_year: normalizeFilterValue($('#filter-financial-year').val() || ''),
                             selectedSubAdminId: selectedSubAdminId
                         },
                         success: function(response) {
                             if (response.status) {
+                                if (typeof response.financial_year_enabled !== 'undefined') {
+                                    toggleSalesFinancialYearFilter(response.financial_year_enabled);
+                                }
                                 $('.pagination-controls').hide();
                                 renderOrdersByMonthAndYear(response.data, selectedMonth,
                                     selectedYear); // render table with filters
@@ -2872,6 +3614,16 @@
                         }
                     });
                 });
+
+            $('#filter-financial-year').off('change').on('change', function() {
+                if (!isFinancialYearEnabled) {
+                    return;
+                }
+                fetchAllOrders();
+                setTimeout(function() {
+                    calculateFilteredTotal();
+                }, 200);
+            });
 
             function fetchAllOrders() {
                 loadOrders(1);
@@ -3062,7 +3814,9 @@
                                         <a class="me-3" href="/sales-invoice/${order.id}">
 
 
-            <svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" width="25" height="25" x="0" y="0" viewBox="0 0 32 32" style="enable-background:new 0 0 512 512" xml:space="preserve" class=""><g><path d="M28 24v-4a1 1 0 0 0-2 0v4a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1v-4a1 1 0 0 0-2 0v4a3 3 0 0 0 3 3h18a3 3 0 0 0 3-3zm-6.38-5.22-5 4a1 1 0 0 1-1.24 0l-5-4a1 1 0 0 1 1.24-1.56l3.38 2.7V6a1 1 0 0 1 2 0v13.92l3.38-2.7a1 1 0 1 1 1.24 1.56z" data-name="Download" fill="#092C4C" opacity="1" data-original="#092C4C" class=""></path></g></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="#092C4C" viewBox="0 0 24 24">
+                <path d="M14 2H7a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7zm0 2.5L16.5 7H14zM8 11h8v1.5H8zm0 3h8v1.5H8zm0 3h5v1.5H8z"/>
+            </svg>
                                         </a>
                                         <a class="me-3" href="javascript:void(0);" onclick="window.open('/sales/invoice/pdf/' + ${order.id});"  title="Print Invoice">
             <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="#092C4C" viewBox="0 0 24 24">
@@ -3093,7 +3847,10 @@
                 };
 
                 tableBody.push([
-                    `<a href="/sales-details/${order.id}" class="">${order.order_number || ''}</a>`,
+                    `<div class="order-mobile-summary">
+                        <a href="/sales-details/${order.id}" class="order-mobile-link">${order.order_number || ''}</a>
+                        <span class="order-mobile-customer">${order.user?.name || 'N/A'}</span>
+                    </div>`,
                     `<button class="mobile-toggle-btn-table" onclick="toggleTableRowDetails('${order.id}')" data-order-id="${order.id}">
                         <span class="toggle-icon">+</span>
                     </button>`,
@@ -3101,8 +3858,6 @@
                     order.user?.name || 'N/A',
                     getStatusBadge(order.quotation_status || 'sales', 'quotation'),
                     getStatusBadge(order.payment_status, 'payment', order.extra_paid || 0),
-                    getStatusBadge(order.payment_method, 'method'),
-                    getStatusBadge(parseFloat(order.total_return || 0) > 0 ? 'returned' : '', 'return'),
                     displayAmount || '0.00',
                     `<span class="biller-wrap">${order.biller || 'Admin'}</span>`,
                     actionBtns
@@ -3250,7 +4005,9 @@
                                         <a class="me-3" href="/sales-invoice/${order.id}">
 
 
-            <svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" width="25" height="25" x="0" y="0" viewBox="0 0 32 32" style="enable-background:new 0 0 512 512" xml:space="preserve" class=""><g><path d="M28 24v-4a1 1 0 0 0-2 0v4a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1v-4a1 1 0 0 0-2 0v4a3 3 0 0 0 3 3h18a3 3 0 0 0 3-3zm-6.38-5.22-5 4a1 1 0 0 1-1.24 0l-5-4a1 1 0 0 1 1.24-1.56l3.38 2.7V6a1 1 0 0 1 2 0v13.92l3.38-2.7a1 1 0 1 1 1.24 1.56z" data-name="Download" fill="#092C4C" opacity="1" data-original="#092C4C" class=""></path></g></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="#092C4C" viewBox="0 0 24 24">
+                <path d="M14 2H7a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7zm0 2.5L16.5 7H14zM8 11h8v1.5H8zm0 3h8v1.5H8zm0 3h5v1.5H8z"/>
+            </svg>
                                         </a>
                                         <a class="me-3" href="javascript:void(0);" onclick="window.open('/sales/invoice/pdf/' + ${order.id});"  title="Print Invoice">
             <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="#092C4C" viewBox="0 0 24 24">
@@ -3280,7 +4037,11 @@
                 };
 
                 tableBody.push([
-                    `<a href="/sales-details/${order.id}" class="">${order.order_number || ''}</a>`,
+                    `<div class="order-mobile-summary">
+                        <span class="order-mobile-customer">${order.user?.name || 'N/A'}</span>
+                        <a href="/sales-details/${order.id}" class="order-mobile-link">${order.order_number || ''}</a>
+
+                    </div>`,
                     `<button class="mobile-toggle-btn-table" onclick="toggleTableRowDetails('${order.id}')" data-order-id="${order.id}">
                         <span class="toggle-icon">+</span>
                     </button>`,
@@ -3289,8 +4050,6 @@
                     order.user?.name || 'N/A',
                     getStatusBadge(order.quotation_status || 'sales', 'quotation'),
                     getStatusBadge(order.payment_status, 'payment', order.extra_paid || 0),
-                    getStatusBadge(order.payment_method, 'method'),
-                    getStatusBadge(parseFloat(order.total_return || 0) > 0 ? 'returned' : '', 'return'),
                     displayAmount || '0.00',
                     `<span class="biller-wrap">${order.biller || 'Admin'}</span>`,
                     actionBtns
@@ -3373,7 +4132,7 @@
                     } else {
                         html = history.map(p => `
             <li class="list-group-item d-flex justify-content-between">
-                <span>${p.payment_date || p.created_at}</span>
+                <span>${formatPaymentHistoryDate(p.payment_date || p.created_at)}</span>
                 <span>
                     <strong>₹${parseFloat(p.payment_amount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong>
                     (${p.payment_method || ''})

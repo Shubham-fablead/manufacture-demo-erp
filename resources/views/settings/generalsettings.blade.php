@@ -237,6 +237,26 @@
                                 </div>
                             </div>
 
+                            <div class="col-lg-3 col-sm-12 col-6">
+                                <div class="form-group">
+                                    <label>TDS Apply</label>
+                                    <select id="tds_apply" name="tds_apply" class="form-select">
+                                        <option value="1">On</option>
+                                        <option value="0">Off</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-3 col-sm-12 col-6">
+                                <div class="form-group">
+                                    <label>Financial Year</label>
+                                    <select id="financial_year" name="financial_year" class="form-select">
+                                        <option value="1">On</option>
+                                        <option value="0">Off</option>
+                                    </select>
+                                </div>
+                            </div>
+
                             <div class="col-lg-12">
                                 <a href="javascript:void(0);" class="btn btn-submit me-2"
                                     id="btn-setting-submit">Submit</a>
@@ -716,6 +736,16 @@
                             ? '1'
                             : String(Number(settings.send_mail))
                         );
+                        $("#tds_apply").val(
+                            settings.tds_apply === null || settings.tds_apply === undefined
+                            ? '0'
+                            : String(Number(settings.tds_apply))
+                        );
+                        $("#financial_year").val(
+                            settings.financial_year === null || settings.financial_year === undefined
+                            ? '1'
+                            : String(Number(settings.financial_year))
+                        );
 
                         if (settings.currency_position) {
                             $("#currency_position").val(settings.currency_position).trigger("change");
@@ -897,6 +927,8 @@
                 formData.append("_token", "{{ csrf_token() }}");
                 formData.append("invoice_size", $("#invoice_size").val());
                 formData.append("send_mail", $("#send_mail").val());
+                formData.append("tds_apply", $("#tds_apply").val());
+                formData.append("financial_year", $("#financial_year").val());
 
                 // Send AJAX
                 $.ajax({

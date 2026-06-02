@@ -9,7 +9,8 @@
         }
 
         /* Fix for labour items select */
-        .select2-labour+.select2-container {
+        .select2-labour+.select2-container,
+        .product-select+.select2-container {
             width: 100% !important;
         }
 
@@ -43,12 +44,14 @@
             background: #d4edda;
             color: #155724;
             border: 1px solid #c3e6cb;
+            width: fit-content;
         }
 
         .gst-badge.without {
             background: #f8f9fa;
             color: #6c757d;
             border: 1px solid #e9ecef;
+            width: fit-content;
         }
 
         .product-gst-details {
@@ -63,294 +66,328 @@
             display: block;
             line-height: 1.4;
         }
+
+        .bank-label-row {
+            display: flex;
+            align-items: center;
+            /* justify-content: space-between; */
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .bank-add-btn {
+            border: 1px solid #ff9f43;
+            background: #fff7ed;
+            color: #ff9f43;
+            border-radius: 4px;
+            padding: 4px 10px;
+            font-size: 12px;
+            font-weight: 600;
+            line-height: 1.2;
+        }
+
+        .bank-add-btn:hover {
+            background: #ff9f43;
+            color: #fff;
+        }
+
         .page-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap:1px;
-}
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1px;
+        }
 
-.page-header .page-title {
-    display: flex;
-    align-items: center;
-}
+        .page-header .page-title {
+            display: flex;
+            align-items: center;
+        }
 
-.page-header .form-check {
-    display: flex;
-    align-items: center;
-    margin-bottom: 0;
-}
+        .page-header .form-check {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0;
+        }
 
-.gst-header {
-    display: flex;
-    align-items: center;
-    margin-bottom: 0 !important;
-}
+        .gst-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0 !important;
+        }
 
-.gst-header .d-flex {
-    display: flex;
-    align-items: center;
-    
-}
+        .gst-header .d-flex {
+            display: flex;
+            align-items: center;
 
-.custom-radio-label {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    margin-bottom: 0;
-}
+        }
 
-.form-check-input {
-    margin-top: 0;
-}
+        .custom-radio-label {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-bottom: 0;
+        }
 
-.pos-back-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    border: 1px solid #ff9f43;
-    background: #ff9f43;
-    color: #fff;
-    border-radius: 4px;
-    padding: 3px 8px;
-    font-size: 12px;
-    font-weight: 600;
-    line-height: 1;
-    height: 28px;
-    margin-left: 6px;
-}
+        .form-check-input {
+            margin-top: 0;
+        }
 
-.pos-back-btn:hover {
-    background: #ff9f43;
-    color: #fff;
-}
+        .pos-back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            border: 1px solid #ff9f43;
+            background: #ff9f43;
+            color: #fff;
+            border-radius: 4px;
+            padding: 3px 8px;
+            font-size: 12px;
+            font-weight: 600;
+            line-height: 1;
+            height: 28px;
+            margin-left: 6px;
+        }
 
-.pos-back-btn i {
-    font-size: 12px;
-    line-height: 1;
-}
+        .pos-back-btn:hover {
+            background: #ff9f43;
+            color: #fff;
+        }
 
-@media (max-width: 767.98px) {
-    .page-header {
-        flex-wrap: wrap;
-        align-items: flex-start;
-        gap: 10px;
-    }
+        .pos-back-btn i {
+            font-size: 12px;
+            line-height: 1;
+        }
 
-    .page-header .form-check {
-        margin-left: 0 !important;
-    }
+        @media (max-width: 767.98px) {
+            .page-header {
+                flex-wrap: wrap;
+                align-items: flex-start;
+                gap: 10px;
+            }
 
-    .gst-header {
-        width: 100%;
-        flex-wrap: wrap;
-        gap: 10px;
-    }
+            .page-header .form-check {
+                margin-left: 0 !important;
+            }
 
-    .gst-header .d-flex {
-        flex-wrap: wrap;
-        row-gap: 8px;
-    }
+            .gst-header {
+                width: 100%;
+                flex-wrap: wrap;
+                gap: 10px;
+            }
 
-    .custom-radio-label {
-        white-space: nowrap;
-    }
+            .gst-header .d-flex {
+                flex-wrap: wrap;
+                row-gap: 8px;
+            }
 
-    .pos-back-btn {
-        margin-left: auto;
-        min-width: 70px;
-        justify-content: center;
-    }
+            .custom-radio-label {
+                white-space: nowrap;
+            }
 
-    .card .card-body {
-        padding: 12px 10px;
-    }
+            .pos-back-btn {
+                margin-left: auto;
+                min-width: 70px;
+                justify-content: center;
+            }
 
-    .select2-container--default .select2-selection--multiple {
-        min-height: 40px;
-        border-radius: 6px;
-        padding: 2px 4px;
-    }
+            #paid_type_col,
+            #bank_container,
+            #cash_amount_col,
+            #online_amount_col,
+            #pending_amount_col {
+                flex: 0 0 50%;
+                max-width: 50%;
+            }
 
-    .select2-container--default .select2-selection--multiple .select2-selection__choice {
-        font-size: 11px;
-        line-height: 1.2;
-        margin-top: 4px;
-        padding: 2px 6px;
-    }
+            #payment_method_col {
+                flex: 0 0 100%;
+                max-width: 100%;
+            }
 
-    .table-responsive {
-        overflow: visible;
-    }
+            #payment_details_row > .col-lg-12 > .row {
+                row-gap: 0;
+            }
 
-    .table-responsive table {
-        width: 100%;
-        min-width: 0;
-    }
+            #bank_container .bank-label-row {
+                flex-wrap: nowrap;
+                justify-content: space-between;
+                align-items: center;
+                gap: 6px;
+            }
 
-    .table-responsive thead {
-        display: none;
-    }
+            #bank_container .bank-add-btn {
+                padding: 3px 8px;
+                font-size: 11px;
+                white-space: nowrap;
+            }
+        }
 
-    #product-table-body tr {
-        display: block;
-        position: relative;
-        margin-bottom: 12px;
-        padding: 12px 10px 10px;
-        border: 1px solid #e9ecef;
-        border-radius: 10px;
-        background: #fff;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
-    }
+        @media (max-width: 991.98px) {
+            .table-responsive {
+                overflow-x: visible;
+            }
 
-    #product-table-body tr#no-products-row {
-        display: table-row;
-        margin-bottom: 0;
-        padding: 0;
-        border: 0;
-        box-shadow: none;
-        background: transparent;
-    }
+            .table-responsive .table thead {
+                display: none;
+            }
 
-    #product-table-body tr td {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        width: 100%;
-        padding: 6px 0 !important;
-        border: 0 !important;
-        white-space: normal;
-    }
+            .table-responsive .table,
+            .table-responsive .table tbody,
+            .table-responsive .table tr,
+            .table-responsive .table td {
+                display: block;
+                width: 100%;
+            }
 
-    #product-table-body tr#no-products-row td {
-        display: table-cell;
-        padding: 12px !important;
-    }
+            #product-table-body {
+                display: flex;
+                flex-direction: column;
+                gap: 14px;
+            }
 
-    #product-table-body tr#no-products-row td:last-child {
-        position: static;
-        top: auto;
-        right: auto;
-        width: auto;
-    }
+            #product-table-body tr[data-product-id] {
+                position: relative;
+                padding: 14px 14px 12px;
+                border: 1px solid #e5e7eb;
+                border-radius: 12px;
+                background: #fff;
+                box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
+            }
 
-    #product-table-body tr td:first-child {
-        flex-wrap: wrap;
-        align-items: flex-start;
-        justify-content: flex-start;
-        gap: 8px;
-        padding-right: 40px !important;
-    }
+            #product-table-body tr[data-product-id]>td {
+                border: 0;
+                padding: 0;
+            }
 
-    #product-table-body tr td:first-child .product-img {
-        flex: 0 0 54px;
-        width: 54px;
-        height: 54px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-    }
+            #product-table-body tr[data-product-id]>td:first-child {
+                display: none;
+            }
 
-    #product-table-body tr td:first-child .product-img img {
-        width: 54px !important;
-        height: 54px !important;
-        object-fit: cover;
-        border-radius: 8px;
-    }
+            #product-table-body tr[data-product-id]>td:nth-child(2) {
+                display: grid;
+                grid-template-columns: 56px minmax(0, 1fr);
+                gap: 12px;
+                align-items: start;
+                padding-right: 36px;
+                margin-bottom: 12px;
+            }
 
-    #product-table-body tr td:first-child a:not(.product-img) {
-        flex: 1 1 auto;
-        font-size: 13px;
-        font-weight: 700;
-        color: #111;
-        line-height: 1.25;
-        margin-top: 2px;
-    }
+            #product-table-body tr[data-product-id]>td:nth-child(2) .product-img {
+                display: block;
+                width: 56px;
+                height: 56px;
+                border-radius: 10px;
+                overflow: hidden;
+                background: #f8fafc;
+            }
 
-    #product-table-body tr td:first-child .gst-badge {
-        flex-basis: 100%;
-        margin: 2px 0 0 62px;
-        font-size: 10px;
-        padding: 2px 6px;
-    }
+            #product-table-body tr[data-product-id]>td:nth-child(2) .product-img img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                display: block;
+            }
 
-    #product-table-body tr td:nth-child(3)::before {
-        content: "Unit";
-        font-weight: 600;
-        color: #6b7280;
-        margin-right: 12px;
-    }
+            #product-table-body tr[data-product-id]>td:nth-child(2)>a:last-of-type {
+                display: block;
+                color: #111827;
+                font-weight: 600;
+                line-height: 1.35;
+                margin-bottom: 4px;
+                word-break: break-word;
+            }
 
-    #product-table-body tr td:nth-child(4)::before {
-        content: "QTY";
-        font-weight: 600;
-        color: #6b7280;
-        margin-right: 12px;
-    }
+            #product-table-body tr[data-product-id]>td:nth-child(2) .gst-badge {
+                margin-left: 0;
+                margin-top: 2px;
+            }
 
-    #product-table-body tr td:nth-child(5)::before {
-        content: "Price";
-        font-weight: 600;
-        color: #6b7280;
-        margin-right: 12px;
-    }
+            #product-table-body tr[data-product-id]>td:not(:first-child):not(:nth-child(2)):not(:last-child) {
+                display: flex;
+                align-items: flex-start;
+                justify-content: space-between;
+                gap: 12px;
+                padding: 8px 0;
+            }
 
-    #product-table-body tr td:nth-child(6)::before {
-        content: "Discount %";
-        font-weight: 600;
-        color: #6b7280;
-        margin-right: 12px;
-    }
+            #product-table-body tr[data-product-id]>td:not(:first-child):not(:nth-child(2)):not(:last-child)::before {
+                content: attr(data-label);
+                flex: 0 0 96px;
+                color: #6b7280;
+                font-size: 12px;
+                font-weight: 600;
+                line-height: 1.4;
+            }
 
-    #product-table-body tr td:nth-child(7)::before {
-        content: "GST Details";
-        font-weight: 600;
-        color: #6b7280;
-        margin-right: 12px;
-    }
+            #product-table-body tr[data-product-id]>td[data-label="GST Details"] {
+                align-items: flex-start;
+            }
 
-    #product-table-body tr td:nth-child(8)::before {
-        content: "Total";
-        font-weight: 600;
-        color: #6b7280;
-        margin-right: 12px;
-    }
+            #product-table-body tr[data-product-id]>td[data-label="GST Details"] .product-gst-details,
+            #product-table-body tr[data-product-id]>td[data-label="GST Details"] .text-muted {
+                flex: 1 1 auto;
+                text-align: right;
+            }
 
-    #product-table-body tr td:nth-child(4) .quantity-input,
-    #product-table-body tr td:nth-child(6) .discount-input {
-        width: 95px !important;
-        margin-left: auto;
-    }
+            #product-table-body tr[data-product-id]>td[data-label="Total"] .total-amount {
+                flex: 1 1 auto;
+                text-align: right;
+            }
 
-    #product-table-body tr td:nth-child(7) .product-gst-details {
-        width: 100%;
-        margin-left: auto;
-        padding: 6px 8px;
-    }
+            #product-table-body tr[data-product-id] input.form-control {
+                width: 140px !important;
+                max-width: 100%;
+                margin-left: auto;
+                text-align: right;
+            }
 
-    #product-table-body tr td:nth-child(8) .total-amount {
-        width: 100%;
-        text-align: right;
-    }
+            #product-table-body tr[data-product-id]>td:last-child {
+                position: absolute;
+                top: 12px;
+                right: 12px;
+                width: auto;
+                display: block;
+            }
 
-    #product-table-body tr td:nth-child(8) .total-amount div {
-        font-size: 11px;
-        line-height: 1.35;
-    }
+            #product-table-body tr[data-product-id]>td:last-child .delete-set {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                width: 26px;
+                height: 26px;
+            }
+        }
 
-    #product-table-body tr td:last-child {
-        position: absolute;
-        top: 10px;
-        right: 10px;
-        width: auto;
-        padding: 0 !important;
-    }
+        /* Fix for Labour Items on iPad Pro/Tablets */
+        @media (min-width: 992px) and (max-width: 1199px) {
+            .labour-item-row .col-lg-5 {
+                flex: 0 0 33.333333% !important;
+                max-width: 33.333333% !important;
+            }
 
-    #product-table-body tr td:last-child img {
-        width: 18px;
-        height: 18px;
-    }
-}
+            .labour-item-row .col-lg-3 {
+                flex: 0 0 25% !important;
+                max-width: 25% !important;
+            }
+
+            .labour-item-row .col-lg-1 {
+                flex: 0 0 16.666667% !important;
+                max-width: 16.666667% !important;
+            }
+
+            .labour-item-row .btn {
+                padding: 6px 10px !important;
+                height: 38px !important;
+                width: 100% !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+            }
+
+            .labour-item-row .select2-container {
+                width: 100% !important;
+            }
+        }
     </style>
     <div class="content">
         <div class="page-header">
@@ -394,10 +431,84 @@
 
 
 
+
         <div class="card">
             <div class="card-body">
                 <div class="row">
-                    <div class="col-lg-4 col-sm-6 col-6">
+                    @php
+                        $activePayments = $sales->payments->filter(function ($payment) {
+                            return (int) ($payment->isDeleted ?? 0) === 0;
+                        });
+
+                        $prefillOrderTotal = max(0, (float) ($sales->total_amount ?? 0));
+                        $prefillRemainingAmount = max(0, (float) ($sales->remaining_amount ?? 0));
+                        $prefillTotalPaidFromPayments = (float) $activePayments->sum(function ($payment) {
+                            return (float) ($payment->payment_amount ?? 0);
+                        });
+                        $prefillTotalPaid = $prefillTotalPaidFromPayments > 0
+                            ? min($prefillOrderTotal, $prefillTotalPaidFromPayments)
+                            : max(0, $prefillOrderTotal - $prefillRemainingAmount);
+                        $prefillCashAmount = (float) $activePayments->sum(function ($payment) {
+                            return (float) ($payment->cash_amount ?? 0);
+                        });
+                        $prefillOnlineAmount = (float) $activePayments->sum(function ($payment) {
+                            $method = strtolower((string) ($payment->payment_method ?? ''));
+                            if ($method === 'cash') {
+                                return 0;
+                            }
+
+                            $upiAmount = (float) ($payment->upi_amount ?? 0);
+                            return $upiAmount > 0 ? $upiAmount : (float) ($payment->payment_amount ?? 0);
+                        });
+                        $prefillBankId = optional($activePayments->first(function ($payment) {
+                            return !empty($payment->bank_id);
+                        }))->bank_id;
+
+                        $prefillPaymentMethod = strtolower((string) ($sales->payment_method ?? 'pending'));
+                        $prefillPaymentMethod = match ($prefillPaymentMethod) {
+                            'cash_online', 'cash+bank', 'cash_bank', 'cash + bank', 'cash + online' => 'cash+online',
+                            'debit card', 'upi', 'debit', 'scan' => 'online',
+                            default => $prefillPaymentMethod,
+                        };
+
+                        if ($prefillCashAmount > 0 && $prefillOnlineAmount > 0) {
+                            $prefillPaymentMethod = 'cash+online';
+                        } elseif ($prefillOnlineAmount > 0 || !empty($prefillBankId)) {
+                            $prefillPaymentMethod = 'online';
+                        } elseif ($prefillCashAmount > 0) {
+                            $prefillPaymentMethod = 'cash';
+                        } elseif ($prefillTotalPaid <= 0) {
+                            $prefillPaymentMethod = 'pending';
+                        }
+
+                        if ($prefillPaymentMethod === 'cash' && $prefillCashAmount <= 0) {
+                            $prefillCashAmount = $prefillTotalPaid;
+                        }
+
+                        if (in_array($prefillPaymentMethod, ['online', 'debit', 'scan'], true) && $prefillOnlineAmount <= 0) {
+                            $prefillOnlineAmount = $prefillTotalPaid;
+                        }
+
+                        if ($prefillPaymentMethod === 'cash+online' && $prefillCashAmount <= 0 && $prefillOnlineAmount <= 0) {
+                            $prefillOnlineAmount = $prefillTotalPaid;
+                        }
+
+                        $prefillPendingAmount = $prefillRemainingAmount > 0
+                            ? min($prefillOrderTotal, $prefillRemainingAmount)
+                            : max(0, $prefillOrderTotal - $prefillTotalPaid);
+                        $prefillPaidType = $prefillPendingAmount > 0 ? '' : 'full';
+                        $prefillPaymentStatus = $prefillPendingAmount <= 0 && $prefillTotalPaid > 0
+                            ? 'completed'
+                            : ($prefillTotalPaid > 0 ? 'partially' : 'pending');
+
+                        if ($prefillPendingAmount > 0) {
+                            $prefillPaymentMethod = 'pending';
+                        }
+
+                        $displayCashAmount = $prefillPendingAmount > 0 ? 0 : $prefillCashAmount;
+                        $displayOnlineAmount = $prefillPendingAmount > 0 ? 0 : $prefillOnlineAmount;
+                    @endphp
+                    <div class="col-lg-3 col-sm-6 col-6">
                         <input type="hidden" name="update_selse_id" id="update_selse_id" value="{{ $update_id }}">
                         <div class="form-group">
                             <label>Customer</label>
@@ -412,7 +523,16 @@
                             </select>
                         </div>
                     </div>
-                    <div class="col-lg-4 col-sm-6 col-6">
+                    <div class="col-lg-3 col-sm-6 col-6">
+                        <div class="form-group">
+                            <label>Order Number</label>
+                            <div class="input-groupicon">
+                                <input type="text" id="order_number" class="form-control" placeholder="Order number"
+                                    name="order_number" value="{{ $sales->order_number ?? '' }}">
+                                <span class="text-danger" id="order_number_error" style="display:none;"></span>
+                            </div>
+                        </div>
+                    </div> <div class="col-lg-3 col-sm-6 col-6">
                         <div class="form-group">
                             <label>Customer Number</label>
                             <div class="input-groupicon">
@@ -422,20 +542,24 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-4 col-sm-6 col-6">
+                    <div class="col-lg-3 col-sm-6 col-6">
                         <div class="form-group">
                             <label>Order Date</label>
                             <div class="input-groupicon">
-                                <input type="date" class="form-control" name="order_date" {{-- value="{{ \Carbon\Carbon::now()->format('Y-m-d') }}" required> --}}
-                                    value="{{ \Carbon\Carbon::parse($sales->created_at)->format('Y-m-d') }}" required>
+                                <input type="hidden" id="order_date" name="order_date" value="{{ \Carbon\Carbon::parse($sales->created_at)->format('Y-m-d') }}">
+                                <input type="text" class="datetimepicker form-control" id="order_date_display"
+                                    value="{{ \Carbon\Carbon::parse($sales->created_at)->format('d/m/Y') }}" required>
+                                <a class="addonset">
+                                    <img src="{{ env('ImagePath') . 'admin/assets/img/icons/calendars.svg' }}" alt="img">
+                                </a>
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-12 col-sm-6 col-6">
+                    <div class="col-lg-12 col-sm-12 col-12">
                         <div class="form-group">
                             <label>Product Name</label>
                             <div class="input-groupicon">
-                                <select name="product_id[]" class="form-control product-select" multiple="multiple">
+                                <select name="product_id[]" class="form-control product-select" multiple="multiple" style="width: 100%;">
                                     @php
                                         $user = auth()->user();
                                         $branchIdToUse = $user->role === 'staff' ? $user->branch_id : $user->id;
@@ -474,13 +598,14 @@
                                             }
                                         @endphp
 
-                                        <option value="{{ $product->id }}" data-image="{{ $imageUrl }}"
-                                            data-price="{{ $product->price }}" data-name="{{ $product->name }}"
-                                            data-unit="{{ $product->unit->unit_name ?? 'N/A' }}"
-                                            data-gst-option="{{ $gstOption }}"
-                                            data-product-gst="{{ $product->product_gst ?? '[]' }}"
-                                            data-discount="{{ $product->discount ?? 0 }}"
-                                            {{ in_array((string) $product->id, $selectedProductIds) ? 'selected' : '' }}>
+                                     <option value="{{ $product->id }}" data-image="{{ $imageUrl }}"
+    data-price="{{ $product->price }}" data-name="{{ $product->name }}"
+    data-unit="{{ $product->unit->unit_name ?? 'N/A' }}"
+    data-gst-option="{{ $gstOption }}"
+    data-product-gst="{{ $product->product_gst ?? '[]' }}"
+    data-discount="{{ $product->discount ?? 0 }}"
+    data-stock="{{ $product->quantity ?? 999999 }}"
+    {{ in_array((string) $product->id, $selectedProductIds) ? 'selected' : '' }}>
                                             {{ $product->name }} - {{ $displayPrice }}
                                             @if ($gstOption === 'with_gst')
                                                 (With GST)
@@ -580,7 +705,8 @@ $gstDataForAttribute = '[]';
                                     @endphp
 
                                     <tr data-product-id="{{ $item->product_id }}" data-gst-option="{{ $gstOption }}"
-                                        data-product-gst="{{ $gstDataForAttribute }}">
+    data-product-gst="{{ $gstDataForAttribute }}"
+    data-stock="{{ $item->product->quantity ?? 999999 }}">
                                         <td>{{ $index + 1 }}</td>
                                         <td class="">
                                             @php
@@ -603,20 +729,25 @@ $gstDataForAttribute = '[]';
                                         <td data-label="Unit">
                                             {{ $item->product->unit->unit_name ?? 'N/A' }}
                                         </td>
-                                        <td>
-                                            <input type="number" name="quantities[{{ $item->product_id }}]"
+                                        <td data-label="QTY">
+                                            <input type="text" name="quantities[{{ $item->product_id }}]"
                                                 class="form-control quantity-input"
                                                 value="{{ number_format($item->quantity, 2, '.', '') }}" step="1"
-                                                min="0" data-price="{{ $item->price }}" style="width: 80px;">
+                                                min="0" style="width: 80px;">
                                         </td>
-                                        <td>{{ number_format($item->price, 2) }}</td>
-                                        <td>
-                                            <input type="number" name="discounts[{{ $item->product_id }}]"
+                                        <td data-label="Price">
+                                            <input type="text" name="prices[{{ $item->product_id }}]"
+                                                class="form-control price-input"
+                                                value="{{ number_format($item->price, 2, '.', '') }}" min="0"
+                                                step="0.01" style="width: 90px;">
+                                        </td>
+                                        <td data-label="Discount %">
+                                            <input type="text" name="discounts[{{ $item->product_id }}]"
                                                 class="form-control discount-input"
                                                 value="{{ number_format($item->discount_percentage ?? 0, 2, '.', '') }}"
                                                 min="0" max="100" step="0.01" style="width: 80px;">
                                         </td>
-                                        <td class="gst-details-cell">
+                                        <td class="gst-details-cell" data-label="GST Details">
                                             @if ($gstDetails && is_array($gstDetails))
                                                 <div class="product-gst-details">
                                                     @foreach ($gstDetails as $tax)
@@ -638,7 +769,7 @@ $gstDataForAttribute = '[]';
                                                 <span class="text-muted">No GST</span>
                                             @endif
                                         </td>
-                                        <td>
+                                        <td data-label="Total">
                                             <span class="total-amount">
                                                 <div style="color:#ff9f43;">
                                                     <strong>Sub Total:</strong>
@@ -661,7 +792,10 @@ $gstDataForAttribute = '[]';
                                                 @endif
 
                                                 @php
-                                                    $discountAmt = $item->price * $item->quantity * (($item->discount_percentage ?? 0) / 100);
+                                                    $discountAmt =
+                                                        $item->price *
+                                                        $item->quantity *
+                                                        (($item->discount_percentage ?? 0) / 100);
                                                 @endphp
 
                                                 @if ($discountAmt > 0)
@@ -686,7 +820,7 @@ $gstDataForAttribute = '[]';
                                                 </div>
                                             </span>
                                         </td>
-                                        <td>
+                                        <td data-label="Action">
                                             <a href="javascript:void(0);" class="delete-set">
                                                 <img src="{{ env('ImagePath') . 'admin/assets/img/icons/delete.svg' }}"
                                                     alt="svg">
@@ -707,7 +841,7 @@ $gstDataForAttribute = '[]';
 
                 <div class="row">
 
-                    <div class="col-lg-4 col-sm-6 col-12">
+                    <div class="col-lg-3 col-sm-6 col-12">
                         <div class="form-group">
                             <label>Shipping</label>
                             <input type="number" class="form-control" name="shipping" id="shipping-input"
@@ -716,59 +850,134 @@ $gstDataForAttribute = '[]';
                         </div>
                     </div>
 
-                    <div class="col-lg-4 col-sm-6 col-6" id="payment_method_col">
+                    @if ((bool) ($setting->tds_apply ?? false))
+                        <div class="col-lg-3 col-sm-6 col-6">
+                            <div class="form-group">
+                                <label>TDS Percentage (%)</label>
+                                <input type="number" class="form-control" name="tds_percentage"
+                                    id="tds-percentage-input"
+                                    value="{{ number_format((float) ($sales->tds_percentage ?? 0), 2, '.', '') }}"
+                                    min="0" max="100" step="0.01">
+                            </div>
+                        </div>
+
+                        <div class="col-lg-3 col-sm-6 col-6">
+                            <div class="form-group">
+                                <label>TDS Amount</label>
+                                <input type="number" class="form-control" name="tds_amount" id="tds-amount-input"
+                                    value="{{ number_format((float) ($sales->tds_amount ?? 0), 2, '.', '') }}"
+                                    min="0" step="0.01" readonly>
+                            </div>
+                        </div>
+                    @endif
+
+                    <div class="col-lg-3 col-sm-6 col-6" id="payment_method_col">
                         <div class="form-group">
                             <label>Payment Method</label>
-                            <select class="select form-control" name="payment_method">
-                                <option value="pending" {{ $sales->payment_method == 'pending' ? 'selected' : '' }}>
+                            <select class="select form-control" name="payment_method" id="payment_method">
+                                <option value="pending" {{ $prefillPaymentMethod === 'pending' ? 'selected' : '' }}>
                                     Pending
                                 </option>
-                                <option value="cash" {{ $sales->payment_method == 'cash' ? 'selected' : '' }}>Cash
+                                <option value="cash" {{ $prefillPaymentMethod === 'cash' ? 'selected' : '' }}>Cash
                                 </option>
-                                <option value="debit" {{ $sales->payment_method == 'debit' ? 'selected' : '' }}>Debit
+                                <option value="online" {{ in_array($prefillPaymentMethod, ['online', 'debit', 'scan'], true) ? 'selected' : '' }}>Online
                                 </option>
-                                <option value="scan" {{ $sales->payment_method == 'scan' ? 'selected' : '' }}>Scan
-                                </option>
-                                <option value="cheque" {{ $sales->payment_method == 'cheque' ? 'selected' : '' }}>Cheque
-                                </option>
-                                <option value="cash+online"
-                                    {{ $sales->payment_method == 'cash+online' ? 'selected' : '' }}>Cash+Online
-                                </option>
-                                <option value="online" {{ $sales->payment_method == 'online' ? 'selected' : '' }}>Online
+                                <option value="cash+online" {{ $prefillPaymentMethod === 'cash+online' ? 'selected' : '' }}>
+                                    Cash+Online
                                 </option>
                             </select>
                         </div>
                     </div>
 
-
-
-                    <div class="col-lg-4 col-sm-6 col-6" id="payment_status_col">
+                    <div class="col-lg-3 col-sm-6 col-6 d-none" id="payment_status_col">
                         <div class="form-group">
                             <label>Payment Status</label>
-                            <select class="select form-control" name="status">
-                                <option value="pending" {{ $sales->payment_status == 'pending' ? 'selected' : '' }}>
+                            <select class="select form-control" name="status" id="payment_status">
+                                <option value="pending" {{ $prefillPaymentStatus === 'pending' ? 'selected' : '' }}>
                                     Pending
                                 </option>
-
-                                <option value="partially" {{ $sales->payment_status == 'partially' ? 'selected' : '' }}>
+                                <option value="partially" {{ $prefillPaymentStatus === 'partially' ? 'selected' : '' }}>
                                     Partially Paid
                                 </option>
-
-                                <option value="completed" {{ $sales->payment_status == 'completed' ? 'selected' : '' }}>
+                                <option value="completed" {{ $prefillPaymentStatus === 'completed' ? 'selected' : '' }}>
                                     Completed
                                 </option>
                             </select>
                         </div>
                     </div>
 
-                    <div class="row ">
-                        <div class="col-lg-6 mb-3">
-                            <div class="form-group">
-                                <label>Remarks</label>
-                                <textarea class="form-control" name="remarks" id="remarks" rows="6" placeholder="Enter any remarks">{{ old('remarks', $sales->remarks ?? '') }}</textarea>
+                </div>
+
+                <div class="row" id="payment_details_row">
+                    <div class="col-lg-12">
+                        <div class="row">
+                            <div class="col-lg-3 col-sm-6 col-6 " id="paid_type_col">
+                                <div class="form-group">
+                                    <label>Paid Type</label>
+                                    <select class="select form-control" name="paid_type" id="paid_type">
+                                        <option value="" {{ $prefillPaidType === '' ? 'selected' : '' }}>Select Paid Type</option>
+                                        <option value="full" {{ $prefillPaidType === 'full' ? 'selected' : '' }}>Fully</option>
+                                        <option value="partial" {{ $prefillPaidType === 'partial' ? 'selected' : '' }}>Partially</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-3 col-sm-6 col-12 " id="bank_container">
+                                <div class="form-group">
+                                    <div class="bank-label-row">
+                                        <label for="bank_id" class="mb-0">SelectBank</label>
+                                        <button type="button" class="bank-add-btn" id="openAddBankModal">Add Bank</button>
+                                    </div>
+                                    <select class="form-control" id="bank_id" name="bank_id" style="width: 100%;">
+                                        <option value="">Select Bank</option>
+                                        @foreach ($banks as $bank)
+                                            <option value="{{ $bank->id }}" {{ (int) $prefillBankId === (int) $bank->id ? 'selected' : '' }}>
+                                                {{ $bank->bank_name }}{{ $bank->account_number ? ' (' . $bank->account_number . ')' : '' }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-3 col-sm-6 col-6 " id="cash_amount_col">
+                                <div class="form-group">
+                                    <label id="cash_amount_label" for="cash_amount">Cash Amount</label>
+                                    <input type="text" class="form-control" id="cash_amount" name="cash_amount"
+                                        data-prefill="{{ number_format($prefillCashAmount, 2, '.', '') }}"
+                                        value="{{ number_format($displayCashAmount, 2, '.', '') }}">
+                                </div>
+                            </div>
+
+                            <div class="col-lg-3 col-sm-6 col-6 " id="online_amount_col">
+                                <div class="form-group">
+                                    <label id="online_amount_label" for="online_amount">Bank Amount</label>
+                                    <input type="text" class="form-control" id="online_amount" name="online_amount"
+                                        data-prefill="{{ number_format($prefillOnlineAmount, 2, '.', '') }}"
+                                        value="{{ number_format($displayOnlineAmount, 2, '.', '') }}">
+                                </div>
+                            </div>
+
+                            <div class="col-lg-3 col-sm-6 col-6 " id="pending_amount_col">
+                                <div class="form-group">
+                                    <label for="pending_amount">Pending Amount</label>
+                                    <input type="text" class="form-control" id="pending_amount" name="pending_amount"
+                                        data-prefill="{{ number_format($prefillPendingAmount, 2, '.', '') }}"
+                                        data-paid-total="{{ number_format($prefillTotalPaid, 2, '.', '') }}"
+                                        value="{{ number_format($prefillPendingAmount, 2, '.', '') }}" readonly>
+                                </div>
                             </div>
                         </div>
-                        <div class="col-lg-6 justify-content-end">
+                    </div>
+                </div>
+
+                <div class="row ">
+                    <div class="col-lg-6 mb-3">
+                        <div class="form-group">
+                            <label>Remarks</label>
+                            <textarea class="form-control" name="remarks" id="remarks" rows="6" placeholder="Enter any remarks">{{ old('remarks', $sales->remarks ?? '') }}</textarea>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 justify-content-end">
                             @php
                                 // 1. Calculate Product Subtotal (Gross)
                                 $productsSubtotal = $sales->order_items->sum(function ($item) {
@@ -801,6 +1010,11 @@ $gstDataForAttribute = '[]';
                                 // 5. Calculate Shipping
                                 $shippingCost = $sales->shipping ?? 0;
 
+                                // 5.1 Calculate TDS
+                                $isTdsEnabled = (bool) ($setting->tds_apply ?? false);
+                                $tdsPercentage = $isTdsEnabled ? (float) ($sales->tds_percentage ?? 0) : 0;
+                                $storedTdsAmount = (float) ($sales->tds_amount ?? 0);
+
                                 // 6. Calculate Taxes on (Products After Discount) only
                                 $taxRates = $TaxRate;
                                 $totalTaxAmount = 0;
@@ -817,8 +1031,16 @@ $gstDataForAttribute = '[]';
                                 }
 
                                 // 7. Grand Total
-                                $grandTotal =
+                                $preTdsTotal =
                                     $productsAfterDiscount + $labourSubtotal + $shippingCost + $totalTaxAmount;
+                                $tdsAmount = $isTdsEnabled
+                                    ? ($storedTdsAmount > 0
+                                        ? $storedTdsAmount
+                                        : ($preTdsTotal * $tdsPercentage) / 100)
+                                    : 0;
+                                $grandTotal = $preTdsTotal - $tdsAmount;
+                                $roundedGrandTotal = round($grandTotal);
+                                $roundOffAmount = $roundedGrandTotal - $grandTotal;
                             @endphp
 
                             <!-- Labour Items Section -->
@@ -846,18 +1068,19 @@ $gstDataForAttribute = '[]';
                                                                 </select>
                                                             </div>
                                                             <div class="col-lg-3 col-sm-3 col-3">
-                                                                <input type="number" name="labour_qty[]"
+                                                                <input type="text" name="labour_qty[]"
                                                                     class="form-control labour-qty" placeholder="Qty"
                                                                     value="{{ $item->qty }}" min="0">
                                                             </div>
                                                             <div class="col-lg-3 col-sm-3 col-3">
-                                                                <input type="number" name="labour_price[]"
+                                                                <input type="text" name="labour_price[]"
                                                                     class="form-control labour-price" placeholder="Price"
                                                                     value="{{ $item->price }}" min="0">
                                                             </div>
                                                             <div class="col-lg-1 col-sm-2 col-2">
                                                                 @if ($loop->last)
-                                                                    <button type="button" class="btn btn-success add-labour-item">
+                                                                    <button type="button"
+                                                                        class="btn btn-success add-labour-item">
                                                                         <i class="fas fa-plus"></i>
                                                                     </button>
                                                                 @else
@@ -876,7 +1099,8 @@ $gstDataForAttribute = '[]';
                                                                 class="form-control select2 select2-labour">
                                                                 <option value="">Select Labour Item</option>
                                                                 @foreach ($labourItems as $lItem)
-                                                                    <option value="{{ $lItem->id }}" data-price="{{ $lItem->price }}">
+                                                                    <option value="{{ $lItem->id }}"
+                                                                        data-price="{{ $lItem->price }}">
                                                                         {{ $lItem->item_name }}
                                                                     </option>
                                                                 @endforeach
@@ -884,8 +1108,8 @@ $gstDataForAttribute = '[]';
                                                         </div>
                                                         <div class="col-lg-3 col-sm-3 col-3">
                                                             <input type="number" name="labour_qty[]"
-                                                                class="form-control labour-qty" placeholder="Qty" value="1"
-                                                                min="0">
+                                                                class="form-control labour-qty" placeholder="Qty"
+                                                                value="1" min="0">
                                                         </div>
                                                         <div class="col-lg-3 col-sm-3 col-3">
                                                             <input type="number" name="labour_price[]"
@@ -893,7 +1117,8 @@ $gstDataForAttribute = '[]';
                                                                 value="0" min="0">
                                                         </div>
                                                         <div class="col-lg-1 col-sm-2 col-2">
-                                                            <button type="button" class="btn btn-success add-labour-item">
+                                                            <button type="button"
+                                                                class="btn btn-success add-labour-item">
                                                                 <i class="fas fa-plus"></i>
                                                             </button>
                                                         </div>
@@ -910,7 +1135,7 @@ $gstDataForAttribute = '[]';
                             <div class="total-order w-100 max-widthauto m-auto mb-4">
                                 <ul>
                                     <li class="subtotal">
-                                        <h4>Subtotal (Products)</h4>
+                                        <h4>Total (Products)</h4>
                                         <h5>
                                             @if ($setting->currency_position === 'right')
                                                 <span
@@ -922,7 +1147,20 @@ $gstDataForAttribute = '[]';
                                         </h5>
                                     </li>
 
-                                    <li class="product-discount">
+                                    <li class="total-gst" style="display: none;">
+                                        <h4>Total GST</h4>
+                                        <h5>
+                                            @if ($setting->currency_position === 'right')
+                                                <span
+                                                    id="total-gst-amount">0.00</span>{{ $setting->currency_symbol ?? '₹' }}
+                                            @else
+                                                {{ $setting->currency_symbol ?? '₹' }}<span
+                                                    id="total-gst-amount">0.00</span>
+                                            @endif
+                                        </h5>
+                                    </li>
+                                    <li class="product-discount"
+                                        @if ($totalProductDiscounts <= 0) style="display:none;" @endif>
                                         <h4>Discounts</h4>
                                         <h5>
                                             @if ($setting->currency_position === 'right')
@@ -936,32 +1174,37 @@ $gstDataForAttribute = '[]';
                                     </li>
 
                                     <!-- <li class="discount">
-                                            <h4>Discount</h4>
-                                            <h5>
-                                                <span
-                                                    id="discount-percent">{{ number_format($discountPercent, 2) }}</span>%
-                                                (
-                                                @if ($setting->currency_position === 'right')
-    <span
-                                                        id="discount-amount">{{ number_format($discountAmount, 2) }}</span>{{ $setting->currency_symbol ?? '₹' }}
-@else
-    {{ $setting->currency_symbol ?? '₹' }}<span
-                                                        id="discount-amount">{{ number_format($discountAmount, 2) }}</span>
-    @endif
-                                                )
-                                            </h5>
-                                        </li> -->
+                                                    <h4>Discount</h4>
+                                                    <h5>
+                                                        <span
+                                                            id="discount-percent">{{ number_format($discountPercent, 2) }}</span>%
+                                                        (
+                                                        @if ($setting->currency_position === 'right')
+                                                        <span
+                                                                                                                    id="discount-amount">{{ number_format($discountAmount, 2) }}</span>{{ $setting->currency_symbol ?? '₹' }}
+                                                    @else
+                                                        {{ $setting->currency_symbol ?? '₹' }}<span
+                                                                                                                    id="discount-amount">{{ number_format($discountAmount, 2) }}</span>
+                                                        @endif
+                                                                                                            )
+                                                    </h5>
+                                                </li> -->
 
-                                    <li class="after-discount">
-                                        <h4>After Discount</h4>
-                                        <h5>
-                                            @if ($setting->currency_position === 'right')
-                                                <span
-                                                    id="after-discount-display">{{ number_format($productsAfterDiscount, 2) }}</span>{{ $setting->currency_symbol ?? '₹' }}
+                                    <li class="after-discount"
+                                        @if ($totalProductDiscounts <= 0) style="display:none;" @endif>
+                                        <h4>Sub Total</h4>
+                                        <h5 id="after-discount-display">
+                                            {{-- @if ($setting->currency_position === 'right')
+                                                0.00{{ $setting->currency_symbol ?? '₹' }} +
+                                                0.00{{ $setting->currency_symbol ?? '₹' }} -
+                                                0.00{{ $setting->currency_symbol ?? '₹' }} =
+                                                0.00{{ $setting->currency_symbol ?? '₹' }}
                                             @else
-                                                {{ $setting->currency_symbol ?? '₹' }}<span
-                                                    id="after-discount-display">{{ number_format($productsAfterDiscount, 2) }}</span>
-                                            @endif
+                                                {{ $setting->currency_symbol ?? '₹' }}0.00 +
+                                                {{ $setting->currency_symbol ?? '₹' }}0.00 -
+                                                {{ $setting->currency_symbol ?? '₹' }}0.00 =
+                                                {{ $setting->currency_symbol ?? '₹' }}0.00
+                                            @endif --}}
                                         </h5>
                                     </li>
 
@@ -984,7 +1227,8 @@ $gstDataForAttribute = '[]';
                                             </li>
                                         @endforeach
                                     </div> --}}
-                                    <li class="labour-cost">
+                                    <li class="labour-cost"
+                                        @if ($labourSubtotal <= 0) style="display:none;" @endif>
                                         <h4>Labour Cost</h4>
                                         <h5>
                                             @if ($setting->currency_position === 'right')
@@ -997,7 +1241,8 @@ $gstDataForAttribute = '[]';
                                         </h5>
                                     </li>
 
-                                    <li class="shipping-cost">
+                                    <li class="shipping-cost"
+                                        @if ($shippingCost <= 0) style="display:none;" @endif>
                                         <h4>Shipping Cost</h4>
                                         <h5>
                                             @if ($setting->currency_position === 'right')
@@ -1010,19 +1255,36 @@ $gstDataForAttribute = '[]';
                                         </h5>
                                     </li>
 
-                                    <li class="total-gst" style="display: none;">
-                                        <h4>Total GST</h4>
+                                    <li class="tds-summary"
+                                        @if (!$isTdsEnabled) style="display:none;" @endif>
+                                        <h4>TDS (<span
+                                                id="tds-percentage-display">{{ number_format($tdsPercentage, 2) }}</span>%)
+                                        </h4>
                                         <h5>
                                             @if ($setting->currency_position === 'right')
                                                 <span
-                                                    id="total-gst-amount">0.00</span>{{ $setting->currency_symbol ?? '₹' }}
+                                                    id="tds-amount-display">-{{ number_format(abs($tdsAmount), 2) }}</span>{{ $setting->currency_symbol ?? 'â‚¹' }}
                                             @else
-                                                {{ $setting->currency_symbol ?? '₹' }}<span
-                                                    id="total-gst-amount">0.00</span>
+                                                {{ $setting->currency_symbol ?? 'â‚¹' }}<span
+                                                    id="tds-amount-display">-{{ number_format(abs($tdsAmount), 2) }}</span>
                                             @endif
                                         </h5>
                                     </li>
 
+
+
+                                    <li class="round-off d-none">
+                                        <h4>Round Off</h4>
+                                        <h5>
+                                            @if ($setting->currency_position === 'right')
+                                                <span
+                                                    id="round-off-display">{{ number_format($roundOffAmount, 2) }}</span>{{ $setting->currency_symbol ?? 'â‚¹' }}
+                                            @else
+                                                {{ $setting->currency_symbol ?? 'â‚¹' }}<span
+                                                    id="round-off-display">{{ number_format($roundOffAmount, 2) }}</span>
+                                            @endif
+                                        </h5>
+                                    </li>
                                     <li class="total">
                                         <h4>Grand Total</h4>
                                         <h5>
@@ -1115,6 +1377,63 @@ $gstDataForAttribute = '[]';
                         </div>
                     </div>
                 </div>
+                <div class="modal fade" id="addBankModal" tabindex="-1" aria-labelledby="addBankModalLabel"
+                    aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <form id="addBankForm">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="addBankModalLabel">Add Bank</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">x</button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="row">
+                                        <div class="col-6 mb-3">
+                                            <label for="add_bank_name" class="form-label">Bank Name</label>
+                                            <input type="text" class="form-control" id="add_bank_name" name="bank_name">
+                                            <div class="text-danger small" id="addBankNameError"></div>
+                                        </div>
+                                        <div class="col-6 mb-3">
+                                            <label for="add_account_number" class="form-label">Account Number</label>
+                                            <input type="text" class="form-control" id="add_account_number" name="account_number">
+                                            <div class="text-danger small" id="addAccountNumberError"></div>
+                                        </div>
+                                        <div class="col-6 mb-3">
+                                            <label for="add_ifsc_code" class="form-label">IFSC Code</label>
+                                            <input type="text" class="form-control" id="add_ifsc_code" name="ifsc_code">
+                                            <div class="text-danger small" id="addIfscCodeError"></div>
+                                        </div>
+                                        <div class="col-6 mb-3">
+                                            <label for="add_branch_name" class="form-label">Branch Name</label>
+                                            <input type="text" class="form-control" id="add_branch_name" name="branch_name">
+                                            <div class="text-danger small" id="addBranchNameError"></div>
+                                        </div>
+                                        <div class="col-6 mb-3">
+                                            <label for="add_opening_balance" class="form-label">Opening Balance</label>
+                                            <input type="number" class="form-control" id="add_opening_balance"
+                                                name="opening_balance" min="0" step="0.01" value="0">
+                                            <div class="text-danger small" id="addOpeningBalanceError"></div>
+                                        </div>
+                                        <div class="col-6 mb-3">
+                                            <label for="add_bank_status" class="form-label">Status</label>
+                                            <select class="form-select" id="add_bank_status" name="status">
+                                                <option value="1" selected>Active</option>
+                                                <option value="0">Inactive</option>
+                                            </select>
+                                            <div class="text-danger small" id="addBankStatusError"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="submit" class="btn text-white" id="saveBankBtn"
+                                        style="background-color: #ff9f43;">Save Bank</button>
+                                    <button type="button" class="btn btn-secondary btn-cancel"
+                                        data-bs-dismiss="modal">Cancel</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
             @endsection
 
             @push('js')
@@ -1122,11 +1441,17 @@ $gstDataForAttribute = '[]';
                     $(document).ready(function() {
                         const currencySymbol = '{{ $setting->currency_symbol ?? '₹' }}';
                         const currencyPosition = '{{ $setting->currency_position ?? 'left' }}';
+                        const isTdsEnabled = @json((bool) ($setting->tds_apply ?? false));
+                        const selectedSubAdminId = localStorage.getItem("selectedSubAdminId");
+                        const addBankModalElement = document.getElementById('addBankModal');
+                        const addBankModal = addBankModalElement && typeof bootstrap !== 'undefined' ?
+                            new bootstrap.Modal(addBankModalElement) :
+                            null;
 
-                        function formatNumber(amount) {
+                        function formatNumber(amount, decimals = 2) {
                             return parseFloat(amount).toLocaleString('en-US', {
-                                minimumFractionDigits: 2,
-                                maximumFractionDigits: 2
+                                minimumFractionDigits: decimals,
+                                maximumFractionDigits: decimals
                             });
                         }
 
@@ -1135,6 +1460,336 @@ $gstDataForAttribute = '[]';
                             return currencyPosition === 'right' ?
                                 formatted + currencySymbol :
                                 currencySymbol + formatted;
+                        }
+
+                        function parseMoney(value) {
+                            const normalized = String(value ?? '')
+                                .replace(/,/g, '')
+                                .replace(/[^0-9.-]/g, '')
+                                .trim();
+                            const parsed = parseFloat(normalized);
+                            return Number.isFinite(parsed) ? parsed : 0;
+                        }
+
+                        function getGrandTotalValue() {
+                            return parseMoney($('#grand-total').first().text());
+                        }
+
+                        function normalizePaymentMethod(value) {
+                            const normalized = String(value || '').toLowerCase().trim();
+
+                            if (['cash+online', 'cash_online', 'cash + online', 'cash+bank', 'cash_bank', 'cash + bank']
+                                .includes(normalized)) {
+                                return 'cash+online';
+                            }
+
+                            if (['online', 'debit', 'debit card', 'scan', 'upi'].includes(normalized)) {
+                                return 'online';
+                            }
+
+                            if (normalized === 'cash') {
+                                return 'cash';
+                            }
+
+                            return 'pending';
+                        }
+
+                        function setSelect2Value(selector, value) {
+                            const $element = $(selector);
+                            if (!$element.length) {
+                                return;
+                            }
+
+                            $element.find('option').prop('selected', false);
+                            $element.find(`option[value="${value}"]`).prop('selected', true);
+                            $element.val(value);
+                            if ($element.hasClass('select2-hidden-accessible')) {
+                                $element.trigger('change.select2');
+                                const selectedText = $element.find('option:selected').text();
+                                $element.next('.select2-container').find('.select2-selection__rendered').text(selectedText);
+                            }
+                        }
+
+                        function syncPaidTypeWithStatus() {
+                            const status = $('#payment_status').val();
+                            if (status === 'pending') {
+                                setSelect2Value('#paid_type', '');
+                            } else if (status === 'partially') {
+                                setSelect2Value('#paid_type', 'partial');
+                            } else if (status === 'completed') {
+                                setSelect2Value('#paid_type', 'full');
+                            }
+                        }
+
+                        function syncStatusWithPayment(pendingAmount, paidAmount, grandTotal) {
+                            let status = 'pending';
+
+                            if (pendingAmount <= 0 && paidAmount > 0) {
+                                status = 'completed';
+                            } else if (paidAmount > 0 && paidAmount < grandTotal) {
+                                status = 'partially';
+                            }
+
+                            setSelect2Value('#payment_status', status);
+                        }
+
+                        // function formatPaymentAmountInput(value) {
+                        //     const amount = parseMoney(value);
+                        //     return amount > 0 ? amount.toFixed(2) : '';
+                        // }
+                        function formatPaymentAmountInput(value) {
+    const amount = parseMoney(value);
+    return amount > 0 ? amount.toFixed(2) : '';
+}
+
+// Format cash/online fields to 2 decimal places only on blur
+$(document).on('blur', '#cash_amount, #online_amount', function() {
+    const val = parseMoney($(this).val());
+    if (val > 0) {
+        $(this).val(val.toFixed(2));
+    }
+});
+$(document).on('blur', '#tds-percentage-input', function() {
+    const val = Math.max(0, Math.min(100, parseFloat($(this).val()) || 0));
+    $(this).val(val.toFixed(2));
+});
+
+                        function normalizeDiscountInputValue(value) {
+                            const normalized = String(value ?? '')
+                                .replace(/[^0-9.]/g, '')
+                                .trim();
+
+                            if (normalized === '') {
+                                return '';
+                            }
+
+                            const parts = normalized.split('.');
+                            const sanitized = parts.length > 2
+                                ? `${parts[0]}.${parts.slice(1).join('')}`
+                                : normalized;
+                            const parsed = parseFloat(sanitized);
+
+                            if (!Number.isFinite(parsed)) {
+                                return '';
+                            }
+
+                            return Math.max(0, Math.min(100, parsed)).toFixed(2);
+                        }
+
+                        function togglePaymentInputLayout() {
+                            const isQuotation = $('#quotationToggle').is(':checked');
+                            const method = normalizePaymentMethod($('#payment_method').val());
+                            const $paymentColumns = $('#payment_details_row > .col-lg-12 > .row').children();
+                            const shouldShowPaymentRow = !isQuotation && method !== 'pending';
+
+                            $('#payment_method_col').toggle(!isQuotation);
+                            $('#payment_status_col').show();
+                            $('#payment_details_row').toggle(shouldShowPaymentRow);
+                            $('#paid_type_col').toggle(shouldShowPaymentRow);
+                            $('#bank_container').toggle(shouldShowPaymentRow && (method === 'online' || method === 'cash+online'));
+                            $('#cash_amount_col').toggle(shouldShowPaymentRow && (method === 'cash' || method === 'cash+online'));
+                            $('#online_amount_col').toggle(shouldShowPaymentRow && (method === 'online' || method === 'cash+online'));
+                            $('#pending_amount_col').toggle(shouldShowPaymentRow);
+
+                            $('#cash_amount_label').text(method === 'cash' ? 'Payment Amount' : 'Cash Amount');
+                            $('#online_amount_label').text(method === 'online' ? 'Payment Amount' : 'Bank Amount');
+
+                            $('#bank_id').prop('disabled', isQuotation || !(method === 'online' || method === 'cash+online'));
+                            $('#cash_amount').prop('disabled', isQuotation || !(method === 'cash' || method === 'cash+online'));
+                            $('#online_amount').prop('disabled', isQuotation || !(method === 'online' || method === 'cash+online'));
+                            $('#pending_amount').prop('disabled', true);
+                            $('#paid_type').prop('disabled', !shouldShowPaymentRow);
+
+                            $paymentColumns.removeClass('col-lg-3 col-lg-4 col-lg-6 col-lg-12 d-none');
+
+                            const visibleColumns = $paymentColumns.filter(':visible');
+                            let paymentColumnClass = 'col-lg-3';
+
+                            if (visibleColumns.length === 1) {
+                                paymentColumnClass = 'col-lg-12';
+                            } else if (visibleColumns.length === 2) {
+                                paymentColumnClass = 'col-lg-6';
+                            } else if (visibleColumns.length === 3) {
+                                paymentColumnClass = 'col-lg-4';
+                            }
+
+                            visibleColumns.addClass(paymentColumnClass);
+                        }
+
+                        function calculatePaymentBreakdown() {
+                            const isQuotation = $('#quotationToggle').is(':checked');
+                            const method = normalizePaymentMethod($('#payment_method').val());
+                            const paidType = $('#paid_type').val();
+                            const grandTotal = getGrandTotalValue();
+                            const historicalPaidAmount = Math.min(
+                                grandTotal,
+                                parseMoney($('#pending_amount').data('paid-total'))
+                            );
+                            const outstandingAmount = Math.max(0, grandTotal - historicalPaidAmount);
+                            let cashAmount = parseMoney($('#cash_amount').val());
+                            let onlineAmount = parseMoney($('#online_amount').val());
+                            let additionalPaidAmount = 0;
+                            let paidAmount = historicalPaidAmount;
+                            let pendingAmount = outstandingAmount;
+
+                            if (isQuotation) {
+                                cashAmount = 0;
+                                onlineAmount = 0;
+                                pendingAmount = grandTotal;
+                                paidAmount = 0;
+                            } else if (method === 'pending' || !paidType) {
+                                cashAmount = 0;
+                                onlineAmount = 0;
+                                pendingAmount = outstandingAmount;
+                            } else if (method === 'cash') {
+                                onlineAmount = 0;
+                                additionalPaidAmount = paidType === 'full'
+                                    ? outstandingAmount
+                                    : Math.min(cashAmount, outstandingAmount);
+                                cashAmount = additionalPaidAmount;
+                                pendingAmount = Math.max(outstandingAmount - additionalPaidAmount, 0);
+                                paidAmount = Math.min(historicalPaidAmount + additionalPaidAmount, grandTotal);
+                            } else if (method === 'online') {
+                                cashAmount = 0;
+                                additionalPaidAmount = paidType === 'full'
+                                    ? outstandingAmount
+                                    : Math.min(onlineAmount, outstandingAmount);
+                                onlineAmount = additionalPaidAmount;
+                                pendingAmount = Math.max(outstandingAmount - additionalPaidAmount, 0);
+                                paidAmount = Math.min(historicalPaidAmount + additionalPaidAmount, grandTotal);
+                            } else if (method === 'cash+online') {
+                                cashAmount = Math.min(cashAmount, outstandingAmount);
+
+                                if (paidType === 'full') {
+                                    additionalPaidAmount = outstandingAmount;
+                                    onlineAmount = Math.max(outstandingAmount - cashAmount, 0);
+                                } else {
+                                    onlineAmount = Math.min(onlineAmount, Math.max(outstandingAmount - cashAmount, 0));
+                                    additionalPaidAmount = Math.min(cashAmount + onlineAmount, outstandingAmount);
+                                }
+
+                                pendingAmount = Math.max(outstandingAmount - additionalPaidAmount, 0);
+                                paidAmount = Math.min(historicalPaidAmount + additionalPaidAmount, grandTotal);
+                            }
+
+                            $('#cash_amount').val(formatPaymentAmountInput(cashAmount));
+                            $('#online_amount').val(formatPaymentAmountInput(onlineAmount));
+                            $('#pending_amount').val(pendingAmount.toFixed(2));
+
+                            syncStatusWithPayment(pendingAmount, paidAmount, grandTotal);
+                            togglePaymentInputLayout();
+                        }
+
+                        function resetAddBankForm() {
+                            const form = document.getElementById('addBankForm');
+                            if (form) {
+                                form.reset();
+                            }
+
+                            $('#add_opening_balance').val('0');
+                            $('#add_bank_status').val('1');
+                            $('#addBankForm .text-danger').text('');
+                        }
+
+                        function validateAddBankForm() {
+                            const formValues = {
+                                bank_name: $('#add_bank_name').val().trim(),
+                                account_number: $('#add_account_number').val().trim(),
+                                ifsc_code: $('#add_ifsc_code').val().trim(),
+                                branch_name: $('#add_branch_name').val().trim(),
+                                opening_balance: $('#add_opening_balance').val().trim(),
+                                status: $('#add_bank_status').val()
+                            };
+                            let hasError = false;
+
+                            $('#addBankForm .text-danger').text('');
+
+                            if (!formValues.bank_name) {
+                                $('#addBankNameError').text('Bank name is required.');
+                                hasError = true;
+                            }
+
+                            if (!formValues.account_number) {
+                                $('#addAccountNumberError').text('Account number is required.');
+                                hasError = true;
+                            }
+
+                            if (!formValues.ifsc_code) {
+                                $('#addIfscCodeError').text('IFSC code is required.');
+                                hasError = true;
+                            }
+
+                            if (!formValues.branch_name) {
+                                $('#addBranchNameError').text('Branch name is required.');
+                                hasError = true;
+                            }
+
+                            if (formValues.opening_balance === '') {
+                                $('#addOpeningBalanceError').text('Opening balance is required.');
+                                hasError = true;
+                            } else if (parseMoney(formValues.opening_balance) < 0) {
+                                $('#addOpeningBalanceError').text('Opening balance must be 0 or more.');
+                                hasError = true;
+                            }
+
+                            if (!['0', '1'].includes(formValues.status)) {
+                                $('#addBankStatusError').text('Status is required.');
+                                hasError = true;
+                            }
+
+                            return !hasError;
+                        }
+
+                        function upsertBankOption(bank) {
+                            if (!bank || !bank.id) {
+                                return;
+                            }
+
+                            const bankId = String(bank.id);
+                            const accountNumber = bank.account_number ? ` (${bank.account_number})` : '';
+                            const label = `${bank.bank_name || 'Unnamed Bank'}${accountNumber}`;
+                            const $bankSelect = $('#bank_id');
+                            let $option = $bankSelect.find(`option[value="${bankId}"]`);
+
+                            if ($option.length) {
+                                $option.text(label);
+                            } else {
+                                $option = $('<option></option>').val(bankId).text(label);
+                                $bankSelect.append($option);
+                            }
+
+                            setSelect2Value('#bank_id', bankId);
+                        }
+
+                        function getOptionData($option, key, fallback = null) {
+                            if (!$option || !$option.length) {
+                                return fallback;
+                            }
+
+                            const dataValue = $option.data(key);
+                            if (dataValue !== undefined && dataValue !== null && dataValue !== '') {
+                                return dataValue;
+                            }
+
+                            const attrValue = $option.attr(`data-${key}`);
+                            return attrValue !== undefined && attrValue !== null && attrValue !== '' ? attrValue :
+                                fallback;
+                        }
+
+                        function normalizeProductPrice(price) {
+                            const normalizedPrice = parseFloat(price);
+                            return Number.isFinite(normalizedPrice) ? normalizedPrice : null;
+                        }
+
+                        function fetchProductDetails(productId) {
+                            return $.ajax({
+                                url: `/api/getProductById/${productId}`,
+                                type: 'GET',
+                                headers: {
+                                    "Authorization": "Bearer " + localStorage.getItem("authToken"),
+                                    "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr('content')
+                                }
+                            });
                         }
 
                         // Initialize Select2 with images and GST info
@@ -1182,7 +1837,8 @@ $gstDataForAttribute = '[]';
                         $('.product-select').select2({
                             templateResult: formatProduct,
                             templateSelection: formatProduct,
-                            closeOnSelect: false
+                            closeOnSelect: false,
+                            width: '100%'
                         });
 
                         $('.select2-labour').select2({
@@ -1195,6 +1851,12 @@ $gstDataForAttribute = '[]';
                             allowClear: true
                         });
 
+                        if ($.fn.select2) {
+                            $('#payment_method, #payment_status, #paid_type, #bank_id').select2({
+                                width: '100%'
+                            });
+                        }
+
                         // Handle customer selection change
                         $('#customer_id').on('change', function() {
                             var phone = $(this).find(':selected').data('phone');
@@ -1206,7 +1868,9 @@ $gstDataForAttribute = '[]';
 
                         // Add product to table
                         function addProductToTable(productId, productName, productImage, productPrice, gstOption, productGst,
-                            existingGstDetails = null, unit = 'N/A', discount = 0) {
+    existingGstDetails = null, unit = 'N/A', discount = 0, stock = 999999) {
+                            const normalizedInitialPrice = normalizeProductPrice(productPrice);
+                            const resolvedPrice = normalizedInitialPrice !== null ? normalizedInitialPrice : 0;
                             const rowCount = $('tbody tr[data-product-id]').length + 1;
                             let gstBadge = '';
                             let gstDetailsHtml = '';
@@ -1244,7 +1908,7 @@ $gstDataForAttribute = '[]';
                             }
 
                             const newRow = `
-            <tr data-product-id="${productId}" data-gst-option="${gstOption}" data-product-gst='${JSON.stringify(gstDetails).replace(/'/g, "&#39;")}'>
+<tr data-product-id="${productId}" data-gst-option="${gstOption}" data-product-gst='${JSON.stringify(gstDetails).replace(/'/g, "&#39;")}' data-stock="${stock || 999999}">
                 <td>${rowCount}</td>
                 <td class="">
                     <a class="product-img">
@@ -1254,19 +1918,26 @@ $gstDataForAttribute = '[]';
                     ${gstBadge}
                 </td>
                 <td data-label="Unit">${unit}</td>
-                <td>
-                    <input type="number"
+                <td data-label="QTY">
+                    <input type="text"
                            name="quantities[${productId}]"
                            class="form-control quantity-input"
                            value="1"
                            step="1"
                            min="0"
-                           data-price="${productPrice}"
                            style="width: 80px;">
                 </td>
-                <td>${formatNumber(productPrice)}</td>
-                <td>
-                    <input type="number"
+                <td data-label="Price">
+                    <input type="text"
+                           name="prices[${productId}]"
+                           class="form-control price-input"
+                           value="${resolvedPrice.toFixed(2)}"
+                           step="0.01"
+                           min="0"
+                           style="width: 90px;">
+                </td>
+                <td data-label="Discount %">
+                    <input type="text"
                            name="discounts[${productId}]"
                            class="form-control discount-input"
                            value="${discount}"
@@ -1275,13 +1946,13 @@ $gstDataForAttribute = '[]';
                            max="100"
                            style="width: 80px;">
                 </td>
-                <td class="gst-details-cell">
+                <td class="gst-details-cell" data-label="GST Details">
                     ${gstDetailsHtml || '<span class="text-muted">No GST</span>'}
                 </td>
-                <td>
-                    <span class="total-amount">${formatNumber(productPrice)}</span>
+                <td data-label="Total">
+                    <span class="total-amount">${formatNumber(resolvedPrice)}</span>
                 </td>
-                <td>
+                <td data-label="Action">
                     <a href="javascript:void(0);" class="delete-set">
                         <img src="{{ env('ImagePath') . 'admin/assets/img/icons/delete.svg' }}" alt="svg">
                     </a>
@@ -1294,6 +1965,7 @@ $gstDataForAttribute = '[]';
 
                             // Add event listeners
                             $('tbody tr[data-product-id="' + productId + '"] .quantity-input').on('input', calculateAllTotals);
+                            $('tbody tr[data-product-id="' + productId + '"] .price-input').on('input', calculateAllTotals);
                             $('tbody tr[data-product-id="' + productId + '"] .discount-input').on('input', calculateAllTotals);
                             $('tbody tr[data-product-id="' + productId + '"] .delete-set').on('click', function() {
                                 $(this).closest('tr').remove();
@@ -1333,8 +2005,8 @@ $gstDataForAttribute = '[]';
                             $('tbody tr[data-product-id]').each(function() {
                                 const $row = $(this);
                                 const quantity = parseFloat($row.find('.quantity-input').val()) || 0;
-                                const price = parseFloat($row.find('.quantity-input').data('price')) || 0;
-                                const discountPercent = parseFloat($row.find('.discount-input').val()) || 0;
+                                const price = parseFloat($row.find('.price-input').val()) || 0;
+                                const discountPercent = Math.max(0, Math.min(100, parseFloat($row.find('.discount-input').val()) || 0));
                                 const productGstOption = $row.data('gst-option');
                                 let productGstData = $row.data('product-gst') || [];
 
@@ -1431,10 +2103,14 @@ $gstDataForAttribute = '[]';
 
                             // Total Discounts
                             $('#product-discount-total-display').text(formatNumber(totalPerItemDiscount));
+                            const hasDiscounts = totalPerItemDiscount > 0;
+                            $('.product-discount, .after-discount').toggle(hasDiscounts);
 
                             // After discount (Total with GST - Discount)
                             const afterDiscount = (grossSubtotal + totalGst) - totalPerItemDiscount;
-                            $('#after-discount-display').text(formatNumber(afterDiscount));
+                            const subtotalFormulaText =
+                                `${formatCurrency(afterDiscount)}`;
+                            $('#after-discount-display').text(subtotalFormulaText);
 
                             // Calculate labour cost
                             let labourSubtotal = 0;
@@ -1444,10 +2120,31 @@ $gstDataForAttribute = '[]';
                                 labourSubtotal += qty * price;
                             });
                             $('#labour-cost-display').text(formatNumber(labourSubtotal));
+                            $('.labour-cost').toggle(labourSubtotal > 0);
 
                             // Shipping cost
                             const shippingCost = parseFloat($('#shipping-input').val()) || 0;
                             $('#shipping-cost-display').text(formatNumber(shippingCost));
+                            $('.shipping-cost').toggle(shippingCost > 0);
+
+                            // TDS (applies only when enabled in settings)
+                            const tdsPercentageInput = isTdsEnabled ? (parseFloat($('#tds-percentage-input').val()) || 0) : 0;
+                            const tdsPercentage = Math.max(0, Math.min(100, tdsPercentageInput));
+                            // if (isTdsEnabled) {
+                            //     $('#tds-percentage-input').val(tdsPercentage.toFixed(2));
+                            // }
+
+                            const preTdsGrandTotal = afterDiscount + labourSubtotal + shippingCost;
+                            const tdsAmount = isTdsEnabled ? (preTdsGrandTotal * tdsPercentage) / 100 : 0;
+
+                            if (isTdsEnabled) {
+                                $('#tds-percentage-display').text(formatNumber(tdsPercentage));
+                                $('#tds-amount-display').text(`-${formatNumber(tdsAmount)}`);
+                                $('#tds-amount-input').val(tdsAmount.toFixed(2));
+                                $('.tds-summary').show();
+                            } else {
+                                $('.tds-summary').hide();
+                            }
 
                             // Show/hide GST total
                             const $gstTotalLi = $('.total-gst');
@@ -1458,13 +2155,76 @@ $gstDataForAttribute = '[]';
                                 $gstTotalLi.hide();
                             }
 
-                            // Grand Total (After Discount + Labour + Shipping)
-                            const grandTotal = afterDiscount + labourSubtotal + shippingCost;
-                            $('#grand-total').text(formatNumber(grandTotal));
+                            // Grand Total (After Discount + Labour + Shipping - TDS)
+                            const grandTotal = preTdsGrandTotal - tdsAmount;
+                            const roundedGrandTotal = Math.round(grandTotal);
+                            const roundOffAmount = roundedGrandTotal - grandTotal;
+                            $('#round-off-display').text(formatNumber(roundOffAmount));
+                            $('#grand-total').text(formatNumber(roundedGrandTotal, 0));
+                            calculatePaymentBreakdown();
                         }
 
                         // Bind events for recalculation
-                        $(document).on('input', '.quantity-input, .discount-input, #shipping-input, .labour-qty, .labour-price', calculateAllTotals);
+                        // $(document).on('input',
+                        //     '.quantity-input, .price-input, .discount-input, #shipping-input, #tds-percentage-input, .labour-qty, .labour-price',
+                        //     calculateAllTotals);
+
+// $(document).on('input',
+//     '.price-input, .discount-input, #shipping-input, #tds-percentage-input, .labour-qty, .labour-price',
+//     calculateAllTotals);
+$(document).on('input',
+    '.price-input, .discount-input, #shipping-input, .labour-qty, .labour-price',
+    calculateAllTotals);
+
+// TDS: only recalculate on blur to avoid overwriting while typing
+$(document).on('blur', '#tds-percentage-input', calculateAllTotals);
+
+// While typing TDS: only update the display live, don't reformat the field
+$(document).on('input', '#tds-percentage-input', function() {
+    const rawVal = parseFloat($(this).val()) || 0;
+    const tdsPercentage = Math.max(0, Math.min(100, rawVal));
+    const grandTotalBeforeTds = parseFloat($('#grand-total').text().replace(/,/g, '')) || 0;
+    const tdsAmount = (grandTotalBeforeTds * tdsPercentage) / 100;
+    $('#tds-percentage-display').text(tdsPercentage.toFixed(2));
+    $('#tds-amount-display').text(`-${tdsAmount.toFixed(2)}`);
+    $('#tds-amount-input').val(tdsAmount.toFixed(2));
+});
+
+$(document).on('input', '.discount-input', function() {
+    const normalizedDiscount = normalizeDiscountInputValue($(this).val());
+    $(this).val(normalizedDiscount);
+});
+
+// Quantity input: validate stock then recalculate
+$(document).on('input', '.quantity-input', function() {
+    const $input = $(this);
+    const $row = $input.closest('tr');
+    const stock = parseFloat($row.data('stock'));
+    const enteredQty = parseFloat($input.val()) || 0;
+    const productName = $row.find('td:nth-child(2) a:last-of-type').text().trim() ||
+                        $row.find('td:nth-child(2) a').last().text().trim() || 'this product';
+
+    // Only validate if stock is a real finite number (not 999999 placeholder)
+    if (isFinite(stock) && stock < 999999 && enteredQty > stock) {
+        Swal.fire({
+            title: 'Stock Quantity Exceeded',
+            text: `Only ${stock.toFixed(2)} quantity are available for '${productName}'.`,
+            icon: 'error',
+            confirmButtonText: 'OK',
+            confirmButtonColor: '#ff9f43'
+        }).then(() => {
+            $input.val(stock.toFixed(2));
+            calculateAllTotals();
+        });
+        return; // Don't recalculate until user dismisses
+    }
+
+    if (enteredQty < 0) {
+        $input.val(0);
+    }
+
+    calculateAllTotals();
+});
                         $(document).on('change', 'input[name="gst_option"], .select2-labour', calculateAllTotals);
 
                         $(document).on('change', '.select2-labour', function() {
@@ -1518,17 +2278,144 @@ $gstDataForAttribute = '[]';
 
                         // Handle Quotation Toggle
                         function togglePaymentFields() {
-                            if ($('#quotationToggle').is(':checked')) {
-                                $('#payment_method_col').hide();
-                                $('#payment_status_col').show();
-                            } else {
-                                $('#payment_method_col').show();
-                                $('#payment_status_col').show();
-                            }
+                            togglePaymentInputLayout();
+                            calculatePaymentBreakdown();
                         }
 
                         $('#quotationToggle').on('change', togglePaymentFields);
                         togglePaymentFields(); // Initial call
+
+                        $('#payment_method').on('change', function() {
+                            setSelect2Value('#paid_type', '');
+                            $('#cash_amount').val('');
+                            $('#online_amount').val('');
+                            $('#pending_amount').val(parseMoney($('#pending_amount').data('prefill')).toFixed(2));
+                            calculatePaymentBreakdown();
+                        });
+
+                        $('#payment_status').on('change', function() {
+                            const status = $(this).val();
+
+                            if (status === 'pending') {
+                                setSelect2Value('#payment_method', 'pending');
+                            } else {
+                                syncPaidTypeWithStatus();
+
+                                if (normalizePaymentMethod($('#payment_method').val()) === 'pending') {
+                                    setSelect2Value('#payment_method', 'cash');
+                                }
+                            }
+
+                            calculatePaymentBreakdown();
+                        });
+
+                        $('#paid_type').on('change', calculatePaymentBreakdown);
+                        // $('#cash_amount, #online_amount').on('input', calculatePaymentBreakdown);
+
+                        // Recalculate pending/status on blur only (so typing isn't interrupted)
+$('#cash_amount, #online_amount').on('blur', calculatePaymentBreakdown);
+
+// While typing: only update pending amount display live, don't reformat the field
+$('#cash_amount, #online_amount').on('input', function() {
+    const method = normalizePaymentMethod($('#payment_method').val());
+    const grandTotal = getGrandTotalValue();
+    const historicalPaidAmount = Math.min(grandTotal, parseMoney($('#pending_amount').data('paid-total')));
+    const outstandingAmount = Math.max(0, grandTotal - historicalPaidAmount);
+
+    let cashAmount = parseMoney($('#cash_amount').val());
+    let onlineAmount = parseMoney($('#online_amount').val());
+    let additionalPaid = 0;
+
+    if (method === 'cash') {
+        additionalPaid = Math.min(cashAmount, outstandingAmount);
+    } else if (method === 'online') {
+        additionalPaid = Math.min(onlineAmount, outstandingAmount);
+    } else if (method === 'cash+online') {
+        cashAmount = Math.min(cashAmount, outstandingAmount);
+        onlineAmount = Math.min(onlineAmount, Math.max(outstandingAmount - cashAmount, 0));
+        additionalPaid = Math.min(cashAmount + onlineAmount, outstandingAmount);
+    }
+
+    const pendingAmount = Math.max(outstandingAmount - additionalPaid, 0);
+    $('#pending_amount').val(pendingAmount.toFixed(2));
+});
+
+                        $('#openAddBankModal').on('click', function() {
+                            resetAddBankForm();
+                            if (addBankModal) {
+                                addBankModal.show();
+                            }
+                        });
+
+                        $('#addBankForm').on('submit', function(e) {
+                            e.preventDefault();
+
+                            if (!validateAddBankForm()) {
+                                return;
+                            }
+
+                            const authToken = localStorage.getItem("authToken");
+                            const formData = new FormData(this);
+                            if (selectedSubAdminId) {
+                                formData.append('selectedSubAdminId', selectedSubAdminId);
+                            }
+                            formData.set('bank_name', $('#add_bank_name').val().trim());
+                            formData.set('account_number', $('#add_account_number').val().trim());
+                            formData.set('ifsc_code', $('#add_ifsc_code').val().trim().toUpperCase());
+                            formData.set('branch_name', $('#add_branch_name').val().trim());
+                            formData.set('opening_balance', parseMoney($('#add_opening_balance').val()).toFixed(2));
+
+                            const $saveButton = $('#saveBankBtn');
+                            $saveButton.prop('disabled', true).text('Saving...');
+
+                            $.ajax({
+                                url: '/api/banks',
+                                type: 'POST',
+                                data: formData,
+                                processData: false,
+                                contentType: false,
+                                headers: {
+                                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
+                                    "Authorization": "Bearer " + authToken
+                                },
+                                success: function(response) {
+                                    upsertBankOption(response.data || null);
+                                    if (addBankModal) {
+                                        addBankModal.hide();
+                                    }
+
+                                    Swal.fire({
+                                        title: "Success",
+                                        text: response.message || "Bank added successfully.",
+                                        icon: "success",
+                                        confirmButtonText: "OK",
+                                        confirmButtonColor: "#ff9f43"
+                                    });
+                                },
+                                error: function(xhr) {
+                                    const errors = xhr.responseJSON?.errors || {};
+                                    $('#addBankNameError').text(errors.bank_name ? errors.bank_name[0] : '');
+                                    $('#addAccountNumberError').text(errors.account_number ? errors.account_number[0] : '');
+                                    $('#addIfscCodeError').text(errors.ifsc_code ? errors.ifsc_code[0] : '');
+                                    $('#addBranchNameError').text(errors.branch_name ? errors.branch_name[0] : '');
+                                    $('#addOpeningBalanceError').text(errors.opening_balance ? errors.opening_balance[0] : '');
+                                    $('#addBankStatusError').text(errors.status ? errors.status[0] : '');
+
+                                    if (!Object.keys(errors).length) {
+                                        Swal.fire({
+                                            title: "Error",
+                                            text: xhr.responseJSON?.message || "Failed to add bank.",
+                                            icon: "error",
+                                            confirmButtonText: "OK",
+                                            confirmButtonColor: "#ff9f43"
+                                        });
+                                    }
+                                },
+                                complete: function() {
+                                    $saveButton.prop('disabled', false).text('Save Bank');
+                                }
+                            });
+                        });
 
                         // Handle product selection changes
                         $('.product-select').on('change', function() {
@@ -1536,22 +2423,74 @@ $gstDataForAttribute = '[]';
                             const existingProducts = $('tbody tr[data-product-id]').map(function() {
                                 return $(this).data('product-id').toString();
                             }).get();
+                            const addProductPromises = [];
 
                             // Add new products
                             selectedProducts.forEach(productId => {
                                 if (!existingProducts.includes(productId)) {
                                     const option = $(this).find('option[value="' + productId + '"]');
-                                    addProductToTable(
-                                        productId,
-                                        option.data('name'),
-                                        option.data('image'),
-                                        option.data('price'),
-                                        option.data('gst-option'),
-                                        option.data('product-gst'),
-                                        null,
-                                        option.data('unit'),
-                                        option.data('discount')
-                                    );
+                                    const optionName = getOptionData(option, 'name', option.text().trim());
+                                    const optionImage = getOptionData(option, 'image', '');
+                                    const optionGstOption = getOptionData(option, 'gst-option', 'without_gst');
+                                    const optionProductGst = getOptionData(option, 'product-gst', '[]');
+                                    const optionUnit = getOptionData(option, 'unit', 'N/A');
+                                    const optionDiscount = getOptionData(option, 'discount', 0);
+                                    const optionPrice = normalizeProductPrice(getOptionData(option, 'price'));
+
+                                    if (optionPrice !== null) {
+                                     const optionStock = parseFloat(getOptionData(option, 'stock', 999999)) || 999999;
+addProductToTable(
+    productId,
+    optionName,
+    optionImage,
+    optionPrice,
+    optionGstOption,
+    optionProductGst,
+    null,
+    optionUnit,
+    optionDiscount,
+    optionStock
+);
+                                        return;
+                                    }
+
+                                    const fallbackRequest = fetchProductDetails(productId)
+                                        .done(function(response) {
+                                            const product = response.product || {};
+                                            const fallbackPrice = normalizeProductPrice(product.price);
+                                            const fallbackUnit = product.unit && product.unit.unit_name ?
+                                                product.unit
+                                                .unit_name : 'N/A';
+
+                                         addProductToTable(
+    productId,
+    optionName || product.name || option.text().trim(),
+    optionImage || product.image || '',
+    fallbackPrice !== null ? fallbackPrice : 0,
+    optionGstOption || product.gst_option || 'without_gst',
+    optionProductGst || product.product_gst || '[]',
+    null,
+    optionUnit || fallbackUnit,
+    optionDiscount,
+    parseFloat(product.quantity ?? product.stock ?? 999999) || 999999
+);
+                                        })
+                                        .fail(function() {
+                                           addProductToTable(
+    productId,
+    optionName,
+    optionImage,
+    0,
+    optionGstOption,
+    optionProductGst,
+    null,
+    optionUnit,
+    optionDiscount,
+    parseFloat(getOptionData(option, 'stock', 999999)) || 999999
+);
+                                        });
+
+                                    addProductPromises.push(fallbackRequest);
                                 }
                             });
 
@@ -1564,7 +2503,11 @@ $gstDataForAttribute = '[]';
                             });
 
                             toggleNoProductsMessage();
-                            calculateAllTotals();
+                            if (addProductPromises.length) {
+                                $.when.apply($, addProductPromises).always(calculateAllTotals);
+                            } else {
+                                calculateAllTotals();
+                            }
                         });
 
                         // Initialize existing rows with their GST details from order_items
@@ -1589,6 +2532,7 @@ $gstDataForAttribute = '[]';
 
                             // Add event listeners for existing rows
                             $row.find('.quantity-input').on('input', calculateAllTotals);
+                            $row.find('.price-input').on('input', calculateAllTotals);
                             $row.find('.discount-input').on('input', calculateAllTotals);
                             $row.find('.delete-set').on('click', function() {
                                 $(this).closest('tr').remove();
@@ -1600,28 +2544,260 @@ $gstDataForAttribute = '[]';
 
 
 
+                        const initialQuotationStatus = @json($sales->quotation_status ?? 'sales');
+
+                        function resetUpdateButtonState() {
+                            const $btn = $('#update-order-btn');
+                            const $loader = $('#btn-loader');
+                            const $btnText = $('#btn-text');
+
+                            $btn.prop('disabled', false);
+                            $loader.addClass('d-none');
+                            $btnText.text('Update Order');
+                        }
+
+                        function clearOrderNumberError() {
+                            $('#order_number_error').hide().text('');
+                        }
+
+                        function showOrderNumberError(message) {
+                            $('#order_number_error').text(message).show();
+                            $('#order_number').focus();
+                        }
+
+                        function handleOrderNumberValidationError(xhr) {
+                            const orderNumberError = xhr?.responseJSON?.errors?.order_number?.[0];
+
+                            if (orderNumberError) {
+                                showOrderNumberError(orderNumberError);
+                                return true;
+                            }
+
+                            return false;
+                        }
+
+                        function submitOrderUpdate(formData, authToken, successMessage = "Order updated successfully!") {
+                            $.ajax({
+                                url: `/api/update_sale`,
+                                type: "POST",
+                                headers: {
+                                    "Authorization": "Bearer " + authToken,
+                                    "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr('content')
+                                },
+                                data: formData,
+                                success: function(response) {
+                                    if (response.success) {
+                                        Swal.fire({
+                                            title: "Success!",
+                                            text: successMessage,
+                                            icon: "success",
+                                            confirmButtonText: "OK",
+                                            confirmButtonColor: "#ff9f43"
+                                        }).then((result) => {
+                                            if (result.isConfirmed) {
+                                                window.location.href = "{{ route('sales.list') }}";
+                                            }
+                                        });
+                                    } else {
+                                        resetUpdateButtonState();
+
+                                        Swal.fire({
+                                            title: "Error",
+                                            text: response.message,
+                                            icon: "error",
+                                            confirmButtonText: "OK",
+                                            confirmButtonColor: "#ff9f43"
+                                        });
+                                    }
+                                },
+                                error: function(xhr) {
+                                    resetUpdateButtonState();
+
+                                    if (handleOrderNumberValidationError(xhr)) {
+                                        return;
+                                    }
+
+                                    let message = 'An error occurred while updating the order';
+                                    try {
+                                        const res = xhr.responseJSON;
+                                        if (res.message) {
+                                            message = res.message;
+                                        } else if (res.errors) {
+                                            message = Object.values(res.errors).join('<br>');
+                                        }
+                                    } catch (e) {
+                                        // console.error('Failed to parse error message:', e);
+                                    }
+
+                                    Swal.fire({
+                                        title: "Error",
+                                        html: message,
+                                        icon: "error",
+                                        confirmButtonText: "OK",
+                                        confirmButtonColor: "#ff9f43"
+                                    });
+                                }
+                            });
+                        }
+
+                        function convertQuotationToSale(orderId, authToken) {
+                            $.ajax({
+                                url: `/api/convert-quotation-to-sale/${orderId}`,
+                                type: "POST",
+                                headers: {
+                                    "Authorization": "Bearer " + authToken,
+                                    "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr('content')
+                                },
+                                success: function(response) {
+                                    if (response.status === true) {
+                                        Swal.fire({
+                                            title: "Success!",
+                                            text: "Quotation converted to sale and order updated successfully!",
+                                            icon: "success",
+                                            confirmButtonText: "OK",
+                                            confirmButtonColor: "#ff9f43"
+                                        }).then((result) => {
+                                            if (result.isConfirmed) {
+                                                window.location.href = "{{ route('sales.list') }}";
+                                            }
+                                        });
+                                    } else {
+                                        resetUpdateButtonState();
+
+                                        Swal.fire({
+                                            title: "Error",
+                                            text: response.message || "Failed to convert quotation.",
+                                            icon: "error",
+                                            confirmButtonText: "OK",
+                                            confirmButtonColor: "#ff9f43"
+                                        });
+                                    }
+                                },
+                                error: function(xhr) {
+                                    resetUpdateButtonState();
+
+                                    let message = 'Failed to convert quotation.';
+                                    try {
+                                        const res = xhr.responseJSON;
+                                        if (res.message) {
+                                            message = res.message;
+                                        } else if (res.error) {
+                                            message = res.error;
+                                        }
+                                    } catch (e) {
+                                        // console.error('Failed to parse error message:', e);
+                                    }
+
+                                    Swal.fire({
+                                        title: "Error",
+                                        text: message,
+                                        icon: "error",
+                                        confirmButtonText: "OK",
+                                        confirmButtonColor: "#ff9f43"
+                                    });
+                                }
+                            });
+                        }
+
+                        function updateQuotationBeforeConvert(formData, authToken) {
+                            const updateData = {
+                                ...formData,
+                                quotation_status: initialQuotationStatus
+                            };
+
+                            $.ajax({
+                                url: `/api/update_sale`,
+                                type: "POST",
+                                headers: {
+                                    "Authorization": "Bearer " + authToken,
+                                    "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr('content')
+                                },
+                                data: updateData,
+                                success: function(response) {
+                                    if (response.success) {
+                                        convertQuotationToSale(formData.update_id, authToken);
+                                    } else {
+                                        resetUpdateButtonState();
+
+                                        Swal.fire({
+                                            title: "Error",
+                                            text: response.message,
+                                            icon: "error",
+                                            confirmButtonText: "OK",
+                                            confirmButtonColor: "#ff9f43"
+                                        });
+                                    }
+                                },
+                                error: function(xhr) {
+                                    resetUpdateButtonState();
+
+                                    if (handleOrderNumberValidationError(xhr)) {
+                                        return;
+                                    }
+
+                                    let message = 'An error occurred while updating the quotation';
+                                    try {
+                                        const res = xhr.responseJSON;
+                                        if (res.message) {
+                                            message = res.message;
+                                        } else if (res.errors) {
+                                            message = Object.values(res.errors).join('<br>');
+                                        }
+                                    } catch (e) {
+                                        // console.error('Failed to parse error message:', e);
+                                    }
+
+                                    Swal.fire({
+                                        title: "Error",
+                                        html: message,
+                                        icon: "error",
+                                        confirmButtonText: "OK",
+                                        confirmButtonColor: "#ff9f43"
+                                    });
+                                }
+                            });
+                        }
+
                         // Form submission handler
-                        $(document).on("click", '.btn-submit', function(e) {
+                        $(document).on("click", '#update-order-btn', function(e) {
                             var authToken = localStorage.getItem("authToken");
                             const selectedSubAdminId = localStorage.getItem("selectedSubAdminId");
 
                             e.preventDefault();
+                            clearOrderNumberError();
 
                             // Collect all form data
                             const formData = {
                                 update_id: $('#update_selse_id').val(),
                                 customer_id: $('#customer_id').val(),
-                                customer_phone: $('#customer_phone').val(),
-                                product_ids: $('.product-select').val(),
+                                order_number: $('#order_number').val(),
+                                order_date: $('input[name="order_date"]').val(),
+                                product_ids: [],
                                 quantities: {},
+                                prices: {},
                                 discounts: {},
                                 discount: 0,
                                 grand_total: $('#grand-total').text().replace(/[^0-9.]/g, ''),
                                 gst_option: $('input[name="gst_option"]:checked').val(),
                                 selectedSubAdminId: selectedSubAdminId || null,
                                 remarks: $('#remarks').val(),
+                                payment_method: $('#payment_method').val(),
                                 status: $('#payment_status').val(),
+                                paid_type: $('#paid_type').val(),
+                                bank_id: $('#bank_id').val(),
+                                cash_amount: $('#cash_amount').val() || 0,
+                                online_amount: $('#online_amount').val() || 0,
+                                pending_amount: $('#pending_amount').val() || 0,
+                                payment_amount: Math.max(
+                                    0,
+                                    Math.max(
+                                        0,
+                                        getGrandTotalValue() - parseMoney($('#pending_amount').data('paid-total'))
+                                    ) - parseMoney($('#pending_amount').val() || 0)
+                                ).toFixed(2),
                                 shipping: $('#shipping-input').val(),
+                                tds_percentage: $('#tds-percentage-input').val() || 0,
+                                tds_amount: $('#tds-amount-input').val() || 0,
                                 quotation_status: $('#quotationToggle').is(':checked') ? 'quotation' : 'sales',
                                 labour_item_ids: [],
                                 labour_qtys: [],
@@ -1638,16 +2814,20 @@ $gstDataForAttribute = '[]';
                                 }
                             });
 
-                            // Collect quantities
-                            $('.quantity-input').each(function() {
-                                const productId = $(this).closest('tr').data('product-id');
-                                formData.quantities[productId] = $(this).val();
-                            });
+                            // Collect product rows. Rows with qty 0 are removed from the update payload.
+                            $('tbody tr[data-product-id]').each(function() {
+                                const $row = $(this);
+                                const productId = $row.data('product-id');
+                                const quantity = parseFloat($row.find('.quantity-input').val()) || 0;
 
-                            // Collect discounts
-                            $('.discount-input').each(function() {
-                                const productId = $(this).closest('tr').data('product-id');
-                                formData.discounts[productId] = $(this).val();
+                                if (quantity <= 0) {
+                                    return;
+                                }
+
+                                formData.product_ids.push(productId.toString());
+                                formData.quantities[productId] = $row.find('.quantity-input').val();
+                                formData.prices[productId] = $row.find('.price-input').val();
+                                formData.discounts[productId] = $row.find('.discount-input').val();
                             });
 
                             // Validate
@@ -1673,6 +2853,31 @@ $gstDataForAttribute = '[]';
                                 return;
                             }
 
+                            const normalizedPaymentMethod = normalizePaymentMethod(formData.payment_method);
+                            const paymentAmount = parseMoney(formData.payment_amount);
+
+                            if (formData.quotation_status !== 'quotation' && ['online', 'cash+online'].includes(normalizedPaymentMethod) && !formData.bank_id) {
+                                Swal.fire({
+                                    title: "Error",
+                                    text: "Please select a bank for bank payment.",
+                                    icon: "error",
+                                    confirmButtonText: "OK",
+                                    confirmButtonColor: "#ff9f43"
+                                });
+                                return;
+                            }
+
+                            if (formData.quotation_status !== 'quotation' && normalizedPaymentMethod !== 'pending' && paymentAmount <= 0) {
+                                Swal.fire({
+                                    title: "Error",
+                                    text: "Please enter a valid payment amount.",
+                                    icon: "error",
+                                    confirmButtonText: "OK",
+                                    confirmButtonColor: "#ff9f43"
+                                });
+                                return;
+                            }
+
                             // Show loader and disable button
                             const $btn = $('#update-order-btn');
                             const $loader = $('#btn-loader');
@@ -1682,70 +2887,30 @@ $gstDataForAttribute = '[]';
                             $loader.removeClass('d-none');
                             $btnText.text('Updating...');
 
-                            // Send AJAX request to update order
-                            $.ajax({
-                                url: `/api/update_sale`,
-                                type: "POST",
-                                headers: {
-                                    "Authorization": "Bearer " + authToken,
-                                    "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr('content')
-                                },
-                                data: formData,
-                                success: function(response) {
-                                    if (response.success) {
-                                        Swal.fire({
-                                            title: "Success!",
-                                            text: "Order updated successfully!",
-                                            icon: "success",
-                                            confirmButtonText: "OK",
-                                            confirmButtonColor: "#ff9f43"
-                                        }).then((result) => {
-                                            if (result.isConfirmed) {
-                                                window.location.href = "{{ route('sales.list') }}";
-                                            }
-                                        });
+                            const isConvertingToSale = initialQuotationStatus === 'quotation' &&
+                                formData.quotation_status === 'sales';
+
+                            if (isConvertingToSale) {
+                                Swal.fire({
+                                    title: "Convert To Sale?",
+                                    text: "This quotation will be converted to a sale. Do you want to continue?",
+                                    icon: "warning",
+                                    showCancelButton: true,
+                                    confirmButtonText: "Yes, Convert",
+                                    cancelButtonText: "Cancel",
+                                    confirmButtonColor: "#ff9f43",
+                                    cancelButtonColor: "#6c757d"
+                                }).then((result) => {
+                                    if (result.isConfirmed) {
+                                        updateQuotationBeforeConvert(formData, authToken);
                                     } else {
-                                        // Reset button on failure
-                                        $btn.prop('disabled', false);
-                                        $loader.addClass('d-none');
-                                        $btnText.text('Update Order');
-
-                                        Swal.fire({
-                                            title: "Error",
-                                            text: response.message,
-                                            icon: "error",
-                                            confirmButtonText: "OK",
-                                            confirmButtonColor: "#ff9f43"
-                                        });
+                                        resetUpdateButtonState();
                                     }
-                                },
-                                error: function(xhr) {
-                                    // Reset button on error
-                                    $btn.prop('disabled', false);
-                                    $loader.addClass('d-none');
-                                    $btnText.text('Update Order');
+                                });
+                                return;
+                            }
 
-                                    let message = 'An error occurred while updating the order';
-                                    try {
-                                        const res = xhr.responseJSON;
-                                        if (res.message) {
-                                            message = res.message;
-                                        } else if (res.errors) {
-                                            message = Object.values(res.errors).join('<br>');
-                                        }
-                                    } catch (e) {
-                                        // console.error('Failed to parse error message:', e);
-                                    }
-
-                                    Swal.fire({
-                                        title: "Error",
-                                        html: message,
-                                        icon: "error",
-                                        confirmButtonText: "OK",
-                                        confirmButtonColor: "#ff9f43"
-                                    });
-                                }
-                            });
+                            submitOrderUpdate(formData, authToken);
                         });
 
                         // Initial calculation
@@ -1756,7 +2921,36 @@ $gstDataForAttribute = '[]';
                         if (selectedCustomer.length) {
                             $('#customer_phone').val(selectedCustomer.data('phone') || '');
                         }
+
+                        $('#order_number').on('input', function() {
+                            clearOrderNumberError();
+                        });
+
+                        calculatePaymentBreakdown();
+
+                        // Initialize Order Date Picker
+                        const $orderDateDisplay = $('#order_date_display');
+                        if ($orderDateDisplay.length && typeof $orderDateDisplay.datetimepicker === 'function') {
+                            $orderDateDisplay.datetimepicker({
+                                format: 'DD/MM/YYYY',
+                                useCurrent: true,
+                                showTodayButton: true,
+                                icons: {
+                                    date: 'fa fa-calendar',
+                                    previous: 'fa fa-chevron-left',
+                                    next: 'fa fa-chevron-right',
+                                    today: 'fa fa-crosshairs',
+                                    clear: 'fa fa-trash',
+                                    close: 'fa fa-times'
+                                }
+                            });
+
+                            $orderDateDisplay.on('dp.change', function(e) {
+                                if (e.date) {
+                                    $('#order_date').val(e.date.format('YYYY-MM-DD'));
+                                }
+                            });
+                        }
                     });
                 </script>
-
             @endpush

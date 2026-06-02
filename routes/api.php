@@ -127,6 +127,11 @@ Route::middleware(['auth.api'])->group(function () {
 
     Route::get('/order-report', [SalesController::class, 'orderReport']);
 
+     // TDS API
+    Route::get('/tds-order-report', [SalesController::class, 'tdsOrderReport']);
+    Route::get('/tds-order-report/export-excel', [SalesController::class, 'exportTdsOrderReportExcel']);
+    Route::get('/tds-order-report/export-pdf', [SalesController::class, 'exportTdsOrderReportPdf']);
+
     //Purchase Return
     Route::get('get-vendor-name/{invoiceId}', [PurchaseReturnController::class, 'getVendorName']);
     Route::get('get-invoice-products/{invoiceId}', [PurchaseReturnController::class, 'getInvoiceProducts']);

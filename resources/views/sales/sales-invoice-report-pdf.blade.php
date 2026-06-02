@@ -155,6 +155,22 @@
 </head>
 
 <body>
+@php
+$fallbackSetting = new \App\Models\Setting([
+    'name' => 'Fablead Developer & Technolab',
+    'email' => 'info@gmail.com',
+    'phone' => '1234567890',
+    'address' => 'Adajan Surat',
+    'logo' => 'admin/assets/img/logo-image.jpg',
+    'currency_symbol' => '?',
+    'currency_position' => 'left',
+]);
+$setting = ($setting ?? null) ?: ($settings ?? null) ?: $fallbackSetting;
+$settings = $setting;
+$currencySymbol = $currencySymbol ?? ($setting->currency_symbol ?? '?');
+$currencyPosition = $currencyPosition ?? ($setting->currency_position ?? 'left');
+@endphp
+
 
     <div class="card-body">
         <table style="width:100%; margin-bottom: 10px; border-collapse: collapse;">
@@ -167,7 +183,7 @@
                             $logoMime = mime_content_type($logoPath);
                         @endphp
                         <img src="data:{{ $logoMime }};base64,{{ $logoData }}" alt="Company Logo"
-                            style="height: 100px; width: auto;"> {{-- adjust height as needed --}}
+                            style="height: 60px; width: auto;"> {{-- adjust height as needed --}}
                     @endif
                 </td>
                 <td style="vertical-align: middle; padding-left: 15px; text-align: right;">
@@ -354,3 +370,4 @@
 </body>
 
 </html>
+
