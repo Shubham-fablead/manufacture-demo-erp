@@ -170,12 +170,22 @@
             table.datanew tbody td:nth-child(9) {
                 display: table-cell !important;
                 text-align: center;
-                vertical-align: middle;
+                vertical-align: top;
                 width: 50px;
+                padding-top: 12px;
+            }
+
+            .toggle-details {
+                display: flex;
+                align-items: flex-start;
+                justify-content: center;
+                width: 100%;
+                text-decoration: none;
             }
 
             .toggle-details i {
                 font-size: 24px;
+                margin-top: 2px;
             }
 
             /* First column (Staff Name column) */
@@ -233,9 +243,13 @@
             }
 
             .toggle-details {
-                display: inline-block !important;
+                display: flex !important;
+                align-items: flex-start;
+                justify-content: center;
                 padding: 8px !important;
                 z-index: 10 !important;
+                width: 100%;
+                text-decoration: none;
             }
 
             .toggle-details i {
@@ -243,6 +257,7 @@
                 width: 24px !important;
                 height: 24px !important;
                 line-height: 24px !important;
+                margin-top: 2px;
             }
         }
 
