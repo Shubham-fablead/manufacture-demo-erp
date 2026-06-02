@@ -109,12 +109,20 @@
             table.datanew tbody td:nth-child(9) {
                 display: table-cell !important;
                 text-align: center;
-                vertical-align: middle;
+                vertical-align: top !important;
                 width: 50px;
+                padding-top: 12px !important;
             }
 
             .toggle-details i {
                 font-size: 24px;
+            }
+
+            .toggle-details {
+                display: inline-flex !important;
+                align-items: flex-start !important;
+                justify-content: center !important;
+                margin-top: 0 !important;
             }
 
             /* Style for customer name wrapping */
@@ -215,6 +223,65 @@
                 width: 24px !important;
                 height: 24px !important;
                 line-height: 24px !important;
+            }
+        }
+
+        /* iPad Air / iPad Pro landscape and similar tablet widths */
+        @media screen and (min-width: 769px) and (max-width: 1180px) {
+            .content {
+                padding: 15px !important;
+            }
+
+            .page-header {
+                flex-wrap: nowrap;
+                gap: 12px;
+                align-items: center;
+            }
+
+            .page-title h4 {
+                font-size: 18px;
+            }
+
+            .page-btn .btn-added {
+                padding: 6px 12px;
+                font-size: 12px;
+            }
+
+            .card-body {
+                overflow-x: auto;
+            }
+
+            .table-container {
+                width: 100%;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            table.datanew {
+                min-width: 980px;
+                width: 100% !important;
+            }
+
+            table.datanew thead th,
+            table.datanew tbody td {
+                white-space: nowrap;
+                font-size: 13px;
+            }
+
+            table.datanew thead th:first-child,
+            table.datanew tbody td:first-child {
+                min-width: 220px;
+            }
+
+            table.datanew thead th.details-column,
+            table.datanew tbody td:nth-child(9) {
+                min-width: 60px;
+                width: 60px;
+            }
+
+            .pagination-controls {
+                gap: 10px;
+                flex-wrap: wrap;
             }
         }
 

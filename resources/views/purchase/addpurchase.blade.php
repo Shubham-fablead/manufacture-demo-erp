@@ -163,10 +163,10 @@
         @media screen and (max-width: 768px) {
             .purchase-header {
                 display: flex;
-                align-items: center;
-                justify-content: space-between;
+                align-items: flex-start;
+                justify-content: flex-start;
                 flex-wrap: wrap;
-                gap: 8px;
+                gap: 6px;
             }
 
             .purchase-header .page-title h4 {
@@ -175,9 +175,10 @@
             }
 
             .purchase-header .page-title {
-                width: auto;
-                flex: 1 1 160px;
+                width: 100%;
+                flex: 1 1 100%;
                 min-width: 0;
+                text-align: center;
             }
 
             .purchase-tabs {
@@ -185,11 +186,12 @@
                 flex-wrap: nowrap;
                 gap: 6px;
                 margin-top: 8px;
-                width: auto;
+                width: 100%;
                 max-width: 100%;
                 overflow-x: auto;
                 -webkit-overflow-scrolling: touch;
                 scrollbar-width: none;
+                justify-content: flex-start;
             }
 
             .purchase-tabs::-webkit-scrollbar {
@@ -208,11 +210,12 @@
             .gst-header {
                 display: flex;
                 align-items: center;
-                width: auto;
+                width: 100%;
                 padding: 0;
                 gap: 8px;
                 flex-wrap: nowrap;
-                margin-left: auto;
+                margin-left: 0;
+                margin-top: 2px;
                 justify-content: flex-end;
                 flex: 0 0 auto;
             }
