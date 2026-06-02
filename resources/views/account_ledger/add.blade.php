@@ -722,7 +722,7 @@
                 <table class="table table-bordered table-striped mb-0" id="paid-payments-table">
                     <thead class="thead-light">
                         <tr>
-                            <th>Invoice No.</th>
+                            <th>Bill No.</th>
                             <th class="text-center">Details</th>
                             <th>Product(s)</th>
                             <th>Total Amount</th>
@@ -759,7 +759,7 @@
 
                         html += `
             <tr>
-                <td>${order.order_number || order.invoice_number || '-'}</td>
+                <td>${order.bill_no || order.order_number || order.invoice_number || '-'}</td>
                 <td>${detailsToggle}</td>
                 <td>${productNames}</td>
                 <td>${formatCurrency(order.total_amount || order.grand_total || 0)}</td>
@@ -799,7 +799,7 @@
                 <table class="table table-bordered table-striped mb-0" id="pending-payments-table">
                     <thead class="thead-light">
                         <tr>
-                            <th>Invoice No.</th>
+                            <th>Bill No.</th>
                             <th class="text-center">Details</th>
                             <th>Product(s)</th>
                             <th>Total Amount</th>
@@ -831,7 +831,7 @@
 
                         html += `
             <tr>
-                <td>${order.order_number || order.invoice_number || payment.invoice_id || '-'}</td>
+                <td>${order.bill_no || order.order_number || order.invoice_number || payment.invoice_id || '-'}</td>
                 <td>${detailsToggle}</td>
                 <td>${productNames}</td>
                 <td>${formatCurrency(order.total_amount || order.grand_total || 0)}</td>

@@ -28,7 +28,7 @@ class PurchaseReturnController extends Controller
         if ($user->role === 'staff') {
             $branchIdToUse = $user->id;
 
-            $invoices = PurchaseInvoice::select('id', 'invoice_number')
+            $invoices = PurchaseInvoice::select('id', 'bill_no')
                 ->where('isDeleted', 0)
                 ->where('created_by', $branch_id)
                 ->whereHas('vendor', function ($query) {
@@ -40,7 +40,7 @@ class PurchaseReturnController extends Controller
                 ->orderBy('id', 'desc')
                 ->get();
         } else {
-            $invoices = PurchaseInvoice::select('id', 'invoice_number')
+            $invoices = PurchaseInvoice::select('id', 'bill_no')
                 ->where('isDeleted', 0)
                 ->where('branch_id', $branchIdToUse)
                 ->whereHas('vendor', function ($query) {

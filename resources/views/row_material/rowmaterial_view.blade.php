@@ -142,6 +142,21 @@
 
         let productId = "{{ $view_id }}";
 
+        function formatDisplayDate(dateValue) {
+            if (!dateValue) return 'N/A';
+
+            const date = new Date(dateValue);
+            if (isNaN(date.getTime())) {
+                return dateValue;
+            }
+
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const year = date.getFullYear();
+
+            return `${day}-${month}-${year}`;
+        }
+
         $.ajax({
             url: "/api/rowmaterial-view/" + productId,
             type: "GET",
@@ -276,6 +291,10 @@
                     </div>
                     <div class="col-6">
                         <p class="mb-1"><i class="bi bi-check-circle me-2"></i><strong>Status:</strong> ${capitalizeWords(rowMaterial.status ?? 'N/A')}</p>
+                        <hr class="my-1">
+                    </div>
+                    <div class="col-6">
+                        <p class="mb-1"><i class="bi bi-calendar3 me-2"></i><strong>Date:</strong> ${formatDisplayDate(rowMaterial.created_at)}</p>
                         <hr class="my-1">
                     </div>
                      <div class="col-6">

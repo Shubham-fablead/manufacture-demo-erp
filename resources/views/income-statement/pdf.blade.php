@@ -126,8 +126,8 @@
         <div class="text-center">
             <h3 style="margin-bottom: 5px;">Income Statement</h3>
             <div class="period">
-                Period: {{ \Carbon\Carbon::parse($data['period']['start'])->format('M d, Y') ?? '' }}
-                to {{ \Carbon\Carbon::parse($data['period']['end'])->format('M d, Y') ?? '' }}
+                Period: {{ \Carbon\Carbon::parse($data['period']['start'])->format('d/m/Y') ?? '' }}
+                to {{ \Carbon\Carbon::parse($data['period']['end'])->format('d/m/Y') ?? '' }}
             </div>
         </div>
 

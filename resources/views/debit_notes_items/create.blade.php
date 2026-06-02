@@ -53,9 +53,9 @@
 
                     <div class="col-lg-4 col-sm-6 col-6" id="invoice_number_div">
                         <div class="form-group">
-                            <label>Invoice Number <span class="manitory">*</span></label>
+                            <label>Bill No <span class="manitory">*</span></label>
                             <select name="invoice_number" id="invoice_number" class="form-control invoice_number-select2">
-                                <option value="">Select Invoice Number</option>
+                                <option value="">Select Bill No</option>
                                 {{-- Data will be loaded via AJAX --}}
                             </select>
                             <div class="text-danger error-purchase_id"></div>
@@ -201,9 +201,9 @@
                 headers: { "Authorization": "Bearer " + authToken },
                 success: function(response) {
                     if (response.status === 'success') {
-                        let invoiceOptions = '<option value="">Select Invoice Number</option>';
+                        let invoiceOptions = '<option value="">Select Bill No</option>';
                         response.invoices.forEach(function(invoice) {
-                            invoiceOptions += `<option value="${invoice.invoice_number}">${invoice.invoice_number}</option>`;
+                            invoiceOptions += `<option value="${invoice.bill_no ?? invoice.invoice_number}">${invoice.bill_no ?? invoice.invoice_number}</option>`;
                         });
                         $('#invoice_number').html(invoiceOptions).trigger('change');
 
@@ -228,7 +228,7 @@
         $('#invoice_number').on('change', function() {
             var invoiceNumber = $(this).val();
             if (invoiceNumber) {
-                let url = `/api/getPurchaseDetails/${invoiceNumber}`;
+                let url = `/api/getInvoiceDetails/${invoiceNumber}`;
                 if (selectedSubAdminId && selectedSubAdminId !== "null") {
                     url += `?selectedSubAdminId=${selectedSubAdminId}`;
                 }
@@ -237,8 +237,8 @@
                     type: "GET",
                     headers: { 'Authorization': 'Bearer ' + authToken },
                     success: function(response) {
-                        if (response.purchase) {
-                            var data = response.purchase;
+                        if (response.data) {
+                            var data = response.data;
                             $('#purchase_id').val(data.id);
                             $('#user_id').val(data.vendor_id);
                             $('#user_name').val(data.vendor_name);

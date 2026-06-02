@@ -148,7 +148,7 @@
                                                                     Invoice Info</font>
                                                             </font><br>
                                                             <font>
-                                                                <font>Invoice Number</font>
+                                                                <font>Bill No</font>
                                                             </font><br>
                                                             <font>
                                                                 <font>Payment Status</font>
@@ -166,7 +166,7 @@
                                                                     &nbsp;</font>
                                                             </font><br>
                                                             <font>
-                                                                <font class="invoice-id">{{ $invoice->invoice_number }}
+                                                                <font class="invoice-id">{{ $invoice->bill_no ?? $invoice->invoice_number }}
                                                                 </font>
                                                             </font><br>
                                                             <font>

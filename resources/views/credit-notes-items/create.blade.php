@@ -54,9 +54,9 @@
                         </div>
                         <div class="col-lg-4 col-sm-6 col-6" id="purchase_number_div" style="display: none;">
                             <div class="form-group">
-                                <label>Invoice Number <span class="manitory">*</span></label>
+                                <label>Bill No <span class="manitory">*</span></label>
                                 <select name="purchase_number" id="purchase_number" class="form-control select2">
-                                    <option value="">Select Invoice Number</option>
+                                    <option value="">Select Bill No</option>
                                     @foreach ($purchaseInvoiceNumbers as $number)
                                         <option value="{{ $number }}">{{ $number }}</option>
                                     @endforeach

@@ -114,7 +114,7 @@ class DebitNoteItemApiController extends Controller
         return response()->json([
             'status' => 'success',
             'creditNoteTypes' => $creditNoteTypes->get(),
-            'invoices' => $invoices->get(),
+            'invoices' => $invoices->get(['id', 'bill_no', 'invoice_number']),
             'orders' => $orders->get()
         ]);
     }
@@ -146,9 +146,16 @@ class DebitNoteItemApiController extends Controller
     public function getInvoiceDetails(Request $request, $invoice_number)
     {
         $invoice = PurchaseInvoice::with('vendor.userDetail')
-            ->where('invoice_number', $invoice_number)
+            ->where('bill_no', $invoice_number)
             ->where('isDeleted', 0)
             ->first();
+
+        if (! $invoice) {
+            $invoice = PurchaseInvoice::with('vendor.userDetail')
+                ->where('invoice_number', $invoice_number)
+                ->where('isDeleted', 0)
+                ->first();
+        }
 
         if ($invoice) {
             return response()->json([

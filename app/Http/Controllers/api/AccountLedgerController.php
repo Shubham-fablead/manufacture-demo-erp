@@ -132,6 +132,7 @@ class AccountLedgerController extends Controller
                     ->select(
                         'purchases.id as purchase_id',
                         'purchase_invoice.id as purchase_invoice_id',
+                        'purchase_invoice.bill_no',
                         'purchase_invoice.grand_total',
                         'purchase_invoice.remaining_amount',
                         'purchases.payment_status',

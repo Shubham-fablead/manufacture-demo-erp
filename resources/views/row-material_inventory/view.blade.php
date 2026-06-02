@@ -438,7 +438,7 @@
                         </div>
                         <div class="history-detail-row-simple">
                             <span class="history-detail-label-simple">Date:</span>
-                            <span class="history-detail-value-simple">${item.date || 'N/A'}</span>
+                            <span class="history-detail-value-simple">${formatDisplayDate(item.date)}</span>
                         </div>
                     </div>
                  </td>
@@ -505,6 +505,21 @@
     };
 
     $(document).ready(function() {
+        function formatDisplayDate(dateValue) {
+            if (!dateValue) return 'N/A';
+
+            const date = new Date(dateValue);
+            if (isNaN(date.getTime())) {
+                return dateValue;
+            }
+
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const year = date.getFullYear();
+
+            return `${day}-${month}-${year}`;
+        }
+
         var authToken = localStorage.getItem("authToken");
         let url = window.location.href;
         let productId = url.substring(url.lastIndexOf('/') + 1);
@@ -550,7 +565,7 @@
                             let type = item.type ?? 'System';
                             let createdBy = item.name ?? 'System';
                             let signedQty = item.quantity ?? 'N/A';
-                            let date = item.date ?? '-';
+                            let date = formatDisplayDate(item.date);
 
                             // Store for expandable row
                             const historyData = {
