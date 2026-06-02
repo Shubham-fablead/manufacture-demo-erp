@@ -14,19 +14,42 @@
         /* Custom Pagination Styling */
         .pagination .page-item .page-link {
             background-color: #5d6d7e;
-            /* Dark gray for other pages */
             color: #fff;
             border: none;
-            margin: 0 4px;
-            padding: 6px 15px;
+            margin: 0 3px;
+            padding: 4px 10px;
             border-radius: 6px;
             font-weight: bold;
+        }
+
+        @media (max-width: 576px) {
+            .pagination .page-item .page-link {
+                padding: 4px 10px;
+                margin: 0 2px;
+                font-size: 12px;
+            }
+        }
+
+        /* Previous and Next buttons */
+        .pagination .page-item:first-child .page-link,
+        .pagination .page-item:last-child .page-link {
+            background-color: #fff;
+            color: #6c757d;
+            border: 1px solid #dee2e6;
+        }
+
+        .pagination .page-item:first-child .page-link:hover,
+        .pagination .page-item:last-child .page-link:hover {
+            background-color: #f8f9fa;
+            color: #495057;
+            border-color: #dee2e6;
         }
 
         .pagination .page-item.active .page-link {
             background-color: #ff9f43 !important;
             /* Orange for active page */
             color: #fff;
+            border: none;
         }
 
         .pagination .page-item .page-link:hover {
@@ -36,6 +59,14 @@
 
         .pagination .page-item.active .page-link:hover {
             background-color: #e68a35 !important;
+        }
+
+        .pagination .page-item.disabled .page-link {
+            background-color: #fff !important;
+            color: #dee2e6 !important;
+            border: 1px solid #dee2e6 !important;
+            cursor: not-allowed !important;
+            pointer-events: none !important;
         }
 
         /* Search input styling */
@@ -98,6 +129,40 @@
             border: 1px solid #1b2850;
         }
 
+        .mobile-toggle-btn-table {
+            background: #ff9f43;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            min-width: 32px;
+            min-height: 32px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            padding: 0;
+            margin: 0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .mobile-toggle-btn-table:hover {
+            background: #ff8c2e;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+        }
+
+        .mobile-toggle-btn-table.minus {
+            background: #dc3545;
+        }
+
+        .mobile-toggle-btn-table.minus:hover {
+            background: #c82333;
+        }
+
         /* Force hide toggle-details by default */
         .toggle-details {
             display: none !important;
@@ -120,7 +185,7 @@
         }
 
         /* Desktop: show all columns normally, HIDE details column */
-        @media (min-width: 769px) {
+        @media (min-width: 768px) {
 
             table.datanew thead th,
             table.datanew tbody td {
@@ -141,7 +206,7 @@
         }
 
         /* Mobile: hide non-essential columns, show Details toggle */
-        @media (max-width: 768px) {
+        @media (max-width: 767px) {
 
             /* Override DataTables responsive classes */
             table.datanew th.dt-control,
@@ -183,29 +248,42 @@
             table.datanew tbody td.details-column {
                 display: table-cell !important;
                 text-align: center;
-                vertical-align: middle;
-                width: 50px;
-                /* min-width: 65px; */
-                max-width: 65px;
+                vertical-align: top !important;
+                width: 56px !important;
+                min-width: 56px !important;
+                max-width: 56px !important;
+                padding: 12px 6px !important;
             }
 
             /* Show toggle-details only on mobile */
             .toggle-details {
-                display: inline-block !important;
+                display: inline-flex !important;
+                align-items: center;
+                justify-content: center;
+                width: 44px;
+                height: 44px;
+                margin-left: auto;
             }
 
-            .toggle-details i {
-                font-size: 24px;
-                padding-left: 20px;
+            .toggle-details i,
+            .toggle-details .mobile-toggle-btn-table {
+                pointer-events: none;
             }
 
             /* Style for expense name wrapping */
             table.datanew tbody td:nth-child(2) {
-                display: flex !important;
-                align-items: center !important;
+                display: table-cell !important;
+                width: calc(100% - 96px) !important;
+                max-width: calc(100vw - 136px) !important;
+                vertical-align: top !important;
+            }
+
+            table.datanew tbody td:nth-child(2) > .expense-item-wrapper {
+                width: 100%;
             }
 
             table.datanew tbody td:nth-child(2) a {
+                display: flex !important;
                 align-items: center !important;
                 text-align: left !important;
                 word-wrap: break-word !important;
@@ -250,7 +328,7 @@
             }
         }
 
-        @media screen and (max-width: 768px) {
+        @media screen and (max-width: 767.98px) {
             .table-scroll-top {
                 display: block;
                 -webkit-overflow-scrolling: touch !important;
@@ -302,7 +380,7 @@
         }
 
         /* Tablet specific fixes */
-        @media screen and (width: 768px) {
+        @media screen and (width: 767px) {
             .table-responsive {
                 overflow-x: auto !important;
                 -webkit-overflow-scrolling: touch !important;
@@ -311,22 +389,19 @@
             table.datanew thead th.details-column,
             table.datanew tbody td.details-column {
                 display: table-cell !important;
-                width: 60px !important;
-                min-width: 60px !important;
-                max-width: 60px !important;
+                width: 56px !important;
+                min-width: 56px !important;
+                max-width: 56px !important;
+                vertical-align: top !important;
             }
 
             .toggle-details {
-                display: inline-block !important;
-                padding: 8px !important;
+                display: inline-flex !important;
+                align-items: center;
+                justify-content: center;
+                width: 44px;
+                height: 44px;
                 z-index: 10 !important;
-            }
-
-            .toggle-details i {
-                font-size: 20px !important;
-                width: 24px !important;
-                height: 24px !important;
-                line-height: 24px !important;
             }
         }
 
@@ -341,13 +416,13 @@
         }
 
         /* Collapsible details styling */
-        .collapse-details {
+        /* .collapse-details {
             margin-top: 10px;
             padding: 15px;
             background-color: #f8f9fa;
             border-radius: 5px;
             border-left: 3px solid #ff9f43;
-        }
+        } */
 
         .detail-item {
             display: flex;
@@ -364,6 +439,19 @@
         .detail-value {
             color: #212529;
             flex: 1;
+        }
+
+        .expense-details-row {
+            display: none;
+        }
+
+        .expense-details-row.show {
+            display: table-row;
+        }
+
+        .expense-details-row td {
+            padding-top: 0 !important;
+            border-top: 0 !important;
         }
 
         @media screen and (max-width: 575.98px) {
@@ -530,7 +618,7 @@
         }
 
         /* Mobile view for total expense */
-        @media (max-width: 768px) {
+        @media (max-width: 767.98px) {
             .page-header {
                 flex-wrap: wrap;
             }
@@ -800,7 +888,7 @@
                             // Details toggle for mobile
                             let detailsToggle = `
                                 <a href="#expense-details-${expense.id}" class="toggle-details" data-bs-toggle="collapse">
-                                    <i class="fas fa-plus-circle" style="color: #ff9f43;"></i>
+                                    <span class="mobile-toggle-btn-table">+</span>
                                 </a>
                             `;
 
@@ -950,15 +1038,11 @@
 
             // Toggle details icon
             $(document).on('click', '.toggle-details', function() {
-                let icon = $(this).find('i');
-                if (icon.hasClass('fa-plus-circle')) {
-                    icon.removeClass('fa-plus-circle')
-                        .addClass('fa-minus-circle')
-                        .css('color', 'red');
+                let button = $(this).find('.mobile-toggle-btn-table');
+                if (button.hasClass('minus')) {
+                    button.removeClass('minus').text('+');
                 } else {
-                    icon.removeClass('fa-minus-circle')
-                        .addClass('fa-plus-circle')
-                        .css('color', '#ff9f43');
+                    button.addClass('minus').text('-');
                 }
             });
 
@@ -1179,6 +1263,7 @@
             let lastPage = 1;
             let perPage = 10;
             let searchQuery = '';
+            window.expenseReportDataMap = {};
             let currentFilter = '';
             let currentMonth = '';
             let currentYear = '';
@@ -1200,6 +1285,12 @@
                 language: {
                     emptyTable: "No expenses found.",
                     zeroRecords: "No expense record found."
+                }
+            });
+
+            table.on('draw', function() {
+                if (typeof window.addExpenseReportExpandableRows === 'function') {
+                    window.addExpenseReportExpandableRows();
                 }
             });
 
@@ -1266,16 +1357,6 @@
                 fetchExpenses();
             });
 
-            // Handle page navigation
-            $(document).on('click', '#pagination-numbers .page-link', function(e) {
-                e.preventDefault();
-                let page = $(this).data('page');
-                if (page && page !== currentPage && page >= 1 && page <= lastPage) {
-                    currentPage = page;
-                    fetchExpenses();
-                }
-            });
-
             /** ------------------------------------------
              * 📋 Fetch Expense Table Data with Pagination
              * ------------------------------------------ */
@@ -1298,6 +1379,7 @@
                     },
                     success: function(response) {
                         table.clear().draw();
+                        window.expenseReportDataMap = {};
                         let totalAmount = 0;
 
                         const currencySymbol = response.currency_symbol || '₹';
@@ -1318,17 +1400,14 @@
                             $.each(response.data, function(index, expense) {
                                 totalAmount += parseFloat(expense.amount || 0);
 
-                                // Generate a unique ID for each expense
-                                const uniqueId = 'expense-details-' + expense.id + '-' + Date.now() + '-' + index;
-
                                 const formattedAmount = formatINR(expense.amount, currencySymbol, currencyPosition);
-
-                                // ✅ Fixed: Proper toggle-details with unique ID and Bootstrap collapse
-                                let detailsToggle = `
-                                    <a href="javascript:void(0);" class="toggle-details" data-target="${uniqueId}" data-id="${expense.id}">
-                                        <i class="fas fa-plus-circle" style="color: #ff9f43; font-size: 24px;"></i>
-                                    </a>
-                                `;
+                                const expenseId = String(expense.id);
+                                window.expenseReportDataMap[expenseId] = {
+                                    id: expenseId,
+                                    amount: formattedAmount,
+                                    expense_date: formatDate(expense.expense_date),
+                                    description: escapeHtml(expense.description ?? 'N/A')
+                                };
 
                                 table.row.add([
                                     `<label class="checkboxs">
@@ -1337,33 +1416,17 @@
                                     </label>`,
 
                                     `<div class="expense-item-wrapper" data-expense-id="${expense.id}">
-                                        <div class="expense-name-wrapper" style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
-                                            <span class="expense-name" style="flex: 1; word-break: break-word; padding-right: 25px;">
+                                        <div class="expense-name-wrapper" style="display: flex; align-items: center; width: 100%;">
+                                            <span class="expense-name" style="flex: 1; word-break: break-word;">
                                                 ${escapeHtml(expense.expense_name ?? 'N/A')}
                                             </span>
-                                        </div>
-                                        <div class="expense-details-collapse collapse" id="${uniqueId}">
-                                            <div class="collapse-details mt-2 p-3" style="background-color: #f8f9fa; border-radius: 8px; border-left: 3px solid #ff9f43;">
-                                                <div class="detail-item mb-2">
-                                                    <strong class="detail-label" style="min-width: 100px; display: inline-block;">Amount:</strong>
-                                                    <span class="detail-value">${formattedAmount}</span>
-                                                </div>
-                                                <div class="detail-item mb-2">
-                                                    <strong class="detail-label" style="min-width: 100px; display: inline-block;">Date:</strong>
-                                                    <span class="detail-value">${formatDate(expense.expense_date)}</span>
-                                                </div>
-                                                <div class="detail-item">
-                                                    <strong class="detail-label" style="min-width: 100px; display: inline-block;">Expense For:</strong>
-                                                    <span class="detail-value" style="word-break: break-word;">${escapeHtml(expense.description ?? 'N/A')}</span>
-                                                </div>
-                                            </div>
                                         </div>
                                     </div>`,
 
                                     `<span class="fw-semibold" style="color: #2e7d32;">${formattedAmount}</span>`,
                                     formatDate(expense.expense_date),
                                     `<div style="white-space: normal; word-break: break-word; max-width: 200px;">${escapeHtml(expense.description ?? 'N/A')}</div>`,
-                                    detailsToggle
+                                    `<button type="button" class="mobile-toggle-btn-table expense-report-toggle-btn" data-expense-id="${expenseId}">+</button>`
                                 ]).draw(false);
                             });
                         }
@@ -1376,8 +1439,6 @@
                         allSelectedIds = [];
                         fixTopScrollSync();
 
-                        // ✅ Initialize collapse functionality for all toggle buttons
-                        initToggleDetails();
                     },
                     error: function(xhr) {
                         console.error('Error fetching expenses:', xhr);
@@ -1390,39 +1451,73 @@
                 });
             }
 
-            // ✅ Function to initialize toggle-details functionality
-            function initToggleDetails() {
-                $('.toggle-details').off('click').on('click', function(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-
-                    const targetId = $(this).data('target');
-                    const $target = $(`#${targetId}`);
-                    const $icon = $(this).find('i');
-
-                    if ($target.hasClass('show')) {
-                        $target.collapse('hide');
-                        $icon.removeClass('fa-minus-circle').addClass('fa-plus-circle').css('color', '#ff9f43');
-                    } else {
-                        $target.collapse('show');
-                        $icon.removeClass('fa-plus-circle').addClass('fa-minus-circle').css('color', '#dc3545');
-                    }
-                });
-
-                // Handle collapse events to sync icon state
-                $('.expense-details-collapse').off('show.bs.collapse hide.bs.collapse');
-                $('.expense-details-collapse').on('show.bs.collapse', function() {
-                    const targetId = $(this).attr('id');
-                    const $toggle = $(`.toggle-details[data-target="${targetId}"]`);
-                    const $icon = $toggle.find('i');
-                    $icon.removeClass('fa-plus-circle').addClass('fa-minus-circle').css('color', '#dc3545');
-                }).on('hide.bs.collapse', function() {
-                    const targetId = $(this).attr('id');
-                    const $toggle = $(`.toggle-details[data-target="${targetId}"]`);
-                    const $icon = $toggle.find('i');
-                    $icon.removeClass('fa-minus-circle').addClass('fa-plus-circle').css('color', '#ff9f43');
-                });
+            function buildExpenseReportExpandableRowContent(item) {
+                return `
+                    <div class="collapse-details ">
+                        <div class="detail-item mb-2">
+                            <strong class="detail-label" style="min-width: 100px; display: inline-block;">Amount:</strong>
+                            <span class="detail-value">${item.amount}</span>
+                        </div>
+                        <div class="detail-item mb-2">
+                            <strong class="detail-label" style="min-width: 100px; display: inline-block;">Date:</strong>
+                            <span class="detail-value">${item.expense_date}</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong class="detail-label" style="min-width: 100px; display: inline-block;">Expense For:</strong>
+                            <span class="detail-value" style="word-break: break-word;">${item.description}</span>
+                        </div>
+                    </div>
+                `;
             }
+
+            window.toggleExpenseReportRowDetails = function(expenseId) {
+                if ($(window).width() > 1024) {
+                    return;
+                }
+
+                const row = $(`.expense-item-wrapper[data-expense-id="${expenseId}"]`).closest('tr');
+                if (row.length === 0) return;
+
+                const detailsRow = row.next(`tr.expense-details-row[data-expense-details-id="${expenseId}"]`);
+                const toggleBtn = row.find('.mobile-toggle-btn-table');
+                const openRows = $('.expense-details-row.show').not(`[data-expense-details-id="${expenseId}"]`);
+
+                openRows.removeClass('show');
+                $('.expense-report-toggle-btn').not(`[data-expense-id="${expenseId}"]`).removeClass('minus').html('+');
+
+                if (detailsRow.length === 0) {
+                    const item = window.expenseReportDataMap[String(expenseId)];
+                    if (!item) return;
+
+                    const expandableContent = buildExpenseReportExpandableRowContent(item);
+                    const newRow = $(`
+                        <tr class="expense-details-row show" data-expense-details-id="${expenseId}">
+                            <td colspan="6">${expandableContent}</td>
+                        </tr>
+                    `);
+                    row.after(newRow);
+                    toggleBtn.addClass('minus').html('-');
+                } else if (detailsRow.hasClass('show')) {
+                    detailsRow.removeClass('show');
+                    toggleBtn.removeClass('minus').html('+');
+                } else {
+                    detailsRow.addClass('show');
+                    toggleBtn.addClass('minus').html('-');
+                }
+            };
+
+            window.addExpenseReportExpandableRows = function() {
+                if ($(window).width() > 1024) {
+                    $('.expense-details-row').remove();
+                }
+                $('.mobile-toggle-btn-table').removeClass('minus').html('+');
+            };
+
+            $(document).off('click.expenseReportToggle').on('click.expenseReportToggle', '.expense-report-toggle-btn', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                window.toggleExpenseReportRowDetails($(this).data('expense-id'));
+            });
 
             // Update pagination UI
             function updatePaginationUI(pagination) {
@@ -1436,19 +1531,22 @@
                 $('#pagination-total').text(pagination.total);
 
                 let paginationHtml = '';
-                let startPage = Math.max(1, pagination.current_page - 2);
-                let endPage = Math.min(pagination.last_page, startPage + 4);
 
-                if (endPage - startPage < 4 && startPage > 1) {
-                    startPage = Math.max(1, endPage - 4);
-                }
+                // Previous Button
+                paginationHtml += `
+                    <li class="page-item ${pagination.current_page === 1 ? 'disabled' : ''}">
+                        <a class="page-link expense-page-link" href="javascript:void(0);" data-page="${pagination.current_page - 1}">Previous</a>
+                    </li>
+                `;
 
-                if (pagination.current_page > 1) {
+                const visiblePageCount = 2;
+                let startPage = Math.floor((pagination.current_page - 1) / visiblePageCount) * visiblePageCount + 1;
+                let endPage = Math.min(pagination.last_page, startPage + visiblePageCount - 1);
+
+                if (startPage > 1) {
                     paginationHtml += `
                         <li class="page-item">
-                            <a class="page-link" href="javascript:void(0);" data-page="${pagination.current_page - 1}">
-                                <i class="fas fa-chevron-left"></i>
-                            </a>
+                            <a class="page-link expense-page-link" href="javascript:void(0);" data-page="${startPage - 1}" data-action="prev-group">..</a>
                         </li>
                     `;
                 }
@@ -1456,24 +1554,58 @@
                 for (let i = startPage; i <= endPage; i++) {
                     paginationHtml += `
                         <li class="page-item ${i === pagination.current_page ? 'active' : ''}">
-                            <a class="page-link" href="javascript:void(0);" data-page="${i}">${i}</a>
+                            <a class="page-link expense-page-link" href="javascript:void(0);" data-page="${i}">${i}</a>
                         </li>
                     `;
                 }
 
-                if (pagination.current_page < pagination.last_page) {
+                if (endPage < pagination.last_page) {
                     paginationHtml += `
                         <li class="page-item">
-                            <a class="page-link" href="javascript:void(0);" data-page="${pagination.current_page + 1}">
-                                <i class="fas fa-chevron-right"></i>
-                            </a>
+                            <a class="page-link expense-page-link" href="javascript:void(0);" data-page="${endPage + 1}" data-action="next-group">..</a>
                         </li>
                     `;
                 }
 
+                // Next Button
+                paginationHtml += `
+                    <li class="page-item ${pagination.current_page === pagination.last_page || pagination.last_page === 0 ? 'disabled' : ''}">
+                        <a class="page-link expense-page-link" href="javascript:void(0);" data-page="${pagination.current_page + 1}">Next</a>
+                    </li>
+                `;
+
                 $('#pagination-numbers').html(paginationHtml);
-                $('.pagination-controls').show();
+                $('.pagination-controls').toggle(pagination.total > 0);
             }
+
+            $(document).on('click', '.expense-page-link', function(e) {
+                e.preventDefault();
+
+                let page = $(this).data('page');
+                let action = $(this).data('action');
+
+                if (action === 'next-group') {
+                    if (page && page <= lastPage) {
+                        currentPage = page;
+                        fetchExpenses();
+                    }
+                    return;
+                }
+
+                if (action === 'prev-group') {
+                    let prevStartPage = Math.max(1, page - 2);
+                    if (prevStartPage >= 1 && prevStartPage <= lastPage) {
+                        currentPage = prevStartPage;
+                        fetchExpenses();
+                    }
+                    return;
+                }
+
+                if (page && page !== currentPage && page >= 1 && page <= lastPage) {
+                    currentPage = page;
+                    fetchExpenses();
+                }
+            });
 
             // Fix top scroll sync
             function fixTopScrollSync() {
@@ -1588,14 +1720,38 @@
                             expenseChart = null;
                         }
 
+                        // if (!response.data || response.data.length === 0) {
+                        //     chartContainer.append(`
+                        //         <div id="noExpenseMessage" style="display: flex; align-items: center; justify-content: center; height: 100%; width: 100%; color: #6b7280; font-size: 16px; text-align: center;">
+                        //             No expense data found.
+                        //         </div>
+                        //     `);
+                        //     return;
+                        // }
                         if (!response.data || response.data.length === 0) {
-                            chartContainer.append(`
-                                <div id="noExpenseMessage" style="display: flex; align-items: center; justify-content: center; height: 100%; width: 100%; color: #6b7280; font-size: 16px; text-align: center;">
-                                    No expense data found.
-                                </div>
-                            `);
-                            return;
-                        }
+
+    // ✅ 1. Hide chart canvas
+    $('#expenseChart').hide();
+
+    // ✅ 2. Replace entire container content (NOT append)
+    chartContainer.html(`
+        <div id="noExpenseMessage"
+            style="
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                height: 100%;
+                width: 100%;
+                color: #6b7280;
+                font-size: 16px;
+                text-align: center;
+            ">
+            No expense data found.
+        </div>
+    `);
+
+    return;
+}
 
                         const totals = {};
                         response.data.forEach(item => {
@@ -1609,6 +1765,8 @@
                         const values = sorted.map(item => item[1]);
 
                         const ctx = document.getElementById('expenseChart').getContext('2d');
+                        $('#expenseChart').show(); // ✅ show chart again
+$("#noExpenseMessage").remove(); // optional cleanup
                         expenseChart = new Chart(ctx, {
                             type: 'bar',
                             data: {
@@ -1691,7 +1849,9 @@
             // ✅ Handle window resize to fix table layout
             $(window).on('resize', function() {
                 fixTopScrollSync();
-                initToggleDetails();
+                if ($.fn.DataTable.isDataTable('.datanew')) {
+                    window.addExpenseReportExpandableRows($('.datanew').DataTable());
+                }
             });
         });
     </script>

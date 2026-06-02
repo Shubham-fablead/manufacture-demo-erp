@@ -49,6 +49,7 @@
                         <table style="width: 100%; line-height: inherit; text-align: left; border-collapse: collapse;">
                             <tr class="heading" style="background: #F3F2F7;">
                                 <td style="padding: 10px;"><strong>Expense Name</strong></td>
+                                <td style="padding: 10px;"><strong>Expense Type</strong></td>
                                 <td style="padding: 10px;"><strong>Amount</strong></td>
                                 <td style="padding: 10px;"><strong>Date</strong></td>
                                 <td style="padding: 10px;"><strong>Expense For</strong></td>

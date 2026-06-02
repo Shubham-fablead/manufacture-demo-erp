@@ -112,6 +112,7 @@
                         <table style="width: 100%; line-height: inherit; text-align: left; border-collapse: collapse;">
                             <tr class="heading" style="background: #F3F2F7;">
                                 <td style="padding: 10px;"><strong>Expense Name</strong></td>
+                                <td style="padding: 10px;"><strong>Expense Type</strong></td>
                                 <td style="padding: 10px;"><strong>Amount</strong></td>
                                 <td style="padding: 10px;"><strong>Date</strong></td>
                                 <td style="padding: 10px;"><strong>Expense For</strong></td>
@@ -120,6 +121,7 @@
                             @foreach($expenses as $expense)
                                 <tr class="details" style="border-bottom: 1px solid #E9ECEF;">
                                     <td style="padding: 10px;">{{ $expense->expense_name }}</td>
+                                    <td style="padding: 10px;">{{ $expense->expenseType->type ?? '-' }}</td>
                                     <td style="padding: 10px;">
                                         {{ $currencyPosition === 'left' ? $currencySymbol . number_format($expense->amount, 2) : number_format($expense->amount, 2) . $currencySymbol }}
                                     </td>

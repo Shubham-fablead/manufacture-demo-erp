@@ -80,8 +80,10 @@ class ExpenseController extends Controller
             $search = trim((string) $request->search);
             $query->where(function ($q) use ($search) {
                 $q->where('expense_name', 'like', "%{$search}%")
+                    ->orWhere('sr_no', 'like', "%{$search}%")
                     ->orWhere('description', 'like', "%{$search}%")
                     ->orWhere('amount', 'like', "%{$search}%")
+                    ->orWhere('payment_mode', 'like', "%{$search}%")
                     ->orWhereHas('expenseType', function ($expenseTypeQuery) use ($search) {
                         $expenseTypeQuery->where('type', 'like', "%{$search}%");
                     });
@@ -92,7 +94,7 @@ class ExpenseController extends Controller
             });
         }
 
-        $query->orderBy('id', 'desc');
+        $query->orderBy('id', 'asc');
 
         $totalAmount = (clone $query)->sum('amount');
         $perPage = (int) $request->input('per_page', 10);
@@ -147,6 +149,7 @@ class ExpenseController extends Controller
                 'expense_date'    => 'required|date_format:d-m-Y',
                 'amount'          => 'required|numeric|min:0',
                 'expense_type_id' => 'required|exists:expense_types,id',
+                'payment_mode'    => 'required|in:Cash,Bank',
                 'description'     => 'nullable|string',
             ],
             [], // Custom messages array (optional if not needed)
@@ -162,15 +165,23 @@ class ExpenseController extends Controller
         // Convert expense_date to Y-m-d for MySQL
         $formattedDate = Carbon::createFromFormat('d-m-Y', $request->expense_date)->format('Y-m-d');
 
-        Expense::create([
-            'expense_name'    => $request->expense_name,
-            'expense_date'    => $formattedDate,
-            'amount'          => $request->amount,
-            'expense_type_id' => $request->expense_type_id,
-            'description'     => $request->description,
-            'branch_id'       => $userBranch ?? $userId,
-            'created_by'      => $userId,
-        ]);
+        $branchId = $userBranch ?? $userId;
+
+        DB::transaction(function () use ($branchId, $formattedDate, $request, $userId) {
+            $nextSrNo = Expense::getNextSrNoForBranch($branchId, true);
+
+            Expense::create([
+                'sr_no'           => $nextSrNo,
+                'expense_name'    => $request->expense_name,
+                'expense_date'    => $formattedDate,
+                'amount'          => $request->amount,
+                'expense_type_id' => $request->expense_type_id,
+                'payment_mode'    => $request->payment_mode,
+                'description'     => $request->description,
+                'branch_id'       => $branchId,
+                'created_by'      => $userId,
+            ]);
+        });
 
         return response()->json(['success' => 'Expense added successfully']);
     }
@@ -230,6 +241,7 @@ class ExpenseController extends Controller
                 'expense_date'    => 'required|date_format:d-m-Y',
                 'amount'          => 'required|numeric|min:0',
                 'expense_type_id' => 'required|exists:expense_types,id',
+                'payment_mode'    => 'required|in:Cash,Bank',
                 'description'     => 'nullable|string',
             ],
             [], // No custom error messages
@@ -248,6 +260,7 @@ class ExpenseController extends Controller
             'expense_date'    => Carbon::createFromFormat('d-m-Y', $request->expense_date)->format('Y-m-d'),
             'amount'          => $request->amount,
             'expense_type_id' => $request->expense_type_id, // update expense_type_id
+            'payment_mode'    => $request->payment_mode,
             'description'     => $request->description,
         ]);
 
@@ -428,7 +441,9 @@ class ExpenseController extends Controller
         if (!empty($search)) {
             $expenses->where(function ($q) use ($search) {
                 $q->where('expense_name', 'LIKE', "%{$search}%")
-                    ->orWhere('description', 'LIKE', "%{$search}%");
+                    ->orWhere('sr_no', 'LIKE', "%{$search}%")
+                    ->orWhere('description', 'LIKE', "%{$search}%")
+                    ->orWhere('payment_mode', 'LIKE', "%{$search}%");
             });
         }
 
@@ -436,7 +451,7 @@ class ExpenseController extends Controller
         $totalCount = $expenses->count();
 
         // Get paginated results
-        $results = $expenses->select('id', 'expense_name', 'amount', 'expense_date', 'description')
+        $results = $expenses->select('id', 'sr_no', 'expense_name', 'amount', 'expense_date', 'payment_mode', 'description')
             ->orderBy('expense_date', 'desc')
             ->skip(($page - 1) * $perPage)
             ->take($perPage)
