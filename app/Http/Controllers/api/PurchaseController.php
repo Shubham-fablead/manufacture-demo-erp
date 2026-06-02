@@ -3009,6 +3009,7 @@ class PurchaseController extends Controller
             'pending_date'   => 'nullable|date',
             'new_emi_value'  => 'nullable',
             'emi_paid_value' => 'nullable|numeric',
+            'remarks'        => 'nullable|string|max:500',
         ]);
 
         if ($request->filled('purchase_id')) {
@@ -3089,6 +3090,7 @@ class PurchaseController extends Controller
                         'status'           => 'debit',
                         'bank_id'          => $request->bank_id,
                         'emi_month'        => $request->emi_month ?? 1,
+                        'remarks'          => $request->remarks,
                         'isDeleted'        => 0,
                     ]);
                 }
@@ -3112,6 +3114,7 @@ class PurchaseController extends Controller
                         'status'           => 'debit',
                         'bank_id'          => $request->bank_id,
                         'emi_month'        => $request->emi_month ?? 1,
+                        'remarks'          => $request->remarks,
                         'isDeleted'        => 0,
                     ]);
                 }
@@ -3130,6 +3133,7 @@ class PurchaseController extends Controller
                     'status'           => 'debit',
                     'bank_id'          => $request->bank_id,
                     'emi_month'        => $request->emi_month ?? 1,
+                    'remarks'          => $request->remarks,
                     'isDeleted'        => 0,
                 ]);
             }

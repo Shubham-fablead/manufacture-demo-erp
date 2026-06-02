@@ -26,6 +26,7 @@ class PaymentStore extends Model
         'emi_month',
         'remaining_amount',
         'status',
+        'remarks',
         'bank_id',
         'isDeleted',
         'created_at',

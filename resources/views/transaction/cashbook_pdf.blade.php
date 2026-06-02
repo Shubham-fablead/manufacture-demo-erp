@@ -77,7 +77,7 @@
                                 $logoMime = mime_content_type($logoPath);
                             @endphp
                             <img src="data:{{ $logoMime }};base64,{{ $logoData }}" alt="Company Logo"
-                                style="height: 100px; width: auto;">
+                                style="height: 60px; width: auto;">
                         @endif
                     </td>
 
@@ -103,8 +103,8 @@
             <!-- Filter Info -->
             <table style="width: 100%; margin-bottom: 15px;">
                 <tr>
-                    <td style="width: 25%;"><b>From Date:</b> {{ $from_date ?? 'N/A' }}</td>
-                    <td style="width: 25%;"><b>To Date:</b> {{ $to_date ?? 'N/A' }}</td>
+                    <td style="width: 25%;"><b>From Date:</b> {{ $from_date ? \Carbon\Carbon::parse($from_date)->format('d-m-Y') : 'N/A' }}</td>
+                    <td style="width: 25%;"><b>To Date:</b> {{ $to_date ? \Carbon\Carbon::parse($to_date)->format('d-m-Y') : 'N/A' }}</td>
                     <td style="width: 25%;"><b>Year:</b> {{ $year ?? 'N/A' }}</td>
                     <td style="width: 25%; text-align: right;"><b>Total Amount:</b> {{ number_format($data->sum('payment_amount'), 2) }}</td>
                 </tr>
@@ -113,8 +113,8 @@
             <table class="table-bordered">
                 <thead>
                     <tr>
-                        <th style="width: 10%;">Sr No</th>
-                        <th style="width: 25%;">{{ $status === 'debit' ? 'Invoice No' : 'Order No' }}</th>
+                        <!-- <th style="width: 10%;">Sr No</th> -->
+                        <th style="width: 25%;">{{ $status === 'expense' ? 'Expense No' : ($status === 'debit' ? 'Bill No' : 'Order No') }}</th>
                         <th style="width: 15%;">Date</th>
                         <th style="width: 30%;">Particulars</th>
                         <th style="width: 20%;">Amount</th>
@@ -125,7 +125,7 @@
                     @foreach($data as $index => $item)
                         @php $totalAmount += $item->payment_amount; @endphp
                         <tr>
-                            <td class="text-center">{{ $index + 1 }}</td>
+                            <!-- <td class="text-center">{{ $index + 1 }}</td> -->
                             <td class="text-center">{{ $item->order_number }}</td>
                             <td class="text-center">{{ $item->payment_date }}</td>
                             <td class="text-center">{{ $item->user_name }}</td>

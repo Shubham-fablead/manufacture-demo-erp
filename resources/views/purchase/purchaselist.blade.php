@@ -1132,6 +1132,12 @@
                         <input type="hidden" id="remainingAmountHidden" name="remaining_amount">
                         <input type="hidden" id="paymentMethodHidden" name="payment_type">
 
+                        <div class="mb-3">
+                            <label for="paymentRemarks" class="form-label">Remarks</label>
+                            <textarea class="form-control" id="paymentRemarks" name="remarks" rows="3"
+                                placeholder="Enter remarks (optional)"></textarea>
+                        </div>
+
                         <div class="text-end">
                             <button type="submit" class="btn btn-submit text-white"
                                 style="background-color: #ff9f43;">Submit Payment</button>
@@ -1620,6 +1626,7 @@
                                                                                 <strong>Date:</strong> ${payment.payment_date}<br>
                                                                                 <strong>Method:</strong> ${payment.payment_method}<br>
                                                                                 <strong>Payment Type:</strong> ${payment.payment_type ? payment.payment_type : 'N/A'}<br>
+                                                                                <strong>Remarks:</strong> ${payment.remarks ? payment.remarks : 'N/A'}<br>
                                                                                 ${payment.payment_type === 'emi' ? `<strong>EMI Months:</strong> ${payment.emi_month || 0}<br>` : ''}
                                                                             </li>
                                                                             <hr class="my-1"/>
@@ -2155,6 +2162,7 @@
                 $('#cashOnlineFullAmount, #upiOnlineFullAmount, #cashOnlinePartialAmount, #upiOnlinePartialAmount, #remainingCashOnlineAmount')
                     .val('');
                 $('#partialAmount, #pendingAmount, #cashAmount, #upiAmountInput').val('');
+                $('#paymentRemarks').val('');
 
                 // Reset dropdowns
                 $('#paymentMethodSelect').val('').trigger('change');
@@ -2799,7 +2807,10 @@
                         } else {
                             html = history.map(p => `
             <li class="list-group-item d-flex justify-content-between align-items-center">
-                <span>${p.payment_date || p.created_at}</span>
+                <span>
+                    ${p.payment_date || p.created_at}<br>
+                    <small class="text-muted">Remarks: ${p.remarks ? p.remarks : 'N/A'}</small>
+                </span>
                 <span>
                     <strong>₹${formatCurrency(p.payment_amount)}</strong>
                     (${p.payment_method || '-'})

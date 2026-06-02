@@ -5,11 +5,26 @@
 @section('content')
 
     <style>
-        .nav-tabs .nav-item.show .nav-link,
-        .nav-tabs .nav-link.active {
-            color: white;
-            background-color: #ff9f43;
-            border-color: #dee2e6 #dee2e6 #fff;
+        .nav-tabs-solid .nav-link {
+            background-color: transparent !important;
+            color: #6c757d !important;
+        }
+
+        .nav-tabs-solid .nav-link.active {
+            background-color: #ff9b44 !important;
+            border-color: #ff9b44 !important;
+            color: #fff !important;
+        }
+
+        .bankbook-tabs-wrap {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        #bankBookTabs {
+            flex-wrap: nowrap;
+            width: max-content;
+            min-width: 100%;
         }
 
         .nav-link {
@@ -27,7 +42,7 @@
 
         .btn-sm {
             height: 32px;
-            font-size: 13px;
+            font-size: 16px;
         }
 
         /* DataTables Styling from Staff List */
@@ -35,6 +50,10 @@
             display: flex !important;
             align-items: center !important;
             gap: 5px !important;
+        }
+
+        .bankbook-mobile-party {
+            display: none;
         }
 
         .table-scroll-top {
@@ -82,58 +101,97 @@
                 display: table-cell !important;
             }
 
-            /* Hide the Details toggle column on desktop */
+            /* Hide the Details toggle column (col 6) on desktop — Action (col 7) remains visible */
             table.datanew thead th.details-column,
-            table.datanew tbody td:last-child {
+            table.datanew tbody td:nth-child(6) {
                 display: none !important;
             }
         }
 
-        /* Mobile: hide non-essential columns, show Details toggle */
+        /* Mobile: hide non-essential columns, show Details toggle (col 6) only */
         @media (max-width: 768px) {
+            table.datanew {
+                width: 100% !important;
+                table-layout: fixed;
+            }
 
             table.datanew thead th:nth-child(n+2),
             table.datanew tbody td:nth-child(n+2) {
                 display: none !important;
             }
 
-            /* Show only Column 1 and Details columns on mobile */
+            /* Show only Column 1 and Details toggle (col 6) on mobile */
             table.datanew thead th:first-child,
             table.datanew tbody td:first-child {
                 display: table-cell !important;
             }
 
             table.datanew thead th.details-column,
-            table.datanew tbody td:last-child {
+            table.datanew tbody td:nth-child(6) {
                 display: table-cell !important;
                 text-align: center;
-                vertical-align: top;
-                width: 50px;
-                padding-top: 12px;
+                vertical-align: top !important;
+                width: 56px !important;
+                min-width: 56px !important;
+                max-width: 56px !important;
+                padding: 12px 6px !important;
+            }
+
+            /* Keep Action column (col 7) hidden on mobile */
+            table.datanew thead th:nth-child(7),
+            table.datanew tbody td:nth-child(7) {
+                display: none !important;
             }
 
             .toggle-details {
-                display: flex;
-                align-items: flex-start;
+                display: inline-flex;
+                align-items: center;
                 justify-content: center;
-                width: 100%;
-                text-decoration: none;
+                width: 44px;
+                height: 44px;
+                margin-left: auto;
             }
 
             .toggle-details i {
                 font-size: 18px;
-                margin-top: 2px;
+            }
+
+            table.datanew tbody td:first-child {
+                width: calc(100% - 56px) !important;
+                max-width: calc(100vw - 96px) !important;
+                vertical-align: top !important;
+            }
+
+            table.datanew tbody td:first-child > div {
+                width: 100%;
+            }
+
+            .bankbook-mobile-ref {
+                display: block;
+                font-weight: 500;
+            }
+
+            .bankbook-mobile-party {
+                display: block;
+                margin-top: 4px;
+                font-size: 14px;
+                line-height: 1.4;
+                color: #495057;
+                font-weight: 500;
+                white-space: normal;
+                word-break: break-word;
+                overflow-wrap: anywhere;
             }
         }
 
         /* Collapsible details styling */
-        .collapse-details {
+        /* .collapse-details {
             margin-top: 10px;
             padding: 10px;
             background-color: #f8f9fa;
             border-radius: 5px;
             border-left: 3px solid #ff9f43;
-        }
+        } */
 
         .detail-item {
             display: flex;
@@ -169,10 +227,32 @@
             background-color: #5d6d7e;
             color: #fff;
             border: none;
-            margin: 0 4px;
-            padding: 6px 15px;
+            margin: 0 3px;
+            padding: 4px 10px;
             border-radius: 6px;
             font-weight: bold;
+        }
+
+        @media (max-width: 576px) {
+            .pagination .page-item .page-link {
+                padding: 4px 10px;
+                margin: 0 3px;
+                font-size: 12px;
+            }
+        }
+
+        .pagination .page-item:first-child .page-link,
+        .pagination .page-item:last-child .page-link {
+            background-color: #fff;
+            color: #6c757d;
+            border: 1px solid #dee2e6;
+        }
+
+        .pagination .page-item:first-child .page-link:hover,
+        .pagination .page-item:last-child .page-link:hover {
+            background-color: #f8f9fa;
+            color: #495057;
+            border-color: #dee2e6;
         }
 
         .pagination .page-item.active .page-link {
@@ -187,6 +267,37 @@
 
         .pagination .page-item.active .page-link:hover {
             background-color: #e68a35 !important;
+        }
+
+        .pagination .page-item.disabled .page-link {
+            background-color: #fff !important;
+            color: #dee2e6 !important;
+            border: 1px solid #dee2e6 !important;
+            cursor: not-allowed !important;
+            pointer-events: none !important;
+        }
+
+        @media (max-width: 767px) {
+            .pagination-controls {
+                align-items: stretch !important;
+                gap: 12px;
+            }
+
+            .pagination-controls > div,
+            .pagination-controls nav {
+                width: 100%;
+            }
+
+            .pagination-controls > div {
+                justify-content: space-between;
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+
+            .pagination-controls nav .pagination {
+                justify-content: center;
+                flex-wrap: wrap;
+            }
         }
 
         .download-loader-overlay {
@@ -240,17 +351,25 @@
                     <div class="row w-100 align-items-center">
                         {{-- Tabs --}}
                         <div class="col-md-12 mb-3">
-                            <ul class="nav nav-tabs nav-tabs-solid" id="bankBookTabs">
-                                <li class="nav-item">
-                                    <a class="nav-link active" data-status="credit" href="javascript:void(0)">Receipts</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" data-status="debit" href="javascript:void(0)">Payments</a>
-                                </li>
-                            </ul>
+                            <div class="bankbook-tabs-wrap">
+                                <ul class="nav nav-tabs nav-tabs-solid mb-3" id="bankBookTabs">
+                                    <li class="nav-item">
+                                        <a class="nav-link active" href="#receipts" data-bs-toggle="tab"
+                                            data-status="credit">Receipts</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="#payments" data-bs-toggle="tab"
+                                            data-status="debit">Payments</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="#expenses" data-bs-toggle="tab"
+                                            data-status="expense">Expenses</a>
+                                    </li>
+                                </ul>
+                            </div>
                         </div>
 
-                        <div class="row g-2 align-items-center">
+                        <div class="row g-2 align-items-center bankbook-filter-row" style="padding-left: 13px;">
 
                             <!-- Start Date -->
                             <div class="col-md-2 col-6">
@@ -284,7 +403,7 @@
                             </div>
 
                             <!-- Total -->
-                            <div class="col-md-2 col-12">
+                            <div class="col-md-2 col-12 bankbook-total-col">
                                 <label class="form-label fw-bold">Total</label>
                                 <div class="form-control form-control-sm fw-bold bg-light"
                                     style="border:1px solid #dcdcdc; color:#ff9f43;">
@@ -295,7 +414,7 @@
 
 
                             <!-- Excel -->
-                            <div class="col-md-1 col-6 d-flex flex-column">
+                            <div class="col-md-1 col-6 d-flex flex-column bankbook-export-col">
                                 <label class="form-label opacity-0 d-none d-md-block">Excel</label>
                                 <button class="btn btn-success btn-sm w-100" id="exportExcel">
                                     <i class="fa fa-file-excel"></i> Excel
@@ -303,7 +422,7 @@
                             </div>
 
                             <!-- PDF -->
-                            <div class="col-md-1 col-6 d-flex flex-column">
+                            <div class="col-md-1 col-6 d-flex flex-column bankbook-export-col">
                                 <label class="form-label opacity-0 d-none d-md-block">PDF</label>
                                 <button class="btn btn-danger btn-sm w-100" id="exportPdf">
                                     <i class="fa fa-file-pdf"></i> PDF
@@ -336,6 +455,7 @@
                                 {{-- <th>Type</th> --}}
                                 <th>Amount</th>
                                 <th class="details-column">Details</th>
+                                <th>Action</th>
                             </tr>
                         </thead>
                         <tbody></tbody>
@@ -376,6 +496,37 @@
         <div class="download-loader-box">
             <h4 id="downloadLoaderText">Generating PDF...</h4>
             <div class="spinner-border text-primary" role="status" aria-hidden="true"></div>
+        </div>
+    </div>
+
+    {{-- Edit Payment Modal (Bankbook) --}}
+    <div class="modal fade" id="bankbookEditModal" tabindex="-1" aria-labelledby="bankbookEditLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header" style="background:#ff9f43;">
+                    <h5 class="modal-title text-white" id="bankbookEditLabel"><i class="fas fa-edit me-2"></i>Edit Payment</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal">x</button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="bb_edit_id">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Date</label>
+                        <input type="date" id="bb_edit_date" class="form-control">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Amount (₹)</label>
+                        <input type="number" id="bb_edit_amount" class="form-control" step="0.01" min="0">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Remarks</label>
+                        <textarea id="bb_edit_remarks" class="form-control" rows="2"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-warning" id="bb_save_edit_btn">Save Changes</button>
+                </div>
+            </div>
         </div>
     </div>
 @endsection
@@ -484,7 +635,7 @@
 
                 // 🔁 Change column heading dynamically
                 if (currentStatus === 'debit') {
-                    $('#refColumnTitle').text('Invoice No ');
+                    $('#refColumnTitle').text('Bill No ');
                 } else {
                     $('#refColumnTitle').text('Order No');
                 }
@@ -691,7 +842,11 @@
                 lengthChange: false,
                 autoWidth: false,
                 dom: 't',
-                buttons: [] // buttons will be handled separately
+                buttons: [], // buttons will be handled separately
+                columnDefs: [
+                    { targets: 5, orderable: false },
+                    { targets: 6, orderable: false, className: 'text-center' }
+                ]
             });
 
             loadBanks();
@@ -732,7 +887,13 @@
                 $('#bankBookTabs .nav-link').removeClass('active');
                 $(this).addClass('active');
                 currentStatus = $(this).data('status');
-                $('#refColumnTitle').text(currentStatus === 'debit' ? 'Invoice No' : 'Order No');
+                if (currentStatus === 'debit') {
+                    $('#refColumnTitle').text('Bill No');
+                } else if (currentStatus === 'expense') {
+                    $('#refColumnTitle').text('Expense No');
+                } else {
+                    $('#refColumnTitle').text('Order No');
+                }
                 loadBankBook(1);
             });
 
@@ -909,18 +1070,21 @@
                     let tableBody = [];
                     res.data.forEach((row, index) => {
                         let amount = parseFloat(row.payment_amount) || 0;
-                        let refNo = row.status === 'debit' ? row.order_no : row.invoice_no;
+                        let refNo = (row.status === 'debit' || row.status === 'expense') ? row.order_no : row.invoice_no;
                         let detailsId = `details-${currentPage}-${index}`;
+                        let partyName = row.particulars || 'N/A';
 
                         tableBody.push([
                             `<div>
-                            <span>${refNo || '-'}</span>
+                                <span class="bankbook-mobile-party">${partyName}</span>
+                            <span class="bankbook-mobile-ref">${refNo || '-'}</span>
                             <div class="collapse mt-2 d-lg-none" id="${detailsId}">
                                 <div class="collapse-details">
                                     <div class="detail-item"><span class="detail-label">Date:</span><span class="detail-value">${row.payment_date}</span></div>
                                     <div class="detail-item"><span class="detail-label">Particulars:</span><span class="detail-value">${row.particulars}</span></div>
                                     <div class="detail-item"><span class="detail-label">Bank:</span><span class="detail-value">${row.bank_name}</span></div>
                                     <div class="detail-item"><span class="detail-label">Amount:</span><span class="detail-value">₹${formatINR(amount)}</span></div>
+                                    <div class="detail-item"><span class="detail-label">Action:</span><span class="detail-value"><div class="d-flex gap-1"><button class="btn btn-sm btn-warning py-0 px-2 bb-edit-btn" data-id="${row.id}" data-amount="${row.payment_amount}" data-date="${row.payment_date}" data-remarks="${row.remarks || ''}" title="Edit"><i class="fas fa-edit"></i></button><button class="btn btn-sm btn-danger py-0 px-2 bb-delete-btn" data-id="${row.id}" title="Delete"><i class="fas fa-trash"></i></button></div></span></div>
                                 </div>
                             </div>
                         </div>`,
@@ -928,7 +1092,18 @@
                             row.particulars,
                             row.bank_name,
                             `₹${formatINR(amount)}`,
-                            `<a href="#${detailsId}" class="toggle-details" data-bs-toggle="collapse"><i class="fas fa-plus-circle" style="color:#ff9f43;"></i></a>`
+                            `<a href="#${detailsId}" class="toggle-details" data-bs-toggle="collapse"><i class="fas fa-plus-circle" style="color:#ff9f43;"></i></a>`,
+                            `<div class="d-flex gap-1 justify-content-center">
+                                <button class="btn btn-sm btn-warning py-0 px-2 bb-edit-btn"
+                                    data-id="${row.id}"
+                                    data-amount="${row.payment_amount}"
+                                    data-date="${row.payment_date}"
+                                    data-remarks="${row.remarks || ''}"
+                                    title="Edit"><i class="fas fa-edit"></i></button>
+                                <button class="btn btn-sm btn-danger py-0 px-2 bb-delete-btn"
+                                    data-id="${row.id}"
+                                    title="Delete"><i class="fas fa-trash"></i></button>
+                            </div>`
                         ]);
                     });
 
@@ -970,19 +1145,130 @@ $('#grandClosingBalance').text(formatINR(res.current_tab_total));
             $('#pagination-total').text(pagination.total);
 
             let paginationHtml = '';
-            let startPage = Math.max(1, pagination.current_page - 2);
-            let endPage = Math.min(pagination.last_page, startPage + 4);
-            if (endPage - startPage < 4) {
-                startPage = Math.max(1, endPage - 4);
-            }
-            for (let i = startPage; i <= endPage; i++) {
-                paginationHtml += `
-                <li class="page-item ${i === pagination.current_page ? 'active' : ''}">
-                    <a class="page-link" href="javascript:void(0);" data-page="${i}">${i}</a>
+            let currentPage = pagination.current_page || 1;
+            let lastPage = pagination.last_page || 1;
+            paginationHtml += `
+                <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+                    <a class="page-link" href="javascript:void(0);" data-page="${currentPage - 1}">Previous</a>
                 </li>
             `;
+
+            const visiblePageCount = 2;
+            let startPage = Math.floor((currentPage - 1) / visiblePageCount) * visiblePageCount + 1;
+            let endPage = Math.min(lastPage, startPage + visiblePageCount - 1);
+
+            if (startPage > 1) {
+                paginationHtml += `
+                    <li class="page-item">
+                        <a class="page-link" href="javascript:void(0);" data-page="${startPage - 1}" data-action="prev-group">..</a>
+                    </li>
+                `;
             }
+
+            for (let i = startPage; i <= endPage; i++) {
+                paginationHtml += `
+                    <li class="page-item ${i === currentPage ? 'active' : ''}">
+                        <a class="page-link" href="javascript:void(0);" data-page="${i}">${i}</a>
+                    </li>
+                `;
+            }
+
+            if (endPage < lastPage) {
+                paginationHtml += `
+                    <li class="page-item">
+                        <a class="page-link" href="javascript:void(0);" data-page="${endPage + 1}" data-action="next-group">..</a>
+                    </li>
+                `;
+            }
+
+            paginationHtml += `
+                <li class="page-item ${currentPage === lastPage || lastPage === 0 ? 'disabled' : ''}">
+                    <a class="page-link" href="javascript:void(0);" data-page="${currentPage + 1}">Next</a>
+                </li>
+            `;
+
             $('#pagination-numbers').html(paginationHtml);
         }
+
+        // ── Edit button click ──
+        $(document).on('click', '.bb-edit-btn', function () {
+            let id      = $(this).data('id');
+            let amount  = $(this).data('amount');
+            let dateRaw = $(this).data('date');   // dd-mm-yyyy from API
+            let remarks = $(this).data('remarks') || '';
+
+            // Convert dd-mm-yyyy → yyyy-mm-dd for date input
+            let parts   = String(dateRaw).split('-');
+            let isoDate = parts.length === 3 ? `${parts[2]}-${parts[1]}-${parts[0]}` : dateRaw;
+
+            $('#bb_edit_id').val(id);
+            $('#bb_edit_amount').val(amount);
+            $('#bb_edit_date').val(isoDate);
+            $('#bb_edit_remarks').val(remarks);
+            $('#bankbookEditModal').modal('show');
+        });
+
+        // ── Save edit ──
+        $('#bb_save_edit_btn').on('click', function () {
+            let id     = $('#bb_edit_id').val();
+            let amount = $('#bb_edit_amount').val();
+            let date   = $('#bb_edit_date').val();
+            let remark = $('#bb_edit_remarks').val();
+
+            if (!amount || !date) {
+                Swal.fire({ icon: 'warning', title: 'Required', text: 'Date and Amount are required.', confirmButtonColor: '#ff9f43' });
+                return;
+            }
+
+            $.ajax({
+                url: `{{ url('/api/bankbook-payment') }}/${id}/update`,
+                method: 'POST',
+                headers: { Authorization: 'Bearer ' + localStorage.getItem('authToken') },
+                data: { payment_amount: amount, payment_date: date, remarks: remark, type: currentStatus },
+                success: function (res) {
+                    if (res.status) {
+                        $('#bankbookEditModal').modal('hide');
+                        Swal.fire({ icon: 'success', title: 'Updated!', text: res.message, confirmButtonColor: '#ff9f43', timer: 1500, showConfirmButton: false });
+                        loadBankBook(currentPage);
+                    }
+                },
+                error: function (xhr) {
+                    Swal.fire({ icon: 'error', title: 'Error', text: xhr.responseJSON?.message || 'Update failed.', confirmButtonColor: '#ff9f43' });
+                }
+            });
+        });
+
+        // ── Delete button click ──
+        $(document).on('click', '.bb-delete-btn', function () {
+            let id = $(this).data('id');
+            Swal.fire({
+                title: 'Delete Payment?',
+                text: 'This action cannot be undone.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#e74c3c',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Yes, Delete'
+            }).then(function (result) {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: `{{ url('/api/bankbook-payment') }}/${id}/delete`,
+                        method: 'POST',
+                        headers: { Authorization: 'Bearer ' + localStorage.getItem('authToken') },
+                        data: { type: currentStatus },
+                        success: function (res) {
+                            if (res.status) {
+                                Swal.fire({ icon: 'success', title: 'Deleted!', text: res.message, confirmButtonColor: '#ff9f43', timer: 1500, showConfirmButton: false });
+                                loadBankBook(currentPage);
+                            }
+                        },
+                        error: function (xhr) {
+                            Swal.fire({ icon: 'error', title: 'Error', text: xhr.responseJSON?.message || 'Delete failed.', confirmButtonColor: '#ff9f43' });
+                        }
+                    });
+                }
+            });
+        });
+
     </script>
 @endpush

@@ -57,6 +57,63 @@ class TransactionController extends Controller
             $branchId = $user->id;
         }
 
+        if ($request->status === 'expense') {
+            $query = \App\Models\Expense::where('isDeleted', 0)
+                ->where('branch_id', $branchId)
+                ->where('payment_mode', 'LIKE', '%Cash%');
+
+            if ($request->filled('from_date')) {
+                $query->whereDate('expense_date', '>=', $request->from_date);
+            }
+            if ($request->filled('to_date')) {
+                $query->whereDate('expense_date', '<=', $request->to_date);
+            }
+            if ($request->filled('year')) {
+                $query->whereYear('expense_date', $request->year);
+            }
+
+            if ($request->filled('search')) {
+                $search = $request->search;
+                $query->where(function ($q) use ($search) {
+                    $q->where('expense_name', 'like', "%{$search}%")
+                        ->orWhere('sr_no', 'like', "%{$search}%")
+                        ->orWhere('description', 'like', "%{$search}%")
+                        ->orWhere('amount', 'like', "%{$search}%");
+                });
+            }
+
+            $totalAmount = (clone $query)->sum('amount');
+            $perPage = $request->get('per_page', 10);
+            $paginated = $query->orderBy('id', 'desc')->paginate($perPage, ['*'], 'page', $request->get('page', 1));
+
+            $data = $paginated->map(function ($item) {
+                return [
+                    'id'                 => $item->id,
+                    'transaction_status' => 'Expense',
+                    'user_name'          => $item->expense_name,
+                    'order_number'       => $item->sr_no,
+                    'payment_amount'     => $item->amount,
+                    'payment_date'       => Carbon::parse($item->expense_date)->format('d-m-Y'),
+                    'remarks'            => $item->description,
+                    'is_expense'         => true,
+                ];
+            });
+
+            return response()->json([
+                'status' => true,
+                'data' => $data,
+                'pagination' => [
+                    'current_page' => $paginated->currentPage(),
+                    'last_page'    => $paginated->lastPage(),
+                    'per_page'     => $paginated->perPage(),
+                    'total'        => $paginated->total(),
+                    'from'         => $paginated->firstItem(),
+                    'to'           => $paginated->lastItem(),
+                ],
+                'total_amount' => $totalAmount,
+            ]);
+        }
+
         $query = $this->getCashbookQuery($request, $branchId);
 
         // // Apply search if provided (example: search in order_number, user_name)
@@ -179,7 +236,8 @@ class TransactionController extends Controller
             'custom_invoice.invoice_number as custom_invoice_number',
             'custom_invoice.customer_id as custom_customer_id',
             'custom_invoice.vendor_id as custom_vendor_id',
-            'purchase_invoice.invoice_number as purchase_invoice_number'
+            'purchase_invoice.invoice_number as purchase_invoice_number',
+            'purchase_invoice.bill_no as purchase_bill_no'
         );
     }
 
@@ -203,7 +261,7 @@ class TransactionController extends Controller
         } elseif ($item->purchase_id > 0) {
             $item->transaction_status = 'Debit';
             $item->user_name = $item->vendor_name;
-            $item->order_number = $item->purchase_invoice_number;
+            $item->order_number = $item->purchase_bill_no ?: $item->purchase_invoice_number;
         } else {
             $item->transaction_status = 'N/A';
             $item->user_name = 'N/A';
@@ -233,12 +291,55 @@ class TransactionController extends Controller
             $branchId = $user->id;
         }
 
-        $query = $this->getCashbookQuery($request, $branchId);
-        $data = $query->orderBy('payment_store.id', 'desc')
-            ->get()
-            ->map(function ($item) {
+        if ($request->status === 'expense') {
+            $query = \App\Models\Expense::where('isDeleted', 0)
+                ->where('branch_id', $branchId)
+                ->where('payment_mode', 'LIKE', '%Cash%');
+
+            if ($request->filled('from_date')) { $query->whereDate('expense_date', '>=', $request->from_date); }
+            if ($request->filled('to_date')) { $query->whereDate('expense_date', '<=', $request->to_date); }
+            if ($request->filled('year')) { $query->whereYear('expense_date', $request->year); }
+            if ($request->filled('search')) {
+                $search = $request->search;
+                $query->where(function ($q) use ($search) {
+                    $q->where('expense_name', 'like', "%{$search}%")
+                      ->orWhere('sr_no', 'like', "%{$search}%")
+                      ->orWhere('description', 'like', "%{$search}%")
+                      ->orWhere('amount', 'like', "%{$search}%");
+                });
+            }
+
+            $data = $query->orderBy('id', 'desc')->get()->map(function ($item) {
+                return (object)[
+                    'id'                 => $item->id,
+                    'transaction_status' => 'Expense',
+                    'user_name'          => $item->expense_name,
+                    'order_number'       => $item->sr_no,
+                    'payment_amount'     => $item->amount,
+                    'payment_date'       => \Carbon\Carbon::parse($item->expense_date)->format('d-m-Y'),
+                    'remarks'            => $item->description,
+                ];
+            });
+        } else {
+            $query = $this->getCashbookQuery($request, $branchId);
+            if ($request->filled('search')) {
+                $search = $request->search;
+                $query->where(function ($q) use ($search) {
+                    $q->where('orders.order_number', 'like', "%{$search}%")
+                        ->orWhere('order_users.name', 'like', "%{$search}%")
+                        ->orWhere('vendors.name', 'like', "%{$search}%")
+                        ->orWhere('custom_users.name', 'like', "%{$search}%")
+                        ->orWhere('custom_vendors.name', 'like', "%{$search}%")
+                        ->orWhere('purchase_invoice.bill_no', 'like', "%{$search}%")
+                        ->orWhere('purchase_invoice.invoice_number', 'like', "%{$search}%")
+                        ->orWhere('custom_invoice.invoice_number', 'like', "%{$search}%")
+                        ->orWhere('payment_store.payment_amount', 'like', "%{$search}%");
+                });
+            }
+            $data = $query->orderBy('payment_store.id', 'desc')->get()->map(function ($item) {
                 return $this->formatCashbookItem($item);
             });
+        }
 
         $settings = DB::table('settings')->first();
 
@@ -281,30 +382,63 @@ class TransactionController extends Controller
         }
 
         $status = $request->get('status', 'credit');
-        $firstColumnHeader = ($status === 'debit') ? 'Invoice No' : 'Order No';
-
-        $query = $this->getCashbookQuery($request, $branchId);
-
-        // Apply search (same as getCashbookData)
-        if ($request->filled('search')) {
-            $search = $request->search;
-            $query->where(function ($q) use ($search) {
-                $q->where('orders.order_number', 'like', "%{$search}%")
-                    ->orWhere('order_users.name', 'like', "%{$search}%")
-                    ->orWhere('vendors.name', 'like', "%{$search}%")
-                    ->orWhere('custom_users.name', 'like', "%{$search}%")
-                    ->orWhere('custom_vendors.name', 'like', "%{$search}%")
-                    ->orWhere('purchase_invoice.invoice_number', 'like', "%{$search}%")
-                    ->orWhere('custom_invoice.invoice_number', 'like', "%{$search}%")
-                    ->orWhere('payment_store.payment_amount', 'like', "%{$search}%");
-            });
+        if ($status === 'debit') {
+            $firstColumnHeader = 'Bill No';
+        } elseif ($status === 'expense') {
+            $firstColumnHeader = 'Expense No';
+        } else {
+            $firstColumnHeader = 'Order No';
         }
 
-        $payments = $query->orderBy('payment_store.id', 'desc')
-            ->get()
-            ->map(function ($item) {
+        if ($status === 'expense') {
+            $query = \App\Models\Expense::where('isDeleted', 0)
+                ->where('branch_id', $branchId)
+                ->where('payment_mode', 'LIKE', '%Cash%');
+
+            if ($request->filled('from_date')) { $query->whereDate('expense_date', '>=', $request->from_date); }
+            if ($request->filled('to_date')) { $query->whereDate('expense_date', '<=', $request->to_date); }
+            if ($request->filled('year')) { $query->whereYear('expense_date', $request->year); }
+            if ($request->filled('search')) {
+                $search = $request->search;
+                $query->where(function ($q) use ($search) {
+                    $q->where('expense_name', 'like', "%{$search}%")
+                      ->orWhere('sr_no', 'like', "%{$search}%")
+                      ->orWhere('description', 'like', "%{$search}%")
+                      ->orWhere('amount', 'like', "%{$search}%");
+                });
+            }
+
+            $payments = $query->orderBy('id', 'desc')->get()->map(function ($item) {
+                return [
+                    'id'                 => $item->id,
+                    'transaction_status' => 'Expense',
+                    'user_name'          => $item->expense_name,
+                    'order_number'       => $item->sr_no,
+                    'payment_amount'     => $item->amount,
+                    'payment_date'       => \Carbon\Carbon::parse($item->expense_date)->format('d-m-Y'),
+                    'remarks'            => $item->description,
+                ];
+            });
+        } else {
+            $query = $this->getCashbookQuery($request, $branchId);
+            if ($request->filled('search')) {
+                $search = $request->search;
+                $query->where(function ($q) use ($search) {
+                    $q->where('orders.order_number', 'like', "%{$search}%")
+                        ->orWhere('order_users.name', 'like', "%{$search}%")
+                        ->orWhere('vendors.name', 'like', "%{$search}%")
+                        ->orWhere('custom_users.name', 'like', "%{$search}%")
+                        ->orWhere('custom_vendors.name', 'like', "%{$search}%")
+                        ->orWhere('purchase_invoice.bill_no', 'like', "%{$search}%")
+                        ->orWhere('purchase_invoice.invoice_number', 'like', "%{$search}%")
+                        ->orWhere('custom_invoice.invoice_number', 'like', "%{$search}%")
+                        ->orWhere('payment_store.payment_amount', 'like', "%{$search}%");
+                });
+            }
+            $payments = $query->orderBy('payment_store.id', 'desc')->get()->map(function ($item) {
                 return $this->formatCashbookItem($item);
             });
+        }
 
         $filename = 'Cash Book' . '.xls';
 
@@ -408,5 +542,45 @@ class TransactionController extends Controller
         };
 
         return response()->stream($callback, 200, $headers);
+    }
+
+    public function getPayment($id)
+    {
+        $payment = PaymentStore::findOrFail($id);
+        return response()->json(['status' => true, 'data' => $payment]);
+    }
+
+    public function updatePayment(Request $request, $id)
+    {
+        if ($request->type === 'expense') {
+            $expense = \App\Models\Expense::findOrFail($id);
+            $expense->amount = $request->payment_amount;
+            $expense->expense_date = Carbon::parse($request->payment_date)->format('Y-m-d');
+            $expense->description = $request->remarks;
+            $expense->save();
+            return response()->json(['status' => true, 'message' => 'Expense updated successfully.']);
+        }
+
+        $payment = PaymentStore::findOrFail($id);
+        $payment->payment_amount = $request->payment_amount;
+        $payment->payment_date   = $request->payment_date;
+        $payment->remarks        = $request->remarks;
+        $payment->save();
+        return response()->json(['status' => true, 'message' => 'Payment updated successfully.']);
+    }
+
+    public function deletePayment(Request $request, $id)
+    {
+        if ($request->type === 'expense') {
+            $expense = \App\Models\Expense::findOrFail($id);
+            $expense->isDeleted = 1;
+            $expense->save();
+            return response()->json(['status' => true, 'message' => 'Expense deleted successfully.']);
+        }
+
+        $payment = PaymentStore::findOrFail($id);
+        $payment->isDeleted = 1;
+        $payment->save();
+        return response()->json(['status' => true, 'message' => 'Payment deleted successfully.']);
     }
 }

@@ -41,6 +41,10 @@
             font-size: 13px !important;
         }
 
+        .cashbook-mobile-party {
+            display: none;
+        }
+
         /* Responsive Table Styling */
         @media screen and (max-width: 768px) {
             .table-responsive {
@@ -58,6 +62,10 @@
         }
 
         @media (max-width: 768px) {
+            .datatable-cashbook {
+                width: 100% !important;
+                table-layout: fixed;
+            }
 
             .datatable-cashbook thead th:nth-child(n+2):not(.details-column),
             .datatable-cashbook tbody td:nth-child(n+2):not(.details-control) {
@@ -73,21 +81,47 @@
             .datatable-cashbook tbody td.details-control {
                 display: table-cell !important;
                 text-align: center;
-                vertical-align: top;
-                width: 50px;
-                padding-top: 12px;
+                vertical-align: top !important;
+                width: 56px !important;
+                min-width: 56px !important;
+                max-width: 56px !important;
+                padding: 12px 6px !important;
             }
 
             .toggle-details {
-                display: flex;
-                align-items: flex-start;
+                display: inline-flex;
+                align-items: center;
                 justify-content: center;
-                width: 100%;
-                text-decoration: none;
+                width: 44px;
+                height: 44px;
+                margin-left: auto;
             }
 
-            .toggle-details i {
-                margin-top: 2px;
+            .datatable-cashbook tbody td:first-child {
+                width: calc(100% - 56px) !important;
+                max-width: calc(100vw - 96px) !important;
+                vertical-align: top !important;
+            }
+
+            .datatable-cashbook tbody td:first-child > div {
+                width: 100%;
+            }
+
+            .cashbook-mobile-ref {
+                display: block;
+                font-weight: 500;
+            }
+
+            .cashbook-mobile-party {
+                display: block;
+                margin-top: 4px;
+                font-size: 14px;
+                line-height: 1.4;
+                color: #495057;
+                font-weight: 500;
+                white-space: normal;
+                word-break: break-word;
+                overflow-wrap: anywhere;
             }
         }
 
@@ -97,13 +131,13 @@
             cursor: pointer;
         }
 
-        .collapse-details {
+        /* .collapse-details {
             margin-top: 10px;
             padding: 10px;
             background-color: #f8f9fa;
             border-radius: 5px;
             border-left: 3px solid #ff9b44;
-        }
+        } */
 
         .detail-item {
             display: flex;
@@ -136,10 +170,32 @@
             background-color: #5d6d7e;
             color: #fff;
             border: none;
-            margin: 0 4px;
-            padding: 6px 15px;
+            margin: 0 3px;
+            padding: 4px 10px;
             border-radius: 6px;
             font-weight: bold;
+        }
+
+        @media (max-width: 576px) {
+            .pagination .page-item .page-link {
+                padding: 4px 10px;
+                margin: 0 3px;
+                font-size: 12px;
+            }
+        }
+
+        .pagination .page-item:first-child .page-link,
+        .pagination .page-item:last-child .page-link {
+            background-color: #fff;
+            color: #6c757d;
+            border: 1px solid #dee2e6;
+        }
+
+        .pagination .page-item:first-child .page-link:hover,
+        .pagination .page-item:last-child .page-link:hover {
+            background-color: #f8f9fa;
+            color: #495057;
+            border-color: #dee2e6;
         }
 
         .pagination .page-item.active .page-link {
@@ -154,6 +210,37 @@
 
         .pagination .page-item.active .page-link:hover {
             background-color: #e68a35 !important;
+        }
+
+        .pagination .page-item.disabled .page-link {
+            background-color: #fff !important;
+            color: #dee2e6 !important;
+            border: 1px solid #dee2e6 !important;
+            cursor: not-allowed !important;
+            pointer-events: none !important;
+        }
+
+        @media (max-width: 767px) {
+            .pagination-controls {
+                align-items: stretch !important;
+                gap: 12px;
+            }
+
+            .pagination-controls > div,
+            .pagination-controls nav {
+                width: 100%;
+            }
+
+            .pagination-controls > div {
+                justify-content: space-between;
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+
+            .pagination-controls nav .pagination {
+                justify-content: center;
+                flex-wrap: wrap;
+            }
         }
 
         .me-1 {
@@ -192,6 +279,10 @@
         }
 
         @media (max-width: 768px) {
+            #cashbookTable td.details-control {
+                vertical-align: top !important;
+            }
+
             .download-loader-box h4 {
                 font-size: 28px;
             }
@@ -214,6 +305,8 @@
                             data-status="credit">Receipts</a></li>
                     <li class="nav-item"><a class="nav-link" href="#payments" data-bs-toggle="tab"
                             data-status="debit">Payments</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#expenses" data-bs-toggle="tab"
+                            data-status="expense">Expenses</a></li>
                 </ul>
 
                 <div class="row ">
@@ -289,6 +382,7 @@
                                 <th>Particulars</th>
                                 <th>Amount</th>
                                 <th class="details-column">Details</th>
+                                <th>Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -329,6 +423,37 @@
         <div class="download-loader-box">
             <h4 id="downloadLoaderText">Generating PDF...</h4>
             <div class="spinner-border text-primary" role="status" aria-hidden="true"></div>
+        </div>
+    </div>
+
+    {{-- Edit Payment Modal --}}
+    <div class="modal fade" id="cashbookEditModal" tabindex="-1" aria-labelledby="cashbookEditLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header" style="background:#ff9f43;">
+                    <h5 class="modal-title text-white" id="cashbookEditLabel"><i class="fas fa-edit me-2"></i>Edit Payment</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal">x</button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="cb_edit_id">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Date</label>
+                        <input type="date" id="cb_edit_date" class="form-control">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Amount (₹)</label>
+                        <input type="number" id="cb_edit_amount" class="form-control" step="0.01" min="0">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Remarks</label>
+                        <textarea id="cb_edit_remarks" class="form-control" rows="2"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-warning" id="cb_save_edit_btn">Save Changes</button>
+                </div>
+            </div>
         </div>
     </div>
 @endsection
@@ -438,7 +563,9 @@
                 $('#status').val(status).trigger('change');
 
                 if (status === 'debit') {
-                    $('#refColumnTitle').text('Invoice No');
+                    $('#refColumnTitle').text('Bill No');
+                } else if (status === 'expense') {
+                    $('#refColumnTitle').text('Expense No');
                 } else {
                     $('#refColumnTitle').text('Order No');
                 }
@@ -585,18 +712,23 @@
                 lengthChange: false,
                 autoWidth: false,
                 dom: 't',
-                columnDefs: [{
-                    targets: 4,
-                    className: 'details-control',
-                    orderable: false
-                }]
+                columnDefs: [
+                    { targets: 4, className: 'details-control', orderable: false },
+                    { targets: 5, orderable: false, className: 'text-center' }
+                ]
             });
 
             // Tab switching
             $('a[data-bs-toggle="tab"]').on('shown.bs.tab', function(e) {
                 currentStatus = $(e.target).data('status');
                 $('#status').val(currentStatus).trigger('change');
-                $('#refColumnTitle').text(currentStatus === 'debit' ? 'Invoice No' : 'Order No');
+                if (currentStatus === 'debit') {
+                    $('#refColumnTitle').text('Bill No');
+                } else if (currentStatus === 'expense') {
+                    $('#refColumnTitle').text('Expense No');
+                } else {
+                    $('#refColumnTitle').text('Order No');
+                }
                 fetchCashbook(1); // reset to page 1
             });
 
@@ -794,10 +926,12 @@
                             response.data.forEach((item, index) => {
                                 let amount = parseFloat(item.payment_amount) || 0;
                                 let detailsId = `details-${currentPage}-${index}`;
+                                let partyName = item.user_name || 'N/A';
 
                                 rows.push([
                                     `<div>
-                                    <span>${item.order_number || '-'}</span>
+                                        <span class="cashbook-mobile-party">${partyName}</span>
+                                    <span class="cashbook-mobile-ref">${item.order_number || '-'}</span>
                                     <div class="collapse mt-2 d-lg-none" id="${detailsId}">
                                         <div class="collapse-details">
                                             <div class="detail-item">
@@ -812,6 +946,26 @@
                                                 <span class="detail-label">Amount:</span>
                                                 <span class="detail-value">₹${indianCurrency(amount)}</span>
                                             </div>
+                                            <div class="detail-item">
+                                                <span class="detail-label">Action:</span>
+                                                <span class="detail-value">
+                                                    <div class="d-flex gap-1">
+                                                        <button class="btn btn-sm btn-warning py-0 px-2 cashbook-edit-btn"
+                                                            data-id="${item.id}"
+                                                            data-amount="${item.payment_amount}"
+                                                            data-date="${item.payment_date}"
+                                                            data-remarks="${item.remarks || ''}"
+                                                            title="Edit">
+                                                            <i class="fas fa-edit"></i>
+                                                        </button>
+                                                        <button class="btn btn-sm btn-danger py-0 px-2 cashbook-delete-btn"
+                                                            data-id="${item.id}"
+                                                            title="Delete">
+                                                            <i class="fas fa-trash"></i>
+                                                        </button>
+                                                    </div>
+                                                </span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>`,
@@ -820,7 +974,22 @@
                                     `₹${indianCurrency(amount)}`,
                                     `<a href="#${detailsId}" class="toggle-details" data-bs-toggle="collapse">
                                     <i class="fas fa-plus-circle" style="color: #ff9f43;"></i>
-                                </a>`
+                                </a>`,
+                                    `<div class="d-flex gap-1 justify-content-center">
+                                        <button class="btn btn-sm btn-warning py-0 px-2 cashbook-edit-btn"
+                                            data-id="${item.id}"
+                                            data-amount="${item.payment_amount}"
+                                            data-date="${item.payment_date}"
+                                            data-remarks="${item.remarks || ''}"
+                                            title="Edit">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-danger py-0 px-2 cashbook-delete-btn"
+                                            data-id="${item.id}"
+                                            title="Delete">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>`
                                 ]);
                             });
 
@@ -857,20 +1026,132 @@
                 $('#pagination-total').text(pagination.total);
 
                 let paginationHtml = '';
-                let startPage = Math.max(1, pagination.current_page - 2);
-                let endPage = Math.min(pagination.last_page, startPage + 4);
-                if (endPage - startPage < 4) {
-                    startPage = Math.max(1, endPage - 4);
-                }
-                for (let i = startPage; i <= endPage; i++) {
-                    paginationHtml += `
-                    <li class="page-item ${i === pagination.current_page ? 'active' : ''}">
-                        <a class="page-link" href="javascript:void(0);" data-page="${i}">${i}</a>
+                let currentPage = pagination.current_page || 1;
+                let lastPage = pagination.last_page || 1;
+                paginationHtml += `
+                    <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+                        <a class="page-link" href="javascript:void(0);" data-page="${currentPage - 1}">Previous</a>
                     </li>
                 `;
+
+                const visiblePageCount = 2;
+                let startPage = Math.floor((currentPage - 1) / visiblePageCount) * visiblePageCount + 1;
+                let endPage = Math.min(lastPage, startPage + visiblePageCount - 1);
+
+                if (startPage > 1) {
+                    paginationHtml += `
+                        <li class="page-item">
+                            <a class="page-link" href="javascript:void(0);" data-page="${startPage - 1}" data-action="prev-group">..</a>
+                        </li>
+                    `;
                 }
+
+                for (let i = startPage; i <= endPage; i++) {
+                    paginationHtml += `
+                        <li class="page-item ${i === currentPage ? 'active' : ''}">
+                            <a class="page-link" href="javascript:void(0);" data-page="${i}">${i}</a>
+                        </li>
+                    `;
+                }
+
+                if (endPage < lastPage) {
+                    paginationHtml += `
+                        <li class="page-item">
+                            <a class="page-link" href="javascript:void(0);" data-page="${endPage + 1}" data-action="next-group">..</a>
+                        </li>
+                    `;
+                }
+
+                paginationHtml += `
+                    <li class="page-item ${currentPage === lastPage || lastPage === 0 ? 'disabled' : ''}">
+                        <a class="page-link" href="javascript:void(0);" data-page="${currentPage + 1}">Next</a>
+                    </li>
+                `;
+
                 $('#pagination-numbers').html(paginationHtml);
             }
+
+            // ── Edit button click ──
+            $(document).on('click', '.cashbook-edit-btn', function () {
+                let id      = $(this).data('id');
+                let amount  = $(this).data('amount');
+                let dateRaw = $(this).data('date');   // dd-mm-yyyy from API
+                let remarks = $(this).data('remarks');
+
+                // Convert dd-mm-yyyy → yyyy-mm-dd for date input
+                let parts = String(dateRaw).split('-');
+                let isoDate = parts.length === 3 ? `${parts[2]}-${parts[1]}-${parts[0]}` : dateRaw;
+
+                $('#cb_edit_id').val(id);
+                $('#cb_edit_amount').val(amount);
+                $('#cb_edit_date').val(isoDate);
+                $('#cb_edit_remarks').val(remarks);
+                $('#cashbookEditModal').modal('show');
+            });
+
+            // ── Save edit ──
+            $('#cb_save_edit_btn').on('click', function () {
+                let id     = $('#cb_edit_id').val();
+                let amount = $('#cb_edit_amount').val();
+                let date   = $('#cb_edit_date').val();
+                let remark = $('#cb_edit_remarks').val();
+
+                if (!amount || !date) {
+                    Swal.fire({ icon: 'warning', title: 'Required', text: 'Date and Amount are required.', confirmButtonColor: '#ff9f43' });
+                    return;
+                }
+
+                $.ajax({
+                    url: `{{ url('/api/payment-store') }}/${id}/update`,
+                    method: 'POST',
+                    headers: { Authorization: 'Bearer ' + authToken },
+                    data: { payment_amount: amount, payment_date: date, remarks: remark, type: currentStatus },
+                    success: function (res) {
+                        if (res.status) {
+                            $('#cashbookEditModal').modal('hide');
+                            Swal.fire({ icon: 'success', title: 'Updated!', text: res.message, confirmButtonColor: '#ff9f43', timer: 1500, showConfirmButton: false });
+                            fetchCashbook(currentPage);
+                        }
+                    },
+                    error: function (xhr) {
+                        Swal.fire({ icon: 'error', title: 'Error', text: xhr.responseJSON?.message || 'Update failed.', confirmButtonColor: '#ff9f43' });
+                    }
+                });
+            });
+
+            // ── Delete button click ──
+            $(document).on('click', '.cashbook-delete-btn', function () {
+                let id = $(this).data('id');
+                Swal.fire({
+                    title: 'Delete Payment?',
+                    text: 'This action cannot be undone.',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#e74c3c',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Yes, Delete'
+                }).then(function (result) {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: `{{ url('/api/payment-store') }}/${id}/delete`,
+                            method: 'POST',
+                            headers: { Authorization: 'Bearer ' + authToken },
+                            data: { type: currentStatus },
+                            success: function (res) {
+                                if (res.status) {
+                                    Swal.fire({ icon: 'success', title: 'Deleted!', text: res.message, confirmButtonColor: '#ff9f43', timer: 1500, showConfirmButton: false });
+                                    fetchCashbook(currentPage);
+                                }
+                            },
+                            error: function (xhr) {
+                                Swal.fire({ icon: 'error', title: 'Error', text: xhr.responseJSON?.message || 'Delete failed.', confirmButtonColor: '#ff9f43' });
+                            }
+                        });
+                    }
+                });
+            });
+
         });
     </script>
 @endpush
+
