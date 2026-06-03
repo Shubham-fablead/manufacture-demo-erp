@@ -216,15 +216,16 @@
                     <thead>
                         <tr>
                             <th style="width:5%; background-color:#ff9f43; color:#fff;">Sr No</th>
-                            <th style="width:15%; background-color:#ff9f43; color:#fff;">Invoice #</th>
+                            <th style="width:15%; background-color:#ff9f43; color:#fff;">Purchase Bill No</th>
                             <th style="width:15%; background-color:#ff9f43; color:#fff;">Vendor</th>
-                            <th style="width:10%; background-color:#ff9f43; color:#fff;">Date</th>
+                            <th style="width:10%; background-color:#ff9f43; color:#fff;">Purchase Date</th>
                             <th style="width:20%; background-color:#ff9f43; color:#fff;">Products</th>
                             <th style="width:10%; background-color:#ff9f43; color:#fff;">Quantities</th>
                             <th style="width:10%; background-color:#ff9f43; color:#fff;">Prices</th>
                             <th style="width:10%; background-color:#ff9f43; color:#fff;">Grand Total</th>
-                            <th style="width:10%; background-color:#ff9f43; color:#fff;">Status</th>
+                            {{-- <th style="width:10%; background-color:#ff9f43; color:#fff;">Purchase Status</th>
                             <th style="width:10%; background-color:#ff9f43; color:#fff;">Payment</th>
+                            --}}
                             <th style="width:10%; background-color:#ff9f43; color:#fff;">Pending</th>
                         </tr>
                     </thead>
@@ -234,13 +235,14 @@
                                 <td class="text-center">{{ $index + 1 }}</td>
                                 <td class="text-center">{{ $purchase->invoice_number }}</td>
                                 <td class="text-center">{{ $purchase->vendor_name }}</td>
-                                <td class="text-center">{{ \Carbon\Carbon::parse($purchase->date)->format('d-m-Y') }}</td>
+                                <td class="text-center">{{ \Carbon\Carbon::parse($purchase->date)->format('d/m/y') }}</td>
                                 <td class="text-center">{{ $purchase->product_names }}</td>
                                 <td class="text-center">{{ $purchase->product_quantities }}</td>
                                 <td class="text-center">{{ $purchase->product_prices }}</td>
                                 <td class="text-center">{{ formatIndian($purchase->grand_total) }}</td>
-                                <td class="text-center">{{ ucfirst($purchase->purchase_status) }}</td>
+                                {{-- <td class="text-center">{{ ucfirst($purchase->purchase_status) }}</td>
                                 <td class="text-center">{{ ucfirst($purchase->payment_status) }}</td>
+                                --}}
                                 <td class="text-center">{{ formatIndian($purchase->pending_amount) }}</td>
                             </tr>
                         @endforeach

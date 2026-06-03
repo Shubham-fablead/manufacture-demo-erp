@@ -446,7 +446,7 @@
                 <tr>
                     <td style="padding: 0 0 5px 0;">Purchase Date :</td>
                     <td style="text-align: right; padding: 0 0 5px 0;">
-                        {{ $purchaseDate ? \Carbon\Carbon::parse($purchaseDate)->format('d-m-Y') : '-' }}
+                        {{ $purchaseDate ? \Carbon\Carbon::parse($purchaseDate)->format('d/m/y') : '-' }}
                     </td>
                 </tr>
 

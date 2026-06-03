@@ -304,14 +304,16 @@
                                         Info</div>
                                     <table style="width:100%; font-size: 14px;">
                                         <tr>
-                                            <td>Bill No</td>
+                                            <td>Purchase Bill No</td>
                                             <td style="text-align:right;">{{ $invoice->bill_no ?? $invoice->invoice_number }}</td>
                                         </tr>
                                         <tr>
                                             <td>Purchase Date</td>
-                                            <td style="text-align:right;">{{ $invoice->created_at }}</td>
+                                            <td style="text-align:right;">
+                                                {{ $invoice->created_at ? \Carbon\Carbon::parse($invoice->created_at)->format('d/m/y') : '-' }}
+                                            </td>
                                         </tr>
-                                        <tr>
+                                        {{-- <tr>
                                             <td>Payment Status</td>
                                             <td style="text-align:right;">{{ $invoice->paid ? 'Paid' : 'Unpaid' }}</td>
                                         </tr>
@@ -327,6 +329,7 @@
                                                 </span>
                                             </td>
                                         </tr>
+                                        --}}
                                     </table>
                                  </td>
                              </tr>
@@ -539,7 +542,7 @@
                                         </li>
                                     @endif
 
-                                    <li>
+                                    {{-- <li>
                                         <h4>Return Status</h4>
                                         <h5>
                                             <span style="color: {{ $returnStatusColor }}; font-weight: bold;">
@@ -547,6 +550,7 @@
                                             </span>
                                         </h5>
                                     </li>
+                                    --}}
 
                                     <li class="total">
                                         <h4>Grand Total</h4>
