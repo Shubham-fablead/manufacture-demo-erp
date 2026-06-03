@@ -108,7 +108,7 @@
             white-space: normal;
             word-wrap: break-word;
         }
-        \  /* Custom Pagination Styling */
+        /* Custom Pagination Styling */
         .pagination .page-item .page-link {
             background-color: #5d6d7e;
             /* Dark gray for other pages */
@@ -118,6 +118,20 @@
             padding: 6px 15px;
             border-radius: 6px;
             font-weight: bold;
+        }
+
+        .pagination .page-item:first-child .page-link,
+        .pagination .page-item:last-child .page-link {
+            background-color: #fff;
+            color: #6c757d;
+            border: 1px solid #dee2e6;
+        }
+
+        .pagination .page-item:first-child .page-link:hover,
+        .pagination .page-item:last-child .page-link:hover {
+            background-color: #f8f9fa;
+            color: #495057;
+            border-color: #dee2e6;
         }
 
         .pagination .page-item.active .page-link {
@@ -133,6 +147,14 @@
 
         .pagination .page-item.active .page-link:hover {
             background-color: #e68a35 !important;
+        }
+
+        .pagination .page-item.disabled .page-link {
+            background-color: #fff !important;
+            color: #dee2e6 !important;
+            border: 1px solid #dee2e6 !important;
+            cursor: not-allowed !important;
+            pointer-events: none !important;
         }
 
 
@@ -1354,17 +1376,65 @@
             $pagination.empty();
 
             if (lastPage <= 1) {
+                $pagination.html(`
+                    <li class="page-item disabled">
+                        <a class="page-link invoice-page-link" href="javascript:void(0);" data-page="0">Previous</a>
+                    </li>
+                    <li class="page-item active">
+                        <a class="page-link invoice-page-link" href="javascript:void(0);" data-page="1">1</a>
+                    </li>
+                    <li class="page-item disabled">
+                        <a class="page-link invoice-page-link" href="javascript:void(0);" data-page="2">Next</a>
+                    </li>
+                `);
+                $('.pagination-controls').toggle(total > 0);
                 return;
             }
 
-            for (let page = 1; page <= lastPage; page++) {
-                const activeClass = page === currentPage ? ' active' : '';
-                $pagination.append(`
-                    <li class="page-item${activeClass}">
-                        <a class="page-link" href="#" data-page="${page}">${page}</a>
+            let paginationHtml = '';
+
+            paginationHtml += `
+                <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+                    <a class="page-link invoice-page-link" href="javascript:void(0);" data-page="${currentPage - 1}">Previous</a>
+                </li>
+            `;
+
+            const visiblePageCount = 2;
+            let startPage = Math.floor((currentPage - 1) / visiblePageCount) * visiblePageCount + 1;
+            let endPage = Math.min(lastPage, startPage + visiblePageCount - 1);
+
+            if (startPage > 1) {
+                paginationHtml += `
+                    <li class="page-item">
+                        <a class="page-link invoice-page-link" href="javascript:void(0);" data-page="${startPage - 1}" data-action="prev-group">..</a>
                     </li>
-                `);
+                `;
             }
+
+            for (let page = startPage; page <= endPage; page++) {
+                paginationHtml += `
+                    <li class="page-item ${page === currentPage ? 'active' : ''}">
+                        <a class="page-link invoice-page-link" href="javascript:void(0);" data-page="${page}">${page}</a>
+                    </li>
+                `;
+            }
+
+            if (endPage < lastPage) {
+                paginationHtml += `
+                    <li class="page-item">
+                        <a class="page-link invoice-page-link" href="javascript:void(0);" data-page="${endPage + 1}" data-action="next-group">..</a>
+                    </li>
+                `;
+            }
+
+            paginationHtml += `
+                <li class="page-item ${currentPage === lastPage || lastPage === 0 ? 'disabled' : ''}">
+                    <a class="page-link invoice-page-link" href="javascript:void(0);" data-page="${currentPage + 1}">Next</a>
+                </li>
+            `;
+
+            $pagination.html(paginationHtml);
+            $('.pagination-controls').toggle(total > 0);
         }
 
         function initializeInvoiceTable(rows) {
@@ -1651,13 +1721,30 @@
             });
 
             // Pagination click handler
-            $(document).on('click', '#pagination-numbers .page-link', function(e) {
+            $(document).off('click', '.invoice-page-link').on('click', '.invoice-page-link', function(e) {
                 e.preventDefault();
                 const $parent = $(this).closest('.page-item');
                 if ($parent.hasClass('disabled') || $parent.hasClass('active')) {
                     return;
                 }
                 const page = parseInt($(this).data('page'), 10);
+                const action = $(this).data('action');
+
+                if (action === 'next-group') {
+                    if (page && page >= 1) {
+                        window.loadPurchases(page);
+                    }
+                    return;
+                }
+
+                if (action === 'prev-group') {
+                    const prevStartPage = Math.max(1, page - 2);
+                    if (prevStartPage >= 1) {
+                        window.loadPurchases(prevStartPage);
+                    }
+                    return;
+                }
+
                 if (page && page >= 1) {
                     window.loadPurchases(page);
                 }

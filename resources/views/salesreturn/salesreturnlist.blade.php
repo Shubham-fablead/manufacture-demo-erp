@@ -93,6 +93,20 @@
             font-weight: bold;
         }
 
+        .pagination .page-item:first-child .page-link,
+        .pagination .page-item:last-child .page-link {
+            background-color: #fff;
+            color: #6c757d;
+            border: 1px solid #dee2e6;
+        }
+
+        .pagination .page-item:first-child .page-link:hover,
+        .pagination .page-item:last-child .page-link:hover {
+            background-color: #f8f9fa;
+            color: #495057;
+            border-color: #dee2e6;
+        }
+
         .pagination .page-item.active .page-link {
             background-color: #ff9f43 !important;
             color: #fff;
@@ -105,6 +119,14 @@
 
         .pagination .page-item.active .page-link:hover {
             background-color: #e68a35 !important;
+        }
+
+        .pagination .page-item.disabled .page-link {
+            background-color: #fff !important;
+            color: #dee2e6 !important;
+            border: 1px solid #dee2e6 !important;
+            cursor: not-allowed !important;
+            pointer-events: none !important;
         }
 
         /* Action button styling */
@@ -875,19 +897,93 @@
                 $('#pagination-numbers').html(paginationHtml);
             }
 
+            function updatePaginationUI(pagination) {
+                let from = (pagination.current_page - 1) * pagination.per_page + 1;
+                let to = pagination.current_page * pagination.per_page;
+                if (to > pagination.total) to = pagination.total;
+                if (pagination.total === 0) from = 0;
+
+                $('#pagination-from').text(from);
+                $('#pagination-to').text(to);
+                $('#pagination-total').text(pagination.total);
+
+                let paginationHtml = '';
+
+                paginationHtml += `
+                    <li class="page-item ${pagination.current_page === 1 ? 'disabled' : ''}">
+                        <a class="page-link sales-return-page-link" href="javascript:void(0);" data-page="${pagination.current_page - 1}">Previous</a>
+                    </li>
+                `;
+
+                const visiblePageCount = 2;
+                let startPage = Math.floor((pagination.current_page - 1) / visiblePageCount) * visiblePageCount + 1;
+                let endPage = Math.min(pagination.last_page, startPage + visiblePageCount - 1);
+
+                if (startPage > 1) {
+                    paginationHtml += `
+                        <li class="page-item">
+                            <a class="page-link sales-return-page-link" href="javascript:void(0);" data-page="${startPage - 1}" data-action="prev-group">..</a>
+                        </li>
+                    `;
+                }
+
+                for (let i = startPage; i <= endPage; i++) {
+                    paginationHtml += `
+                        <li class="page-item ${i === pagination.current_page ? 'active' : ''}">
+                            <a class="page-link sales-return-page-link" href="javascript:void(0);" data-page="${i}">${i}</a>
+                        </li>
+                    `;
+                }
+
+                if (endPage < pagination.last_page) {
+                    paginationHtml += `
+                        <li class="page-item">
+                            <a class="page-link sales-return-page-link" href="javascript:void(0);" data-page="${endPage + 1}" data-action="next-group">..</a>
+                        </li>
+                    `;
+                }
+
+                paginationHtml += `
+                    <li class="page-item ${pagination.current_page === pagination.last_page || pagination.last_page === 0 ? 'disabled' : ''}">
+                        <a class="page-link sales-return-page-link" href="javascript:void(0);" data-page="${pagination.current_page + 1}">Next</a>
+                    </li>
+                `;
+
+                $('#pagination-numbers').html(paginationHtml);
+                $('.pagination-controls').toggle(pagination.total > 0);
+            }
+
+            $(document).off('click', '#pagination-numbers .page-link')
+                .off('click', '.sales-return-page-link')
+                .on('click', '.sales-return-page-link', function(e) {
+                    e.preventDefault();
+                    const action = $(this).data('action');
+                    let page = $(this).data('page');
+
+                    if (action === 'next-group') {
+                        if (page && page >= 1) {
+                            fetchSalesReturns(page);
+                        }
+                        return;
+                    }
+
+                    if (action === 'prev-group') {
+                        const prevStartPage = Math.max(1, page - 2);
+                        if (prevStartPage >= 1) {
+                            fetchSalesReturns(prevStartPage);
+                        }
+                        return;
+                    }
+
+                    if (page && page !== currentPage && page >= 1 && page <= lastPage) {
+                        fetchSalesReturns(page);
+                    }
+                });
+
             // Search
             $('#search-input').on('keyup', function() {
                 searchQuery = $(this).val();
                 fetchSalesReturns(1);
-            });
-
-            // Pagination click
-            $(document).on('click', '#pagination-numbers .page-link', function(e) {
-                e.preventDefault();
-                let page = $(this).data('page');
-                if (page && page !== currentPage && page >= 1 && page <= lastPage) {
-                    fetchSalesReturns(page);
-                }
             });
 
             // Per-page change

@@ -444,6 +444,20 @@
             font-weight: bold;
         }
 
+        .pagination .page-item:first-child .page-link,
+        .pagination .page-item:last-child .page-link {
+            background-color: #fff;
+            color: #6c757d;
+            border: 1px solid #dee2e6;
+        }
+
+        .pagination .page-item:first-child .page-link:hover,
+        .pagination .page-item:last-child .page-link:hover {
+            background-color: #f8f9fa;
+            color: #495057;
+            border-color: #dee2e6;
+        }
+
         .pagination .page-item.active .page-link {
             background-color: #ff9f43 !important;
             color: #fff;
@@ -456,6 +470,14 @@
 
         .pagination .page-item.active .page-link:hover {
             background-color: #e68a35 !important;
+        }
+
+        .pagination .page-item.disabled .page-link {
+            background-color: #fff !important;
+            color: #dee2e6 !important;
+            border: 1px solid #dee2e6 !important;
+            cursor: not-allowed !important;
+            pointer-events: none !important;
         }
 
         /* Search input styling */
@@ -1033,43 +1055,96 @@
             //     $("#pagination-numbers").html(paginationHtml);
             // }
             function renderPagination(pagination) {
-    lastPage = pagination.last_page;
-    currentPage = pagination.current_page;
-    let total = pagination.total;
-    let perPage = pagination.per_page;
+                lastPage = pagination.last_page;
+                currentPage = pagination.current_page;
+                let total = pagination.total;
+                let perPage = pagination.per_page;
 
-    let from = total > 0 ? (currentPage - 1) * perPage + 1 : 0;
-    let to = Math.min(currentPage * perPage, total);
+                let from = total > 0 ? (currentPage - 1) * perPage + 1 : 0;
+                let to = Math.min(currentPage * perPage, total);
 
-    $("#pagination-from").text(from);
-    $("#pagination-to").text(to);
-    $("#pagination-total").text(total);
+                $("#pagination-from").text(from);
+                $("#pagination-to").text(to);
+                $("#pagination-total").text(total);
 
-    let paginationHtml = "";
+                let paginationHtml = "";
 
-    let startPage = Math.max(1, currentPage - 2);
-    let endPage = Math.min(lastPage, startPage + 4);
+                paginationHtml += `
+                    <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+                        <a class="page-link advance-page-link" href="javascript:void(0);" data-page="${currentPage - 1}">Previous</a>
+                    </li>
+                `;
 
-    if (endPage - startPage < 4) {
-        startPage = Math.max(1, endPage - 4);
-    }
+                const visiblePageCount = 2;
+                let startPage = Math.floor((currentPage - 1) / visiblePageCount) * visiblePageCount + 1;
+                let endPage = Math.min(lastPage, startPage + visiblePageCount - 1);
 
-    for (let i = startPage; i <= endPage; i++) {
-        paginationHtml += `
-            <li class="page-item ${i === currentPage ? 'active' : ''}">
-                <a class="page-link" href="javascript:void(0);" onclick="changePage(${i})">${i}</a>
-            </li>
-        `;
-    }
+                if (startPage > 1) {
+                    paginationHtml += `
+                        <li class="page-item">
+                            <a class="page-link advance-page-link" href="javascript:void(0);" data-page="${startPage - 1}" data-action="prev-group">..</a>
+                        </li>
+                    `;
+                }
 
-    $("#pagination-numbers").html(paginationHtml);
-}
+                for (let i = startPage; i <= endPage; i++) {
+                    paginationHtml += `
+                        <li class="page-item ${i === currentPage ? 'active' : ''}">
+                            <a class="page-link advance-page-link" href="javascript:void(0);" data-page="${i}">${i}</a>
+                        </li>
+                    `;
+                }
+
+                if (endPage < lastPage) {
+                    paginationHtml += `
+                        <li class="page-item">
+                            <a class="page-link advance-page-link" href="javascript:void(0);" data-page="${endPage + 1}" data-action="next-group">..</a>
+                        </li>
+                    `;
+                }
+
+                paginationHtml += `
+                    <li class="page-item ${currentPage === lastPage || lastPage === 0 ? 'disabled' : ''}">
+                        <a class="page-link advance-page-link" href="javascript:void(0);" data-page="${currentPage + 1}">Next</a>
+                    </li>
+                `;
+
+                $("#pagination-numbers").html(paginationHtml);
+                $(".pagination-controls").toggle(total > 0);
+            }
 
             // Define changePage globally so it can be called from onclick
             window.changePage = function(page) {
                 if (page < 1 || page > lastPage) return;
                 fetchAdvancePayments(page);
             };
+
+            $(document).off('click', '.advance-page-link')
+                .on('click', '.advance-page-link', function(e) {
+                    e.preventDefault();
+                    let page = $(this).data('page');
+                    let action = $(this).data('action');
+
+                    if (action === 'next-group') {
+                        if (page && page <= lastPage) {
+                            fetchAdvancePayments(page);
+                        }
+                        return;
+                    }
+
+                    if (action === 'prev-group') {
+                        let prevStartPage = Math.max(1, page - 2);
+                        if (prevStartPage >= 1 && prevStartPage <= lastPage) {
+                            fetchAdvancePayments(prevStartPage);
+                        }
+                        return;
+                    }
+
+                    page = parseInt(page);
+                    if (page && page !== currentPage && page >= 1 && page <= lastPage) {
+                        fetchAdvancePayments(page);
+                    }
+                });
 
             // When any filter changes, reload data
             $("#filterStaffName, #filterYear, #filterMonth").on("change", function() {

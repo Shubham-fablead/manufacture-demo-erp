@@ -178,7 +178,12 @@ class IncomeSheetController extends Controller
 
         // Period
         $sheet->setCellValue("A$row", 'Period:');
-        $sheet->setCellValue("B$row", $data['period']['start'] . ' to ' . $data['period']['end']);
+        $sheet->setCellValue(
+            "B$row",
+            \Carbon\Carbon::parse($data['period']['start'])->format('d/m/Y') .
+                ' to ' .
+                \Carbon\Carbon::parse($data['period']['end'])->format('d/m/Y')
+        );
         $row += 2;
 
         // Revenue Section
