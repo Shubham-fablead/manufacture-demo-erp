@@ -53,6 +53,12 @@ class AutoPermission
             return $next($request);
         }
 
+        // Allow staff to access their own attendance, leave, and payroll features without explicit permissions.
+        // The respective controllers (AttendanceeController, LeaveController, PayrollController) inherently limit staff to their own records.
+        if ($user->role === 'staff' && in_array($module, ['attendence', 'attendance', 'leave', 'payroll'], true)) {
+            return $next($request);
+        }
+
         // Notifications list/detail should be available to authenticated staff users.
         if ($module === 'notifications') {
             return $next($request);
@@ -60,6 +66,11 @@ class AutoPermission
 
         // Global header search should be available for authenticated users.
         if ($normalizedRouteName === 'users.ajaxsearch') {
+            return $next($request);
+        }
+
+        // Allow check-in / check-out API calls for all authenticated users
+        if (in_array($normalizedRouteName, ['staff.checkstatus', 'staff.checkin', 'staff.checkout'], true)) {
             return $next($request);
         }
 

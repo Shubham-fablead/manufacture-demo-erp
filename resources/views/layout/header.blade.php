@@ -944,6 +944,23 @@
                 </div>
             @endif
 
+            @if ($user->role === 'staff')
+            <div class="d-none d-lg-flex align-items-center me-3">
+                <button class="btn-check-in"
+                    style="display:none; align-items:center; height:38px; background:#ff9f43; color:#fff;
+                           border:none; border-radius:6px; padding:0 15px; font-weight:600;
+                           font-size:13px; cursor:pointer; gap:6px; white-space:nowrap;">
+                    <i class="fa fa-sign-in-alt"></i>&nbsp;Check In
+                </button>
+                <button class="btn-check-out"
+                    style="display:none; align-items:center; height:38px; background:#ff9f43; color:#fff;
+                           border:none; border-radius:6px; padding:0 15px; font-weight:600;
+                           font-size:13px; cursor:pointer; gap:6px; white-space:nowrap;">
+                    <i class="fa fa-sign-out-alt"></i>&nbsp;Check Out
+                </button>
+            </div>
+            @endif
+
             <!-- Search Field Container -->
             <div class="header-search d-flex align-items-center position-relative me-3 ">
                 <!-- Search Icon -->
@@ -1072,6 +1089,23 @@
             </div>
         </li>
     </ul>
+
+    @if ($user->role === 'staff')
+    <div class="mobile-attendance-btn d-lg-none" style="position: absolute; right: 55px; top: 13px;">
+        <button class="btn-check-in"
+            style="display:flex; align-items:center; height:34px; background:#ff9f43; color:#fff;
+                   border:none; border-radius:6px; padding:0 12px; font-weight:600;
+                   font-size:12px; cursor:pointer; gap:4px; white-space:nowrap;">
+            <i class="fa fa-sign-in-alt"></i>&nbsp;Check In
+        </button>
+        <button class="btn-check-out"
+            style="display:none; align-items:center; height:34px; background:#ff9f43; color:#fff;
+                   border:none; border-radius:6px; padding:0 12px; font-weight:600;
+                   font-size:12px; cursor:pointer; gap:4px; white-space:nowrap;">
+            <i class="fa fa-sign-out-alt"></i>&nbsp;Check Out
+        </button>
+    </div>
+    @endif
 
     <div class="dropdown mobile-user-menu">
         <a href="javascript:void(0);" class="nav-link dropdown-toggle" data-bs-toggle="dropdown"
@@ -2529,4 +2563,287 @@ function escapeHtml(text) {
         box-shadow: 0 0 0 0.2rem rgba(255, 159, 67, 0.25);
     }
 </style>
+
+    {{-- ==================== ATTENDANCE CHECK IN/OUT (same as omsai-ERP) ==================== --}}
+    <script>
+        (function() {
+            // Guard: only run for staff role
+            console.log('[Attendance] currentUserRole =', typeof currentUserRole !== 'undefined' ? currentUserRole : 'UNDEFINED');
+            if (typeof currentUserRole === 'undefined' || currentUserRole !== 'staff') {
+                console.log('[Attendance] Skipping — user is not staff.');
+                return;
+            }
+
+            var btnIns  = document.querySelectorAll('.btn-check-in');
+            var btnOuts = document.querySelectorAll('.btn-check-out');
+
+            console.log('[Attendance] check-in buttons found:', btnIns.length, '| check-out buttons found:', btnOuts.length);
+
+            if (btnIns.length === 0 || btnOuts.length === 0) return;
+
+            var csrfMeta  = document.querySelector('meta[name="csrf-token"]');
+            var csrfToken = csrfMeta ? csrfMeta.getAttribute('content') : '';
+
+            // ── State helpers ──────────────────────────────────────────────
+            function showCheckIn() {
+                btnIns.forEach(function(btn) { btn.style.display = 'flex'; });
+                btnOuts.forEach(function(btn) { btn.style.display = 'none'; });
+                console.log('[Attendance] → Showing Check In');
+            }
+            function showCheckOut() {
+                btnIns.forEach(function(btn) { btn.style.display = 'none'; });
+                btnOuts.forEach(function(btn) { btn.style.display = 'flex'; });
+                console.log('[Attendance] → Showing Check Out');
+            }
+
+            // ── Fetch today's status on page load ──────────────────────────
+            function fetchStatus() {
+                fetch("{{ route('staff.checkstatus', [], false) }}", {
+                    method: 'GET',
+                    headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+                    credentials: 'same-origin'
+                })
+                .then(function(r) {
+                    console.log('[Attendance] status response HTTP:', r.status);
+                    return r.ok ? r.json() : Promise.reject('HTTP ' + r.status);
+                })
+                .then(function(data) {
+                    console.log('[Attendance] status data:', data);
+                    if (data.status === 'checked_in') {
+                        showCheckOut();
+                    } else {
+                        showCheckIn();
+                    }
+                })
+                .catch(function(err) {
+                    console.warn('[Attendance] status fetch failed:', err);
+                    showCheckIn(); // safe fallback
+                });
+            }
+
+            fetchStatus();
+
+            // ── Check In click ─────────────────────────────────────────────
+            btnIns.forEach(function(btn) {
+                btn.addEventListener('click', function() {
+
+                    // Disable all check-in buttons and show spinner
+                    btnIns.forEach(function(b) {
+                        b.disabled = true;
+                        b.innerHTML = '<i class="fa fa-spinner fa-spin"></i>&nbsp;Getting GPS...';
+                    });
+
+                    function resetBtnIns() {
+                        btnIns.forEach(function(b) {
+                            b.disabled = false;
+                            b.innerHTML = '<i class="fa fa-sign-in-alt"></i>&nbsp;Check In';
+                        });
+                    }
+
+                    async function doCheckIn(latitude, longitude) {
+                        btnIns.forEach(function(b) {
+                            b.innerHTML = '<i class="fa fa-spinner fa-spin"></i>&nbsp;Checking In...';
+                        });
+
+                        var body = {};
+                        if (latitude !== undefined && longitude !== undefined) {
+                            body.check_in_latitude  = latitude;
+                            body.check_in_longitude = longitude;
+                            
+                            try {
+                                btnIns.forEach(function(b) { b.innerHTML = '<i class="fa fa-spinner fa-spin"></i>&nbsp;Getting Address...'; });
+                                let geoRes = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`);
+                                let geoData = await geoRes.json();
+                                if (geoData && geoData.display_name) {
+                                    body.check_in_location_name = geoData.display_name;
+                                }
+                            } catch (e) {
+                                console.warn('[CheckIn] Geocoding failed:', e);
+                            }
+                            
+                            btnIns.forEach(function(b) { b.innerHTML = '<i class="fa fa-spinner fa-spin"></i>&nbsp;Checking In...'; });
+                        }
+
+                        fetch("{{ route('staff.checkin', [], false) }}", {
+                            method: 'POST',
+                            headers: {
+                                'Accept': 'application/json',
+                                'Content-Type': 'application/json',
+                                'X-Requested-With': 'XMLHttpRequest',
+                                'X-CSRF-TOKEN': csrfToken
+                            },
+                            credentials: 'same-origin',
+                            body: JSON.stringify(body)
+                        })
+                        .then(async function(r) {
+                            var text = await r.text();
+                            try {
+                                var data = JSON.parse(text);
+                                return { ok: r.ok, status: r.status, data: data };
+                            } catch (e) {
+                                console.error('[CheckIn] Server returned non-JSON:', text);
+                                throw new Error('Server returned an invalid response (HTTP ' + r.status + ')');
+                            }
+                        })
+                        .then(function(res) {
+                            var data = res.data;
+                            if (res.ok || data.success) {
+                                Swal.fire({ toast:true, position:'top', icon:'success', title: data.message || 'Checked In successfully.', showConfirmButton:false, timer:2000, timerProgressBar:true })
+                                    .then(function() { window.location.reload(); });
+                                showCheckOut();
+                            } else {
+                                Swal.fire({ toast:true, position:'top', icon:'error', title: data.error || 'Check In failed.', showConfirmButton:false, timer:5000 });
+                            }
+                        })
+                        .catch(function(err) {
+                            console.error('[CheckIn] Request failed:', err);
+                            Swal.fire({ toast:true, position:'top', icon:'error', title: err.message || 'Check In failed. Please try again.', showConfirmButton:false, timer:5000 });
+                        })
+                        .finally(resetBtnIns);
+                    }
+
+                    // Get GPS then check in
+                    if (navigator.geolocation) {
+                        navigator.geolocation.getCurrentPosition(
+                            function(position) {
+                                var lat      = position.coords.latitude;
+                                var lon      = position.coords.longitude;
+                                var accuracy = position.coords.accuracy;
+                                console.log('[CheckIn] GPS: ' + lat + ', ' + lon + ' | Accuracy: ' + accuracy + 'm');
+                                doCheckIn(lat, lon);
+                            },
+                            function(error) {
+                                console.warn('[CheckIn] GPS error (code ' + error.code + '):', error.message);
+                                if (error.code === 1) {
+                                    Swal.fire({
+                                        icon: 'warning',
+                                        title: 'Location Access Required',
+                                        html: 'Please allow location access in your browser and try again.<br><br><small>On iPhone: Settings → Safari → Location → Allow</small>',
+                                        confirmButtonText: 'OK'
+                                    });
+                                    resetBtnIns();
+                                } else {
+                                    // GPS timeout / unavailable — proceed without coords
+                                    doCheckIn();
+                                }
+                            },
+                            { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
+                        );
+                    } else {
+                        doCheckIn();
+                    }
+
+                }); // end click listener
+            }); // end btnIns.forEach
+
+            // ── Check Out click ────────────────────────────────────────────
+            btnOuts.forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    btnOuts.forEach(function(b) {
+                        b.disabled = true;
+                        b.innerHTML = '<i class="fa fa-spinner fa-spin"></i>&nbsp;Getting GPS...';
+                    });
+
+                    async function doCheckOut(latitude, longitude) {
+                        btnOuts.forEach(function(b) {
+                            b.innerHTML = '<i class="fa fa-spinner fa-spin"></i>&nbsp;Checking Out...';
+                        });
+
+                        var body = {};
+                        if (latitude !== undefined && longitude !== undefined) {
+                            body.check_out_latitude  = latitude;
+                            body.check_out_longitude = longitude;
+                            
+                            try {
+                                btnOuts.forEach(function(b) { b.innerHTML = '<i class="fa fa-spinner fa-spin"></i>&nbsp;Getting Address...'; });
+                                let geoRes = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`);
+                                let geoData = await geoRes.json();
+                                if (geoData && geoData.display_name) {
+                                    body.check_out_location_name = geoData.display_name;
+                                }
+                            } catch (e) {
+                                console.warn('[CheckOut] Geocoding failed:', e);
+                            }
+                            
+                            btnOuts.forEach(function(b) { b.innerHTML = '<i class="fa fa-spinner fa-spin"></i>&nbsp;Checking Out...'; });
+                        }
+
+                        fetch("{{ route('staff.checkout', [], false) }}", {
+                            method: 'POST',
+                            headers: {
+                                'Accept': 'application/json',
+                                'Content-Type': 'application/json',
+                                'X-Requested-With': 'XMLHttpRequest',
+                                'X-CSRF-TOKEN': csrfToken
+                            },
+                            credentials: 'same-origin',
+                            body: JSON.stringify(body)
+                        })
+                        .then(async function(r) {
+                            var text = await r.text();
+                            try {
+                                var data = JSON.parse(text);
+                                return { ok: r.ok, status: r.status, data: data };
+                            } catch (e) {
+                                console.error('[CheckOut] Server returned non-JSON:', text);
+                                throw new Error('Server returned an invalid response (HTTP ' + r.status + ')');
+                            }
+                        })
+                        .then(function(res) {
+                            var data = res.data;
+                            if (res.ok || data.success) {
+                                Swal.fire({ toast:true, position:'top', icon:'success', title: data.message || 'Checked Out successfully.', showConfirmButton:false, timer:2000, timerProgressBar:true })
+                                    .then(function() { window.location.reload(); });
+                                showCheckIn();
+                            } else {
+                                Swal.fire({ toast:true, position:'top', icon:'error', title: data.error || 'Check Out failed.', showConfirmButton:false, timer:5000 });
+                            }
+                        })
+                        .catch(function(err) {
+                            console.error('[CheckOut] Request failed:', err);
+                            Swal.fire({ toast:true, position:'top', icon:'error', title: err.message || 'Check Out failed. Please try again.', showConfirmButton:false, timer:5000 });
+                        })
+                        .finally(function() {
+                            btnOuts.forEach(function(b) { 
+                                b.disabled = false; 
+                                b.innerHTML = '<i class="fa fa-sign-out-alt"></i>&nbsp;Check Out';
+                            });
+                        });
+                    }
+
+                    if (navigator.geolocation) {
+                        navigator.geolocation.getCurrentPosition(
+                            function(position) {
+                                var lat = position.coords.latitude;
+                                var lon = position.coords.longitude;
+                                doCheckOut(lat, lon);
+                            },
+                            function(error) {
+                                console.warn('[CheckOut] GPS error:', error.message);
+                                if (error.code === 1) {
+                                    Swal.fire({
+                                        icon: 'warning',
+                                        title: 'Location Access Required',
+                                        html: 'Please allow location access in your browser and try again.',
+                                        confirmButtonText: 'OK'
+                                    });
+                                    btnOuts.forEach(function(b) { 
+                                        b.disabled = false; 
+                                        b.innerHTML = '<i class="fa fa-sign-out-alt"></i>&nbsp;Check Out';
+                                    });
+                                } else {
+                                    doCheckOut();
+                                }
+                            },
+                            { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
+                        );
+                    } else {
+                        doCheckOut();
+                    }
+                });
+            });
+
+        })();
+    </script>
+
 @endpush

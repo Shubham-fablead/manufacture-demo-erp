@@ -350,27 +350,7 @@
                         </ul>
                     </li>
                 @endif
-                @if (auth()->user()->role === 'staff')
-                {{-- ====== STAFF WORKSPACE SECTION ====== --}}
-                <li style="padding: 14px 16px 6px; font-size: 11px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; color: #28a745;">
-                    My Workspace
-                </li>
-                <li>
-                    <a href="{{ route('attendence.calendar') }}">
-                        <i class="fa fa-clock"></i><span> My Attendance</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="{{ route('leave.request') }}">
-                        <i class="fa fa-calendar-alt"></i><span> My Leaves</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="{{ route('payroll.list') }}">
-                        <i class="fa fa-money-check-dollar"></i><span> My Payroll</span>
-                    </a>
-                </li>
-                @endif
+
 
                 @if (in_array(auth()->user()->role, ['admin', 'hr', 'sub-admin', 'staff']))
                 {{-- ====== HR MODULE SECTION ====== --}}
@@ -432,7 +412,7 @@
                 @endif
 
                 {{-- Payroll --}}
-                @if (app('hasPermission')(29, 'view') || app('hasPermission')(29, 'add'))
+                @if (app('hasPermission')(29, 'view') || app('hasPermission')(29, 'add') || auth()->user()->role === 'staff')
                     <li class="submenu">
                         <a href="javascript:void(0);">
                             <i class="fa fa-money-check-dollar"></i>
