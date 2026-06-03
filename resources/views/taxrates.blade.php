@@ -43,14 +43,49 @@
             top: 7px !important;
         }
 
-        .pagination .page-item.active .page-link {
-            background-color: #ff9f43 !important;
-            border-color: #ff9f43 !important;
-            color: #fff !important;
+        .pagination .page-item .page-link {
+            background-color: #5d6d7e;
+            color: #fff;
+            border: none;
+            margin: 0 3px;
+            padding: 4px 10px;
+            font-weight: bold;
         }
 
-        .pagination .page-link {
-            color: #1b2850;
+        .pagination .page-item.active .page-link {
+            background-color: #ff9f43 !important;
+            color: #fff;
+        }
+
+        .pagination .page-item .page-link:hover {
+            background-color: #4a5766;
+            color: #fff;
+        }
+
+        .pagination .page-item.active .page-link:hover {
+            background-color: #e68a35 !important;
+        }
+
+        .pagination .page-item:first-child .page-link,
+        .pagination .page-item:last-child .page-link {
+            background-color: #fff;
+            color: #6c757d;
+            border: 1px solid #dee2e6;
+        }
+
+        .pagination .page-item:first-child .page-link:hover,
+        .pagination .page-item:last-child .page-link:hover {
+            background-color: #f8f9fa;
+            color: #495057;
+            border-color: #dee2e6;
+        }
+
+        .pagination .page-item.disabled .page-link {
+            background-color: #fff !important;
+            color: #dee2e6 !important;
+            border: 1px solid #dee2e6 !important;
+            cursor: not-allowed !important;
+            pointer-events: none !important;
         }
 #tax-rates-table {
     width: 100% !important;
@@ -733,27 +768,33 @@
             }
 
             function updatePaginationUI(pagination) {
-                let from = (pagination.current_page - 1) * pagination.per_page + 1;
+                let from = (pagination.current_page - 1) * pagination.per_page;
                 let to = pagination.current_page * pagination.per_page;
-
-                if (to > pagination.total) {
-                    to = pagination.total;
-                }
-
-                if (pagination.total === 0) {
-                    from = 0;
-                }
+                if (to > pagination.total) to = pagination.total;
+                if (pagination.total === 0) from = 0;
 
                 $('#tax-pagination-from').text(from);
                 $('#tax-pagination-to').text(to);
                 $('#tax-pagination-total').text(pagination.total);
 
                 let paginationHtml = '';
-                let startPage = Math.max(1, pagination.current_page - 2);
-                let endPage = Math.min(pagination.last_page, startPage + 4);
 
-                if (endPage - startPage < 4) {
-                    startPage = Math.max(1, endPage - 4);
+                paginationHtml += `
+                    <li class="page-item ${pagination.current_page === 1 ? 'disabled' : ''}">
+                        <a class="page-link tax-page-link" href="javascript:void(0);" data-page="${pagination.current_page - 1}">Previous</a>
+                    </li>
+                `;
+
+                const visiblePageCount = 2;
+                let startPage = Math.floor((pagination.current_page - 1) / visiblePageCount) * visiblePageCount + 1;
+                let endPage = Math.min(pagination.last_page, startPage + visiblePageCount - 1);
+
+                if (startPage > 1) {
+                    paginationHtml += `
+                        <li class="page-item">
+                            <a class="page-link tax-page-link" href="javascript:void(0);" data-page="${startPage - 1}" data-action="prev-group">..</a>
+                        </li>
+                    `;
                 }
 
                 for (let i = startPage; i <= endPage; i++) {
@@ -764,13 +805,44 @@
                     `;
                 }
 
+                if (endPage < pagination.last_page) {
+                    paginationHtml += `
+                        <li class="page-item">
+                            <a class="page-link tax-page-link" href="javascript:void(0);" data-page="${endPage + 1}" data-action="next-group">..</a>
+                        </li>
+                    `;
+                }
+
+                paginationHtml += `
+                    <li class="page-item ${pagination.current_page === pagination.last_page || pagination.last_page === 0 ? 'disabled' : ''}">
+                        <a class="page-link tax-page-link" href="javascript:void(0);" data-page="${pagination.current_page + 1}">Next</a>
+                    </li>
+                `;
+
                 $('#tax-pagination-numbers').html(paginationHtml);
-                $('.pagination-controls').toggle(pagination.total > 0);
+                $('.pagination-controls').show();
             }
 
-            $(document).on('click', '.tax-page-link', function (e) {
+            $(document).on('click', '#tax-pagination-numbers .tax-page-link', function (e) {
                 e.preventDefault();
                 let page = $(this).data('page');
+                let action = $(this).data('action');
+
+                if (action === 'next-group') {
+                    if (page && page <= lastPage) {
+                        loadTaxRates(page);
+                    }
+                    return;
+                }
+
+                if (action === 'prev-group') {
+                    let prevStartPage = Math.max(1, page - 2);
+                    if (prevStartPage >= 1 && prevStartPage <= lastPage) {
+                        loadTaxRates(prevStartPage);
+                    }
+                    return;
+                }
+
                 if (page && page !== currentPage && page >= 1 && page <= lastPage) {
                     loadTaxRates(page);
                 }
