@@ -80,6 +80,11 @@
                                           </div>
                                           <hr>
                                           <div class="row">
+                                              <div class="col-lg-3 col-md-4 label">GST Number</div>
+                                              <div class="col-lg-9 col-md-8"><span class="profile-gst_number"></span></div>
+                                          </div>
+                                          <hr>
+                                          <div class="row">
                                               <div class="col-lg-3 col-md-4 label">Address</div>
                                               <div class="col-lg-9 col-md-8"><span class="profile-address"></span></div>
                                           </div>
@@ -148,6 +153,7 @@
                       $('.profile-role').text(res.role ?? 'N/A');
                       $('.profile-email').text(res.email ?? 'N/A');
                       $('.profile-phone').text(res.phone ?? 'N/A');
+                      $('.profile-gst_number').text(res.gst_number ?? 'N/A');
                       $('.profile-role').text(res.role ?? 'N/A');
                       $('.profile-address').text(res.address ?? 'N/A');
                       $('.profile-country').text(res.country ?? 'N/A');

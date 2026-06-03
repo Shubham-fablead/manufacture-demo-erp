@@ -17,6 +17,22 @@ use Illuminate\Support\Facades\Validator;
 
 class SalaryController extends Controller
 {
+    private function resolveAccessibleBranchId($user, $selectedSubAdminId = null)
+    {
+        if ($user->role === 'staff') {
+            return $user->branch_id;
+        }
+
+        if (!empty($selectedSubAdminId)) {
+            return $selectedSubAdminId;
+        }
+
+        if ($user->role === 'sub-admin') {
+            return $user->id;
+        }
+
+        return $user->id;
+    }
 
     // public function index(Request $request)
     // {
@@ -134,8 +150,8 @@ class SalaryController extends Controller
     {
         $user               = Auth::guard('api')->user();
         $role               = $user->role;
-        $userBranchId       = $user->id;
         $selectedSubAdminId = $request->query('selectedSubAdminId');
+        $branchId           = $this->resolveAccessibleBranchId($user, $selectedSubAdminId);
 
         // Get pagination parameters
         $page = $request->input('page', 1);
@@ -148,12 +164,10 @@ class SalaryController extends Controller
 
         $query = User::where('role', 'staff')->where('isDeleted', 0);
 
-        if (!empty($selectedSubAdminId)) {
-            $query->where('branch_id', $selectedSubAdminId);
-        } elseif ($role == 'sub-admin') {
-            $query->where('branch_id', $userBranchId);
+        if ($role === 'staff') {
+            $query->where('id', $user->id);
         } else {
-            $query->where('branch_id', $userBranchId);
+            $query->where('branch_id', $branchId);
         }
 
         // Apply search filter
@@ -283,6 +297,14 @@ class SalaryController extends Controller
 
     public function store(Request $request)
     {
+        $authUser = Auth::guard('api')->user();
+        if ($authUser && $authUser->role === 'staff') {
+            return response()->json([
+                'status' => false,
+                'message' => 'You are not allowed to make salary payments.',
+            ], 403);
+        }
+
         // dd($request->all());
         $validator = Validator::make($request->all(), [
             'staff_id'      => 'required|exists:users,id',
@@ -404,6 +426,13 @@ class SalaryController extends Controller
 
     public function update(Request $request, $id)
     {
+        $authUser = Auth::guard('api')->user();
+        if ($authUser && $authUser->role === 'staff') {
+            return response()->json([
+                'status' => false,
+                'message' => 'You are not allowed to edit salary records.',
+            ], 403);
+        }
 
         // ✅ Validate inputs
         $validator = Validator::make($request->all(), [
@@ -666,17 +695,27 @@ class SalaryController extends Controller
     //         ], 500);
     //     }
     // }
-    public function generateStaffPDF(Request $request)
+public function generateStaffPDF(Request $request)
 {
     try {
+        $authUser = Auth::guard('api')->user();
         $staffId = $request->input('staff_id');
         $month = $request->month ?? $request->monthselected;
         $year = $request->year ?? $request->selectedYear1;
+
+        if ($authUser && $authUser->role === 'staff') {
+            $staffId = $authUser->id;
+        }
+
         $staff = User::find($staffId);
-        $branchId = $request->input('selectedSubAdminId') ?? (auth()->user()->branch_id ?? null);
+        $branchId = $this->resolveAccessibleBranchId($authUser, $request->input('selectedSubAdminId'));
 
         if (!$staff) {
             return response()->json(['status' => false, 'message' => 'Staff not found.'], 404);
+        }
+
+        if ($authUser && $authUser->role === 'staff' && (int) $staff->id !== (int) $authUser->id) {
+            return response()->json(['status' => false, 'message' => 'Unauthorized salary slip access.'], 403);
         }
 
         $salary = Salary::where('staff_id', $staffId)
@@ -746,19 +785,16 @@ class SalaryController extends Controller
     {
         $user               = Auth::guard('api')->user();
         $role               = $user->role;
-        $userBranchId       = $user->id; // ✅ should use branch_id, not id
         $selectedSubAdminId = $request->query('selectedSubAdminId');
+        $branchId           = $this->resolveAccessibleBranchId($user, $selectedSubAdminId);
 
         $query = User::where('role', 'staff')
             ->where('isDeleted', 0);
 
-        // ✅ Correct variable name here
-        if (! empty($selectedSubAdminId)) {
-            $query->where('branch_id', $selectedSubAdminId);
-        } elseif ($role == 'sub-admin') {
-            $query->where('branch_id', $userBranchId);
+        if ($role === 'staff') {
+            $query->where('id', $user->id);
         } else {
-            $query->where('branch_id', $userBranchId);
+            $query->where('branch_id', $branchId);
         }
 
         $staff = $query->select('id', 'name')->get();
@@ -782,19 +818,15 @@ class SalaryController extends Controller
         $selectedSubAdminId = $request->input('selectedSubAdminId');
 
         $role         = $user->role;
-        $userBranchId = $user->id;
-        $branchId     = $selectedSubAdminId ?? ($user->branch_id ?? null);
+        $branchId     = $this->resolveAccessibleBranchId($user, $selectedSubAdminId);
 
         // Base query for staff
         $query = User::where('role', 'staff')->where('isDeleted', 0);
 
-        // Branch filtering
-        if ($selectedSubAdminId) {
-            $query->where('branch_id', $selectedSubAdminId);
-        } elseif ($role === 'sub-admin') {
-            $query->where('branch_id', $userBranchId);
+        if ($role === 'staff') {
+            $query->where('id', $user->id);
         } else {
-            $query->where('branch_id', $userBranchId);
+            $query->where('branch_id', $branchId);
         }
 
         // Staff filter
@@ -933,15 +965,18 @@ class SalaryController extends Controller
     public function generatePDF(Request $request)
     {
 
+        $authUser           = Auth::guard('api')->user();
         $staffId            = $request->input('staff_id');
         $month              = $request->input('month', Carbon::now()->month);
         $year               = $request->input('year', Carbon::now()->year);
         $selectedSubAdminId = $request->input('selectedSubAdminId');
-        $user               = Auth::guard('api')->user();
+        $user               = $authUser;
         $role               = $user->role;
-        // $userBranchId       = $user->id;
-            $userBranchId = $user->branch_id;
-        $branchId           = $request->input('selectedSubAdminId') ?? (auth()->user()->branch_id ?? null);
+        $branchId           = $this->resolveAccessibleBranchId($user, $selectedSubAdminId);
+
+        if ($role === 'staff') {
+            $staffId = $user->id;
+        }
 
         $settings = Setting::where('branch_id', $branchId)->first();
         if (! $settings) {
@@ -952,12 +987,10 @@ class SalaryController extends Controller
         $query = User::where('role', 'staff')->where('isDeleted', 0);
 
         // Branch-wise filtering
-        if (! empty($selectedSubAdminId)) {
-            $query->where('branch_id', $selectedSubAdminId);
-        } elseif ($role === 'sub-admin') {
-            $query->where('branch_id', $userBranchId);
+        if ($role === 'staff') {
+            $query->where('id', $user->id);
         } else {
-            $query->where('branch_id', $userBranchId);
+            $query->where('branch_id', $branchId);
         }
 
         // Staff-specific filter
@@ -1081,7 +1114,12 @@ class SalaryController extends Controller
 
     public function getAdvanceHistory(Request $request)
     {
+        $authUser = Auth::guard('api')->user();
         $staffId = $request->query('staff_id');
+
+        if ($authUser && $authUser->role === 'staff') {
+            $staffId = $authUser->id;
+        }
 
         if (! $staffId) {
             return response()->json(['status' => false, 'message' => 'Staff ID required'], 400);

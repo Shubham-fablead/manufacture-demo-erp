@@ -87,27 +87,21 @@
       <script>
           $(document).ready(function() {
 
-              function formatCurrencyIN(value) {
-                  let number = parseFloat(value) || 0;
+                function formatCurrencyIN(value) {
+                    let number = parseFloat(value) || 0;
 
-                  return '₹' + number.toLocaleString('en-IN', {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2
-                  });
-              }
+                    return '₹' + number.toLocaleString('en-IN', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    });
+                }
 
-              function formatDateIN(value) {
-                  if (!value) return 'N/A';
-
-                  const date = new Date(value);
-                  if (isNaN(date.getTime())) return value;
-
-                  const day = String(date.getDate()).padStart(2, '0');
-                  const month = String(date.getMonth() + 1).padStart(2, '0');
-                  const year = date.getFullYear();
-
-                  return `${day}-${month}-${year}`;
-              }
+                function formatDateDDMMYYYY(dateString) {
+                    if (!dateString) return 'N/A';
+                    const parts = dateString.split('-');
+                    if (parts.length !== 3) return dateString;
+                    return `${parts[2]}-${parts[1]}-${parts[0]}`;
+                }
 
               const authToken = localStorage.getItem("authToken");
               const paymentId = '{{ $id }}';
@@ -131,7 +125,7 @@
                       $('.payment-amount').text(
                           res.amount ? formatCurrencyIN(res.amount) : 'N/A'
                       );
-                      $('.payment-date').text(formatDateIN(res.date));
+                      $('.payment-date').text(formatDateDDMMYYYY(res.date));
                       $('.payment-method').text(res.method ?? 'N/A');
                       $('.payment-reason').text(res.reason ?? 'N/A');
 

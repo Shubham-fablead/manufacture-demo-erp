@@ -5,6 +5,15 @@ use App\Http\Controllers\api\AdvancePaymentController;
 use App\Http\Controllers\api\AppointmentController;
 use App\Http\Controllers\api\AttendanceController;
 use App\Http\Controllers\api\SalaryController;
+use App\Http\Controllers\admin\AttendanceeController;
+use App\Http\Controllers\api\PayrollController;
+use App\Http\Controllers\api\HrDashboardController;
+use App\Http\Controllers\admin\CompanyRulesController;
+use App\Http\Controllers\admin\LeaveController as AdminLeaveController;
+use App\Http\Controllers\admin\DepartmentController as AdminDepartmentController;
+use App\Http\Controllers\admin\DesignationController as AdminDesignationController;
+use App\Http\Controllers\admin\HolidaysController as AdminHolidaysController;
+use App\Http\Controllers\admin\LeaveTypeController as AdminLeaveTypeController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -77,6 +86,31 @@ Route::post('/expense/report/view', [ExpenseController::class, 'view_expense_rep
 
 Route::post('login', [LoginController::class, 'login'])->name('login');
 Route::middleware('auth:api')->get('/dashboard-api', [LoginController::class, 'dashboardApi']);
+
+Route::middleware('auth:api')->get('/hr/dashboard-data', function() {
+    return app(\App\Http\Controllers\api\HrDashboardController::class)->getDashboardData();
+});
+
+Route::get('/get-salary', [PayrollController::class, 'getSalary']);
+Route::prefix('payroll')->group(function () {
+    Route::post('/create', [PayrollController::class, 'create']);
+    Route::get('/getAll', [PayrollController::class, 'getAll']);
+    Route::get('/{id}', [PayrollController::class, 'getByEmployee'])->whereNumber('id');
+    Route::get('/details/{id}', [PayrollController::class, 'getProfile'])->whereNumber('id');
+    Route::post('/update/{id}', [PayrollController::class, 'update'])->whereNumber('id');
+    Route::delete('/{id}', [PayrollController::class, 'delete'])->whereNumber('id');
+    Route::post('/get-worked-hours', [PayrollController::class, 'getWorkedHours']);
+    Route::post('/get-working-days', [PayrollController::class, 'getWorkingDays']);
+    Route::post('/calculate-payroll', [PayrollController::class, 'calculatePayroll']);
+    Route::post('/save', [PayrollController::class, 'save']);
+    Route::post('/saveAll', [PayrollController::class, 'saveAll']);
+    Route::post('/get-monthly-leaves', [PayrollController::class, 'getMonthLeaves']);
+    Route::post('/get-leave-details', [PayrollController::class, 'getLeaveDetails']);
+    Route::post('/get-remaining-leaves/{userId}', [PayrollController::class, 'getRemainingPaidLeaves'])->whereNumber('userId');
+    Route::match(['get', 'post'], '/get-deduction-breakdown', [PayrollController::class, 'getDeductionBreakdown']);
+    Route::post('/downloadMultiple', [PayrollController::class, 'downloadMultiple']);
+    Route::post('/downloadMultipleByIds', [PayrollController::class, 'downloadMultipleByIds']);
+});
 
 Route::middleware(['auth.api'])->group(function () {
     Route::get('/sales/invoice/pdf/download/{id}', [SalesController::class, 'salse_invoice_pdf_download'])->name('sales.invoice.pdf.download');
@@ -211,13 +245,11 @@ Route::middleware(['auth.api'])->group(function () {
     Route::post('/debit-note-items/update/{id}', [DebitNoteItemApiController::class, 'update']);
     Route::post('/debit-note-items/delete/{id}', [DebitNoteItemApiController::class, 'destroy']);
 
-
-
-
-
     Route::get('/general-settings', [GeneralSettingController::class, 'show'])->name('general-settings.show');
     Route::post('/general-settings/update', [GeneralSettingController::class, 'update'])->name('general-settings.update');
     Route::post('/company-rules/update', [GeneralSettingController::class, 'updateCompanyRules'])->name('general-company-settings.update');
+    Route::post('/dashboard-settings/update', [GeneralSettingController::class, 'updateDashboardSettings'])->name('general-dashboard-settings.update');
+
 
     Route::post('/connect-device', [ConnectedDevicesController::class, 'connect']);
     Route::get('/check-device/{code}', [ConnectedDevicesController::class, 'check']);
@@ -476,6 +508,94 @@ Route::middleware(['auth.api'])->group(function () {
     Route::get('/units', [ApiUnitController::class, 'index'])->name('units.index');
     Route::post('/update-unit/{id}', [ApiUnitController::class, 'update'])->name('units.update');
     Route::delete('/delete-unit/{id}', [ApiUnitController::class, 'destroy'])->name('units.destroy');
+
+    // ========== HR MODULE - AttendanceeController routes ==========
+    Route::get('/get-employees', [AttendanceeController::class, 'getEmployees']);
+    Route::get('/attendance/absent-reason', [AttendanceeController::class, 'getAbsentReason']);
+    Route::post('/attendance/update-reason', [AttendanceeController::class, 'updateStatus']);
+    Route::post('/attendance/checkin', [AttendanceeController::class, 'checkIn']);
+    Route::post('/attendance/checkout', [AttendanceeController::class, 'checkOut']);
+    // Alias route: handles both check-in and checkout depending on 'action' in the body
+    Route::post('/attendance/check-in', function (\Illuminate\Http\Request $request) {
+        $action = $request->input('action', 'checkin');
+        $controller = app(\App\Http\Controllers\admin\AttendanceeController::class);
+        if ($action === 'checkout') {
+            return $controller->checkOut();
+        }
+        return $controller->checkIn();
+    });
+    Route::get('/attendance/status', [AttendanceeController::class, 'getStatus']);
+    Route::get('/attendance/getAttendanceData', [AttendanceeController::class, 'getAttendanceData']);
+    Route::get('/attendance/getAttendance/{month}/{year}', [AttendanceeController::class, 'getAttendance'])
+        ->whereNumber('month')
+        ->whereNumber('year');
+    Route::get('/dashboard-stats', [AttendanceeController::class, 'getDashboardStats']);
+    Route::get('/leave/getLeaveDetails/{id}', [AttendanceeController::class, 'getLeaveDetails'])->whereNumber('id');
+    Route::get('/attendance/get-face-photo', [AttendanceeController::class, 'getFacePhoto']);
+    Route::post('/attendance/face-checkin', [AttendanceeController::class, 'faceCheckIn']);
+    Route::delete('/attendance/delete-today', [AttendanceeController::class, 'deleteTodayAttendance']);
+    Route::get('/attendance/day-records', [AttendanceeController::class, 'getDayAttendanceRecords']);
+    Route::post('/attendance/update-day-records', [AttendanceeController::class, 'updateDayAttendanceRecords']);
+    Route::post('/attendance/bulk-update', [AttendanceeController::class, 'bulkUpdateAttendanceRecords']);
+
+    // Company Rules API
+    Route::get('/company-rules/rules', [CompanyRulesController::class, 'rules'])->name('company-rules.rules');
+    Route::post('/company-rules/store', [CompanyRulesController::class, 'store'])->name('company-rules.store');
+    Route::get('/rules_get', [CompanyRulesController::class, 'rules_get'])->name('company-rules.rules_get');
+    Route::get('/company-rules/edit/{id}', [CompanyRulesController::class, 'edit'])->name('company-rules.edit');
+    Route::post('/company-rules/update/{id}', [CompanyRulesController::class, 'update'])->name('company-rules.update');
+    Route::delete('/rules/{id}', [CompanyRulesController::class, 'delete'])->name('company-rules.delete');
+    Route::post('/company-rules/calculate-salary', [CompanyRulesController::class, 'calculateSalary'])->name('company-rules.calculate-salary');
+    Route::post('/company-rules/validate-attendance', [CompanyRulesController::class, 'validateAttendance'])->name('company-rules.validate-attendance');
+
+    // Department APIs
+    Route::get('/department', [AdminDepartmentController::class, 'index']);
+    Route::post('/department', [AdminDepartmentController::class, 'store']);
+    Route::post('/department/add', [AdminDepartmentController::class, 'quickStore']);
+    Route::get('/department/{id}', [AdminDepartmentController::class, 'show']);
+    Route::match(['post', 'put', 'patch'], '/department/{id}', [AdminDepartmentController::class, 'update']);
+    Route::delete('/department/{id}', [AdminDepartmentController::class, 'destroy']);
+    Route::get('/departments', [AdminDepartmentController::class, 'all']);
+    Route::get('/getdepartments', [AdminDepartmentController::class, 'all']);
+
+    // Designation APIs
+    Route::get('/designation', [AdminDesignationController::class, 'index']);
+    Route::post('/designation', [AdminDesignationController::class, 'store']);
+    Route::post('/designation/add', [AdminDesignationController::class, 'quickStore']);
+    Route::get('/designation/{id}', [AdminDesignationController::class, 'show']);
+    Route::match(['post', 'put', 'patch'], '/designation/{id}', [AdminDesignationController::class, 'update']);
+    Route::delete('/designation/{id}', [AdminDesignationController::class, 'destroy']);
+    Route::get('/designations', [AdminDesignationController::class, 'all']);
+
+    // Holiday APIs (with compatibility aliases used by old frontend scripts)
+    Route::get('/get_holidays', [AdminHolidaysController::class, 'index']);
+    Route::get('/holidays', [AdminHolidaysController::class, 'index']);
+    Route::post('/holidays/store', [AdminHolidaysController::class, 'store']);
+    Route::post('/holioday/store', [AdminHolidaysController::class, 'store']);
+    Route::get('/holidays/edit_holiday/{id}', [AdminHolidaysController::class, 'editHoliday']);
+    Route::post('/holidays/update', [AdminHolidaysController::class, 'update']);
+    Route::get('/holidays/{id}', [AdminHolidaysController::class, 'show']);
+    Route::match(['put', 'patch'], '/holidays/{id}', [AdminHolidaysController::class, 'update']);
+    Route::delete('/holidays/{id}', [AdminHolidaysController::class, 'destroy']);
+    Route::delete('/holidays/delete/{id}', [AdminHolidaysController::class, 'destroy']);
+
+    // Leave Type APIs
+    Route::get('/leavetype', [AdminLeaveTypeController::class, 'index']);
+    Route::post('/leavetype', [AdminLeaveTypeController::class, 'store']);
+    Route::post('/leavetype/add', [AdminLeaveTypeController::class, 'quickStore']);
+    Route::get('/leavetype/{id}', [AdminLeaveTypeController::class, 'show']);
+    Route::match(['post', 'put', 'patch'], '/leavetype/{id}', [AdminLeaveTypeController::class, 'update']);
+    Route::delete('/leavetype/{id}', [AdminLeaveTypeController::class, 'destroy']);
+
+    // Leave APIs (CodeIgniter compatibility + Laravel routes)
+    Route::get('/leave', [AdminLeaveController::class, 'index']);
+    Route::post('/leave', [AdminLeaveController::class, 'store']);
+    Route::post('/leave/update/{leaveId}', [AdminLeaveController::class, 'updateStatus'])->whereNumber('leaveId');
+    Route::get('/getEmployees', [AdminLeaveController::class, 'getEmployees']);
+    Route::get('/hr/dashboard-data', [HrDashboardController::class, 'getDashboardData']);
+
+    // Staff register face (added in source)
+    Route::post('/staff/register-face', [StaffController::class, 'registerFace'])->name('staff.register-face');
     });
 
       // Follow Up API Routes

@@ -167,6 +167,7 @@
                             @endif
                         </ul>
                     </li>
+                @endif
                 {{-- Purchases --}}
                 @if (app('hasPermission')(3, 'view') || app('hasPermission')(3, 'add'))
                     <li class="submenu">
@@ -349,29 +350,35 @@
                         </ul>
                     </li>
                 @endif
-                {{-- Quotes --}}
-
-                @php
-
-                    $canViewAttendance = app('hasPermission')(26, 'view');
-
-                @endphp
-
                 @if (auth()->user()->role === 'staff')
-
-                    @if ($canViewAttendance)
-                        @if ($canViewAttendance)
-                            {{-- ✅ Only Attendance permission → show directly --}}
-                            <li>
-                                <a href="{{ route('attendance.list') }}">
-                                    <i class="fa fa-clock"></i><span> Attendance</span>
-                                </a>
-                            </li>
-                        @endif
-                    @endif
+                {{-- ====== STAFF WORKSPACE SECTION ====== --}}
+                <li style="padding: 14px 16px 6px; font-size: 11px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; color: #28a745;">
+                    My Workspace
+                </li>
+                <li>
+                    <a href="{{ route('attendence.calendar') }}">
+                        <i class="fa fa-clock"></i><span> My Attendance</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ route('leave.request') }}">
+                        <i class="fa fa-calendar-alt"></i><span> My Leaves</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ route('payroll.list') }}">
+                        <i class="fa fa-money-check-dollar"></i><span> My Payroll</span>
+                    </a>
+                </li>
                 @endif
 
-                {{-- Staff --}}
+                @if (in_array(auth()->user()->role, ['admin', 'hr', 'sub-admin']))
+                {{-- ====== HR MODULE SECTION ====== --}}
+                <li style="padding: 14px 16px 6px; font-size: 11px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; color: #FF9F43;">
+                    HR Workspace
+                </li>
+
+                 {{-- Staff --}}
                 @if (app('hasPermission')(8, 'view'))
                     <li class="submenu">
                         <a href="javascript:void(0);">
@@ -381,26 +388,77 @@
                         <ul>
                             <li><a href="{{ route('staff.list') }}">All Staff</a></li>
                             <li><a href="{{ route('staff.add') }}">New Staff</a></li>
-                            <li><a href="{{ route('attendance.list') }}">Attendance</a></li>
-                            <li><a href="{{ route('salary.list') }}">Salary</a></li>
                         </ul>
                     </li>
                 @endif
-                <!-- <li class="submenu">
-                        <a href="javascript:void(0);"><i class="fa fa-calendar-check"></i><span> Appointment</span>
-                            <span class="menu-arrow"></span></a>
+
+                {{-- Attendance --}}
+                @if (app('hasPermission')(26, 'view') || app('hasPermission')(26, 'add'))
+                    <li class="submenu">
+                        <a href="javascript:void(0);">
+                            <i class="fa fa-clock"></i>
+                            <span> Attendance</span> <span class="menu-arrow"></span>
+                        </a>
                         <ul>
-                            @if (app('hasPermission')(17, 'view'))
-<li><a href="{{ route('appointments.index') }}">All Appointment</a></li>
-@endif
-                            @if (app('hasPermission')(17, 'add'))
-<li><a href="{{ route('appointments.create') }}">New Appointment</a></li>
-@endif
+                            @if (app('hasPermission')(26, 'add') || app('hasPermission')(26, 'view'))
+                                <li><a href="{{ route('attendence.calendar') }}">Manage Attendance</a></li>
+                                <li><a href="{{ route('attendence.summary') }}">Attendance</a></li>
+                            @endif
                         </ul>
-                    </li> -->
+                    </li>
+                @endif
 
+                {{-- Leaves --}}
+                @if (app('hasPermission')(28, 'view') || app('hasPermission')(28, 'add'))
+                    <li class="submenu">
+                        <a href="javascript:void(0);">
+                            <i class="fa fa-calendar-alt"></i>
+                            <span> Leaves</span> <span class="menu-arrow"></span>
+                        </a>
+                        <ul>
+                            @if (in_array(auth()->user()->role, ['admin', 'sub-admin', 'hr']))
+                                @if (app('hasPermission')(28, 'view'))
+                                    <li><a href="{{ route('leave.view') }}">All Leaves</a></li>
+                                @endif
+                            @endif
+                            @if (app('hasPermission')(28, 'view'))
+                                <li><a href="{{ route('leave.request') }}">Leave Request</a></li>
+                            @endif
+                            @if (app('hasPermission')(28, 'add'))
+                                <li><a href="{{ route('leave.add') }}">Add Leave</a></li>
+                            @endif
+                        </ul>
+                    </li>
+                @endif
+
+                {{-- Payroll --}}
+                @if (app('hasPermission')(29, 'view') || app('hasPermission')(29, 'add'))
+                    <li class="submenu">
+                        <a href="javascript:void(0);">
+                            <i class="fa fa-money-check-dollar"></i>
+                            <span> Payroll</span> <span class="menu-arrow"></span>
+                        </a>
+                        <ul>
+                            @if (in_array(auth()->user()->role, ['staff']))
+                                <li><a href="{{ route('payroll.list') }}">View Payroll</a></li>
+                            @endif
+                            @if (in_array(auth()->user()->role, ['hr', 'admin']))
+                                @if (app('hasPermission')(29, 'view'))
+                                    <li><a href="{{ route('payroll.list') }}">Manage Payroll</a></li>
+                                @endif
+                                @if (app('hasPermission')(29, 'add'))
+                                    <li><a href="{{ route('payroll.create') }}">Add Payroll</a></li>
+                                @endif
+                                @if (app('hasPermission')(29, 'view') || app('hasPermission')(29, 'add'))
+                                    <li><a href="{{ route('payroll.salary-details') }}">Group Salary</a></li>
+                                @endif
+                            @endif
+                        </ul>
+                    </li>
+                @endif
+
+                {{-- Advance Pay --}}
                 @if (auth()->user()->role === 'admin')
-
                     <li class="submenu">
                         <a href="javascript:void(0);">
                             <i class="fa fa-money-bill-wave"></i>
@@ -484,6 +542,14 @@
                             @endif
                             @if (app('hasPermission')(14, 'view'))
                                 <li><a href="{{ route('setting.connecteddevices') }}">Connected Devices</a></li>
+                            @endif
+                            {{-- HR Settings --}}
+                            @if (app('hasPermission')(14, 'view'))
+                                <li><a href="{{ route('department.view') }}">Departments</a></li>
+                                <li><a href="{{ route('designation.view') }}">Designations</a></li>
+                                <li><a href="{{ route('leave-type.view') }}">Leave Types</a></li>
+                                <li><a href="{{ route('holidays.index') }}">Manage Holidays</a></li>
+                                <li><a href="{{ route('holidays.calendar') }}">Holiday Calendar</a></li>
                             @endif
                         </ul>
                     </li>

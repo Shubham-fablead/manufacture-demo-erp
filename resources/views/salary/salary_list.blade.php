@@ -1,6 +1,9 @@
 @extends('layout.app')
 @section('title', 'Salary List')
 @section('content')
+    @php
+        $currentUserRole = auth()->user()->role ?? '';
+    @endphp
     <style>
         .form-control {
             color: #595b5d !important;
@@ -455,9 +458,8 @@
             background-color: #5d6d7e;
             color: #fff;
             border: none;
-            margin: 0 4px;
-            padding: 6px 15px;
-            border-radius: 6px;
+            margin: 0 3px;
+            padding: 4px 10px;
             font-weight: bold;
         }
 
@@ -473,6 +475,28 @@
 
         .pagination .page-item.active .page-link:hover {
             background-color: #e68a35 !important;
+        }
+
+        .pagination .page-item:first-child .page-link,
+        .pagination .page-item:last-child .page-link {
+            background-color: #fff;
+            color: #6c757d;
+            border: 1px solid #dee2e6;
+        }
+
+        .pagination .page-item:first-child .page-link:hover,
+        .pagination .page-item:last-child .page-link:hover {
+            background-color: #f8f9fa;
+            color: #495057;
+            border-color: #dee2e6;
+        }
+
+        .pagination .page-item.disabled .page-link {
+            background-color: #fff !important;
+            color: #dee2e6 !important;
+            border: 1px solid #dee2e6 !important;
+            cursor: not-allowed !important;
+            pointer-events: none !important;
         }
 
         /* ✅ Hide default DataTables search box completely */
@@ -579,9 +603,9 @@
 
         /* Desktop >= 992px: all in one row, no wrap */
         @media (min-width: 992px) {
-            .salary-btn-group {
+            /* .salary-btn-group {
                 flex-wrap: nowrap;
-            }
+            } */
 
             .salary-action-btn {
                 font-size: 13px;
@@ -710,7 +734,7 @@
 
 
                             <!-- Staff -->
-                            <div class="col-lg-2 col-md-3 col-6">
+                            <div class="col-lg-2 col-md-3 col-6 {{ $currentUserRole === 'staff' ? 'd-none' : '' }}">
                                 <label class="form-label">Staff</label>
                                 <select class="form-select form-select-sm" id="filterStaff">
                                     <option value="">All Staff</option>
@@ -742,6 +766,7 @@
                                 <strong id="selectedMonthYearDisplay" class="text-dark d-block mb-2">
                                     Salaries for {{ \Carbon\Carbon::now()->format('F Y') }}
                                 </strong>
+                                @if($currentUserRole !== 'staff')
                                 <div class="salary-btn-group">
                                     <button id="exportCSV" class="btn btn-sm btn-success salary-action-btn">
                                         <i class="fas fa-file-excel me-1"></i> Export Excel
@@ -754,6 +779,7 @@
                                         <i class="fas fa-history me-1"></i> Staff Advance Payment History
                                     </button>
                                 </div>
+                                @endif
                             </div>
 
                         </div>
@@ -823,6 +849,7 @@
                                         <th>Extra Present</th>
                                         <th>Pending Advance Pay</th>
                                         <th>Paid Advance Pay</th>
+                                        <th>Total Salary</th>
                                         <th>Status</th>
                                         <th>Action</th>
                                     </tr>
@@ -1079,6 +1106,7 @@
     <script>
         $(document).ready(function() {
             const selectedSubAdminId = localStorage.getItem('selectedSubAdminId');
+            const currentUserRole = @json($currentUserRole);
             // console.log(selectedSubAdminId);
             // Handle payment action
 
@@ -1714,7 +1742,8 @@
                 let actionBtns = '';
 
                 if (salary.status === 'Pending') {
-                    actionBtns += `<button type="button" class="btn btn-sm btn-primary make-payment me-2"
+                    if (currentUserRole !== 'staff') {
+                        actionBtns += `<button type="button" class="btn btn-sm btn-primary make-payment me-2"
                 data-staff-id="${salary.staff_id}"
                 data-staff-name="${salary.staff_name}"
                 data-present="${salary.present}"
@@ -1724,8 +1753,10 @@
                 style="background-color: #ff9f43; border-color: #ff9f43; color: white;">
                 Make Payment
             </button>`;
+                    }
                 } else {
-                    actionBtns += `<button type="button" class="btn btn-sm btn-success make-bonus-payment me-2"
+                    if (currentUserRole !== 'staff') {
+                        actionBtns += `<button type="button" class="btn btn-sm btn-success make-bonus-payment me-2"
                 data-staff-id="${salary.staff_id}"
                 data-salary-id="${salary.salary_id}"
                 data-staff-name="${salary.staff_name}"
@@ -1740,6 +1771,7 @@
                 data-bs-target="#paymentModal2">
                 Edit Salary
             </button>`;
+                    }
 
                     actionBtns += `<button class="btn-icon-mobile btn-download download-slip me-2"
                 data-staff-id="${salary.staff_id}"
@@ -1785,6 +1817,10 @@
                                 <div class="order-detail-row-simple">
                                     <span class="order-detail-label-simple">Extra Amount:</span>
                                     <span class="order-detail-value-simple">₹${parseFloat(salary.extra_amount || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                </div>
+                                <div class="order-detail-row-simple">
+                                    <span class="order-detail-label-simple">Total Salary:</span>
+                                    <span class="order-detail-value-simple" style="font-weight: bold; color: #1b2850;">₹${parseFloat(salary.total_salary || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                                 </div>
                                 ` : ''}
                     <div class="order-detail-row-simple">
@@ -2104,7 +2140,10 @@
 
                                     let actionButtons = '';
                                     if (salary.status === 'Pending') {
-                                        actionButtons = `<div class="action-buttons-wrapper" style="display: inline-flex; gap: 5px; flex-wrap: wrap;">
+                                        if (currentUserRole === 'staff') {
+                                            actionButtons = '';
+                                        } else {
+                                            actionButtons = `<div class="action-buttons-wrapper" style="display: inline-flex; gap: 5px; flex-wrap: wrap;">
         <button class="btn btn-sm make-payment"
             data-staff-id="${salary.staff_id}"
             data-staff-name="${salary.staff_name}"
@@ -2116,9 +2155,10 @@
             Make Payment
         </button>
     </div>`;
+                                        }
                                     } else {
                                         actionButtons = `<div class="action-buttons-wrapper" style="display: inline-flex; gap: 5px; flex-wrap: wrap; align-items: center;">
-        <button class="btn btn-sm make-bonus-payment"
+        ${currentUserRole === 'staff' ? '' : `<button class="btn btn-sm make-bonus-payment"
             data-staff-id="${salary.staff_id}"
             data-salary-id="${salary.salary_id}"
             data-staff-name="${salary.staff_name}"
@@ -2133,7 +2173,7 @@
             data-bs-target="#paymentModal2"
             style="background-color: #28a745; border-color: #28a745; color: white; padding: 5px 12px; font-size: 12px;">
             Edit Salary
-        </button>
+        </button>`}
         <button class="btn btn-sm download-slip"
             data-staff-id="${salary.staff_id}"
             data-month="${selectedMonth}"
@@ -2145,7 +2185,7 @@
     </div>`;
                                     }
 
-                                    const row = [
+                                    const baseColumns = [
                                         staffName,
                                         `<button class="mobile-toggle-btn-table" onclick="toggleSalaryRowDetails('${salaryId}')" data-salary-id="${salaryId}">
                                 <span class="toggle-icon">+</span>
@@ -2163,14 +2203,25 @@
                                             minimumFractionDigits: 2,
                                             maximumFractionDigits: 2
                                         }),
-                                        salary.status,
-                                        actionButtons,
                                     ];
 
                                     if (salary.status === 'Pending') {
-                                        pendingRows.push(row);
+                                        pendingRows.push([
+                                            ...baseColumns,
+                                            salary.status,
+                                            actionButtons,
+                                        ]);
                                     } else {
-                                        paidRows.push(row);
+                                        paidRows.push([
+                                            ...baseColumns,
+                                            "₹" + parseFloat(salary.total_salary || 0)
+                                                .toLocaleString('en-IN', {
+                                                    minimumFractionDigits: 2,
+                                                    maximumFractionDigits: 2
+                                                }),
+                                            salary.status,
+                                            actionButtons,
+                                        ]);
                                     }
                                 });
 
@@ -2195,7 +2246,7 @@
 
                 // Update pagination UI
                 function updatePaginationUI(pagination) {
-                    let from = (pagination.current_page - 1) * pagination.per_page + 1;
+                    let from = (pagination.current_page - 1) * pagination.per_page;
                     let to = pagination.current_page * pagination.per_page;
                     if (to > pagination.total) to = pagination.total;
                     if (pagination.total === 0) from = 0;
@@ -2205,20 +2256,46 @@
                     $('#pagination-total').text(pagination.total);
 
                     let paginationHtml = '';
-                    let startPage = Math.max(1, pagination.current_page - 2);
-                    let endPage = Math.min(pagination.last_page, startPage + 4);
 
-                    if (endPage - startPage < 4) {
-                        startPage = Math.max(1, endPage - 4);
+                    paginationHtml += `
+                        <li class="page-item ${pagination.current_page === 1 ? 'disabled' : ''}">
+                            <a class="page-link" href="javascript:void(0);" data-page="${pagination.current_page - 1}">Previous</a>
+                        </li>
+                    `;
+
+                    const visiblePageCount = 2;
+                    let startPage = Math.floor((pagination.current_page - 1) / visiblePageCount) * visiblePageCount + 1;
+                    let endPage = Math.min(pagination.last_page, startPage + visiblePageCount - 1);
+
+                    if (startPage > 1) {
+                        paginationHtml += `
+                            <li class="page-item">
+                                <a class="page-link" href="javascript:void(0);" data-page="${startPage - 1}" data-action="prev-group">..</a>
+                            </li>
+                        `;
                     }
 
                     for (let i = startPage; i <= endPage; i++) {
                         paginationHtml += `
-                <li class="page-item ${i === pagination.current_page ? 'active' : ''}">
-                    <a class="page-link" href="javascript:void(0);" data-page="${i}">${i}</a>
-                </li>
-            `;
+                            <li class="page-item ${i === pagination.current_page ? 'active' : ''}">
+                                <a class="page-link" href="javascript:void(0);" data-page="${i}">${i}</a>
+                            </li>
+                        `;
                     }
+
+                    if (endPage < pagination.last_page) {
+                        paginationHtml += `
+                            <li class="page-item">
+                                <a class="page-link" href="javascript:void(0);" data-page="${endPage + 1}" data-action="next-group">..</a>
+                            </li>
+                        `;
+                    }
+
+                    paginationHtml += `
+                        <li class="page-item ${pagination.current_page === pagination.last_page || pagination.last_page === 0 ? 'disabled' : ''}">
+                            <a class="page-link" href="javascript:void(0);" data-page="${pagination.current_page + 1}">Next</a>
+                        </li>
+                    `;
 
                     $('#pagination-numbers').html(paginationHtml);
                     $('.pagination-controls').show();
@@ -2228,6 +2305,23 @@
                 $(document).on('click', '#pagination-numbers .page-link', function(e) {
                     e.preventDefault();
                     let page = $(this).data('page');
+                    let action = $(this).data('action');
+
+                    if (action === 'next-group') {
+                        if (page && page <= lastPage) {
+                            fetchSalaries(page);
+                        }
+                        return;
+                    }
+
+                    if (action === 'prev-group') {
+                        let prevStartPage = Math.max(1, page - 2);
+                        if (prevStartPage >= 1 && prevStartPage <= lastPage) {
+                            fetchSalaries(prevStartPage);
+                        }
+                        return;
+                    }
+
                     if (page && page !== currentPage && page >= 1 && page <= lastPage) {
                         fetchSalaries(page);
                     }
@@ -2292,6 +2386,12 @@
                 //     });
                 // }
                 function populateStaffDropdown() {
+                    // Staff role: skip dropdown population, just fetch their own salary directly
+                    if (currentUserRole === 'staff') {
+                        fetchSalaries(1);
+                        return;
+                    }
+
                     let url = "/api/staff";
                     if (selectedSubAdminId) {
                         url += `?selectedSubAdminId=${selectedSubAdminId}`;
@@ -2764,9 +2864,11 @@
                                         minimumFractionDigits: 2
                                     });
 
+                                const formattedDate = row.date ? row.date.split('-').reverse().join('-') : '-';
+
                                 tbody.append(`
                                     <tr>
-                                        <td>${row.date ?? '-'}</td>
+                                        <td>${formattedDate}</td>
                                         <td>${amount}</td>
                                         <td>${paid}</td>
                                         <td>${pending}</td>

@@ -3,6 +3,7 @@
 @section('title', 'Staff List')
 
 @section('content')
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" />
     <style>
         /* .sorting_1 {
                     display: flex !important;
@@ -24,6 +25,16 @@
 
         .table-scroll-top {
             display: none;
+        }
+
+        .table-container {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        table.datanew {
+            width: 100%;
         }
 
         table.datanew td.sorting_1 {
@@ -79,16 +90,41 @@
         /* Custom Pagination Styling */
         .pagination .page-item .page-link {
             background-color: #5d6d7e;
+            /* Dark gray for other pages */
             color: #fff;
             border: none;
-            margin: 0 4px;
-            padding: 6px 15px;
+            margin: 0 3px;
+            padding: 4px 10px;
             border-radius: 6px;
             font-weight: bold;
         }
 
+        @media (max-width: 576px) {
+            .pagination .page-item .page-link {
+                padding: 4px 10px;
+                margin: 0 3px;
+                font-size: 12px;
+            }
+        }
+
+        /* Previous and Next buttons */
+        .pagination .page-item:first-child .page-link,
+        .pagination .page-item:last-child .page-link {
+            background-color: #fff;
+            color: #6c757d;
+            border: 1px solid #dee2e6;
+        }
+
+        .pagination .page-item:first-child .page-link:hover,
+        .pagination .page-item:last-child .page-link:hover {
+            background-color: #f8f9fa;
+            color: #495057;
+            border-color: #dee2e6;
+        }
+
         .pagination .page-item.active .page-link {
             background-color: #ff9f43 !important;
+            /* Orange for active page */
             color: #fff;
         }
 
@@ -99,6 +135,14 @@
 
         .pagination .page-item.active .page-link:hover {
             background-color: #e68a35 !important;
+        }
+
+        .pagination .page-item.disabled .page-link {
+            background-color: #fff !important;
+            color: #dee2e6 !important;
+            border: 1px solid #dee2e6 !important;
+            cursor: not-allowed !important;
+            pointer-events: none !important;
         }
 
 
@@ -120,6 +164,10 @@
 
         /* Desktop: show all columns normally */
         @media (min-width: 769px) {
+            table.datanew {
+                min-width: 1100px;
+            }
+
             .staff-name {
                 display: block !important;
                 max-width: 250px;
@@ -154,6 +202,10 @@
 
         /* Mobile: hide non-essential columns, show Details toggle */
         @media (max-width: 768px) {
+            table.datanew {
+                width: 100% !important;
+                table-layout: fixed;
+            }
 
             table.datanew thead th:nth-child(n+2),
             table.datanew tbody td:nth-child(n+2) {
@@ -170,31 +222,39 @@
             table.datanew tbody td:nth-child(7) {
                 display: table-cell !important;
                 text-align: center;
-                vertical-align: top;
-                width: 50px;
-                padding-top: 12px;
+                vertical-align: top !important;
+                width: 56px !important;
+                min-width: 56px !important;
+                max-width: 56px !important;
+                padding: 12px 6px !important;
             }
 
             .toggle-details {
-                display: flex;
-                align-items: flex-start;
+                display: inline-flex;
+                align-items: center;
                 justify-content: center;
-                width: 100%;
-                text-decoration: none;
+                width: 44px;
+                height: 44px;
+                margin-left: auto;
             }
 
             .toggle-details i {
                 font-size: 24px;
-                margin-top: 2px;
             }
 
             /* First column (Staff Name column) */
             table.datanew tbody td:first-child {
-                max-width: 260px;
-                /* control column width */
+                display: table-cell !important;
+                width: calc(100% - 56px) !important;
+                max-width: calc(100vw - 96px) !important;
+                vertical-align: top !important;
                 white-space: normal !important;
                 word-break: break-word !important;
                 overflow-wrap: anywhere !important;
+            }
+
+            table.datanew tbody td:first-child > div {
+                width: 100%;
             }
 
             /* Image + name container */
@@ -203,6 +263,7 @@
                 align-items: center;
                 gap: 2px;
                 width: 100%;
+                min-width: 0;
             }
 
             /* Staff name text */
@@ -237,19 +298,19 @@
             table.datanew thead th.details-column,
             table.datanew tbody td:nth-child(7) {
                 display: table-cell !important;
-                width: 60px !important;
-                min-width: 60px !important;
-                max-width: 60px !important;
+                width: 56px !important;
+                min-width: 56px !important;
+                max-width: 56px !important;
+                vertical-align: top !important;
             }
 
             .toggle-details {
-                display: flex !important;
-                align-items: flex-start;
+                display: inline-flex !important;
+                align-items: center;
                 justify-content: center;
-                padding: 8px !important;
+                width: 44px;
+                height: 44px;
                 z-index: 10 !important;
-                width: 100%;
-                text-decoration: none;
             }
 
             .toggle-details i {
@@ -257,7 +318,6 @@
                 width: 24px !important;
                 height: 24px !important;
                 line-height: 24px !important;
-                margin-top: 2px;
             }
         }
 
@@ -295,13 +355,13 @@
         }
 
         /* Collapsible details styling */
-        .collapse-details {
+        /* .collapse-details {
             margin-top: 10px;
             padding: 10px;
             background-color: #f8f9fa;
             border-radius: 5px;
             border-left: 3px solid #ff9f43;
-        }
+        } */
 
         .detail-item {
             display: flex;
@@ -335,7 +395,7 @@
             width: 36px;
             height: 36px;
             border-radius: 50%;
-            background-color: #f8f9fa;
+            /* background-color: #f8f9fa; */
             transition: all 0.3s ease;
         }
 
@@ -394,7 +454,7 @@
                 </div> --}}
                 {{-- <div class="table-responsive">
                     <table class="table datanew"> --}}
-<div class="table-container">
+<div class="table-container table-responsive">
                     <table class="table datanew">
                         <thead>
                             <tr>
@@ -546,6 +606,15 @@
                                                     <span class="detail-label">City:</span>
                                                     <span class="detail-value">${staff.city || 'N/A'}</span>
                                                 </div>
+                                                <div class="detail-item">
+                                                    <span class="detail-label">GST:</span>
+                                                    <span class="detail-value">${staff.gst_number || 'N/A'}</span>
+                                                </div>
+                                                <div class="detail-item">
+                                                    <span class="detail-label">PAN:</span>
+                                                    <span class="detail-value">${staff.pan_number || 'N/A'}</span>
+                                                </div>
+
                                                 <div class="mobile-actions">
                                                     <a href="/staff-view/${staff.id}">
                                                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -576,6 +645,14 @@
 
                                     // Column 3: Phone
                                     staff.phone || 'N/A',
+
+                                    // Column 4: GST Number
+                                    staff.gst_number || 'N/A',
+
+                                    // Column 5: PAN Number
+                                    staff.pan_number || 'N/A',
+
+
 
                                     // Column 7: Country
                                     staff.country || 'N/A',
@@ -735,15 +812,6 @@
                 fetchStaff(1);
             });
 
-            // Page number click handler
-            $(document).on('click', '#pagination-numbers .page-link', function(e) {
-                e.preventDefault();
-                let page = $(this).data('page');
-                if (page && page !== currentPage && page >= 1 && page <= lastPage) {
-                    fetchStaff(page);
-                }
-            });
-
             // Fetch staff with server‑side pagination & search
             function fetchStaff(page = 1) {
                 let url = `/api/getAllStaff?page=${page}&per_page=${perPage}`;
@@ -825,7 +893,7 @@
                                 // Build the main column with name, image and collapsible details
                                 let firstColumn = `
     <div>
-        <a href="javascript:void(0);" class="d-flex align-items-center">
+        <a href="/staff-view/${staff.id}" class="d-flex align-items-center">
             <img src="${imageUrl}" alt="staff" class="staff-image">
             <span class="staff-name">${staffName}</span>
         </a>
@@ -916,32 +984,102 @@
 
             // Update pagination numbers and info
             function updatePaginationUI(pagination) {
+                currentPage = pagination.current_page;
+                lastPage = pagination.last_page;
                 let from = (pagination.current_page - 1) * pagination.per_page + 1;
                 let to = pagination.current_page * pagination.per_page;
-                if (to > pagination.total) to = pagination.total;
-                if (pagination.total === 0) from = 0;
+
+                if (to > pagination.total) {
+                    to = pagination.total;
+                }
+
+                if (pagination.total === 0) {
+                    from = 0;
+                }
 
                 $('#pagination-from').text(from);
                 $('#pagination-to').text(to);
                 $('#pagination-total').text(pagination.total);
 
                 let paginationHtml = '';
-                let startPage = Math.max(1, pagination.current_page - 2);
-                let endPage = Math.min(pagination.last_page, startPage + 4);
-                if (endPage - startPage < 4) {
-                    startPage = Math.max(1, endPage - 4);
-                }
 
-                for (let i = startPage; i <= endPage; i++) {
+                paginationHtml += `
+                    <li class="page-item ${pagination.current_page === 1 ? 'disabled' : ''}">
+                        <a class="page-link staff-page-link" href="javascript:void(0);" data-page="${pagination.current_page - 1}">Previous</a>
+                    </li>
+                `;
+
+                // Show only 2 page numbers at a time
+                const visiblePageCount = 2;
+                let startPage = Math.floor((pagination.current_page - 1) / visiblePageCount) * visiblePageCount + 1;
+                let endPage = Math.min(pagination.last_page, startPage + visiblePageCount - 1);
+
+                // Show previous ellipsis if there are pages before startPage
+                if (startPage > 1) {
                     paginationHtml += `
-                        <li class="page-item ${i === pagination.current_page ? 'active' : ''}">
-                            <a class="page-link" href="javascript:void(0);" data-page="${i}">${i}</a>
+                        <li class="page-item">
+                            <a class="page-link staff-page-link" href="javascript:void(0);" data-page="${startPage - 1}" data-action="prev-group">..</a>
                         </li>
                     `;
                 }
+
+                // Generate page numbers
+                for (let i = startPage; i <= endPage; i++) {
+                    paginationHtml += `
+                        <li class="page-item ${i === pagination.current_page ? 'active' : ''}">
+                            <a class="page-link staff-page-link" href="javascript:void(0);" data-page="${i}">${i}</a>
+                        </li>
+                    `;
+                }
+
+                // Show next ellipsis if there are more pages after endPage
+                if (endPage < pagination.last_page) {
+                    paginationHtml += `
+                        <li class="page-item">
+                            <a class="page-link staff-page-link" href="javascript:void(0);" data-page="${endPage + 1}" data-action="next-group">..</a>
+                        </li>
+                    `;
+                }
+
+                paginationHtml += `
+                    <li class="page-item ${pagination.current_page === pagination.last_page || pagination.last_page === 0 ? 'disabled' : ''}">
+                        <a class="page-link staff-page-link" href="javascript:void(0);" data-page="${pagination.current_page + 1}">Next</a>
+                    </li>
+                `;
+
                 $('#pagination-numbers').html(paginationHtml);
-                $('.pagination-controls').show();
+                $('.pagination-controls').toggle(pagination.total > 0);
             }
+
+            // Handle page number clicks with ellipsis support
+            $(document).on('click', '.staff-page-link', function(e) {
+                e.preventDefault();
+                let page = $(this).data('page');
+                let action = $(this).data('action');
+
+                // Handle ellipsis clicks to load next/previous groups
+                if (action === 'next-group') {
+                    // Load the page that starts the next group
+                    if (page && page <= lastPage) {
+                        fetchStaff(page);
+                    }
+                    return;
+                }
+
+                if (action === 'prev-group') {
+                    // Load the previous group's starting page
+                    let prevStartPage = Math.max(1, page - 2);
+                    if (prevStartPage >= 1 && prevStartPage <= lastPage) {
+                        fetchStaff(prevStartPage);
+                    }
+                    return;
+                }
+
+                // Regular page navigation
+                if (page && page !== currentPage && page >= 1 && page <= lastPage) {
+                    fetchStaff(page);
+                }
+            });
 
             // Toggle details icon (unchanged)
             $(document).on('click', '.toggle-details', function() {

@@ -4,6 +4,71 @@
 
 @section('content')
     <style>
+        .dataTables_filter,
+        .dataTables_length,
+        .dataTables_info,
+        .dataTables_paginate {
+            display: none !important;
+        }
+
+        /* Custom Pagination Styling */
+        .pagination .page-item .page-link {
+            background-color: #5d6d7e;
+            /* Dark gray for other pages */
+            color: #fff;
+            border: none;
+            margin: 0 3px;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-weight: bold;
+        }
+
+        @media (max-width: 576px) {
+            .pagination .page-item .page-link {
+                padding: 4px 10px;
+                margin: 0 3px;
+                font-size: 12px;
+            }
+        }
+
+        /* Previous and Next buttons */
+        .pagination .page-item:first-child .page-link,
+        .pagination .page-item:last-child .page-link {
+            background-color: #fff;
+            color: #6c757d;
+            border: 1px solid #dee2e6;
+        }
+
+        .pagination .page-item:first-child .page-link:hover,
+        .pagination .page-item:last-child .page-link:hover {
+            background-color: #f8f9fa;
+            color: #495057;
+            border-color: #dee2e6;
+        }
+
+        .pagination .page-item.active .page-link {
+            background-color: #ff9f43 !important;
+            /* Orange for active page */
+            color: #fff;
+        }
+
+        .pagination .page-item .page-link:hover {
+            background-color: #4a5766;
+            color: #fff;
+        }
+
+        .pagination .page-item.active .page-link:hover {
+            background-color: #e68a35 !important;
+        }
+
+        .pagination .page-item.disabled .page-link {
+            background-color: #fff !important;
+            color: #dee2e6 !important;
+            border: 1px solid #dee2e6 !important;
+            cursor: not-allowed !important;
+            pointer-events: none !important;
+        }
+
         #DataTables_Table_0_info {
             float: left;
         }
@@ -45,7 +110,7 @@
         }
 
         .form-select-sm {
-            min-width: 130px;
+            /* min-width: 130px; */
             margin-right: 10px;
         }
 
@@ -269,6 +334,328 @@
                 display: none !important;
             }
         }
+        /* ============================================
+   TABLET VIEW SPECIFIC FIXES (768px - 1024px)
+   ============================================ */
+
+@media screen and (min-width: 768px) and (max-width: 1024px) {
+    /* --- FILTER SECTION FIXES --- */
+    .card-body .row.g-3 {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+
+    /* Filter columns - 2 columns layout for tablet */
+    .card-body .row.g-3 > [class*="col-"] {
+        flex: 0 0 calc(50% - 15px);
+        max-width: calc(50% - 15px);
+        margin-bottom: 5px;
+    }
+
+    /* Make Export button take full width of its column */
+    .card-body .row.g-3 > .col-12.col-sm-2.col-md-2 {
+        flex: 0 0 calc(50% - 15px);
+        max-width: calc(50% - 15px);
+    }
+
+    /* Export button styling for tablet */
+    #exportBtn {
+        width: 100%;
+        padding: 8px 12px;
+        margin-top: 24px;
+    }
+
+    /* Search input full width fix */
+    .search-set {
+        width: 100%;
+    }
+
+    .search-input {
+        width: 100%;
+    }
+
+    .search-input input {
+        width: 100%;
+        min-width: 0;
+    }
+
+    /* Form select styling */
+    .form-select-sm {
+        width: 100%;
+        min-width: unset;
+    }
+
+    /* Labels */
+    .form-label {
+        font-size: 13px;
+        margin-bottom: 4px;
+        font-weight: 500;
+    }
+
+    /* --- TABLE FIXES --- */
+    .table-container {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .datanew {
+        width: 100%;
+        min-width: 700px;
+        font-size: 13px;
+    }
+
+    .datanew th,
+    .datanew td {
+        padding: 10px 8px;
+        white-space: normal;
+        word-break: break-word;
+    }
+
+    /* Keep all columns visible on tablet, but adjust widths */
+    .datanew thead th:nth-child(1),
+    .datanew tbody td:nth-child(1) {
+        min-width: 120px;
+    }
+
+    .datanew thead th:nth-child(2),
+    .datanew tbody td:nth-child(2),
+    .datanew thead th:nth-child(3),
+    .datanew tbody td:nth-child(3),
+    .datanew thead th:nth-child(4),
+    .datanew tbody td:nth-child(4) {
+        min-width: 85px;
+        text-align: right;
+    }
+
+    .datanew thead th:nth-child(5),
+    .datanew tbody td:nth-child(5) {
+        min-width: 100px;
+    }
+
+    .datanew thead th:nth-child(6),
+    .datanew tbody td:nth-child(6) {
+        min-width: 80px;
+    }
+
+    .datanew thead th:nth-child(7),
+    .datanew tbody td:nth-child(7) {
+        min-width: 120px;
+        max-width: 180px;
+    }
+
+    .datanew thead th:nth-child(8),
+    .datanew tbody td:nth-child(8) {
+        min-width: 100px;
+        white-space: nowrap;
+    }
+
+    .datanew thead th:nth-child(9),
+    .datanew tbody td:nth-child(9) {
+        min-width: 60px;
+        text-align: center;
+    }
+
+    /* Action buttons in main table - horizontal layout */
+    .datanew tbody td:nth-child(8) {
+        /* display: flex;
+        gap: 8px; */
+        align-items: center;
+        justify-content: flex-start;
+        flex-wrap: wrap;
+    }
+
+    /* Hide the DETAILS column (9th column) on tablets since expandable rows work */
+    .datanew thead th:nth-child(9),
+    .datanew tbody td:nth-child(9) {
+        display: none;
+    }
+
+    /* Expandable details row styling */
+    .advance-details-row.show {
+        display: table-row;
+    }
+
+    .advance-details-content {
+        padding: 15px;
+        background: #f9fafb;
+    }
+
+    /* 2-column grid for expandable details on tablet */
+    .advance-details-list {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px 20px;
+    }
+
+    .advance-detail-row-simple {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 8px 0;
+        border-bottom: 1px solid #eef2f6;
+    }
+
+    .advance-detail-row-simple:last-of-type {
+        border-bottom: none;
+    }
+
+    .advance-detail-label-simple {
+        font-size: 13px;
+        color: #6c757d;
+    }
+
+    .advance-detail-value-simple {
+        font-size: 13px;
+        font-weight: 500;
+        text-align: right;
+    }
+
+    .advance-action-buttons-simple {
+        grid-column: span 2;
+        display: flex;
+        gap: 15px;
+        justify-content: flex-start;
+        padding-top: 12px;
+        margin-top: 5px;
+        border-top: 1px solid #e0e0e0;
+    }
+
+    /* Toggle button adjustments */
+    .advance-toggle-btn-table {
+        width: 32px;
+        height: 32px;
+        font-size: 16px;
+    }
+
+    /* --- TOTALS SECTION FIXES --- */
+    .totals-wrapper {
+        display: flex;
+        flex-direction: row !important;
+        justify-content: flex-end;
+        gap: 15px;
+        flex-wrap: wrap;
+    }
+
+    .grand-total-box {
+        padding: 8px 16px;
+        font-size: 14px;
+    }
+
+    .grand-total-box strong {
+        font-size: 13px;
+    }
+
+    /* --- PAGINATION FIXES --- */
+    .pagination-controls {
+        flex-direction: row !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        gap: 15px;
+    }
+
+    .pagination .page-link {
+        padding: 5px 12px;
+        font-size: 13px;
+    }
+
+    /* Per page selector */
+    #per-page-select {
+        font-size: 13px;
+    }
+
+    /* --- TABLE SCROLL HINT --- */
+    .table-container::after {
+        content: "← Scroll horizontally →";
+        display: block;
+        text-align: center;
+        font-size: 11px;
+        color: #999;
+        padding: 8px 0 4px;
+        background: #f8f9fa;
+        border-radius: 0 0 8px 8px;
+    }
+}
+
+/* ============================================
+   LANDSCAPE TABLET (1024px specific edge)
+   ============================================ */
+@media screen and (min-width: 1024px) and (max-width: 1024px) and (orientation: landscape) {
+    .card-body .row.g-3 > [class*="col-"] {
+        flex: 0 0 calc(33.33% - 15px);
+        max-width: calc(33.33% - 15px);
+    }
+
+    .card-body .row.g-3 > .col-12.col-sm-2.col-md-2 {
+        flex: 0 0 calc(33.33% - 15px);
+        max-width: calc(33.33% - 15px);
+    }
+
+    #exportBtn {
+        margin-top: 24px;
+    }
+}
+
+/* ============================================
+   PORTRAIT TABLET (768px specific)
+   ============================================ */
+@media screen and (min-width: 768px) and (max-width: 820px) and (orientation: portrait) {
+    .datanew {
+        min-width: 750px;
+    }
+
+    .datanew tbody td:nth-child(7) {
+        max-width: 140px;
+    }
+
+    .advance-details-list {
+        grid-template-columns: 1fr;
+        gap: 5px;
+    }
+
+    .advance-action-buttons-simple {
+        grid-column: span 1;
+    }
+}
+
+/* ============================================
+   IPAD SPECIFIC (768px - 1024px)
+   ============================================ */
+@media only screen and (min-device-width: 768px) and (max-device-width: 1024px) {
+    /* Ensure touch targets are large enough */
+    .advance-toggle-btn-table,
+    .btn-icon-mobile-advance,
+    .pagination .page-link,
+    #exportBtn,
+    .delete-btn,
+    a[href*="advance_pay"] {
+        min-height: 44px;
+        min-width: 44px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* Improve table row tap targets */
+    .datanew tbody tr {
+        cursor: pointer;
+    }
+
+    /* Better scrollbar for table container */
+    .table-container::-webkit-scrollbar {
+        height: 6px;
+    }
+
+    .table-container::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 10px;
+    }
+
+    .table-container::-webkit-scrollbar-thumb {
+        background: #c1c1c1;
+        border-radius: 10px;
+    }
+}
 
         /* Expandable row details - available for all screen sizes */
         .advance-details-row {
@@ -423,61 +810,6 @@
 
         .total-responsive {
             margin-bottom: 10px !important;
-        }
-
-        /* ✅ Pagination & Search Styling */
-        .dataTables_filter,
-        .dataTables_length,
-        .dataTables_info,
-        .dataTables_paginate {
-            display: none !important;
-        }
-
-        /* Custom Pagination Styling */
-        .pagination .page-item .page-link {
-            background-color: #5d6d7e;
-            color: #fff;
-            border: none;
-            margin: 0 4px;
-            padding: 6px 15px;
-            border-radius: 6px;
-            font-weight: bold;
-        }
-
-        .pagination .page-item:first-child .page-link,
-        .pagination .page-item:last-child .page-link {
-            background-color: #fff;
-            color: #6c757d;
-            border: 1px solid #dee2e6;
-        }
-
-        .pagination .page-item:first-child .page-link:hover,
-        .pagination .page-item:last-child .page-link:hover {
-            background-color: #f8f9fa;
-            color: #495057;
-            border-color: #dee2e6;
-        }
-
-        .pagination .page-item.active .page-link {
-            background-color: #ff9f43 !important;
-            color: #fff;
-        }
-
-        .pagination .page-item .page-link:hover {
-            background-color: #4a5766;
-            color: #fff;
-        }
-
-        .pagination .page-item.active .page-link:hover {
-            background-color: #e68a35 !important;
-        }
-
-        .pagination .page-item.disabled .page-link {
-            background-color: #fff !important;
-            color: #dee2e6 !important;
-            border: 1px solid #dee2e6 !important;
-            cursor: not-allowed !important;
-            pointer-events: none !important;
         }
 
         /* Search input styling */
@@ -671,6 +1003,12 @@
     <script>
         // Global variables
         var advancePaymentDataMap = {};
+        function formatDateDDMMYYYY(dateString) {
+            if (!dateString) return '-';
+            const parts = dateString.split('-');
+            if (parts.length !== 3) return dateString;
+            return `${parts[2]}-${parts[1]}-${parts[0]}`;
+        }
 
         // Helper function to build expandable row content
         function buildAdvancePaymentExpandableRowContent(payment) {
@@ -719,7 +1057,7 @@
                         </div>
                         <div class="advance-detail-row-simple">
                             <span class="advance-detail-label-simple">Date:</span>
-                            <span class="advance-detail-value-simple">${formatDisplayDate(payment.date)}</span>
+                            <span class="advance-detail-value-simple">${formatDateDDMMYYYY(payment.date)}</span>
                         </div>
                         <div class="advance-detail-row-simple">
                             <span class="advance-detail-label-simple">Method:</span>
@@ -776,21 +1114,6 @@
                 minimumFractionDigits: 2,
                 maximumFractionDigits: 2
             });
-        }
-
-        function formatDisplayDate(dateValue) {
-            if (!dateValue) return '-';
-
-            const date = new Date(dateValue);
-            if (isNaN(date.getTime())) {
-                return dateValue;
-            }
-
-            const day = String(date.getDate()).padStart(2, '0');
-            const month = String(date.getMonth() + 1).padStart(2, '0');
-            const year = date.getFullYear();
-
-            return `${day}-${month}-${year}`;
         }
 
 
@@ -929,7 +1252,7 @@
                                         <td>${formatCurrencyIN(amount)}</td>
                                         <td>${formatCurrencyIN(paid)}</td>
                                         <td>${formatCurrencyIN(pending)}</td>
-                                        <td>${formatDisplayDate(payment.date)}</td>
+                                        <td>${formatDateDDMMYYYY(payment.date)}</td>
                                         <td>${method}</td>
                                         <td style="white-space: normal; word-wrap: break-word; word-break: break-word;">
                                             ${reason}
@@ -1008,77 +1331,38 @@
                 });
             }
 
-            // function renderPagination(pagination) {
-            //     lastPage = pagination.last_page;
-            //     currentPage = pagination.current_page;
-            //     let total = pagination.total;
-            //     let perPage = pagination.per_page;
-
-            //     let from = total > 0 ? (currentPage - 1) * perPage + 1 : 0;
-            //     let to = Math.min(currentPage * perPage, total);
-
-            //     $("#pagination-from").text(from);
-            //     $("#pagination-to").text(to);
-            //     $("#pagination-total").text(total);
-
-            //     let paginationHtml = "";
-
-            //     // Previous button
-            //     paginationHtml += `
-            //         <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
-            //             <a class="page-link" href="javascript:void(0);" onclick="changePage(${currentPage - 1})">Previous</a>
-            //         </li>
-            //     `;
-
-            //     // Page numbers
-            //     let startPage = Math.max(1, currentPage - 2);
-            //     let endPage = Math.min(lastPage, startPage + 4);
-            //     if (endPage - startPage < 4) {
-            //         startPage = Math.max(1, endPage - 4);
-            //     }
-
-            //     for (let i = startPage; i <= endPage; i++) {
-            //         paginationHtml += `
-            //             <li class="page-item ${i === currentPage ? 'active' : ''}">
-            //                 <a class="page-link" href="javascript:void(0);" onclick="changePage(${i})">${i}</a>
-            //             </li>
-            //         `;
-            //     }
-
-            //     // Next button
-            //     paginationHtml += `
-            //         <li class="page-item ${currentPage === lastPage ? 'disabled' : ''}">
-            //             <a class="page-link" href="javascript:void(0);" onclick="changePage(${currentPage + 1})">Next</a>
-            //         </li>
-            //     `;
-
-            //     $("#pagination-numbers").html(paginationHtml);
-            // }
             function renderPagination(pagination) {
                 lastPage = pagination.last_page;
                 currentPage = pagination.current_page;
-                let total = pagination.total;
-                let perPage = pagination.per_page;
+                let from = (pagination.current_page - 1) * pagination.per_page + 1;
+                let to = pagination.current_page * pagination.per_page;
 
-                let from = total > 0 ? (currentPage - 1) * perPage + 1 : 0;
-                let to = Math.min(currentPage * perPage, total);
+                if (to > pagination.total) {
+                    to = pagination.total;
+                }
+
+                if (pagination.total === 0) {
+                    from = 0;
+                }
 
                 $("#pagination-from").text(from);
                 $("#pagination-to").text(to);
-                $("#pagination-total").text(total);
+                $("#pagination-total").text(pagination.total);
 
                 let paginationHtml = "";
 
                 paginationHtml += `
-                    <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
-                        <a class="page-link advance-page-link" href="javascript:void(0);" data-page="${currentPage - 1}">Previous</a>
+                    <li class="page-item ${pagination.current_page === 1 ? 'disabled' : ''}">
+                        <a class="page-link advance-page-link" href="javascript:void(0);" data-page="${pagination.current_page - 1}">Previous</a>
                     </li>
                 `;
 
+                // Show only 2 page numbers at a time
                 const visiblePageCount = 2;
-                let startPage = Math.floor((currentPage - 1) / visiblePageCount) * visiblePageCount + 1;
-                let endPage = Math.min(lastPage, startPage + visiblePageCount - 1);
+                let startPage = Math.floor((pagination.current_page - 1) / visiblePageCount) * visiblePageCount + 1;
+                let endPage = Math.min(pagination.last_page, startPage + visiblePageCount - 1);
 
+                // Show previous ellipsis if there are pages before startPage
                 if (startPage > 1) {
                     paginationHtml += `
                         <li class="page-item">
@@ -1087,15 +1371,17 @@
                     `;
                 }
 
+                // Generate page numbers
                 for (let i = startPage; i <= endPage; i++) {
                     paginationHtml += `
-                        <li class="page-item ${i === currentPage ? 'active' : ''}">
+                        <li class="page-item ${i === pagination.current_page ? 'active' : ''}">
                             <a class="page-link advance-page-link" href="javascript:void(0);" data-page="${i}">${i}</a>
                         </li>
                     `;
                 }
 
-                if (endPage < lastPage) {
+                // Show next ellipsis if there are more pages after endPage
+                if (endPage < pagination.last_page) {
                     paginationHtml += `
                         <li class="page-item">
                             <a class="page-link advance-page-link" href="javascript:void(0);" data-page="${endPage + 1}" data-action="next-group">..</a>
@@ -1104,47 +1390,44 @@
                 }
 
                 paginationHtml += `
-                    <li class="page-item ${currentPage === lastPage || lastPage === 0 ? 'disabled' : ''}">
-                        <a class="page-link advance-page-link" href="javascript:void(0);" data-page="${currentPage + 1}">Next</a>
+                    <li class="page-item ${pagination.current_page === pagination.last_page || pagination.last_page === 0 ? 'disabled' : ''}">
+                        <a class="page-link advance-page-link" href="javascript:void(0);" data-page="${pagination.current_page + 1}">Next</a>
                     </li>
                 `;
 
                 $("#pagination-numbers").html(paginationHtml);
-                $(".pagination-controls").toggle(total > 0);
+                $('.pagination-controls').toggle(pagination.total > 0);
             }
 
-            // Define changePage globally so it can be called from onclick
-            window.changePage = function(page) {
-                if (page < 1 || page > lastPage) return;
-                fetchAdvancePayments(page);
-            };
+            // Handle page number clicks with ellipsis support
+            $(document).on('click', '.advance-page-link', function(e) {
+                e.preventDefault();
+                let page = $(this).data('page');
+                let action = $(this).data('action');
 
-            $(document).off('click', '.advance-page-link')
-                .on('click', '.advance-page-link', function(e) {
-                    e.preventDefault();
-                    let page = $(this).data('page');
-                    let action = $(this).data('action');
-
-                    if (action === 'next-group') {
-                        if (page && page <= lastPage) {
-                            fetchAdvancePayments(page);
-                        }
-                        return;
-                    }
-
-                    if (action === 'prev-group') {
-                        let prevStartPage = Math.max(1, page - 2);
-                        if (prevStartPage >= 1 && prevStartPage <= lastPage) {
-                            fetchAdvancePayments(prevStartPage);
-                        }
-                        return;
-                    }
-
-                    page = parseInt(page);
-                    if (page && page !== currentPage && page >= 1 && page <= lastPage) {
+                // Handle ellipsis clicks to load next/previous groups
+                if (action === 'next-group') {
+                    // Load the page that starts the next group
+                    if (page && page <= lastPage) {
                         fetchAdvancePayments(page);
                     }
-                });
+                    return;
+                }
+
+                if (action === 'prev-group') {
+                    // Load the previous group's starting page
+                    let prevStartPage = Math.max(1, page - 2);
+                    if (prevStartPage >= 1 && prevStartPage <= lastPage) {
+                        fetchAdvancePayments(prevStartPage);
+                    }
+                    return;
+                }
+
+                // Regular page navigation
+                if (page && page !== currentPage && page >= 1 && page <= lastPage) {
+                    fetchAdvancePayments(page);
+                }
+            });
 
             // When any filter changes, reload data
             $("#filterStaffName, #filterYear, #filterMonth").on("change", function() {

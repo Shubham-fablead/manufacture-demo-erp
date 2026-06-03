@@ -74,8 +74,7 @@
                         <div class="col-lg-3 col-sm-6">
                             <div class="form-group">
                                 <label>Date <span class="text-danger">*</span></label>
-                                <input type="text" id="paymentDateInput" name="date" class="form-control"
-                                    value="{{ $payment->date }}">
+                                <input type="date" name="date" class="form-control" value="{{ $payment->date }}">
                                 <div class="text-danger error-date"></div>
                             </div>
                         </div>
@@ -140,39 +139,6 @@
             if (initialAmount) {
                 $("#amountInput").val(formatCurrencyIN(initialAmount));
             }
-
-            function formatDateIN(value) {
-                if (!value) return '';
-
-                const date = new Date(value);
-                if (isNaN(date.getTime())) return value;
-
-                const day = String(date.getDate()).padStart(2, '0');
-                const month = String(date.getMonth() + 1).padStart(2, '0');
-                const year = date.getFullYear();
-
-                return `${day}-${month}-${year}`;
-            }
-
-            function formatDateForSubmit(value) {
-                if (!value) return '';
-
-                const parts = value.split('-');
-                if (parts.length !== 3) return value;
-
-                if (parts[0].length === 4) {
-                    return value;
-                }
-
-                const [day, month, year] = parts;
-                return `${year}-${month}-${day}`;
-            }
-
-            let initialDate = $("#paymentDateInput").val();
-            if (initialDate) {
-                $("#paymentDateInput").val(formatDateIN(initialDate));
-            }
-
             $("#amountInput").on("input", function() {
                 let cursorPos = this.selectionStart;
 
@@ -201,7 +167,6 @@
 
                 let cleanAmount = $("#amountInput").val().replace(/,/g, '');
                 $("#amountInput").val(cleanAmount);
-                $("#paymentDateInput").val(formatDateForSubmit($("#paymentDateInput").val()));
                 let formData = new FormData(this);
                 $(".text-danger").html("");
 

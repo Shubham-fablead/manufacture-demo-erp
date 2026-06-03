@@ -8,8 +8,8 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::table('products', function (Blueprint $table) {
-            $table->varchar('hsn_code')->nullable()->after('SKU');
-            $table->varchar('gst_option')->nullable()->after('hsn_code');
+            $table->string('hsn_code')->nullable()->after('SKU');
+            $table->string('gst_option')->nullable()->after('hsn_code');
             $table->text('product_gst')->nullable()->after('gst_option');
         });
     }

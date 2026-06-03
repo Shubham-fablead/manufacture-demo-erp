@@ -8,11 +8,53 @@
             .form-group {
                 margin-bottom: 10px !important
             }
+            label.form-check-label {
+                font-size: 13px;
+            }
         }
-         a.btn.back-button {
-    background: #ff9f43;
-    color: #fff;
-}
+        a.btn.back-button {
+            background: #ff9f43;
+            color: #fff;
+        }
+        .btn-capture-face {
+            background: #1b2850;
+            color: #fff;
+            width: 100%;
+            font-weight: 600;
+            padding: 8px;
+            border-radius: 5px;
+        }
+
+        .btn-capture-face:hover {
+            background: #2a3a6a;
+            color: #fff;
+        }
+
+        .btn-register-face {
+            border: 1px solid #ff9f43;
+            color: #ff9f43;
+            background: #fff;
+        }
+
+        .btn-register-face:hover {
+            background: #fff7ef;
+            color: #e8892f;
+        }
+
+        .face-recognition-video-shell {
+            border: 2px solid #ffedd5;
+            border-radius: 18px;
+            overflow: hidden;
+            background: linear-gradient(135deg, #111827, #374151);
+        }
+
+        .face-recognition-video {
+            width: 100%;
+            min-height: 340px;
+            object-fit: cover;
+            display: block;
+            background: #111827;
+        }
     </style>
     <div class="content">
         {{-- <div class="page-header">
@@ -33,6 +75,8 @@
 
         <div class="card">
             <div class="card-body">
+                <input type="hidden" name="face_descriptor" id="face_descriptor">
+                <input type="hidden" name="role" id="role" value="staff">
                 <div class="row">
                     <!-- Customer Name -->
                     <div class="col-lg-3 col-sm-6 col-6">
@@ -95,7 +139,7 @@
 
                         </div>
                     </div>
-                    <div class="col-lg-3 col-sm-6 col-6">
+                    <div class="col-lg-4 col-12">
                         <div class="form-group">
                             <label>Address</label>
                             <textarea id="address" name="address" class="form-control"></textarea>
@@ -103,23 +147,7 @@
 
                         </div>
                     </div>
-
-                    <!-- Staff Type -->
-                    <div class="col-lg-3 col-sm-6 col-6">
-                        <div class="form-group">
-                            <label>Staff Type</label>
-                            <select name="staff_type" id="staff_type" class="form-control">
-                                <option value="">-- Select Staff Type --</option>
-                                <option value="raw_material">Raw Material</option>
-                                <option value="product">Product</option>
-                                <option value="other">Other</option>
-                            </select>
-                            <span class="text-danger error-staff_type"></span>
-                        </div>
-                    </div>
-
-                    <!-- Photo -->
-                    <div class="col-lg-3 col-sm-6 col-6">
+                    <div class="col-lg-4">
                         <div class="form-group">
                             <label>Photo</label>
                             <div class="image-upload">
@@ -137,6 +165,28 @@
                                 <img id="avatar-preview" src="" alt="Profile Image"
                                     style="max-width: 100px; border-radius: 8px;">
                             </div>
+                        </div>
+                    </div>
+
+                    <!-- Face Photo Upload/Capture -->
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            <label>Face Photo <span class="text-muted small">(upload or use camera)</span></label>
+                            <div class="image-upload" id="face-photo-upload-box" style="margin: 0; position: relative; overflow: hidden; display: flex; justify-content: center; align-items: center; min-height: 120px;">
+                                <input type="file" name="face_photo" id="face_photo_input" class="form-control" accept="image/*">
+                                <div class="image-uploads" id="face-upload-content">
+                                    <img src="{{ env('ImagePath') . '/admin/assets/img/icons/upload.svg' }}" alt="Upload Icon">
+                                    <h4 id="face-photo-text">Drag and drop a file to upload</h4>
+                                </div>
+                                <img id="face-preview" src="" alt="Face Preview" style="display: none; max-width: 100%; max-height: 120px; border-radius: 8px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); pointer-events: none;">
+                            </div>
+                            <div class="text-danger error-face_photo"></div>
+                            
+                            <button type="button" class="btn btn-capture-face mt-2" id="captureFaceBtn">
+                                <i class="fa-solid fa-camera me-1"></i>Capture Face via Camera
+                            </button>
+                            
+                            <input type="hidden" name="captured_photo" id="captured_photo">
                         </div>
                     </div>
                     <div class="col-lg-12">
@@ -207,9 +257,12 @@
         </div>
 
     </div>
+    @include('partials.face-recognition-modal')
 @endsection
 
 @push('js')
+    <script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+    @include('partials.face-recognition-script')
     <script>
         function togglePasswordVisibility() {
             const passwordInput = document.getElementById('password');
@@ -269,17 +322,24 @@
                         $("#customer_name").val(customer.name);
                         $("#email").val(customer.email || ""); // Use empty string if email is null
                         $("#phone").val(customer.phone);
-                        $("#staff_type").val(customer.staff_type || "");
-                        $("#country").val(customer.details.country ||
-                            ""); // Use empty string if country is null
-                        $("#city").val(customer.details.city || ""); // Use empty string if city is null
-                        $("#address").val(customer.details.address ||
-                            ""); // Use empty string if address is null
+                        $("#country").val(customer.details?.country || ""); 
+                        $("#city").val(customer.details?.city || ""); 
+                        $("#address").val(customer.details?.address || "");
 
                         // Show profile image if exists
                         if (customer.profile_image) {
                             $("#avatar-preview").attr("src", `${IMAGE_PATH}/storage/${customer.profile_image}`);
                             $("#avatar-preview-container").show(); // Make sure preview is visible
+                        }
+
+                        // Show face image if exists
+                        if (customer.face_image_path) {
+                            $("#face-preview").attr("src", `${IMAGE_PATH}/storage/${customer.face_image_path}`);
+                            $("#face-preview-container").show();
+                        }
+                        
+                        if (customer.face_descriptor) {
+                            $("#face_descriptor").val(JSON.stringify(customer.face_descriptor));
                         }
 
                         let modules = response.modules;
@@ -372,6 +432,56 @@
                 reader.readAsDataURL(event.target.files[0]);
             });
 
+            if (typeof window.OmsaiFaceRecognition !== 'undefined') {
+                const faceRecognition = window.OmsaiFaceRecognition.init();
+
+                $('#captureFaceBtn').on('click', function() {
+                    const staffName = $('#customer_name').val().trim() || 'Staff';
+
+                    faceRecognition.open({
+                        title: `Update Face for ${staffName}`,
+                        subtitle: 'Ask the staff member to face the camera and capture one clear frame.',
+                        captureLabel: 'Capture & Set',
+                        onCapture: async function(descriptor, modal, imageDataUrl) {
+                            $('#face_descriptor').val(JSON.stringify(descriptor));
+                            
+                            if (imageDataUrl) {
+                                // Update preview
+                                $('#face-preview').attr('src', imageDataUrl).show();
+                                $('#face-upload-content').hide();
+                                
+                                // Create a hidden input for the captured photo if it doesn't exist
+                                if ($('#captured_photo').length === 0) {
+                                    $('.card-body').append('<input type="hidden" name="captured_photo" id="captured_photo">');
+                                }
+                                $('#captured_photo').val(imageDataUrl);
+                            }
+
+                            modal.showMatchInfo('Face captured successfully.');
+
+                            setTimeout(function() {
+                                modal.close();
+                            }, 600);
+                        }
+                    });
+                });
+            }
+
+            // Face photo file input change
+            $('#face_photo_input').on('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        $('#face-preview').attr('src', event.target.result).show();
+                        $('#face-upload-content').hide();
+                        // Optional: Clear captured photo if file is uploaded
+                        $('#captured_photo').val('');
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+
             $("#updateCustomer").on("click", function(e) {
                 e.preventDefault();
                 $(".text-danger").html("");
@@ -455,12 +565,10 @@
                 if (password !== "") {
                     formData.append("password", password);
                 }
-                formData.append("password", $("#password").val());
                 formData.append("role", $("#role").val());
                 formData.append("staff_name", $("#customer_name").val());
                 formData.append("email", $("#email").val());
                 formData.append("phone", $("#phone").val());
-                formData.append("staff_type", $("#staff_type").val());
                 formData.append("country", $("#country").val());
                 formData.append("city", $("#city").val());
                 formData.append("address", $("#address").val());
@@ -472,6 +580,21 @@
                 let avatar = $("#avatar-input")[0].files[0];
                 if (avatar) {
                     formData.append("avatar", avatar);
+                }
+
+                let faceDescriptor = $("#face_descriptor").val();
+                if (faceDescriptor) {
+                    formData.append("face_descriptor", faceDescriptor);
+                }
+                
+                let capturedPhoto = $("#captured_photo").val();
+                if (capturedPhoto) {
+                    formData.append("captured_photo", capturedPhoto);
+                }
+                
+                let facePhotoFile = $("#face_photo_input")[0]?.files[0];
+                if (facePhotoFile) {
+                    formData.append("face_photo", facePhotoFile);
                 }
 
                 // Collect modules and permissions

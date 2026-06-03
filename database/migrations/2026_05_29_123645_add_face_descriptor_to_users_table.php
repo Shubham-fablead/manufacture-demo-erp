@@ -11,10 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('oauth_personal_access_clients', function (Blueprint $table) {
-            $table->bigIncrements('id');
-            $table->unsignedBigInteger('client_id');
-            $table->timestamps();
+        Schema::table('users', function (Blueprint $table) {
+            $table->json('face_descriptor')->nullable()->after('password');
         });
     }
 
@@ -23,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('oauth_personal_access_clients');
+        Schema::table('users', function (Blueprint $table) {
+            $table->dropColumn('face_descriptor');
+        });
     }
 };

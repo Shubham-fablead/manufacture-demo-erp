@@ -91,6 +91,13 @@
 
                             <div class="col-lg-3 col-sm-6 col-6">
                                 <div class="form-group">
+                                    <label>CIN Number</label>
+                                    <input type="text" id="cin_no" placeholder="Enter CIN Number">
+                                </div>
+                            </div>
+
+                            <div class="col-lg-3 col-sm-6 col-6">
+                                <div class="form-group">
                                     <label>Bank Name<span class="manitory">*</span></label>
                                     <input type="text" id="bank_name" placeholder="Enter Bank Name">
                                 </div>
@@ -117,9 +124,7 @@
                                 </div>
                             </div>
 
-
-
-                            <div class="col-lg-3 col-sm-12 col-6">
+                            <div class="col-lg-3 col-sm-6 col-6">
                                 <div class="form-group">
                                     <label>Shop Currency Symbol <span class="manitory">*</span></label>
                                     <select id="currency_symbol" class="form-select">
@@ -137,12 +142,13 @@
                                 </div>
                             </div>
 
-                            <div class="col-lg-3 col-sm-12 col-6">
+                            <div class="col-lg-3 col-sm-6 col-6">
                                 <div class="form-group">
                                     <label for="currency_position" class="form-label">
                                         Currency Symbol Position
                                     </label>
-                                    <select class="form-select" id="currency_position" name="currency_position" required>
+                                    <select class="form-select" id="currency_position" name="currency_position"
+                                        required>
                                         <option value="left">Left (e.g. ₹100 or $100)</option>
                                         <option value="right">Right (e.g. 100₹ or 100$)</option>
                                     </select>
@@ -159,12 +165,17 @@
                                 </div>
                             </div>
 
-                            <div class="col-lg-3 col-sm-12">
+                            <div class="col-lg-3 col-sm-6">
                                 <div class="form-group">
                                     <label>Shop Address<span class="manitory">*</span></label>
                                     <textarea id="address" placeholder="Enter Address" rows="3" class="form-control"></textarea>
+                                    <div class="d-flex justify-content-between align-items-start mt-1">
+                                        <small id="coordinateLookupStatus" class="text-muted" style="line-height:1.2;"></small>
+                                        <button type="button" class="btn btn-sm btn-primary ms-2 flex-shrink-0" id="btnFetchCoordinates" style="padding: 2px 8px; font-size: 11px;">Get GPS from Address</button>
+                                    </div>
                                 </div>
                             </div>
+
                             <div class="col-lg-3 col-sm-6 col-6">
                                 <div class="form-group">
                                     <label>Shop Logo</label>
@@ -213,7 +224,7 @@
                                 </div>
                             </div>
 
-                            <div class="col-lg-3 col-sm-12 col-6">
+                            <div class="col-lg-3 col-sm-6 col-6">
                                 <div class="form-group">
                                     <label>Invoice Size</label>
                                     <select id="invoice_size" name="invoice_size" class="form-select">
@@ -227,7 +238,7 @@
                                 </div>
                             </div>
 
-                            <div class="col-lg-3 col-sm-12 col-6">
+                            <div class="col-lg-3 col-sm-6 col-6">
                                 <div class="form-group">
                                     <label>Send Mail</label>
                                     <select id="send_mail" name="send_mail" class="form-select">
@@ -237,7 +248,17 @@
                                 </div>
                             </div>
 
-                            <div class="col-lg-3 col-sm-12 col-6">
+                            <div class="col-lg-3 col-sm-6 col-6">
+                                <div class="form-group">
+                                    <label>Financial Year</label>
+                                    <select id="financial_year" name="financial_year" class="form-select">
+                                        <option value="1">On</option>
+                                        <option value="0">Off</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-3 col-sm-6 col-6">
                                 <div class="form-group">
                                     <label>TDS Apply</label>
                                     <select id="tds_apply" name="tds_apply" class="form-select">
@@ -247,10 +268,10 @@
                                 </div>
                             </div>
 
-                            <div class="col-lg-3 col-sm-12 col-6">
+                            <div class="col-lg-3 col-sm-6 col-6">
                                 <div class="form-group">
-                                    <label>Financial Year</label>
-                                    <select id="financial_year" name="financial_year" class="form-select">
+                                    <label>Customer WhatsApp Message</label>
+                                    <select id="customer_whatsapp_message" name="customer_whatsapp_message" class="form-select">
                                         <option value="1">On</option>
                                         <option value="0">Off</option>
                                     </select>
@@ -291,6 +312,51 @@
                                 </div>
                             </div>
 
+                            <div class="col-lg-3 col-sm-6 col-6">
+                                <div class="form-group">
+                                    <label>Admin WhatsApp Message</label>
+                                    <select id="admin_whatsapp_message" name="admin_whatsapp_message" class="form-select">
+                                        <option value="1">On</option>
+                                        <option value="0">Off</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-3 col-sm-6 col-6">
+                                <div class="form-group">
+                                    <label>Office Latitude</label>
+                                    <input type="text" id="office_latitude" class="form-control" placeholder="e.g. 21.1268432">
+                                </div>
+                            </div>
+
+                            <div class="col-lg-3 col-sm-6 col-6">
+                                <div class="form-group">
+                                    <label>Office Longitude</label>
+                                    <input type="text" id="office_longitude" class="form-control" placeholder="e.g. 73.1051204">
+                                </div>
+                            </div>
+
+                            <div class="col-lg-3 col-sm-6 col-6">
+                                <div class="form-group">
+                                    <label>Radius (m)</label>
+                                    <input type="number" id="office_radius" class="form-control" placeholder="e.g. 200" min="0" value="200">
+                                    <small class="text-muted">Staff must be within this distance from office GPS to clock in.</small>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-3 col-sm-6 col-6">
+                                <div class="form-group">
+                                    <label>Meeting / Follow-up reminder (hours before)</label>
+                                    <input type="number" id="appointment_reminder_hours_before"
+                                        name="appointment_reminder_hours_before"
+                                        class="form-control" placeholder="e.g. 3" min="1">
+                                    <small class="text-muted">IST. Default 3. Use matching WhatsApp
+                                        templates (e.g. meeting_reminder_3_hours_before).</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row desktop-submit">
                             <div class="col-lg-12">
                                 <a href="javascript:void(0);" class="btn btn-submit me-2"
                                     id="btn-setting-submit">Submit</a>
@@ -351,6 +417,38 @@
                                 <div class="form-group">
                                     <label>Company Close Time<span class="manitory">*</span></label>
                                     <input type="time" id="close_time" class="form-control">
+                                </div>
+                            </div>
+
+                            <div class="col-lg-3 col-sm-6">
+                                <div class="form-group">
+                                    <label>Overtime After (hours)</label>
+                                    <input type="number" step="0.5" id="overtime_after_hours" class="form-control" placeholder="e.g. 9">
+                                    <small class="text-muted">Hours after which overtime starts (e.g. 9 for 8h shift + 1h grace)</small>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-12 mt-4">
+                                <h5>Security Settings</h5>
+                                <hr>
+                            </div>
+
+                            <div class="col-lg-6 col-sm-12">
+                                <div class="form-group">
+                                    <label>Location Check on Login</label>
+                                    <div class="d-flex align-items-center gap-3 mt-1">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="location_check_enabled"
+                                                id="location_check_on" value="1">
+                                            <label class="form-check-label" for="location_check_on">ON (Check GPS location)</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="location_check_enabled"
+                                                id="location_check_off" value="0" checked>
+                                            <label class="form-check-label" for="location_check_off">OFF (Allow anywhere)</label>
+                                        </div>
+                                    </div>
+                                    <small class="text-muted">If ON, staff must be within the radius of their assigned office location to log in and clock in.</small>
                                 </div>
                             </div>
 
@@ -697,15 +795,67 @@
 @push('js')
     <script>
         $(document).ready(function() {
+            function initDashboardMobileSubsectionTabs() {
+                const $dashboardRow = $("#dashboard-settings > .row");
+                if (!$dashboardRow.length) return;
+
+                const findHeadingPanel = (title) => $dashboardRow.children(".col-lg-12").filter(function() {
+                    return $(this).find("h5").first().text().trim() === title;
+                }).first();
+
+                const sections = [
+                    { key: "crm", heading: findHeadingPanel("CRM Dashboard Subsections") },
+                    { key: "hr", heading: findHeadingPanel("HR Dashboard Subsections") },
+                    { key: "erp", heading: findHeadingPanel("ERP Dashboard Subsections") },
+                ];
+                const $savePanel = $("#saveDashboardSettings").closest(".col-lg-12");
+
+                sections.forEach((section, index) => {
+                    if (!section.heading.length) return;
+                    const $nextBoundary = sections[index + 1]?.heading?.length ? sections[index + 1].heading : $savePanel;
+                    section.items = section.heading.add(section.heading.nextUntil($nextBoundary));
+                    section.items.addClass(`dashboard-mobile-panel dashboard-mobile-panel-${section.key}`);
+                });
+
+                function activateDashboardSubsection(key) {
+                    $(".dashboard-mobile-subsection-tab").removeClass("active");
+                    $(`.dashboard-mobile-subsection-tab[data-dashboard-subsection="${key}"]`).addClass("active");
+                    $(".dashboard-mobile-panel").removeClass("active");
+                    $(`.dashboard-mobile-panel-${key}`).addClass("active");
+                }
+
+                activateDashboardSubsection("crm");
+
+                $(document).on("click", ".dashboard-mobile-subsection-tab", function() {
+                    activateDashboardSubsection($(this).data("dashboard-subsection"));
+                });
+            }
+
+            initDashboardMobileSubsectionTabs();
+
+
+
             var authToken = localStorage.getItem("authToken");
             const ImagePath = "{{ env('ImagePath') }}";
             const selectedSubAdminId = localStorage.getItem("selectedSubAdminId");
             const $generalSettingsBtn = $("#btn-setting-submit");
+            const $addressField = $("#address");
+            const $officeLatitudeField  = $("#office_latitude");
+            const $officeLongitudeField = $("#office_longitude");
+            const $coordinateLookupStatus = $("#coordinateLookupStatus");
             const generalSettingsBtnDefaultHtml = $generalSettingsBtn.html();
+            let lastGeocodedAddress = "";
+            let geocodeDebounceTimer = null;
 
             function toggleGeneralSettingsBtnLoading(isLoading) {
                 if (isLoading) {
                     $generalSettingsBtn
+                        .addClass("disabled")
+                        .attr("aria-disabled", "true")
+                        .html(
+                            '<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>Saving...'
+                        );
+                    $('.btn-submit-mobile')
                         .addClass("disabled")
                         .attr("aria-disabled", "true")
                         .html(
@@ -716,6 +866,10 @@
                         .removeClass("disabled")
                         .removeAttr("aria-disabled")
                         .html(generalSettingsBtnDefaultHtml);
+                    $('.btn-submit-mobile')
+                        .removeClass("disabled")
+                        .removeAttr("aria-disabled")
+                        .html('Submit');
                 }
             }
 
@@ -744,6 +898,14 @@
                             '');
                         $("#close_time").val(settings.close_time ? settings.close_time.substring(0, 5) :
                             '');
+                        $("#overtime_after_hours").val(settings.overtime_after_hours ?? '');
+
+                        // Location Check Enabled
+                        if (settings.location_check_enabled) {
+                            $("#location_check_on").prop("checked", true);
+                        } else {
+                            $("#location_check_off").prop("checked", true);
+                        }
 
                         // Sunday Off
                         if (settings.sunday_off === "yes") {
@@ -756,10 +918,15 @@
                         $("#low_stock").val(settings.low_stock);
                         $("#shop_name").val(settings.name);
                         $("#gst_num").val(settings.gst_num);
+                        $("#cin_no").val(settings.cin_no);
                         $("#email").val(settings.email);
                         $("#phone").val(settings.phone);
                         $("#state_code").val(settings.state_code);
-                        $("#address").val(settings.address);
+                        $addressField.val(settings.address);
+                        $officeLatitudeField.val(settings.office_latitude ?? '');
+                        $officeLongitudeField.val(settings.office_longitude ?? '');
+                        $("#office_radius").val(settings.office_radius ?? 200);
+                        lastGeocodedAddress = (settings.address || '').trim();
                         $("#bank_name").val(settings.bank_name);
                         $("#branch").val(settings.branch);
                         $("#ac_no").val(settings.ac_no);
@@ -770,15 +937,186 @@
                             ? '1'
                             : String(Number(settings.send_mail))
                         );
-                        $("#tds_apply").val(
-                            settings.tds_apply === null || settings.tds_apply === undefined
-                            ? '0'
-                            : String(Number(settings.tds_apply))
-                        );
                         $("#financial_year").val(
                             settings.financial_year === null || settings.financial_year === undefined
                             ? '1'
                             : String(Number(settings.financial_year))
+                        );
+                        $("#tds_apply").val(
+                            settings.tds_apply === null || settings.tds_apply === undefined
+                            ? '1'
+                            : String(Number(settings.tds_apply))
+                        );
+                        $("#show_crm_dashboard").val(
+                            settings.show_crm_dashboard === null || settings.show_crm_dashboard === undefined
+                            ? '1'
+                            : String(Number(settings.show_crm_dashboard))
+                        );
+                        $("#show_hr_dashboard").val(
+                            settings.show_hr_dashboard === null || settings.show_hr_dashboard === undefined
+                            ? '1'
+                            : String(Number(settings.show_hr_dashboard))
+                        );
+                        $("#show_erp_dashboard").val(
+                            settings.show_erp_dashboard === null || settings.show_erp_dashboard === undefined
+                            ? '1'
+                            : String(Number(settings.show_erp_dashboard))
+                        );
+                        
+                        // CRM Subsection Settings
+                        $("#show_crm_lead_pipeline").val(
+                            settings.show_crm_lead_pipeline === null || settings.show_crm_lead_pipeline === undefined
+                            ? '1'
+                            : String(Number(settings.show_crm_lead_pipeline))
+                        );
+                        $("#show_crm_conversion").val(
+                            settings.show_crm_conversion === null || settings.show_crm_conversion === undefined
+                            ? '1'
+                            : String(Number(settings.show_crm_conversion))
+                        );
+                        $("#show_crm_followup_load").val(
+                            settings.show_crm_followup_load === null || settings.show_crm_followup_load === undefined
+                            ? '1'
+                            : String(Number(settings.show_crm_followup_load))
+                        );
+                        $("#show_crm_meeting_momentum").val(
+                            settings.show_crm_meeting_momentum === null || settings.show_crm_meeting_momentum === undefined
+                            ? '1'
+                            : String(Number(settings.show_crm_meeting_momentum))
+                        );
+                        $("#show_crm_lead_status_mix").val(
+                            settings.show_crm_lead_status_mix === null || settings.show_crm_lead_status_mix === undefined
+                            ? '1'
+                            : String(Number(settings.show_crm_lead_status_mix))
+                        );
+                        $("#show_crm_activity_trend").val(
+                            settings.show_crm_activity_trend === null || settings.show_crm_activity_trend === undefined
+                            ? '1'
+                            : String(Number(settings.show_crm_activity_trend))
+                        );
+                        $("#show_crm_pipeline_quality").val(
+                            settings.show_crm_pipeline_quality === null || settings.show_crm_pipeline_quality === undefined
+                            ? '1'
+                            : String(Number(settings.show_crm_pipeline_quality))
+                        );
+                        $("#show_crm_recent_leads").val(
+                            settings.show_crm_recent_leads === null || settings.show_crm_recent_leads === undefined
+                            ? '1'
+                            : String(Number(settings.show_crm_recent_leads))
+                        );
+                        $("#show_crm_next_7_days").val(
+                            settings.show_crm_next_7_days === null || settings.show_crm_next_7_days === undefined
+                            ? '1'
+                            : String(Number(settings.show_crm_next_7_days))
+                        );
+
+                        // HR Subsection Settings
+                        $("#show_hr_staff_strength").val(
+                            settings.show_hr_staff_strength === null || settings.show_hr_staff_strength === undefined
+                            ? '1'
+                            : String(Number(settings.show_hr_staff_strength))
+                        );
+                        $("#show_hr_active_staff").val(
+                            settings.show_hr_active_staff === null || settings.show_hr_active_staff === undefined
+                            ? '1'
+                            : String(Number(settings.show_hr_active_staff))
+                        );
+                        $("#show_hr_monthly_attendance").val(
+                            settings.show_hr_monthly_attendance === null || settings.show_hr_monthly_attendance === undefined
+                            ? '1'
+                            : String(Number(settings.show_hr_monthly_attendance))
+                        );
+                        $("#show_hr_personal_progress").val(
+                            settings.show_hr_personal_progress === null || settings.show_hr_personal_progress === undefined
+                            ? '1'
+                            : String(Number(settings.show_hr_personal_progress))
+                        );
+                        $("#show_hr_attendance_pattern").val(
+                            settings.show_hr_attendance_pattern === null || settings.show_hr_attendance_pattern === undefined
+                            ? '1'
+                            : String(Number(settings.show_hr_attendance_pattern))
+                        );
+                        $("#show_hr_salary_payroll_trend").val(
+                            settings.show_hr_salary_payroll_trend === null || settings.show_hr_salary_payroll_trend === undefined
+                            ? '1'
+                            : String(Number(settings.show_hr_salary_payroll_trend))
+                        );
+                        $("#show_hr_payroll_snapshot").val(
+                            settings.show_hr_payroll_snapshot === null || settings.show_hr_payroll_snapshot === undefined
+                            ? '1'
+                            : String(Number(settings.show_hr_payroll_snapshot))
+                        );
+                        $("#show_hr_attendance_watch").val(
+                            settings.show_hr_attendance_watch === null || settings.show_hr_attendance_watch === undefined
+                            ? '1'
+                            : String(Number(settings.show_hr_attendance_watch))
+                        );
+                        $("#show_hr_payroll_status").val(
+                            settings.show_hr_payroll_status === null || settings.show_hr_payroll_status === undefined
+                            ? '1'
+                            : String(Number(settings.show_hr_payroll_status))
+                        );
+
+                        // ERP Subsection Settings
+                        $("#show_erp_total_sales").val(
+                            settings.show_erp_total_sales === null || settings.show_erp_total_sales === undefined
+                            ? '1'
+                            : String(Number(settings.show_erp_total_sales))
+                        );
+                        $("#show_erp_total_purchase").val(
+                            settings.show_erp_total_purchase === null || settings.show_erp_total_purchase === undefined
+                            ? '1'
+                            : String(Number(settings.show_erp_total_purchase))
+                        );
+                        $("#show_erp_total_expense").val(
+                            settings.show_erp_total_expense === null || settings.show_erp_total_expense === undefined
+                            ? '1'
+                            : String(Number(settings.show_erp_total_expense))
+                        );
+                        $("#show_erp_sales_invoice_count").val(
+                            settings.show_erp_sales_invoice_count === null || settings.show_erp_sales_invoice_count === undefined
+                            ? '1'
+                            : String(Number(settings.show_erp_sales_invoice_count))
+                        );
+                        $("#show_erp_purchase_invoice_count").val(
+                            settings.show_erp_purchase_invoice_count === null || settings.show_erp_purchase_invoice_count === undefined
+                            ? '1'
+                            : String(Number(settings.show_erp_purchase_invoice_count))
+                        );
+                        $("#show_erp_customers_count").val(
+                            settings.show_erp_customers_count === null || settings.show_erp_customers_count === undefined
+                            ? '1'
+                            : String(Number(settings.show_erp_customers_count))
+                        );
+                        $("#show_erp_vendors_count").val(
+                            settings.show_erp_vendors_count === null || settings.show_erp_vendors_count === undefined
+                            ? '1'
+                            : String(Number(settings.show_erp_vendors_count))
+                        );
+                        $("#show_erp_sales_chart").val(
+                            settings.show_erp_sales_chart === null || settings.show_erp_sales_chart === undefined
+                            ? '1'
+                            : String(Number(settings.show_erp_sales_chart))
+                        );
+                        $("#show_erp_purchase_chart").val(
+                            settings.show_erp_purchase_chart === null || settings.show_erp_purchase_chart === undefined
+                            ? '1'
+                            : String(Number(settings.show_erp_purchase_chart))
+                        );
+                        $("#show_erp_recent_sales").val(
+                            settings.show_erp_recent_sales === null || settings.show_erp_recent_sales === undefined
+                            ? '1'
+                            : String(Number(settings.show_erp_recent_sales))
+                        );
+                        $("#show_erp_recent_purchases").val(
+                            settings.show_erp_recent_purchases === null || settings.show_erp_recent_purchases === undefined
+                            ? '1'
+                            : String(Number(settings.show_erp_recent_purchases))
+                        );
+                        $("#show_erp_recent_products").val(
+                            settings.show_erp_recent_products === null || settings.show_erp_recent_products === undefined
+                            ? '1'
+                            : String(Number(settings.show_erp_recent_products))
                         );
                         $("#customer_whatsapp_message").val(
                             settings.customer_whatsapp_message === null || settings.customer_whatsapp_message === undefined
@@ -801,62 +1139,270 @@
                         }
                         $("#currency_symbol").val(settings.currency_symbol);
 
+                        // WhatsApp & Reminder Settings
+                        $("#customer_whatsapp_message").val(
+                            settings.customer_whatsapp_message === null || settings.customer_whatsapp_message === undefined
+                            ? '1'
+                            : String(Number(settings.customer_whatsapp_message))
+                        );
+                        $("#admin_whatsapp_message").val(
+                            settings.admin_whatsapp_message === null || settings.admin_whatsapp_message === undefined
+                            ? '1'
+                            : String(Number(settings.admin_whatsapp_message))
+                        );
+                        $("#appointment_reminder_hours_before").val(settings.appointment_reminder_hours_before ?? 3);
+
                         // Logos and Images
-                        if (settings.logo_url) {
-                            $("#logo_preview").attr("src", settings.logo_url).show();
+                        if (settings.logo) {
+                            $("#logo_preview").attr("src", ImagePath + '/storage/' + settings.logo)
+                                .show();
                         }
-                        if (settings.favicon_url) {
-                            $("#favicon_preview").attr("src", settings.favicon_url).show();
+                        if (settings.favicon) {
+                            $("#favicon_preview").attr("src", ImagePath + '/storage/' + settings
+                                .favicon).show();
                         }
-                        if (settings.qr_code_url) {
-                            $("#qr_preview").attr("src", settings.qr_code_url).show();
+                        if (settings.qr_code) {
+                            $("#qr_preview").attr("src", ImagePath + '/storage/' + settings.qr_code)
+                                .show();
                         }
 
-                        // 📊 Dashboard Settings
-                        $("#crm_section_enabled").val(settings.crm_section_enabled || 'Enable');
-                        $("#hr_section_enabled").val(settings.hr_section_enabled || 'Enable');
-                        $("#erp_section_enabled").val(settings.erp_section_enabled || 'Enable');
-
-                        // CRM Subsections
-                        $("#crm_lead_pipeline_box").val(settings.crm_lead_pipeline_box || 'Enable');
-                        $("#crm_conversion_box").val(settings.crm_conversion_box || 'Enable');
-                        $("#crm_followup_lead_box").val(settings.crm_followup_lead_box || 'Enable');
-                        $("#crm_meeting_momentum_box").val(settings.crm_meeting_momentum_box || 'Enable');
-                        $("#crm_lead_status_mix_chart").val(settings.crm_lead_status_mix_chart || 'Enable');
-                        $("#crm_activity_trend_chart").val(settings.crm_activity_trend_chart || 'Enable');
-                        $("#crm_pipeline_quality_table").val(settings.crm_pipeline_quality_table || 'Enable');
-                        $("#crm_recent_leads_table").val(settings.crm_recent_leads_table || 'Enable');
-                        $("#crm_next_7_days_table").val(settings.crm_next_7_days_table || 'Enable');
-
-                        // HR Subsections
-                        $("#hr_staff_strength_box").val(settings.hr_staff_strength_box || 'Enable');
-                        $("#hr_active_staff_box").val(settings.hr_active_staff_box || 'Enable');
-                        $("#hr_monthly_attendance_box").val(settings.hr_monthly_attendance_box || 'Enable');
-                        $("#hr_personal_progress_box").val(settings.hr_personal_progress_box || 'Enable');
-                        $("#hr_7day_attendance_chart").val(settings.hr_7day_attendance_chart || 'Enable');
-                        $("#hr_salary_payout_trend_chart").val(settings.hr_salary_payout_trend_chart || 'Enable');
-                        $("#hr_payroll_snapshot_table").val(settings.hr_payroll_snapshot_table || 'Enable');
-                        $("#hr_attendance_watch_table").val(settings.hr_attendance_watch_table || 'Enable');
-                        $("#hr_payroll_status_table").val(settings.hr_payroll_status_table || 'Enable');
-
-                        // ERP Subsections
-                        $("#erp_total_sales_box").val(settings.erp_total_sales_box || 'Enable');
-                        $("#erp_total_purchase_box").val(settings.erp_total_purchase_box || 'Enable');
-                        $("#erp_total_expense_box").val(settings.erp_total_expense_box || 'Enable');
-                        $("#erp_sales_invoice_count_box").val(settings.erp_sales_invoice_count_box || 'Enable');
-                        $("#erp_purchase_invoice_count_box").val(settings.erp_purchase_invoice_count_box || 'Enable');
-                        $("#erp_customers_count_box").val(settings.erp_customers_count_box || 'Enable');
-                        $("#erp_vendors_count_box").val(settings.erp_vendors_count_box || 'Enable');
-                        $("#erp_sales_chart").val(settings.erp_sales_chart || 'Enable');
-                        $("#erp_purchase_chart").val(settings.erp_purchase_chart || 'Enable');
-                        $("#erp_latest_sales_table").val(settings.erp_latest_sales_table || 'Enable');
-                        $("#erp_latest_purchases_table").val(settings.erp_latest_purchases_table || 'Enable');
+                        syncDashboardSectionState();
                     }
                 });
             }
 
 
             loadGeneralSettings(); // Load on page load
+
+            const dashboardMainSectionMap = {
+                crm: "#show_crm_dashboard",
+                hr: "#show_hr_dashboard",
+                erp: "#show_erp_dashboard"
+            };
+            const dashboardSubsectionMap = {
+                crm: "#show_crm_lead_pipeline, #show_crm_conversion, #show_crm_followup_load, #show_crm_meeting_momentum, #show_crm_lead_status_mix, #show_crm_activity_trend, #show_crm_pipeline_quality, #show_crm_recent_leads, #show_crm_next_7_days",
+                hr: "#show_hr_staff_strength, #show_hr_active_staff, #show_hr_monthly_attendance, #show_hr_personal_progress, #show_hr_attendance_pattern, #show_hr_salary_payroll_trend, #show_hr_payroll_snapshot, #show_hr_attendance_watch, #show_hr_payroll_status",
+                erp: "#show_erp_total_sales, #show_erp_total_purchase, #show_erp_total_expense, #show_erp_sales_invoice_count, #show_erp_purchase_invoice_count, #show_erp_customers_count, #show_erp_vendors_count, #show_erp_sales_chart, #show_erp_purchase_chart, #show_erp_recent_sales, #show_erp_recent_purchases, #show_erp_recent_products"
+            };
+
+            function syncDashboardSectionState() {
+                Object.keys(dashboardMainSectionMap).forEach(function(section) {
+                    const isEnabled = $(dashboardMainSectionMap[section]).val() === "1";
+                    $(dashboardSubsectionMap[section]).prop("disabled", !isEnabled);
+                });
+            }
+
+            function applyMainSectionState(sectionKey) {
+                const isEnabled = $(dashboardMainSectionMap[sectionKey]).val() === "1";
+                $(dashboardSubsectionMap[sectionKey]).val(isEnabled ? "1" : "0");
+                syncDashboardSectionState();
+            }
+
+            $("#show_crm_dashboard, #show_hr_dashboard, #show_erp_dashboard").on("change", function() {
+                const id = $(this).attr("id");
+                const sectionKey = id === "show_crm_dashboard" ? "crm" : (id === "show_hr_dashboard" ? "hr" : "erp");
+                applyMainSectionState(sectionKey);
+            });
+
+            // =====================================================================
+            // GEOCODING ENGINE  (Nominatim + Photon — free, no API key)
+            // =====================================================================
+
+            function setCoordinateStatus(message, type) {
+                type = type || 'muted';
+                $coordinateLookupStatus
+                    .removeClass('text-muted text-success text-danger text-warning')
+                    .addClass('text-' + type)
+                    .text(message || '');
+            }
+
+            function fillCoordinateFields(coordinates) {
+                $officeLatitudeField.val(coordinates && coordinates.latitude != null ? coordinates.latitude : '');
+                $officeLongitudeField.val(coordinates && coordinates.longitude != null ? coordinates.longitude : '');
+            }
+
+            // Scoring helper — how many address keywords appear in Nominatim display_name
+            function scoreResult(result, keywords) {
+                var name = (result.display_name || '').toLowerCase();
+                var score = 0;
+                keywords.forEach(function(kw) {
+                    if (kw.length > 2 && name.indexOf(kw.toLowerCase()) !== -1) score++;
+                });
+                var addr = result.address || {};
+                var pc = addr.postcode || '';
+                keywords.forEach(function(kw) {
+                    if (/^\d{6}$/.test(kw) && pc === kw) score += 10;
+                });
+                return score;
+            }
+
+            function extractPincode(address) {
+                var m = address.match(/\b(\d{6})\b/);
+                return m ? m[1] : '';
+            }
+
+            function extractKeywords(address) {
+                return address.split(',').map(function(p) { return p.trim(); }).filter(Boolean);
+            }
+
+            function extractBuildingName(address) {
+                var SKIP = [
+                    /^(shop|office|flat|unit|room|plot|door|house|floor|gf|ff)\b/i,
+                    /^\d+(st|nd|rd|th)?\s*(floor|fl)?\.?$/i,
+                    /^[a-z]?\d+$/i,
+                    /^\d+[-–\/]\d+$/i
+                ];
+                var parts = address.split(',').map(function(p){ return p.trim(); }).filter(Boolean);
+                for (var i = 0; i < parts.length; i++) {
+                    var p = parts[i].replace(/^\d+[,\s]*/, '').trim();
+                    var skip = false;
+                    for (var s = 0; s < SKIP.length; s++) {
+                        if (SKIP[s].test(parts[i]) || SKIP[s].test(p)) { skip = true; break; }
+                    }
+                    if (!skip && p.length > 3 && !/^\d/.test(p)) return p;
+                }
+                return '';
+            }
+
+            function extractCity(address) {
+                var parts = address.split(',').map(function(p){ return p.trim().replace(/[-–]\s*\d{6}/, '').trim(); }).filter(Boolean);
+                var states = ['gujarat','maharashtra','rajasthan','karnataka','tamil nadu','andhra pradesh',
+                    'telangana','uttar pradesh','madhya pradesh','west bengal','kerala','punjab','haryana',
+                    'bihar','odisha','goa','delhi','assam','himachal pradesh','uttarakhand'];
+                for (var i = parts.length - 1; i >= 0; i--) {
+                    var lower = parts[i].toLowerCase();
+                    if (/^\d{6}$/.test(parts[i])) continue;
+                    if (states.indexOf(lower) !== -1) continue;
+                    if (/^india$/i.test(parts[i])) continue;
+                    if (parts[i].length > 2) return parts[i];
+                }
+                return '';
+            }
+
+            function nominatimFetch(q, keywords) {
+                var url = 'https://nominatim.openstreetmap.org/search?'
+                    + 'q=' + encodeURIComponent(q)
+                    + '&format=json&addressdetails=1&countrycodes=in&limit=10&accept-language=en';
+                return fetch(url, { headers: { 'User-Agent': 'inventory-billing/1.0' } })
+                    .then(function(r) { return r.ok ? r.json() : []; })
+                    .then(function(data) {
+                        if (!data || !data.length) return null;
+                        var sorted = data.slice().sort(function(a, b) {
+                            return scoreResult(b, keywords) - scoreResult(a, keywords);
+                        });
+                        var best = sorted[0];
+                        return {
+                            lat: parseFloat(best.lat).toFixed(7),
+                            lon: parseFloat(best.lon).toFixed(7),
+                            name: best.display_name.substring(0, 100),
+                            attemptStr: 'Nominatim'
+                        };
+                    })
+                    .catch(function() { return null; });
+            }
+
+            function photonFetch(q, keywords) {
+                var url = 'https://photon.komoot.io/api/?q=' + encodeURIComponent(q)
+                    + '&limit=5&lang=en&bbox=68.0,8.0,97.5,37.6';
+                return fetch(url, { headers: { 'User-Agent': 'inventory-billing/1.0' } })
+                    .then(function(r) { return r.ok ? r.json() : {}; })
+                    .then(function(data) {
+                        var features = (data && data.features) ? data.features : [];
+                        if (!features.length) return null;
+                        var scored = features.map(function(f) {
+                            var props = f.properties || {};
+                            var display = [props.name, props.street, props.city, props.state, props.postcode]
+                                .filter(Boolean).join(', ');
+                            return { feature: f, display: display, score: scoreResult({ display_name: display, address: { postcode: props.postcode || '' } }, keywords) };
+                        }).sort(function(a, b) { return b.score - a.score; });
+                        var best = scored[0];
+                        var coords = best.feature.geometry.coordinates; // [lon, lat]
+                        return {
+                            lat: parseFloat(coords[1]).toFixed(7),
+                            lon: parseFloat(coords[0]).toFixed(7),
+                            name: best.display.substring(0, 100),
+                            attemptStr: 'Photon'
+                        };
+                    })
+                    .catch(function() { return null; });
+            }
+
+            function geocodeWaterfall(address) {
+                var keywords = extractKeywords(address);
+                var pincode  = extractPincode(address);
+                var building = extractBuildingName(address);
+                var city     = extractCity(address);
+
+                var cleanParts = address.split(',')
+                    .map(function(p) { return p.trim(); })
+                    .filter(function(p) {
+                        if (!p || p.length < 2) return false;
+                        if (/^(nr\.?|near|behind|opp\.?|opposite|above|below|beside)\b/i.test(p)) return false;
+                        if (/^[A-Za-z]?\/?[0-9]+/.test(p) && p.length < 8) return false;
+                        return true;
+                    });
+                var shortQuery = cleanParts.slice(-4).join(', ');
+
+                var p1 = pincode ? nominatimFetch(pincode + ', India', [pincode]) : Promise.resolve(null);
+                var p2 = function() { return shortQuery ? nominatimFetch(shortQuery, keywords) : Promise.resolve(null); };
+                var p3 = function() { return (building && city && pincode) ? nominatimFetch(building + ', ' + city + ', ' + pincode + ', India', keywords) : Promise.resolve(null); };
+                var p4 = function() { return (building && city) ? nominatimFetch(building + ', ' + city + ', India', keywords) : Promise.resolve(null); };
+                var p5 = function() { return nominatimFetch(address, keywords); };
+
+                return p1
+                    .then(function(r) { return r || p2(); })
+                    .then(function(r) { return r || p3(); })
+                    .then(function(r) { return r || p4(); })
+                    .then(function(r) { return r || p5(); });
+            }
+
+            // "Get GPS from Address" button
+            $('#btnFetchCoordinates').on('click', function() {
+                var address = $addressField.val().trim();
+                if (!address) {
+                    setCoordinateStatus('Please enter an address first.', 'danger');
+                    return;
+                }
+                var $btn = $(this);
+                $btn.prop('disabled', true).text('Searching…');
+                setCoordinateStatus('🔍 Searching…');
+
+                var keywords = extractKeywords(address);
+                var pincode  = extractPincode(address);
+                var building = extractBuildingName(address);
+                var photonQ  = building ? (building + ', ' + (extractCity(address) || 'India')) : address;
+
+                photonFetch(photonQ, keywords)
+                    .then(function(result) {
+                        return result || geocodeWaterfall(address);
+                    })
+                    .then(function(result) {
+                        if (!result) {
+                            setCoordinateStatus('❌ Address not found. Try entering the PIN code only (e.g. 395009).', 'danger');
+                            return;
+                        }
+                        $officeLatitudeField.val(result.lat);
+                        $officeLongitudeField.val(result.lon);
+                        lastGeocodedAddress = address;
+                        var via = result.attemptStr ? ' [via ' + result.attemptStr + ']' : '';
+                        var displayLower = (result.name || '').toLowerCase();
+                        var keywordHit = keywords.some(function(kw) {
+                            return kw.length > 3 && displayLower.indexOf(kw.toLowerCase()) !== -1;
+                        });
+                        var pincodeOk = !pincode || displayLower.indexOf(pincode) !== -1;
+                        if (!pincodeOk && !keywordHit) {
+                            setCoordinateStatus('⚠️ Possible mismatch — verify manually: ' + result.name + via, 'warning');
+                        } else {
+                            setCoordinateStatus('✅ Found' + via + ': ' + result.name, 'success');
+                        }
+                    })
+                    .catch(function() {
+                        setCoordinateStatus('❌ Network error. Check your internet connection.', 'danger');
+                    })
+                    .finally(function() {
+                        $btn.prop('disabled', false).text('Get GPS from Address');
+                    });
+            });
 
             // Show Image Preview
             function previewImage(input, previewId) {
@@ -959,16 +1505,21 @@
                 formData.append("low_stock", $("#low_stock").val());
                 formData.append("shop_name", $("#shop_name").val());
                 formData.append("gst_num", $("#gst_num").val());
+                formData.append("cin_no", $("#cin_no").val());
                 formData.append("email", $("#email").val());
                 formData.append("phone", $("#phone").val());
                 formData.append("state_code", $("#state_code").val());
-                formData.append("address", $("#address").val());
+                formData.append("address", $addressField.val());
+                formData.append("office_latitude", $officeLatitudeField.val());
+                formData.append("office_longitude", $officeLongitudeField.val());
+                formData.append("office_radius", $("#office_radius").val() || 200);
                 formData.append("bank_name", $("#bank_name").val());
                 formData.append("branch", $("#branch").val());
                 formData.append("ac_no", $("#ac_no").val());
                 formData.append("ifsc_code", $("#ifsc_code").val());
                 formData.append("currency_position", $("#currency_position").val());
                 formData.append("currency_symbol", $("#currency_symbol").val());
+                formData.append("sunday_off", $("input[name='sunday_off']:checked").val() || "no");
                 formData.append("selectedSubAdminId", selectedSubAdminId);
                 if (logo) formData.append("logo", logo);
                 if (favicon) formData.append("favicon", favicon);
@@ -976,11 +1527,7 @@
                 formData.append("_token", "{{ csrf_token() }}");
                 formData.append("invoice_size", $("#invoice_size").val());
                 formData.append("send_mail", $("#send_mail").val());
-                formData.append("tds_apply", $("#tds_apply").val());
                 formData.append("financial_year", $("#financial_year").val());
-                formData.append("customer_whatsapp_message", $("#customer_whatsapp_message").val());
-                formData.append("admin_whatsapp_message", $("#admin_whatsapp_message").val());
-                formData.append("appointment_reminder_hours_before", $("#appointment_reminder_hours_before").val());
 
                 // Send AJAX
                 $.ajax({
@@ -1032,6 +1579,8 @@
                 formData.append("lunch_break", $("#lunch_break").val());
                 formData.append("open_time", $("#open_time").val());
                 formData.append("close_time", $("#close_time").val());
+                formData.append("overtime_after_hours", $("#overtime_after_hours").val());
+                formData.append("location_check_enabled", $("input[name='location_check_enabled']:checked").val() || 0);
                 formData.append("selectedSubAdminId", selectedSubAdminId);
                 formData.append("_token", "{{ csrf_token() }}");
 
