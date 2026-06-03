@@ -114,6 +114,7 @@ class AttendanceeController extends Controller
 
         $attendance = \App\Models\Attendance::where('user_id', $user->id)
             ->where('date', $today)
+            ->orderBy('id', 'desc')
             ->first();
 
         // If they have a check-in time but no check-out time, they are currently checked in
