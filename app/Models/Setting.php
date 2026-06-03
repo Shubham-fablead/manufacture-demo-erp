@@ -33,6 +33,9 @@ use Illuminate\Support\Facades\Storage;
             'send_mail',
             'tds_apply',
             'financial_year',
+            'customer_whatsapp_message',
+            'admin_whatsapp_message',
+            'appointment_reminder_hours_before',
             'created_at',
             'updated_at',
         ];
@@ -41,6 +44,9 @@ use Illuminate\Support\Facades\Storage;
         'send_mail' => 'boolean',
         'tds_apply' => 'boolean',
         'financial_year' => 'boolean',
+        'customer_whatsapp_message' => 'boolean',
+        'admin_whatsapp_message' => 'boolean',
+        'appointment_reminder_hours_before' => 'integer',
     ];
 
     // Automatically append extra fields

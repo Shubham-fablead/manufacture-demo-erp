@@ -320,7 +320,23 @@
                     },
                     error: function(xhr) {
                         if (xhr.status === 422) {
-                            let errors = xhr.responseJSON.errors;
+                            let response = xhr.responseJSON || {};
+                            let errors = response.errors || {};
+
+                            if (response.message) {
+                                Swal.fire({
+                                    title: "Validation Error",
+                                    text: response.message,
+                                    icon: "warning",
+                                    confirmButtonText: "OK",
+                                    confirmButtonColor: "#ff9f43",
+                                }).then(() => {
+                                    if (response.message === "Only 2 sub-branches are allowed.") {
+                                        window.location.href = "/sub-branch";
+                                    }
+                                });
+                            }
+
                             $.each(errors, function(key, value) {
                                 $(".error-" + key).html(value[
                                     0]); // Show error below each field

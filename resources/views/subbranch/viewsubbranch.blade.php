@@ -118,7 +118,7 @@
                 $('img[alt="Profile"]').attr('src', profileImage);
             },
             error: function(err) {
-                Swal.fire("Error!", "Customer not found!", "error");
+                Swal.fire("Error!", "Subbranch not found!", "error");
                 window.location.href = "{{ route('subbranch.list') }}";
             }
         });

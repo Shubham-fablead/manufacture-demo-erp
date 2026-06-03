@@ -16,6 +16,18 @@ class SubBranchController extends Controller
 {
     public function createSubbranch(Request $request)
     {
+        $maxSubBranches = 2;
+        $activeSubAdminCount = User::where('role', 'sub-admin')
+            ->where('isDeleted', 0)
+            ->count();
+
+        if ($activeSubAdminCount >= $maxSubBranches) {
+            return response()->json([
+                'status'  => false,
+                'message' => 'Only 2 sub-branches are allowed.',
+            ], 422);
+        }
+
         $rules = [
             'customer_name' => 'required|string|max:80',
             'email' => 'required|email|unique:users,email',
@@ -25,7 +37,6 @@ class SubBranchController extends Controller
                 'string',
                 'min:8',
                 'max:255',
-                'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).+$/'
             ],
             'country' => 'nullable|string|max:100',
             'city' => 'nullable|string|max:100',
@@ -39,8 +50,6 @@ class SubBranchController extends Controller
             ],
         ];
         $messages = [
-            'password.regex' =>
-            'Password must contain at least one uppercase letter, one lowercase letter, one number and one special character (@$!%*?&).',
             'password.min' => 'Password must be at least 8 characters.',
         ];
         $validator = Validator::make($request->all(), $rules, $messages);
@@ -107,7 +116,6 @@ class SubBranchController extends Controller
                 'string',
                 'min:8',
                 'max:255',
-                'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).+$/'
             ],
             'country'       => 'nullable|string|max:100',
             'city'          => 'nullable|string|max:100',
@@ -123,8 +131,6 @@ class SubBranchController extends Controller
             ],
         ];
         $messages = [
-            'password.regex' =>
-            'Password must contain at least one uppercase letter, one lowercase letter, one number and one special character (@$!%*?&).',
             'password.min' => 'Password must be at least 8 characters.',
         ];
         $validator = Validator::make($request->all(), $rules, $messages);
@@ -226,55 +232,60 @@ class SubBranchController extends Controller
             ], 403);
         }
 
-        // ✅ If sub-admin branch, dynamically check all tables
-        if ($branch->role === 'sub-admin') {
-            $tables       = DB::select('SHOW TABLES');
-            $databaseName = DB::getDatabaseName();
-            $keyName      = 'Tables_in_' . $databaseName;
+        try {
+            DB::beginTransaction();
 
-            foreach ($tables as $table) {
-                $tableName = $table->$keyName;
+            // ✅ Cascade soft-delete branch related rows across project
+            if ($branch->role === 'sub-admin') {
+                $tables       = DB::select('SHOW TABLES');
+                $databaseName = DB::getDatabaseName();
+                $keyName      = 'Tables_in_' . $databaseName;
 
-                // Skip system tables if any (optional)
-                if (in_array($tableName, ['migrations', 'password_resets', 'personal_access_tokens'])) {
-                    continue;
-                }
+                foreach ($tables as $table) {
+                    $tableName = $table->$keyName;
 
-                // Check if table has a branch_id column
-                if (Schema::hasColumn($tableName, 'branch_id')) {
-                    $exists = DB::table($tableName)
-                        ->where('branch_id', $id)
-                        ->where(function ($query) use ($tableName) {
-                            if (Schema::hasColumn($tableName, 'isDeleted')) {
-                                $query->where('isDeleted', 0);
-                            }
-                        })
-                        ->exists();
+                    // Skip system tables
+                    if (in_array($tableName, ['migrations', 'password_resets', 'personal_access_tokens'])) {
+                        continue;
+                    }
 
-                    if ($exists) {
-                        return response()->json([
-                            'status'  => false,
-                            'message' => "This branch cannot be deleted. Records exist in the '{$tableName}' table.",
-                        ], 403);
+                    // Soft delete rows by branch_id only where isDeleted column exists
+                    if (Schema::hasColumn($tableName, 'branch_id') && Schema::hasColumn($tableName, 'isDeleted')) {
+                        DB::table($tableName)
+                            ->where('branch_id', $id)
+                            ->update(['isDeleted' => 1]);
                     }
                 }
             }
+
+            // Soft delete branch user itself
+            $branch->isDeleted = 1;
+            $branch->save();
+
+            // Soft delete sub-branch detail
+            UserDetail::where('user_id', $id)->update(['isDeleted' => 1]);
+
+            // Soft delete branch-scoped users (e.g. staff) and their details
+            $branchUserIds = User::where('branch_id', $id)->pluck('id');
+            if ($branchUserIds->isNotEmpty()) {
+                User::whereIn('id', $branchUserIds)->update(['isDeleted' => 1]);
+                UserDetail::whereIn('user_id', $branchUserIds)->update(['isDeleted' => 1]);
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'status'  => true,
+                'message' => 'Branch and related records deleted successfully.',
+            ], 200);
+        } catch (\Throwable $e) {
+            DB::rollBack();
+
+            return response()->json([
+                'status'  => false,
+                'message' => 'Failed to delete branch records.',
+            ], 500);
         }
-
-        // ✅ Safe to delete
-        $branch->isDeleted = 1;
-        $branch->save();
-
-        $userDetail = UserDetail::where('user_id', $id)->first();
-        if ($userDetail) {
-            $userDetail->isDeleted = 1;
-            $userDetail->save();
-        }
-
-        return response()->json([
-            'status'  => true,
-            'message' => 'Branch deleted successfully.',
-        ], 200);
     }
 
     public function getSubbranch($id)
