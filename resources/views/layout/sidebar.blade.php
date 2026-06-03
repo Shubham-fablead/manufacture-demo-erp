@@ -372,7 +372,7 @@
                 </li>
                 @endif
 
-                @if (in_array(auth()->user()->role, ['admin', 'hr', 'sub-admin']))
+                @if (in_array(auth()->user()->role, ['admin', 'hr', 'sub-admin', 'staff']))
                 {{-- ====== HR MODULE SECTION ====== --}}
                 <li style="padding: 14px 16px 6px; font-size: 11px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; color: #FF9F43;">
                     HR Workspace
@@ -416,7 +416,7 @@
                             <span> Leaves</span> <span class="menu-arrow"></span>
                         </a>
                         <ul>
-                            @if (in_array(auth()->user()->role, ['admin', 'sub-admin', 'hr']))
+                            @if (in_array(auth()->user()->role, ['admin', 'sub-admin', 'hr', 'staff']))
                                 @if (app('hasPermission')(28, 'view'))
                                     <li><a href="{{ route('leave.view') }}">All Leaves</a></li>
                                 @endif

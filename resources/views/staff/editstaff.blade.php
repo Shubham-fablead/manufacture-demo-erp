@@ -99,7 +99,7 @@
                     </div>
 
                     <!-- Password -->
-                    <div class="col-lg-3 col-sm-6 col-6 d-none">
+                    <div class="col-lg-3 col-sm-6 col-6">
                         <div class="form-group ">
                             <label>Password <span class="text-danger">*</span></label>
                             <div class="position-relative">
@@ -123,6 +123,24 @@
                             <div class="text-danger error-phone"></div>
                         </div>
                     </div>
+                    <!-- Salary -->
+                    <div class="col-lg-3 col-sm-6 col-6">
+                        <div class="form-group">
+                            <label>Salary <span class="text-danger">*</span></label>
+                            <input type="number" name="salary" id="salary" min="0" step="0.01" class="form-control" placeholder="Enter salary amount">
+                            <div class="text-danger error-salary"></div>
+                        </div>
+                    </div>
+
+                    <!-- Joining Date -->
+                    <div class="col-lg-3 col-sm-6 col-6">
+                        <div class="form-group">
+                            <label>Joining Date <span class="text-danger">*</span></label>
+                            <input type="date" name="joining_date" id="joining_date" class="form-control">
+                            <div class="text-danger error-joining_date"></div>
+                        </div>
+                    </div>
+
                     <div class="col-lg-3 col-sm-6 col-6">
                         <div class="form-group">
                             <label>Country</label>
@@ -322,6 +340,8 @@
                         $("#customer_name").val(customer.name);
                         $("#email").val(customer.email || ""); // Use empty string if email is null
                         $("#phone").val(customer.phone);
+                        $("#salary").val(customer.details?.salary || ""); 
+                        $("#joining_date").val(customer.details?.joining_date || ""); 
                         $("#country").val(customer.details?.country || ""); 
                         $("#city").val(customer.details?.city || ""); 
                         $("#address").val(customer.details?.address || "");
@@ -533,6 +553,23 @@
                     hasError = true;
                 }
 
+                // Salary validation
+                let salary = $("#salary").val().trim();
+                if (salary === "") {
+                    $(".error-salary").html(" Salary is required. ");
+                    hasError = true;
+                } else if (parseFloat(salary) < 0) {
+                    $(".error-salary").html(" Salary must be a positive number. ");
+                    hasError = true;
+                }
+
+                // Joining Date validation
+                let joiningDate = $("#joining_date").val().trim();
+                if (joiningDate === "") {
+                    $(".error-joining_date").html(" Joining date is required. ");
+                    hasError = true;
+                }
+
 
                 // Permission check
                 if (!$('input[name="permission_type"]:checked').length) {
@@ -569,6 +606,8 @@
                 formData.append("staff_name", $("#customer_name").val());
                 formData.append("email", $("#email").val());
                 formData.append("phone", $("#phone").val());
+                formData.append("salary", $("#salary").val());
+                formData.append("joining_date", $("#joining_date").val());
                 formData.append("country", $("#country").val());
                 formData.append("city", $("#city").val());
                 formData.append("address", $("#address").val());
