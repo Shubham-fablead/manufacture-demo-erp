@@ -2840,7 +2840,7 @@
                                     window.purchaseDataMap[o.id] = purchaseData;
 
                                     rows.push([
-                                        `<a href="/purchase-view/${o.id}" style="text-decoration: none;">${o.bill_no || ''}</a>`,
+                                        `<a href="/print-purchase/${o.id}" style="text-decoration: none;">${o.bill_no || ''}</a>`,
                                         `<button class="mobile-toggle-btn-table" onclick="togglePurchaseRowDetails('${o.id}')" data-purchase-id="${o.id}">
                             <span class="toggle-icon">+</span>
                         </button>`,

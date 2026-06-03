@@ -169,6 +169,135 @@
             }
         }
 
+        @media screen and (min-width: 769px) and (max-width: 1199px) {
+            .purchase-header {
+                display: flex;
+                flex-direction: column;
+                align-items: stretch;
+                justify-content: flex-start;
+                gap: 8px;
+            }
+
+            .purchase-header .page-title {
+                width: 100%;
+                flex: 1 1 100%;
+                min-width: 0;
+            }
+
+            .purchase-header .page-title h4 {
+                font-size: 17px;
+                margin-bottom: 0;
+                text-align: left;
+            }
+
+            .gst-header {
+                display: flex;
+                align-items: center;
+                width: 100%;
+                padding: 0;
+                gap: 10px;
+                flex-wrap: nowrap;
+                margin-left: 0;
+                justify-content: space-between;
+            }
+
+            .custom-radio-label {
+                font-size: 12px;
+                font-weight: 500;
+                padding-left: 20px;
+                gap: 4px;
+            }
+
+            .custom-radio-label input[type="radio"] {
+                width: 14px;
+                height: 14px;
+            }
+
+            .custom-radio-label input[type="radio"]:checked::after {
+                width: 5px;
+                height: 5px;
+            }
+
+            .purchase-back-btn {
+                margin-left: auto;
+                padding: 4px 10px;
+                height: 28px;
+                font-size: 12px;
+            }
+
+            .card .card-body {
+                padding: 12px 10px;
+            }
+
+            .form-row {
+                padding: 14px 8px 8px;
+                margin-bottom: 14px;
+            }
+
+            .form-group {
+                margin-bottom: 10px !important;
+            }
+
+            .form-group label {
+                font-size: 12px;
+                margin-bottom: 4px;
+            }
+
+            .form-group .form-control,
+            .form-group .select2-container--default .select2-selection--single {
+                height: 38px;
+                font-size: 12px;
+            }
+
+            .row.form-row > [class*="col-"] {
+                padding-left: 6px;
+                padding-right: 6px;
+                margin-bottom: 6px;
+            }
+
+            .row.form-row .form-group {
+                margin-bottom: 0 !important;
+            }
+
+            .row.form-row .col-lg-2,
+            .row.form-row .col-lg-1 {
+                flex: 0 0 50%;
+                max-width: 50%;
+            }
+
+            .row.form-row .col-lg-2.col-12,
+            .row.form-row .add-row-btn,
+            .row.form-row .col-lg-1.col-sm-12.add-row-btn {
+                flex: 0 0 100%;
+                max-width: 100%;
+            }
+
+            .row.form-row .select2-container {
+                width: 100% !important;
+            }
+
+            .add-row-btn {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin-top: 0;
+                margin-bottom: 0;
+            }
+
+            .add-row,
+            .remove-row {
+                width: 100%;
+                height: 38px;
+                border-radius: 4px;
+                text-align: center;
+            }
+
+            .product-gst-info {
+                margin-top: 4px !important;
+                font-size: 11px;
+            }
+        }
+
         .gst-header {
             display: flex;
             align-items: center;
