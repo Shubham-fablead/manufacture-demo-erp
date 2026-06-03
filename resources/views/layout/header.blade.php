@@ -107,13 +107,154 @@
     }
 
     /* iPad Pro specific (1024px) */
-    @media screen and (width: 1024px) {
+    @media screen and (min-width: 992px) and (max-width: 1180px) {
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            /* padding: 0 12px; */
+            min-height: 68px;
+        }
+
+
+        .header-left {
+            position: static;
+            transform: none;
+            width: 260px !important;
+            min-width: 260px !important;
+            max-width: 260px !important;
+            flex: 0 0 260px;
+            margin-right: 0;
+            padding: 0 14px;
+            border-right: 1px solid #eef0f2;
+            box-sizing: border-box;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .header-left .logo {
+            flex: 1 1 auto;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            margin: 0;
+            min-width: 0;
+        }
+
+        .header-left .logo .logo-view {
+            width: auto !important;
+            max-width: 92px !important;
+        }
+
+        .header-left .logo-small {
+            display: none;
+        }
+
+        #toggle_btn1 {
+            margin-left: auto;
+        }
+
+        body.mini-sidebar .header-left {
+            width: 80px !important;
+            min-width: 80px !important;
+            max-width: 80px !important;
+            padding: 0;
+            justify-content: center;
+        }
+
+        body.mini-sidebar .header-left .logo {
+            display: none;
+        }
+
+        body.mini-sidebar .header-left .logo-small {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+        }
+
+        body.mini-sidebar .header-left .logo-small img {
+            width: 32px;
+            height: auto;
+        }
+
         .web_button {
             display: flex !important;
+            flex: 0 0 auto;
+            margin-left: 8px;
         }
 
         .mobile_btn {
             display: none !important;
+        }
+
+        .nav.user-menu {
+            display: flex !important;
+            align-items: center;
+            justify-content: flex-end;
+            flex-wrap: nowrap;
+            gap: 8px;
+            margin-left: auto;
+            min-width: 0;
+            width: auto;
+        }
+
+        .nav.user-menu > * {
+            flex: 0 0 auto;
+        }
+
+        .header .header-search-container.tab-view {
+            display: flex !important;
+            align-items: center;
+            flex-wrap: nowrap;
+            gap: 8px;
+            min-width: 0;
+            flex: 1 1 auto;
+        }
+
+        .header .header-search {
+            width: 190px;
+            flex: 0 0 190px;
+        }
+
+        .header #subBranchContainer {
+            display: block !important;
+            width: 160px !important;
+            margin-right: 0 !important;
+            margin-left: 0;
+            flex: 0 0 160px;
+        }
+
+        .header #subBranchContainer .d-flex {
+            width: 160px;
+        }
+
+        .header #subBrandSelect,
+        .header #subBranchContainer .select2-container {
+            width: 160px !important;
+        }
+
+        .header .header-new-order-button {
+            height: 36px !important;
+            padding: 0 12px !important;
+            white-space: nowrap;
+        }
+
+        .header .notification-wrapper {
+            margin-right: 0 !important;
+            flex: 0 0 auto;
+        }
+
+        .header .main-drop {
+            flex: 0 0 auto;
+            margin-left: 2px;
+        }
+
+        .header .user-img img {
+            width: 38px;
+            height: 38px;
+            object-fit: cover;
         }
     }
 
@@ -767,7 +908,7 @@
     <div class="header-left active">
         <a href="{{ $logoRedirectRoute }}" class="logo">
             <img src="{{ !empty($settings) && !empty($settings->logo) ? env('ImagePath') . '/storage/' . $settings->logo : 'https://fableadtechnolabs.com/static/media/250x150%20(1).b3f5a4db48c7770366ef.webp' }}"
-                alt="" style="max-width: 80% !important;" class="logo-view">
+                alt="" style="max-width: 55% !important;" class="logo-view">
         </a>
         <a href="{{ $logoRedirectRoute }}" class="logo-small">
             <img src="{{ !empty($settings) && !empty($settings->favicon) ? env('ImagePath') . '/storage/' . $settings->favicon : 'https://fableadtechnolabs.com/favicon-192x192.webp' }}"
@@ -889,7 +1030,7 @@
             @endif
 
         </div>
-            
+
         <li class="nav-item dropdown has-arrow main-drop">
             <a href="javascript:void(0);" class="dropdown-toggle nav-link userset" data-bs-toggle="dropdown">
                 <span class="user-img">

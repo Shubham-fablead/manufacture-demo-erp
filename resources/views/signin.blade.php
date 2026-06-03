@@ -24,6 +24,14 @@
         /* .logo-img {
             margin-left: 9rem;
         } */
+         .logo-img {
+
+    margin-left: 130px !important;
+
+}
+
+
+
 
         body.account-page {
             padding-bottom: 50px; /* Space for sticky footer */
@@ -35,7 +43,7 @@
             }
 
             .logo-img {
-                margin-left: 0 !important;
+                margin-left: 55px !important;
             }
         }
     </style>
