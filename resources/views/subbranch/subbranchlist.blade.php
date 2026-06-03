@@ -29,8 +29,8 @@
             background-color: #5d6d7e;
             color: #fff;
             border: none;
-            margin: 0 4px;
-            padding: 6px 15px;
+            margin: 0 3px;
+            padding: 4px 10px;
             border-radius: 6px;
             font-weight: bold;
         }
@@ -47,6 +47,21 @@
 
         .pagination .page-item.active .page-link:hover {
             background-color: #e68a35 !important;
+        }
+
+        /* Previous and Next buttons */
+        .pagination .page-item:first-child .page-link,
+        .pagination .page-item:last-child .page-link {
+            background-color: #fff;
+            color: #6c757d;
+            border: 1px solid #dee2e6;
+        }
+
+        .pagination .page-item:first-child .page-link:hover,
+        .pagination .page-item:last-child .page-link:hover {
+            background-color: #f8f9fa;
+            color: #495057;
+            border-color: #dee2e6;
         }
 
         /* Search input styling */
@@ -120,6 +135,11 @@
 
         /* Mobile: hide non-essential columns, show Details toggle */
         @media (max-width: 768px) {
+            table.datanew {
+                width: 100% !important;
+                table-layout: fixed;
+            }
+
             .collapse .card-body .mt-2 {
                 display: flex;
                 flex-direction: row;
@@ -157,6 +177,7 @@
                 justify-content: center;
                 width: 44px;
                 height: 44px;
+                margin-left: auto;
             }
 
             .toggle-details i {
@@ -174,20 +195,31 @@
             table.datanew tbody td:nth-child(2) {
                 display: table-cell !important;
                 text-align: center;
-                vertical-align: middle;
-                width: 50px;
+                vertical-align: top !important;
+                width: 56px !important;
+                min-width: 56px !important;
+                max-width: 56px !important;
+                padding: 12px 6px !important;
             }
 
             /* Branch name column styling for mobile */
             table.datanew tbody td:first-child {
-                max-width: calc(100vw - 100px) !important;
+                width: calc(100% - 56px) !important;
+                max-width: calc(100vw - 96px) !important;
+                vertical-align: top !important;
                 white-space: normal !important;
             }
 
+            table.datanew tbody td:first-child > div {
+                width: 100%;
+            }
+
             table.datanew tbody td:first-child a {
-                display: flex !important;
+                /* display: flex !important; */
                 align-items: center !important;
                 text-align: left !important;
+                width: 100% !important;
+                min-width: 0 !important;
                 max-width: 100% !important;
                 word-wrap: break-word !important;
                 word-break: break-word !important;
@@ -222,7 +254,7 @@
             }
 
             table.datanew tbody td:first-child a {
-                display: flex !important;
+                /* display: flex !important; */
                 align-items: center;
                 gap: 10px;
             }
@@ -379,7 +411,14 @@
             }
 
             // Helper function to get action buttons HTML
-            function getActionButtons(branchId) {
+            function getActionButtons(branchId, role) {
+                const normalizedRole = (role || '').toLowerCase();
+                const deleteButton = normalizedRole === 'admin' ? '' : `
+                    <a class="me-3 confirm-text delete-btn" href="javascript:void(0);" data-id="${branchId}">
+                        <img src="${imagePath}admin/assets/img/icons/delete.svg" alt="Delete">
+                    </a>
+                `;
+
                 return `
                     <a class="me-3" href="/view-subbranch/${branchId}">
                         <img src="${imagePath}admin/assets/img/icons/eye.svg" alt="View">
@@ -387,9 +426,7 @@
                     <a class="me-3" href="/edit-subbranch/${branchId}">
                         <img src="${imagePath}admin/assets/img/icons/edit.svg" alt="Edit">
                     </a>
-                    <a class="me-3 confirm-text delete-btn" href="javascript:void(0);" data-id="${branchId}">
-                        <img src="${imagePath}admin/assets/img/icons/delete.svg" alt="Delete">
-                    </a>
+                    ${deleteButton}
                 `;
             }
 
@@ -468,7 +505,7 @@
                     // Mobile expandable details content
                     let mobileDetails = `
                         <div class="collapse mt-2 d-lg-none" id="branch-details-${branch.id}">
-                            <div class="card card-body p-3 bg-light border">
+                            <div class="">
                                 <div class="mb-2">
                                     <strong>Branch Role:</strong> ${branchRole}
                                 </div>
@@ -487,7 +524,7 @@
                                 <div class="mt-3">
                                     <strong>Actions:</strong>
                                     <div class="mt-2">
-                                        ${getActionButtons(branch.id)}
+                                        ${getActionButtons(branch.id, branch.role)}
                                     </div>
                                 </div>
                             </div>
@@ -497,7 +534,7 @@
                     tableBody.push([
                         // Column 1: Branch Name with Image and Mobile Details
                         `<div>
-                            <div style="display: flex; align-items: center;">
+                            <div style=" align-items: center;">
                                 <a href="/view-subbranch/${branch.id}" style="display: flex; align-items: center; text-decoration: none; color: inherit;">
                                     <img src="${profileImage}" alt="Branch" class="branch-img">
                                     <span class="branch-name">${branchName}</span>
@@ -518,7 +555,7 @@
                         // Column 7: City
                         city,
                         // Column 8: Action Buttons
-                        getActionButtons(branch.id)
+                        getActionButtons(branch.id, branch.role)
                     ]);
                 });
 
@@ -527,7 +564,7 @@
 
             // Update pagination UI
             function updatePaginationUI(pagination) {
-                let from = (pagination.current_page - 1) * pagination.per_page + 1;
+                let from = (pagination.current_page - 1) * pagination.per_page ;
                 let to = pagination.current_page * pagination.per_page;
                 if (to > pagination.total) to = pagination.total;
                 if (pagination.total === 0) from = 0;
@@ -537,13 +574,29 @@
                 $('#pagination-total').text(pagination.total);
 
                 let paginationHtml = '';
-                let startPage = Math.max(1, pagination.current_page - 2);
-                let endPage = Math.min(pagination.last_page, startPage + 4);
 
-                if (endPage - startPage < 4 && startPage > 1) {
-                    startPage = Math.max(1, endPage - 4);
+                // Previous button
+                paginationHtml += `
+                    <li class="page-item ${pagination.current_page === 1 ? 'disabled' : ''}">
+                        <a class="page-link" href="javascript:void(0);" data-page="${pagination.current_page - 1}">Previous</a>
+                    </li>
+                `;
+
+                // Show only 3 page numbers at a time
+                const visiblePageCount = 2;
+                let startPage = Math.floor((pagination.current_page - 1) / visiblePageCount) * visiblePageCount + 1;
+                let endPage = Math.min(pagination.last_page, startPage + visiblePageCount - 1);
+
+                // Show previous ellipsis if there are pages before startPage
+                if (startPage > 1) {
+                    paginationHtml += `
+                        <li class="page-item">
+                            <a class="page-link" href="javascript:void(0);" data-page="${startPage - 1}" data-action="prev-group">..</a>
+                        </li>
+                    `;
                 }
 
+                // Generate page numbers
                 for (let i = startPage; i <= endPage; i++) {
                     paginationHtml += `
                         <li class="page-item ${i === pagination.current_page ? 'active' : ''}">
@@ -552,14 +605,51 @@
                     `;
                 }
 
+                // Show next ellipsis if there are more pages after endPage
+                if (endPage < pagination.last_page) {
+                    paginationHtml += `
+                        <li class="page-item">
+                            <a class="page-link" href="javascript:void(0);" data-page="${endPage + 1}" data-action="next-group">..</a>
+                        </li>
+                    `;
+                }
+
+                // Next button
+                paginationHtml += `
+                    <li class="page-item ${pagination.current_page === pagination.last_page || pagination.last_page === 0 ? 'disabled' : ''}">
+                        <a class="page-link" href="javascript:void(0);" data-page="${pagination.current_page + 1}">Next</a>
+                    </li>
+                `;
+
                 $('#pagination-numbers').html(paginationHtml);
                 $('.pagination-controls').show();
             }
 
-            // Handle page number clicks
+            // Handle page number clicks with ellipsis support
             $(document).on('click', '#pagination-numbers .page-link', function(e) {
                 e.preventDefault();
                 let page = $(this).data('page');
+                let action = $(this).data('action');
+
+                // Handle ellipsis clicks to load next/previous groups
+                if (action === 'next-group') {
+                    // Load the page that starts the next group
+                    if (page && page <= lastPage) {
+                        fetchBranches(page);
+                    }
+                    return;
+                }
+
+                if (action === 'prev-group') {
+                    // Load the previous group's starting page
+                    let prevStartPage = Math.max(1, page - 2);
+                    if (prevStartPage >= 1 && prevStartPage <= lastPage) {
+                        fetchBranches(prevStartPage);
+                    }
+                    return;
+                }
+
+                // Regular page navigation
                 if (page && page !== currentPage && page >= 1 && page <= lastPage) {
                     fetchBranches(page);
                 }

@@ -257,6 +257,40 @@
                                 </div>
                             </div>
 
+                            <div class="col-lg-3 col-sm-12 col-6">
+                                <div class="form-group">
+                                    <label>Customer WhatsApp Message</label>
+                                    <select id="customer_whatsapp_message" name="customer_whatsapp_message"
+                                        class="form-select">
+                                        <option value="1">On</option>
+                                        <option value="0">Off</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-3 col-sm-12 col-6">
+                                <div class="form-group">
+                                    <label>Admin WhatsApp Message</label>
+                                    <select id="admin_whatsapp_message" name="admin_whatsapp_message"
+                                        class="form-select">
+                                        <option value="1">On</option>
+                                        <option value="0">Off</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-3 col-sm-12 col-6">
+                                <div class="form-group">
+                                    <label>Meeting / Follow-up reminder (hours before)</label>
+                                    <input type="number" id="appointment_reminder_hours_before"
+                                        class="form-control" min="0" step="1"
+                                        placeholder="Enter reminder hours">
+                                    <small class="text-muted d-block mt-1">
+                                        Default 3 hours before the scheduled time.
+                                    </small>
+                                </div>
+                            </div>
+
                             <div class="col-lg-12">
                                 <a href="javascript:void(0);" class="btn btn-submit me-2"
                                     id="btn-setting-submit">Submit</a>
@@ -746,6 +780,21 @@
                             ? '1'
                             : String(Number(settings.financial_year))
                         );
+                        $("#customer_whatsapp_message").val(
+                            settings.customer_whatsapp_message === null || settings.customer_whatsapp_message === undefined
+                            ? '0'
+                            : String(Number(settings.customer_whatsapp_message))
+                        );
+                        $("#admin_whatsapp_message").val(
+                            settings.admin_whatsapp_message === null || settings.admin_whatsapp_message === undefined
+                            ? '0'
+                            : String(Number(settings.admin_whatsapp_message))
+                        );
+                        $("#appointment_reminder_hours_before").val(
+                            settings.appointment_reminder_hours_before === null || settings.appointment_reminder_hours_before === undefined
+                            ? '3'
+                            : settings.appointment_reminder_hours_before
+                        );
 
                         if (settings.currency_position) {
                             $("#currency_position").val(settings.currency_position).trigger("change");
@@ -929,6 +978,9 @@
                 formData.append("send_mail", $("#send_mail").val());
                 formData.append("tds_apply", $("#tds_apply").val());
                 formData.append("financial_year", $("#financial_year").val());
+                formData.append("customer_whatsapp_message", $("#customer_whatsapp_message").val());
+                formData.append("admin_whatsapp_message", $("#admin_whatsapp_message").val());
+                formData.append("appointment_reminder_hours_before", $("#appointment_reminder_hours_before").val());
 
                 // Send AJAX
                 $.ajax({

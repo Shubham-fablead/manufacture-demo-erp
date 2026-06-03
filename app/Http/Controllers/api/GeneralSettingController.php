@@ -85,6 +85,9 @@ class GeneralSettingController extends Controller
             'send_mail'         => 'nullable|boolean',
             'tds_apply'         => 'nullable|boolean',
             'financial_year'    => 'nullable|boolean',
+            'customer_whatsapp_message' => 'nullable|boolean',
+            'admin_whatsapp_message' => 'nullable|boolean',
+            'appointment_reminder_hours_before' => 'nullable|integer|min:0',
             // 📊 Dashboard Settings validation
             'crm_section_enabled' => 'nullable|in:Enable,Disable',
             'hr_section_enabled' => 'nullable|in:Enable,Disable',
@@ -158,6 +161,15 @@ class GeneralSettingController extends Controller
         $settings->financial_year = $request->has('financial_year')
             ? (int) $request->financial_year
             : ($settings->financial_year ?? 1);
+        $settings->customer_whatsapp_message = $request->has('customer_whatsapp_message')
+            ? (int) $request->customer_whatsapp_message
+            : ($settings->customer_whatsapp_message ?? 0);
+        $settings->admin_whatsapp_message = $request->has('admin_whatsapp_message')
+            ? (int) $request->admin_whatsapp_message
+            : ($settings->admin_whatsapp_message ?? 0);
+        $settings->appointment_reminder_hours_before = $request->has('appointment_reminder_hours_before')
+            ? (int) $request->appointment_reminder_hours_before
+            : ($settings->appointment_reminder_hours_before ?? 3);
 
         // 📊 Dashboard Settings
         $settings->crm_section_enabled = $request->input('crm_section_enabled', $settings->crm_section_enabled ?? 'Enable');
