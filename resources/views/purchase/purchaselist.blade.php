@@ -506,6 +506,32 @@
             .table-scroll-top {
                 display: block;
             }
+
+            .purchase-responsive-summary {
+                display: block !important;
+                flex: 0 0 100% !important;
+                max-width: 100% !important;
+                width: 100% !important;
+                margin: 8px 0 0 0 !important;
+                padding: 0 8px !important;
+            }
+
+            .purchase-summary-box {
+                width: 100% !important;
+                min-width: 0 !important;
+                justify-content: space-between !important;
+                min-height: 32px !important;
+                height: 32px;
+                padding: 0 12px !important;
+                border-radius: 5px;
+                font-size: 14px;
+                line-height: 32px;
+            }
+
+            .purchase-summary-box span {
+                margin-left: auto !important;
+                text-align: right;
+            }
         }
 
         /* FILTER UI SAME SIZE DESIGN */
@@ -524,6 +550,41 @@
         #filtered-total {
             color: #ff9f43;
             margin-left: 5px;
+        }
+
+        .purchase-summary-box {
+            border-radius: 5px;
+            padding: 8px 12px;
+            font-size: 14px;
+            font-weight: bold;
+            width: auto;
+            min-width: 190px;
+            min-height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            white-space: nowrap;
+        }
+
+        .purchase-responsive-summary {
+            order: 10;
+            flex: 0 0 auto !important;
+            max-width: none !important;
+            width: auto !important;
+            margin-top: 8px;
+            margin-right: 8px;
+        }
+
+        .purchase-total-pending {
+            color: #ff4d4f;
+            border: 1px solid #ffb3b3;
+            background: #fff5f5;
+        }
+
+        .purchase-total-paid {
+            color: #00b050;
+            border: 1px solid #9be7b0;
+            background: #f4fff7;
         }
 
         .filter-row input.form-control-sm,
@@ -724,6 +785,225 @@
                 font-size: 28px;
             }
         }
+
+        @media (max-width: 575.98px) {
+            .content {
+                padding: 74px 14px 74px !important;
+                background: #eef3fa;
+            }
+
+            .page-wrapper {
+                background: #eef3fa;
+            }
+
+            .content .page-header {
+                margin: 0 0 14px !important;
+                gap: 8px !important;
+                justify-content: space-between !important;
+            }
+
+            .content .page-header .page-title h4 {
+                color: #061226;
+                font-size: 16px;
+                font-weight: 700;
+            }
+
+            .content .page-header .btn-added {
+                height: 31px;
+                border-radius: 4px;
+                padding: 6px 10px !important;
+                font-size: 12px !important;
+                background: #ff9f43;
+                border-color: #ff9f43;
+            }
+
+            .content .page-header .btn-added img {
+                width: 14px;
+                height: 14px;
+            }
+
+            .content>.card {
+                border: 1px solid #dfe5ec;
+                border-radius: 5px;
+                box-shadow: none;
+                margin: 0;
+                background: #fff;
+            }
+
+            .content>.card>.card-body {
+                padding: 12px 14px 14px !important;
+            }
+
+            .table-top {
+                margin-bottom: 10px !important;
+            }
+
+            .filter-row {
+                margin: 0 !important;
+                row-gap: 4px;
+            }
+
+            .filter-row>[class*="col-"] {
+                padding-left: 7px !important;
+                padding-right: 7px !important;
+            }
+
+            .filter-row>.col-12:first-child,
+            .filter-row>.col-md-2:nth-child(2),
+            .filter-row>.export-buttons-row,
+            .filter-row>.purchase-responsive-summary {
+                flex: 0 0 100% !important;
+                max-width: 100% !important;
+            }
+
+            .search-set,
+            .search-input,
+            .search-input input {
+                width: 100% !important;
+            }
+
+            .search-input input,
+            .filter-row input.form-control-sm,
+            .filter-row select.form-control-sm,
+            .filter-row .select2-container--default .select2-selection--single {
+                height: 29px !important;
+                min-height: 29px !important;
+                border: 1px solid #d3dbe4 !important;
+                border-radius: 5px !important;
+                background: #fff !important;
+                color: #516070 !important;
+                font-size: 14px !important;
+            }
+
+            .search-input input {
+                height: 30px !important;
+                padding-left: 34px !important;
+            }
+
+            .btn-searchset {
+                top: 6px !important;
+                left: 10px;
+            }
+
+            .filter-row .col-6 {
+                flex: 0 0 50% !important;
+                max-width: 50% !important;
+            }
+
+            .filter-row .col-md-2:nth-child(2) .mb-1 {
+                height: 30px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border-color: #d3dbe4 !important;
+                font-size: 14px !important;
+                margin-top: 4px;
+            }
+
+            .purchase-responsive-summary {
+                order: 20;
+                flex: 0 0 100% !important;
+                max-width: 100% !important;
+                width: 100% !important;
+                margin: 7px 0 0 !important;
+                padding-left: 7px !important;
+                padding-right: 7px !important;
+            }
+
+            .purchase-summary-box {
+                height: 32px !important;
+                min-height: 32px !important;
+                padding: 0 10px !important;
+                justify-content: space-between !important;
+                font-size: 14px !important;
+            }
+
+            .export-buttons-row {
+                order: 18;
+                margin-top: 4px !important;
+            }
+
+            .export-buttons-row .d-flex {
+                gap: 14px !important;
+                padding: 0 7px;
+            }
+
+            .export-buttons-row .btn {
+                height: 28px;
+                padding: 4px 8px !important;
+                border-radius: 3px;
+                font-size: 10px !important;
+                font-weight: 600;
+            }
+
+            .table-responsive.mt-3 {
+                margin-top: 16px !important;
+                overflow-x: visible !important;
+            }
+
+            #order-table {
+                table-layout: fixed;
+                width: 100% !important;
+                max-width: none !important;
+                margin-bottom: 0;
+                border-collapse: collapse;
+            }
+
+            #order-table thead th {
+                background: #fbfcfe !important;
+                color: #061226 !important;
+                font-size: 10px !important;
+                font-weight: 700 !important;
+                padding: 12px 8px !important;
+                border: 0 !important;
+            }
+
+            #order-table tbody td {
+                color: #1b2850;
+                font-size: 11px !important;
+                line-height: 1.35;
+                padding: 9px 8px !important;
+                border-bottom: 1px solid #edf0f4 !important;
+                vertical-align: middle;
+            }
+
+            #order-table th:nth-child(1),
+            #order-table td:nth-child(1) {
+                width: 74% !important;
+            }
+
+            #order-table th:nth-child(2),
+            #order-table td:nth-child(2) {
+                width: 26% !important;
+                text-align: center !important;
+            }
+
+            #order-table td:nth-child(1) a {
+                color: #1b2850 !important;
+                display: inline-block;
+                max-width: 100%;
+                white-space: normal;
+                word-break: break-word;
+            }
+
+            .mobile-toggle-btn-table {
+                width: 29px !important;
+                height: 29px !important;
+                min-width: 29px;
+                font-size: 17px !important;
+                line-height: 1;
+                margin: 0 auto;
+                background: #ff9f43 !important;
+            }
+
+            .order-details-content {
+                padding: 10px 8px !important;
+            }
+
+            .pagination-controls {
+                display: none !important;
+            }
+        }
     </style>
     @if (session('error'))
         <div class="alert alert-danger" id="error-message">
@@ -825,6 +1105,20 @@
 
 
                         </div>
+
+                        @if (in_array(auth()->user()->role, ['admin', 'sub-admin']))
+                            <div class="col-md-2 col-12 purchase-responsive-summary">
+                                <div class="mb-1 purchase-summary-box purchase-total-pending">
+                                    Total Pending: <span class="ms-1" id="purchase-total-pending">₹0.00</span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-2 col-12 purchase-responsive-summary">
+                                <div class="mb-1 purchase-summary-box purchase-total-paid">
+                                    Total Paid: <span class="ms-1" id="purchase-total-paid">₹0.00</span>
+                                </div>
+                            </div>
+                        @endif
 
 
                         <!-- Month Filter -->
@@ -1308,9 +1602,7 @@
                         <div class="order-detail-row-simple">
                             <span class="order-detail-label-simple">Payment Status:</span>
                             <span class="order-detail-value-simple">
-                                ${parseFloat(purchase.extra_paid || 0) > 0 ?
-                                    `<span class="mobile-badge bg-lightred">Extra Paid: ${currencySymbol}${formatCurrency(purchase.extra_paid)}</span>` :
-                                    `<span class="mobile-badge bg-lightgreen">${purchase.payment_status || 'N/A'}</span>`}
+                                <span class="mobile-badge bg-lightgreen">${purchase.payment_status || 'N/A'}</span>
                             </span>
                         </div>
                         <div class="order-detail-row-simple">
@@ -1331,22 +1623,6 @@
                                 ${currencySymbol}${formatCurrency(purchase.total_return || 0)}
                             </span>
                         </div>
-                        ${parseFloat(purchase.remaining_amount || 0) > 0 ? `
-                                                            <div class="order-detail-row-simple">
-                                                                <span class="order-detail-label-simple">Remaining:</span>
-                                                                <span class="order-detail-value-simple" style="color: #dc3545; font-weight: bold;">
-                                                                    ${currencySymbol}${formatCurrency(purchase.remaining_amount || 0)}
-                                                                </span>
-                                                            </div>
-                                                            ` : ''}
-                        ${parseFloat(purchase.extra_paid || 0) > 0 ? `
-                                                            <div class="order-detail-row-simple">
-                                                                <span class="order-detail-label-simple">Extra Paid:</span>
-                                                                <span class="order-detail-value-simple" style="color: #28c76f; font-weight: bold;">
-                                                                    ${currencySymbol}${parseFloat(purchase.extra_paid || 0).toFixed(2)}
-                                                                </span>
-                                                            </div>
-                                                            ` : ''}
                     </div>
                     <div class="mobile-action-buttons-simple">
                         ${actionBtns}
@@ -1463,6 +1739,19 @@
 
             const currencySymbol = "₹";
             $('#filtered-total').text(`${currencySymbol}${formatCurrency(total.toFixed(2))}`);
+        }
+
+        function updatePurchaseSummaryBoxes(purchases, currencySymbol) {
+            let totalPending = 0;
+            let totalPaid = 0;
+
+            (purchases || []).forEach(function(purchase) {
+                totalPending += parseFloat(purchase.remaining_amount || 0) || 0;
+                totalPaid += parseFloat(purchase.total_paid || 0) || 0;
+            });
+
+            $('#purchase-total-pending').text(`${currencySymbol}${formatCurrency(totalPending)}`);
+            $('#purchase-total-paid').text(`${currencySymbol}${formatCurrency(totalPaid)}`);
         }
 
         $(document).on('focus',
@@ -2520,6 +2809,8 @@
                                 const currencySymbol = res.currency_symbol || '₹';
                                 const currencyPosition = res.currency_position || 'left';
                                 const pagination = res.pagination;
+
+                                updatePurchaseSummaryBoxes(res.data, currencySymbol);
 
                                 if (pagination) {
                                     currentPage = pagination.current_page;
