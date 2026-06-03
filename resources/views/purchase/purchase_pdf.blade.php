@@ -158,7 +158,7 @@
                 $explode = explode(".", number_format($num, 2, '.', ''));
                 $whole = $explode[0];
                 $decimal = $explode[1];
-                
+
                 $lastThree = substr($whole, -3);
                 $restUnits = substr($whole, 0, -3);
                 if ($restUnits != '') {
@@ -188,7 +188,7 @@
                                     $logoMime = mime_content_type($logoPath);
                                 @endphp
                                 <img src="data:{{ $logoMime }};base64,{{ $logoData }}" alt="Company Logo"
-                                    style="height: 100px; width: auto;">
+                                    style="height: 60px; width: auto;">
                             @endif
                         </td>
 

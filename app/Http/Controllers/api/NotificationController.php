@@ -145,16 +145,30 @@ class NotificationController extends Controller
      * POST /api/notifications/read-all
      * Mark all notifications as read
      */
-    public function markAllAsRead()
+    public function markAllAsRead(Request $request)
     {
         try {
             $user = Auth::guard('api')->user();
+            $role = $user->role;
+            $userBranchId = $user->branch_id;
             $userId = $user->id;
 
-            // Mark all unread notifications for this user as read
-            $updatedCount = Notification::where('user_id', $userId)
-                ->where('is_read', false)
-                ->update(['is_read' => true]);
+            if ($role === 'staff' && $userBranchId) {
+                $branchIdToUse = $userBranchId;
+            } elseif ($role === 'admin' && !empty($request->selectedSubAdminId)) {
+                $branchIdToUse = $request->selectedSubAdminId;
+            } else {
+                $branchIdToUse = $userId;
+            }
+
+            $query = Notification::where('branch_id', $branchIdToUse)
+                ->where('is_read', false);
+
+            if ($role === 'staff') {
+                $query->where('user_id', $userId);
+            }
+
+            $updatedCount = $query->update(['is_read' => true]);
 
             return response()->json([
                 'status' => true,
@@ -226,14 +240,29 @@ class NotificationController extends Controller
      * DELETE /api/notifications/delete-all
      * Delete all notifications
      */
-    public function deleteAll()
+    public function deleteAll(Request $request)
     {
         try {
             $user = Auth::guard('api')->user();
+            $role = $user->role;
+            $userBranchId = $user->branch_id;
             $userId = $user->id;
 
-            // Delete all notifications for this user
-            $deletedCount = Notification::where('user_id', $userId)->delete();
+            if ($role === 'staff' && $userBranchId) {
+                $branchIdToUse = $userBranchId;
+            } elseif ($role === 'admin' && !empty($request->selectedSubAdminId)) {
+                $branchIdToUse = $request->selectedSubAdminId;
+            } else {
+                $branchIdToUse = $userId;
+            }
+
+            $query = Notification::where('branch_id', $branchIdToUse);
+
+            if ($role === 'staff') {
+                $query->where('user_id', $userId);
+            }
+
+            $deletedCount = $query->delete();
 
             return response()->json([
                 'status' => true,

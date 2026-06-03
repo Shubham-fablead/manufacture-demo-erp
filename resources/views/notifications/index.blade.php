@@ -79,11 +79,9 @@
             background-color: #5d6d7e;
             color: #fff;
             border: none;
-            margin: 0 4px;
-            padding: 6px 15px;
-            border-radius: 6px;
+            margin: 0 3px;
+            padding: 4px 10px;
             font-weight: bold;
-            cursor: pointer;
         }
 
         .pagination .page-item.active .page-link {
@@ -100,10 +98,41 @@
             background-color: #e68a35 !important;
         }
 
+        /* Previous and Next buttons */
+        .pagination .page-item:first-child .page-link,
+        .pagination .page-item:last-child .page-link {
+            background-color: #fff;
+            color: #6c757d;
+            border: 1px solid #dee2e6;
+        }
+
+        .pagination .page-item:first-child .page-link:hover,
+        .pagination .page-item:last-child .page-link:hover {
+            background-color: #f8f9fa;
+            color: #495057;
+            border-color: #dee2e6;
+        }
+
         .pagination .page-item.disabled .page-link {
-            background-color: #adb5bd;
-            cursor: not-allowed;
-            opacity: 0.6;
+            background-color: #fff !important;
+            color: #dee2e6 !important;
+            border: 1px solid #dee2e6 !important;
+            cursor: not-allowed !important;
+            pointer-events: none !important;
+        }
+
+        /* Responsive adjustments for mobile pagination */
+        @media (max-width: 480px) {
+            .pagination .page-item .page-link {
+                padding: 3px 6px;
+                font-size: 11px;
+                margin: 0 1px;
+            }
+
+            .pagination .page-item:first-child .page-link,
+            .pagination .page-item:last-child .page-link {
+                padding: 3px 8px;
+            }
         }
 
         /* ── Branch Filter Section ── */
@@ -243,7 +272,7 @@
         <div class="page-header">
             <div class="page-title">
                 <h4><i class="fa fa-bell me-2"></i>All Notifications</h4>
-                <h6>View and manage all your notifications</h6>
+                {{-- <h6>View and manage all your notifications</h6> --}}
             </div>
             <div class="page-btn">
                 <button class="btn btn-danger" id="deleteAllBtn">
@@ -550,13 +579,6 @@
                     contentType: 'application/json',
                     success: function(res) {
                         if (res.status) {
-                            setTimeout(function() {
-                                wrap.remove();
-                                refreshUnreadCount();
-                                if ($('.notification-item-wrapper').length === 0) {
-                                    loadNotifications(1);
-                                }
-                            }, 300);
                             Swal.fire({
                                 icon: 'success',
                                 title: 'Deleted!',
@@ -565,6 +587,9 @@
                                 timer: 1500,
                                 showConfirmButton: false
                             });
+                            setTimeout(function() {
+                                window.location.reload();
+                            }, 800);
                         } else {
                             Swal.fire({
                                 icon: 'error',
@@ -648,7 +673,7 @@
                                 showConfirmButton: false
                             });
                             setTimeout(function() {
-                                loadNotifications(1);
+                                window.location.reload();
                             }, 800);
                         } else {
                             Swal.fire({
@@ -769,8 +794,8 @@
            7.  PAGINATION
         ════════════════════════════════════ */
         function updatePaginationUI(pagination) {
-            var from = (pagination.current_page - 1) * pagination.per_page + 1;
-            var to = pagination.current_page * pagination.per_page;
+            let from = (pagination.current_page - 1) * pagination.per_page;
+            let to = pagination.current_page * pagination.per_page;
             if (to > pagination.total) to = pagination.total;
             if (pagination.total === 0) from = 0;
 
@@ -778,19 +803,55 @@
             $('#pagination-to').text(to);
             $('#pagination-total').text(pagination.total);
 
-            var startPage = Math.max(1, pagination.current_page - 2);
-            var endPage = Math.min(pagination.last_page, startPage + 4);
-            if (endPage - startPage < 4) startPage = Math.max(1, endPage - 4);
+            let paginationHtml = '';
 
-            var html = '';
+            // Previous button
+            paginationHtml += `
+                <li class="page-item ${pagination.current_page === 1 ? 'disabled' : ''}">
+                    <a class="page-link" href="javascript:void(0);" data-page="${pagination.current_page - 1}">Previous</a>
+                </li>
+            `;
 
-            for (var i = startPage; i <= endPage; i++) {
-                html += '<li class="page-item ' + (i === pagination.current_page ? 'active' : '') + '">' +
-                    '<a class="page-link" href="javascript:void(0);" data-page="' + i + '">' + i + '</a>' +
-                    '</li>';
+            // Show only limited page numbers at a time (behavior from productlist)
+            const visiblePageCount = 2;
+            let startPage = Math.floor((pagination.current_page - 1) / visiblePageCount) * visiblePageCount + 1;
+            let endPage = Math.min(pagination.last_page, startPage + visiblePageCount - 1);
+
+            // Show previous ellipsis if there are pages before startPage
+            if (startPage > 1) {
+                paginationHtml += `
+                    <li class="page-item">
+                        <a class="page-link" href="javascript:void(0);" data-page="${startPage - 1}" data-action="prev-group">..</a>
+                    </li>
+                `;
             }
 
-            $('#pagination-numbers').html(html);
+            // Generate page numbers
+            for (let i = startPage; i <= endPage; i++) {
+                paginationHtml += `
+                    <li class="page-item ${i === pagination.current_page ? 'active' : ''}">
+                        <a class="page-link" href="javascript:void(0);" data-page="${i}">${i}</a>
+                    </li>
+                `;
+            }
+
+            // Show next ellipsis if there are more pages after endPage
+            if (endPage < pagination.last_page) {
+                paginationHtml += `
+                    <li class="page-item">
+                        <a class="page-link" href="javascript:void(0);" data-page="${endPage + 1}" data-action="next-group">..</a>
+                    </li>
+                `;
+            }
+
+            // Next button
+            paginationHtml += `
+                <li class="page-item ${pagination.current_page === pagination.last_page || pagination.last_page === 0 ? 'disabled' : ''}">
+                    <a class="page-link" href="javascript:void(0);" data-page="${pagination.current_page + 1}">Next</a>
+                </li>
+            `;
+
+            $('#pagination-numbers').html(paginationHtml);
             $('#paginationControls').show();
         }
 

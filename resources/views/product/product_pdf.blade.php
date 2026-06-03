@@ -170,7 +170,7 @@
                                 $logoMime = mime_content_type($logoPath);
                             @endphp
                             <img src="data:{{ $logoMime }};base64,{{ $logoData }}" alt="Company Logo"
-                                style="height: 100px; width: auto;">
+                                style="height: 60px; width: auto;">
                         @endif
                     </td>
 
@@ -192,7 +192,7 @@
 
             <!-- Purchase Details (Merged) -->
             <div class="text-center">
-                <h4 style="text-transform: uppercase;">Purchase Details</h4>
+                <h4 style="text-transform: uppercase;">Product Details</h4>
             </div>
             <table class="table-bordered">
                 <thead>
@@ -200,7 +200,7 @@
                         <th style="width:5%; background-color:#ff9f43; color:#fff;">Sr No</th>
                         <th style="width:15%; background-color:#ff9f43; color:#fff;">Product Name</th>
                         <th style="width:15%; background-color:#ff9f43; color:#fff;">SKU</th>
-                        <th style="width:10%; background-color:#ff9f43; color:#fff;">Barcode</th>
+                        {{-- <th style="width:10%; background-color:#ff9f43; color:#fff;">Barcode</th> --}}
                         <th style="width:20%; background-color:#ff9f43; color:#fff;">Category</th>
                         <th style="width:10%; background-color:#ff9f43; color:#fff;">Brand</th>
                         <th style="width:10%; background-color:#ff9f43; color:#fff;">Quantity</th>
@@ -215,11 +215,11 @@
                             <td class="text-center">{{ $index + 1 }}</td>
                             <td class="text-center">{{ !empty($product->product_name) ? ucfirst(strtolower($product->product_name)) : 'N/A' }}</td>
                             <td class="text-center">{{ $product->SKU }}</td>
-                            <td class="text-center">{{ $product->barcode }}</td>
+                            {{-- <td class="text-center">{{ $product->barcode }}</td> --}}
                             <td class="text-center">{{ !empty($product->category_name) ? ucfirst(strtolower($product->category_name)) : 'N/A' }}</td>
                             <td class="text-center">{{ !empty($product->brand_name) ? ucfirst(strtolower($product->brand_name)) : 'N/A' }}
                             </td>
-                            <td class="text-center">{{ number_format($product->quantity, 0) }}</td>
+                            <td class="text-center">{{ number_format($product->quantity, 2) }}</td>
                             <td class="text-center">
                                 {{ !empty($product->unit_name) ? ucfirst(strtolower($product->unit_name)) : 'N/A' }}
                             </td>

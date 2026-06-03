@@ -170,7 +170,7 @@
                         $logoMime = mime_content_type($logoPath);
                         @endphp
                         <img src="data:{{ $logoMime }};base64,{{ $logoData }}" alt="Company Logo"
-                            style="height: 100px; width: auto;">
+                            style="height: 60px; width: auto;">
                         @endif
                     </td>
 
