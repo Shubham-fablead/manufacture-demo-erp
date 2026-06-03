@@ -9,6 +9,8 @@ use App\Models\CustomInvoice;
 use App\Models\LogAttendance;
 use App\Models\Attendance;
 use App\Models\Setting;
+use App\Models\FaceLoginAudit;
+use App\Services\FaceRecognitionService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
@@ -156,6 +158,145 @@ class LoginController extends Controller
         RateLimiter::hit($key, 600);
         return response()->json(['status' => false, 'error' => 'Login Credential Wrong'], 401);
     }
+
+    /**
+     * Login with Face Recognition.
+     * Accepts a 128-element face descriptor and matches it against all staff users.
+     */
+    public function faceLogin(Request $request)
+    {
+        $request->validate([
+            'face_descriptor'   => 'required|array|size:128',
+            'face_descriptor.*' => 'numeric',
+        ]);
+
+        $descriptor = $this->faceRecognition()->normalizeDescriptor($request->input('face_descriptor'));
+        if (!$descriptor) {
+            $this->logFaceAttempt($request, null, 'failed', null, null, 'Invalid face descriptor payload.');
+            return response()->json([
+                'status' => false,
+                'error'  => 'Invalid face descriptor provided.',
+            ], 422);
+        }
+
+        $faceRecognition = $this->faceRecognition();
+        $staffCandidates = User::query()
+            ->where('isDeleted', 0)
+            ->whereNotNull('face_descriptor')
+            ->orderBy('id')
+            ->get(['id', 'name', 'branch_id', 'role', 'isDeleted', 'face_descriptor']);
+
+        $matchResult = $faceRecognition->resolveLoginMatch($descriptor, $staffCandidates);
+        $bestMatch   = $matchResult['match'] ?? null;
+
+        if (($matchResult['reason'] ?? null) !== 'matched' || !$bestMatch) {
+            $this->logFaceAttempt(
+                $request,
+                $bestMatch['user'] ?? null,
+                'failed',
+                $bestMatch['distance'] ?? null,
+                $bestMatch['confidence'] ?? null,
+                $this->faceLoginFailureMessage($matchResult['reason'] ?? null)
+            );
+            return response()->json([
+                'status' => false,
+                'error'  => $this->faceLoginFailureMessage($matchResult['reason'] ?? null),
+            ], 401);
+        }
+
+        $staff = $bestMatch['user'];
+
+        Auth::guard('web')->login($staff, true);
+        $request->session()->regenerate();
+
+        $this->logFaceAttempt(
+            $request, $staff, 'success',
+            $bestMatch['distance'], $bestMatch['confidence'],
+            'Staff face login successful.'
+        );
+
+        if ((int) $staff->isDeleted === 1) {
+            Auth::guard('web')->logout();
+            return response()->json([
+                'status' => false,
+                'error'  => 'Your account is inactive. Please contact admin.',
+            ], 403);
+        }
+
+        $token               = $staff->createToken('LaravelPassportToken')->accessToken;
+        $formattedPermissions = $this->formatPermissionsForUser($staff);
+        $redirect            = route('auth.dashboard');
+        $this->createLoginNotification($staff);
+
+        return response()->json([
+            'status'      => true,
+            'token'       => $token,
+            'user'        => $staff,
+            'redirect'    => $redirect,
+            'permissions' => $formattedPermissions,
+            'login_method' => 'face',
+            'showAppointments' => false,
+        ]);
+    }
+
+    protected function logFaceAttempt(
+        Request $request,
+        ?User $user,
+        string $status,
+        ?float $distance,
+        ?float $confidence,
+        string $message
+    ): void {
+        try {
+            FaceLoginAudit::create([
+                'user_id'    => $user?->id,
+                'branch_id'  => $user?->branch_id,
+                'status'     => $status,
+                'method'     => 'face',
+                'distance'   => $distance,
+                'confidence' => $confidence,
+                'ip_address' => $request->ip(),
+                'user_agent' => (string) $request->userAgent(),
+                'message'    => $message,
+            ]);
+        } catch (\Throwable $e) {
+            Log::warning('Face login audit skipped: ' . $e->getMessage());
+        }
+    }
+
+    protected function faceRecognition(): FaceRecognitionService
+    {
+        return app(FaceRecognitionService::class);
+    }
+
+    protected function faceLoginFailureMessage(?string $reason): string
+    {
+        return match ($reason) {
+            'ambiguous_match' => 'Face verification is too close to another staff record. Please contact admin and re-register your face.',
+            default           => 'Face not recognized. Please try again or use password.',
+        };
+    }
+
+    protected function formatPermissionsForUser(User $user): array
+    {
+        $permissions          = $user->permissions()->with('module')->get();
+        $formattedPermissions = [];
+        foreach ($permissions as $permission) {
+            $moduleName = $permission->module->module ?? 'Unknown';
+            $formattedPermissions[$moduleName] = [
+                'id'         => $permission->id,
+                'user_id'    => $permission->user_id,
+                'module_id'  => $permission->module_id,
+                'view'       => $permission->view,
+                'create'     => $permission->add,
+                'update'     => $permission->edit,
+                'delete'     => $permission->delete,
+                'created_at' => $permission->created_at,
+            ];
+        }
+        return $formattedPermissions;
+    }
+
 
     private function createLoginNotification($user): void
     {

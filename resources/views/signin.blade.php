@@ -61,7 +61,7 @@
                 <div class="login-content">
                     <div class="login-userset">
                         <div class="login-logo">
-                            <img src="{{ env('ImagePath') . '/storage/' . $settings->logo ?? 'https://fableadtechnolabs.com/static/media/250x150%20(1).b3f5a4db48c7770366ef.webp'}}"
+                            <img src="{{ $settings?->logo ? env('ImagePath') . '/storage/' . $settings->logo : 'https://fableadtechnolabs.com/static/media/250x150%20(1).b3f5a4db48c7770366ef.webp'}}"
                                 alt="img" class="logo-img">
                         </div>
                         <div class="login-userheading">
@@ -99,6 +99,23 @@
                             </div>
 
                             <div id="loginMessage" class="text-danger"></div>
+
+                            {{-- ── Face Login ─────────────────────────────────────── --}}
+                            <div class="form-login mt-2">
+                                <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+                                    <hr style="flex:1;border-color:#e2e8f0;">
+                                    <span style="color:#94a3b8;font-size:13px;font-weight:500;">OR</span>
+                                    <hr style="flex:1;border-color:#e2e8f0;">
+                                </div>
+                                <button type="button" id="faceLoginBtn"
+                                    style="width:100%;padding:13px 20px;border-radius:10px;border:2px solid #ff9f43;
+                                           background:#fff;color:#f97316;font-weight:700;font-size:14px;
+                                           cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;
+                                           transition:all .2s ease;">
+                                    <i class="fas fa-camera" style="font-size:15px;"></i> Login with Face
+                                </button>
+                                <div id="faceLoginMessage" class="text-danger mt-2" style="font-size:13px;"></div>
+                            </div>
                         </form>
 
                     </div>
@@ -122,6 +139,13 @@
     <script src="{{ env('ImagePath') . 'admin/assets/js/script.js'}}"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- face-api.js from CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+
+    {{-- ── Face Recognition Modal & Script Partials ─────── --}}
+    @include('partials.face-recognition-modal')
+    @include('partials.face-recognition-script')
 
     <script>
         $(document).ready(function () {
@@ -242,6 +266,77 @@
         performLogin(false);
     });
 
+            /* ── Face Login ──────────────────────────────────────────── */
+            const $faceBtn = $('#faceLoginBtn');
+            const $faceMsgBox = $('#faceLoginMessage');
+
+            $faceBtn.on('click', function () {
+                $faceMsgBox.text('');
+                let fr;
+                try {
+                    fr = window.OmsaiFaceRecognition.init();
+                } catch (err) {
+                    $faceMsgBox.text('Face recognition UI failed to initialise. Please refresh.');
+                    return;
+                }
+
+                fr.open({
+                    title:        'Login with Face',
+                    subtitle:     'Look straight at the camera. We will log you in automatically.',
+                    autoDetect:   true,
+                    onCapture: async function (descriptor, modal) {
+                        modal.setStatus('⏳ Verifying face...', 'info');
+
+                        try {
+                            const response = await $.ajax({
+                                url:  '{{ route("auth.face-login") }}',
+                                type: 'POST',
+                                contentType: 'application/json',
+                                data: JSON.stringify({
+                                    face_descriptor: descriptor,
+                                    _token: $('meta[name="csrf-token"]').attr('content'),
+                                }),
+                                headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
+                            });
+
+                            if (response.status && response.redirect) {
+                                modal.setStatus('✅ Face matched! Redirecting...', 'success');
+
+                                // Store auth data same as password login
+                                if (response.token) {
+                                    localStorage.setItem('authToken', response.token);
+                                    localStorage.setItem('token', response.token);
+                                }
+                                if (response.user) {
+                                    const userId = response.user.branch_id ?? response.user.id;
+                                    localStorage.setItem('selectedSubAdminId', userId);
+                                    $.post('/set-subadmin-session', {
+                                        _token: $('meta[name="csrf-token"]').attr('content'),
+                                        subAdminId: userId
+                                    }, function() {});
+                                }
+
+                                setTimeout(() => {
+                                    modal.close();
+                                    window.location.href = response.redirect;
+                                }, 800);
+                            } else {
+                                throw new Error(response.error || 'Face login failed.');
+                            }
+                        } catch (err) {
+                            const msg = err.responseJSON?.error || err.responseJSON?.message || err.message || 'Face login failed.';
+                            throw new Error(msg);
+                        }
+                    },
+                });
+            });
+
+            // Hover effects for face login button
+            $faceBtn.on('mouseenter', function () {
+                $(this).css({ 'background': 'linear-gradient(135deg,#ff9f43,#f97316)', 'color': '#fff' });
+            }).on('mouseleave', function () {
+                $(this).css({ 'background': '#fff', 'color': '#f97316' });
+            });
         });
     </script>
 </body>

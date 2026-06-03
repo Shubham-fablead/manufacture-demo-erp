@@ -51,7 +51,7 @@
         }
 
         .table-style th {
-            background: #FF9F43;
+            background: #bc1e2e;
             color: #fff;
             font-weight: 600;
         }
@@ -123,7 +123,7 @@
                         $logoMime = mime_content_type($logoPath);
                         @endphp
                         <img src="data:{{ $logoMime }};base64,{{ $logoData }}" alt="Company Logo"
-                            style="height: 60px; width: auto;">
+                            style="height: 100px; width: auto;">
                         @endif
                     </td>
                     <td style="vertical-align: middle; text-align: right; padding-left: 15px;">

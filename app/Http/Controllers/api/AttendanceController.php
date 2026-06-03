@@ -14,13 +14,23 @@ use Carbon\Carbon;
 
 class AttendanceController extends Controller
 {
+    protected function canManageAttendance($user): bool
+    {
+        return in_array($user->role, ['admin', 'sub-admin', 'hr'], true);
+    }
+
     public function store(Request $request)
     {
+        $user = Auth::guard('api')->user();
+        if (! $user || ! $this->canManageAttendance($user)) {
+            return response()->json(['message' => 'Access denied'], 403);
+        }
+
         // dd($request->all());
         $today = Carbon::today()->toDateString();
 
         $request->validate([
-            'id' => 'nullable|exists:attendances,id',
+            'id' => 'nullable|exists:attendance,id',
             'user_id' => 'required|exists:users,id',
             'date' => 'required|date|before_or_equal:today',
             'status' => 'required|in:P,A,H',
@@ -65,6 +75,11 @@ class AttendanceController extends Controller
 
     public function bulkStore(Request $request)
     {
+        $user = Auth::guard('api')->user();
+        if (! $user || ! $this->canManageAttendance($user)) {
+            return response()->json(['message' => 'Access denied'], 403);
+        }
+
         $request->validate([
             'user_id' => 'nullable|exists:users,id',
             'start_date' => 'required|date_format:d/m/Y|before_or_equal:today',

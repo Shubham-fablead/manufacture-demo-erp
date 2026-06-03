@@ -337,7 +337,7 @@ class AdvancePaymentController extends Controller
             $sheet->setCellValue('A' . $row, $payment->staff->name ?? 'N/A');
             $sheet->setCellValue('B' . $row, $payment->amount);
             $sheet->setCellValue('C' . $row, $payment->method);
-            $sheet->setCellValue('D' . $row, $payment->created_at->format('d/m/Y'));
+            $sheet->setCellValue('D' . $row, $payment->created_at->format('d-m-Y'));
             $sheet->setCellValue('E' . $row, $payment->reason ?? 'N/A');
             $row++;
         }

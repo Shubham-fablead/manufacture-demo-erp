@@ -77,7 +77,7 @@
         }
 
         .table-style th {
-            background: #FF9F43;
+            background: #ff9f43;
             color: #fff;
             font-weight: 600;
         }

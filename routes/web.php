@@ -4,6 +4,14 @@ use App\Http\Controllers\admin\AccountLedgerController;
 use App\Http\Controllers\admin\AdvancePaymentController;
 use App\Http\Controllers\admin\AppointmentController;
 use App\Http\Controllers\admin\AttendanceController;
+use App\Http\Controllers\admin\AttendanceeController;
+use App\Http\Controllers\admin\CompanyRulesController;
+use App\Http\Controllers\admin\DepartmentController;
+use App\Http\Controllers\admin\DesignationController;
+use App\Http\Controllers\admin\HolidaysController;
+use App\Http\Controllers\admin\LeaveController;
+use App\Http\Controllers\admin\LeaveTypeController;
+use App\Http\Controllers\api\PayrollController as ApiPayrollController;
 use App\Http\Controllers\admin\AuthController;
 use App\Http\Controllers\admin\BalanceSheetController;
 use App\Http\Controllers\admin\BankMasterController;
@@ -94,6 +102,7 @@ Route::middleware(['guest:web'])->group(function () {
 });
 
 Route::post('/', [LoginController::class, 'login'])->name('login');
+Route::post('/auth/face-login', [LoginController::class, 'faceLogin'])->name('auth.face-login');
 
 Route::get('/storage/{path}', function (string $path) {
     abort_unless(Storage::disk('public')->exists($path), 404);
@@ -103,6 +112,9 @@ Route::get('/storage/{path}', function (string $path) {
 
 Route::middleware(['auth:web', 'auto.permission'])->group(function () {
     Route::get('/logout', [LoginController::class, 'logout'])->name('logout');
+
+    // Settings
+    Route::get('/setting', [SettingController::class, 'generalsettings'])->name('setting.generalsettings');
 
     // Search bar
     Route::get('/search-users', [AuthController::class, 'ajaxSearch'])->name('users.ajaxSearch');
@@ -533,4 +545,73 @@ Route::middleware(['auth:web', 'auto.permission'])->group(function () {
     // Salary
     Route::get('/salary-list', [SalaryController::class, 'List'])->name('salary.list');
     Route::get('/salary/view', [SalaryController::class, 'viewList'])->name('salary.view');
+    Route::get('/my-salary', [SalaryController::class, 'mySalary'])->name('salary.my');
+
+    // HR Dashboard
+    Route::get('/hr/dashboard', [AuthController::class, 'hrDashboard'])->name('hr.dashboard');
+
+    // Company Rules pages
+    Route::get('/view-rules', [CompanyRulesController::class, 'display_rules'])->name('company-rules.view-rules');
+    Route::get('/creates-rules', [CompanyRulesController::class, 'create_rules'])->name('company-rules.create-rules');
+    Route::get('/company-rules', [CompanyRulesController::class, 'company_rules'])->name('company-rules.show');
+    Route::get('/company-rules/create', [CompanyRulesController::class, 'create'])->name('company-rules.create');
+
+    // Department pages
+    Route::get('/department', [DepartmentController::class, 'createPage'])->name('department.create');
+    Route::get('/department/{id}', [DepartmentController::class, 'createPage'])->name('department.edit');
+    Route::get('/departmentview', [DepartmentController::class, 'indexPage'])->name('department.view');
+
+    // Designation pages
+    Route::get('/designation', [DesignationController::class, 'createPage'])->name('designation.create');
+    Route::post('/designation/edit', [DesignationController::class, 'openEditPage'])->name('designation.edit.open');
+    Route::get('/designationview', [DesignationController::class, 'indexPage'])->name('designation.view');
+
+    // Holiday pages
+    Route::get('/company-holidays', [HolidaysController::class, 'calendarPage'])->name('holidays.calendar');
+    Route::get('/holidays', [HolidaysController::class, 'indexPage'])->name('holidays.index');
+    Route::get('/holidays/add', [HolidaysController::class, 'createPage'])->name('holidays.create');
+    Route::get('/holidays/edit/{id}', [HolidaysController::class, 'editPage'])->name('holidays.edit');
+
+    // Leave type pages
+    Route::get('/leave_type', [LeaveTypeController::class, 'createPage'])->name('leave-type.create');
+    Route::post('/leave_type/edit', [LeaveTypeController::class, 'openEditPage'])->name('leave-type.edit.open');
+    Route::get('/leavetypeview', [LeaveTypeController::class, 'indexPage'])->name('leave-type.view');
+
+    // Leave pages
+    Route::get('/leaveview', [LeaveController::class, 'indexPage'])->name('leave.view');
+    Route::get('/leave-request', [LeaveController::class, 'leaveRequest'])->name('leave.request');
+    Route::post('/leave-request/{leaveId}/status', [LeaveController::class, 'updateStatusWeb'])->name('leave.request.status');
+    Route::get('/leaveviews', [LeaveController::class, 'legacyPage'])->name('leave.views');
+    Route::get('/addleave', [LeaveController::class, 'createPage'])->name('leave.add');
+
+    // Converted attendance module from legacy CodeIgniter screens
+    Route::prefix('staff/attendance')->name('attendence.')->group(function () {
+        Route::get('/summary', [AttendanceeController::class, 'display'])->name('summary');
+        Route::get('/list', [AttendanceeController::class, 'view'])->name('list');
+        Route::get('/calendar', [AttendanceeController::class, 'viewCalendar'])->name('calendar');
+        Route::post('/checkin', [AttendanceeController::class, 'checkIn'])->name('checkin.web');
+        Route::post('/checkout', [AttendanceeController::class, 'checkOut'])->name('checkout.web');
+    });
+
+    // omsai-ERP style staff check-in / check-out (web session, GPS capture)
+    Route::get('/staff/check-status',  [AttendanceeController::class, 'staffCheckStatus'])->name('staff.checkstatus');
+    Route::post('/staff/check-in',     [AttendanceeController::class, 'staffCheckIn'])->name('staff.checkin');
+    Route::post('/staff/check-out',    [AttendanceeController::class, 'staffCheckOut'])->name('staff.checkout');
+
+    // Backward-compatible URLs used inside the legacy attendance UI
+    Route::get('/attendence', [AttendanceeController::class, 'display'])->name('attendence.manage');
+    Route::get('/view', [AttendanceeController::class, 'view'])->name('attendence.view');
+    Route::get('/view-calendar', [AttendanceeController::class, 'viewCalendar'])->name('attendence.view_calendar');
+
+    // Payroll pages
+    Route::prefix('payroll')->name('payroll.')->group(function () {
+        Route::get('/', [ApiPayrollController::class, 'page'])->name('create');
+        Route::get('/{id}', [ApiPayrollController::class, 'page'])->whereNumber('id')->name('edit');
+        Route::get('/salary', [ApiPayrollController::class, 'groupsalaryPage'])->name('salary');
+        Route::get('/salary-details', [ApiPayrollController::class, 'salaryDetails'])->name('salary-details');
+        Route::get('/profile/{id}', [ApiPayrollController::class, 'profilePage'])->whereNumber('id')->name('profile');
+        Route::get('/details/{id}', [ApiPayrollController::class, 'getProfile'])->whereNumber('id')->name('details');
+        Route::get('/download-slip/{id}', [ApiPayrollController::class, 'downloadSlip'])->whereNumber('id')->name('download-slip');
+    });
+    Route::get('/payrollview', [ApiPayrollController::class, 'display'])->name('payroll.list');
 });

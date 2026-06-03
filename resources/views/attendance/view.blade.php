@@ -15,30 +15,155 @@
         margin-left: 5px;
     }
 
-    /* You can also add this to your existing style section */
     .btn-submit:disabled {
         opacity: 0.7;
         cursor: not-allowed;
     }
+
     /* Staff Name column word wrap */
-.staff-name-cell {
-    white-space: normal !important;
-    word-break: break-word;
-    overflow-wrap: anywhere;
-    max-width: 160px;
-    line-height: 1.3;
-}
+    .staff-name-cell {
+        white-space: normal !important;
+        word-break: break-word;
+        overflow-wrap: anywhere;
+        max-width: 160px;
+        line-height: 1.3;
+    }
+
+    .staff-edit-cell,
+    .staff-edit-head {
+        width: 48px;
+        min-width: 48px;
+        text-align: center;
+    }
+
+    .staff-edit-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 30px;
+        height: 30px;
+        border: 1px solid #d9d9d9;
+        border-radius: 4px;
+        background: #fff;
+        cursor: pointer;
+    }
+
+    .staff-edit-btn i {
+        color: #6c757d;
+        font-size: 14px;
+    }
+
+    /* ============================================================
+       MANAGE ATTENDANCE — Summary Table & History Rows
+       ============================================================ */
+    #manageAttendanceModal .modal-dialog { max-width: 96vw; }
+
+    .att-summary-table thead th {
+        background-color: #1b2850;
+        color: #fff;
+        font-size: 12px;
+        white-space: nowrap;
+        vertical-align: middle;
+        padding: 10px 12px;
+    }
+    .att-summary-table tbody td {
+        vertical-align: middle;
+        padding: 10px 12px;
+        font-size: 13px;
+    }
+    .att-summary-table tbody tr:hover { background-color: #f8f9ff; }
+
+    .emp-avatar {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin-right: 8px;
+    }
+
+    .btn-view-history {
+        background: #17a2b8;
+        color: #fff;
+        border: none;
+        border-radius: 20px;
+        padding: 5px 14px;
+        font-size: 12px;
+        cursor: pointer;
+        white-space: nowrap;
+        transition: background .2s;
+    }
+    .btn-view-history:hover { background: #138496; color: #fff; }
+    .btn-view-history.active { background: #e67e22; }
+
+    .history-expand-row td {
+        padding: 0 !important;
+        background: #f4f7fb;
+        border-top: none !important;
+    }
+    .history-expand-inner {
+        padding: 16px 24px;
+        border-left: 4px solid #17a2b8;
+    }
+    .history-expand-inner h6 {
+        font-weight: 700;
+        margin-bottom: 12px;
+        color: #1b2850;
+        font-size: 13px;
+    }
+
+    .att-history-table thead th {
+        background-color: #1b2850;
+        color: #fff;
+        font-size: 11px;
+        white-space: nowrap;
+        padding: 8px 10px;
+        vertical-align: middle;
+    }
+    .att-history-table tbody td {
+        font-size: 12px;
+        padding: 7px 10px;
+        vertical-align: middle;
+        white-space: nowrap;
+    }
+    .att-history-table tbody tr:nth-child(even) { background: #edf1f7; }
+
+    .status-present  { color: #27ae60; font-weight: 600; }
+    .status-absent   { color: #e74c3c; font-weight: 600; }
+    .status-weekoff  { color: #7f8c8d; font-weight: 600; }
+    .status-halfday  { color: #f39c12; font-weight: 600; }
+
+    .ma-filter-bar {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .ma-filter-bar select { min-width: 90px; font-size: 13px; }
+    .btn-all-attendance {
+        background: #ff6b35;
+        color: #fff;
+        border: none;
+        border-radius: 6px;
+        padding: 6px 14px;
+        font-size: 13px;
+        cursor: pointer;
+        white-space: nowrap;
+        transition: background .2s;
+    }
+    .btn-all-attendance:hover { background: #e55a25; }
     </style>
     <div class="content">
         <div class="page-header">
             <div class="page-title">
                 <h4>All Attendance</h4>
             </div>
-            <div class="page-btn">
+            <div class="page-btn d-flex gap-2">
                 @if(auth()->user()->role !== 'staff')
                 <a href="javascript:void(0);" class="btn btn-added" id="addAllBtn">
                     <img src="{{ env('ImagePath') . 'admin/assets/img/icons/plus.svg' }}" class="me-1" alt="img">
                     Add All Attendance
+                </a>
+                <a href="{{ route('attendance.manage') }}" class="btn btn-primary" style="background:#e74c3c;border-color:#e74c3c;">
+                    <i class="fa fa-chart-bar me-1"></i> Manage Attendance
                 </a>
                 @endif
             </div>
@@ -86,6 +211,10 @@
                     <th style="position: sticky; left: 0; z-index: 10; background-color: #1b2850; color: #fff;">
                         Staff Name
                     </th>
+                    @if(auth()->user()->role !== 'staff')
+                        <th class="staff-edit-head text-white">Edit</th>
+                    @endif
+                    <th class="text-white" style="min-width: 80px;">Total OT</th>
 
                     @for ($i = 1; $i <= $daysInMonth; $i++)
                         <th class="text-white">{{ $i }}</th>
@@ -101,6 +230,28 @@
                             data-user-name="{{ ucwords($staff->name) }}">
                             {{ ucwords($staff->name) }}
                         </td>
+                        @if(auth()->user()->role !== 'staff')
+                            <td class="staff-edit-cell">
+                                <button type="button" class="staff-edit-btn open-staff-attendance-modal"
+                                    data-user-id="{{ $staff->id }}"
+                                    data-user-name="{{ ucwords($staff->name) }}"
+                                    title="Edit {{ ucwords($staff->name) }} attendance">
+                                    <i class="fa fa-pencil-alt"></i>
+                                </button>
+                            </td>
+                        @endif
+                        @php
+                            $totalOtForMonth = 0;
+                            for ($j = 1; $j <= $daysInMonth; $j++) {
+                                $d = $year . '-' . $month . '-' . str_pad($j, 2, '0', STR_PAD_LEFT);
+                                $k = $staff->id . '_' . $d;
+                                $att = $attendances[$k][0] ?? null;
+                                if ($att && $att->overtime_hours > 0) {
+                                    $totalOtForMonth += $att->overtime_hours;
+                                }
+                            }
+                        @endphp
+                        <td class="text-center fw-bold text-primary">{{ $totalOtForMonth > 0 ? $totalOtForMonth . 'h' : '-' }}</td>
                         @for ($i = 1; $i <= $daysInMonth; $i++)
                             @php
                                 $date = $year . '-' . $month . '-' . str_pad($i, 2, '0', STR_PAD_LEFT);
@@ -122,7 +273,8 @@
                                 data-checkin="{{ $attendance->check_in_time ?? '' }}"
                                 data-checkout="{{ $attendance->check_out_time ?? '' }}"
                                 data-reason="{{ $attendance->reason ?? '' }}"
-                                data-extraday="{{ $attendance->extraday ?? '0' }}" style="cursor:pointer;">
+                                data-extraday="{{ $attendance->extraday ?? '0' }}"
+                                data-overtime="{{ $attendance->overtime_hours ?? '0' }}" style="cursor:pointer;">
                                 @if ($displayStatus == 'P' || $displayStatus == '2P')
                                     <strong class="text-success">{{ $displayStatus }}</strong>
                                 @elseif ($displayStatus == 'H')
@@ -154,52 +306,62 @@
                             <label class="me-2">Date:</label>
                             <div id="display_date" class="fw-bold"></div>
                         </div>
-                        {{-- <button type="button" class="btn-close" data-bs-dismiss="modal"></button> --}}
                     </div>
 
                     <div class="modal-body">
                         <input type="hidden" name="user_id" id="user_id">
                         <input type="hidden" name="date" id="date">
-                        <div class="mb-2">
-                            <label>Status</label>
-                            <select class="form-select" name="status" id="status">
-                                <option value="P">Present</option>
-                                <option value="H">Half Day</option>
-                                <option value="A">Absent</option>
-                            </select>
-                            <div class="text-danger" id="error_status"></div>
 
-                        </div>
-                        <div class="mb-2">
-                            <label>Check-In Time</label>
-                            <input type="time" class="form-control" name="check_in_time" id="check_in_time">
-                            <div class="text-danger" id="error_check_in_time"></div>
+                        <div class="row">
+                            <!-- Row 1: Status | Extra Day -->
+                            <div class="col-md-6 mb-3">
+                                <label>Status</label>
+                                <select class="form-select" name="status" id="status">
+                                    <option value="P">Present</option>
+                                    <option value="H">Half Day</option>
+                                    <option value="A">Absent</option>
+                                </select>
+                                <div class="text-danger" id="error_status"></div>
+                            </div>
+                            <div class="col-md-6 mb-3" id="extraday-field" style="display: none;">
+                                <label>Extra Day</label>
+                                <select class="form-select" name="extraday" id="extraday">
+                                    <option value="0">No</option>
+                                    <option value="1">Yes</option>
+                                </select>
+                                <div class="text-danger" id="error_extraday"></div>
+                            </div>
 
-                        </div>
-                        <div class="mb-2">
-                            <label>Check-Out Time</label>
-                            <input type="time" class="form-control" name="check_out_time" id="check_out_time">
-                            <div class="text-danger" id="error_check_out_time"></div>
-                        </div>
-                        <div class="mb-2" id="extraday-field" style="display: none;">
-                            <label>Extra Day</label>
-                            <select class="form-select" name="extraday" id="extraday">
-                                <option value="0">No</option>
-                                <option value="1">Yes</option>
-                            </select>
-                            <div class="text-danger" id="error_extraday"></div>
-                        </div>
-                        <div class="mb-2">
-                            <label>Reason</label>
-                            <textarea class="form-control" name="reason" id="reason"></textarea>
-                            <div class="text-danger" id="error_reason"></div>
+                            <!-- Row 2: Check-In Time | Check-Out Time -->
+                            <div class="col-md-6 mb-3">
+                                <label>Check-In Time</label>
+                                <input type="time" class="form-control" name="check_in_time" id="check_in_time">
+                                <div class="text-danger" id="error_check_in_time"></div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label>Check-Out Time</label>
+                                <input type="time" class="form-control" name="check_out_time" id="check_out_time">
+                                <div class="text-danger" id="error_check_out_time"></div>
+                            </div>
+
+                            <!-- Row 3: Duration | Overtime -->
+                            <div class="col-md-6 mb-3">
+                                <label>Duration</label>
+                                <input type="text" class="form-control bg-light" name="duration" id="duration_display" readonly placeholder="0h 0m">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label>Overtime</label>
+                                <input type="text" class="form-control bg-light" name="overtime" id="overtime_display" readonly placeholder="0h 0m">
+                            </div>
+
+                            <!-- Row 4: Reason -->
+                            <div class="col-md-12 mb-3">
+                                <label>Reason</label>
+                                <textarea class="form-control" name="reason" id="reason" rows="2"></textarea>
+                                <div class="text-danger" id="error_reason"></div>
+                            </div>
                         </div>
                     </div>
-                    {{-- <div style="padding: 1rem;">
-                        <button type="button" class="btn btn-cancel" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-submit">Save</button>
-                    </div> --}}
-                    <!-- In your modal footer section -->
                     <div style="padding: 1rem;">
                         <button type="button" class="btn btn-cancel" data-bs-dismiss="modal">Cancel</button>
                         <button type="submit" class="btn btn-submit" id="saveBtn">
@@ -220,7 +382,6 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="bulkModalTitle">All Attendance Update</h5>
-                        {{-- <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> --}}
                     </div>
 
                     <div class="modal-body">
@@ -231,10 +392,6 @@
                                 <div class="input-groupicon">
                                     <input type="text" class="form-control datetimepicker-bulk" name="start_date"
                                         id="bulk_start_date" placeholder="DD/MM/YYYY" required>
-                                    {{-- <div class="addonset">
-                                        <img src="{{ env('ImagePath') . 'admin/assets/img/icons/calendars.svg' }}"
-                                            alt="img">
-                                    </div> --}}
                                 </div>
                                 <div class="text-danger" id="error_bulk_start_date"></div>
                             </div>
@@ -243,10 +400,6 @@
                                 <div class="input-groupicon">
                                     <input type="text" class="form-control datetimepicker-bulk" name="end_date"
                                         id="bulk_end_date" placeholder="DD/MM/YYYY" required>
-                                    {{-- <div class="addonset">
-                                        <img src="{{ env('ImagePath') . 'admin/assets/img/icons/calendars.svg' }}"
-                                            alt="img">
-                                    </div> --}}
                                 </div>
                                 <div class="text-danger" id="error_bulk_end_date"></div>
                             </div>
@@ -295,15 +448,21 @@
             </form>
         </div>
     </div>
+
     @endif
 @endsection
 
 @push('js')
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
+        @php
+            $setting = \App\Models\Setting::first();
+            $working_hours = $setting && $setting->working_hours ? $setting->working_hours : '09:00';
+        @endphp
+        var companyWorkingHours = '{{ $working_hours }}';
+
         $(document).ready(function() {
             const selectedSubAdminId = localStorage.getItem("selectedSubAdminId");
-            // console.log(selectedSubAdminId);
 
             // Function to update the month-year header
             function updateMonthYearHeader() {
@@ -323,7 +482,7 @@
             if ($('.datetimepicker-bulk').length > 0) {
                 $('.datetimepicker-bulk').datetimepicker({
                     format: 'DD/MM/YYYY',
-                    useCurrent: false, // Prevent automatic date selection
+                    useCurrent: false,
                     icons: {
                         up: "fas fa-angle-up",
                         down: "fas fa-angle-down",
@@ -360,15 +519,64 @@
                 fetchAttendanceData();
             });
 
+            // Auto calculate duration and overtime
+            function calculateDurationOvertime() {
+                var checkIn = $('#check_in_time').val();
+                var checkOut = $('#check_out_time').val();
+
+                if (checkIn && checkOut) {
+                    var inTime = new Date("1970-01-01T" + checkIn + "Z");
+                    var outTime = new Date("1970-01-01T" + checkOut + "Z");
+
+                    if (outTime < inTime) {
+                        outTime.setDate(outTime.getDate() + 1); // Cross midnight
+                    }
+
+                    var diffMs = outTime - inTime;
+                    var diffHrs = diffMs / 3600000;
+
+                    var durH = Math.floor(diffHrs);
+                    var durM = Math.round((diffHrs - durH) * 60);
+                    $('#duration_display').val(durH + 'h ' + durM + 'm');
+
+                    // Parse company working hours
+                    var whParts = companyWorkingHours.split(':');
+                    var whHrs = parseFloat(whParts[0]) + (parseFloat(whParts[1] || 0) / 60);
+
+                    if (diffHrs > whHrs) {
+                        var otHrs = diffHrs - whHrs;
+                        var oH = Math.floor(otHrs);
+                        var oM = Math.round((otHrs - oH) * 60);
+                        $('#overtime_display').val(oH + 'h ' + oM + 'm');
+                    } else {
+                        $('#overtime_display').val('0h 0m');
+                    }
+
+                    // Auto-select status based on duration
+                    if (diffHrs >= whHrs) {
+                        $('#status').val('P').change();
+                    } else if (diffHrs >= (whHrs / 2)) {
+                        $('#status').val('H').change();
+                    } else {
+                        $('#status').val('A').change();
+                    }
+                } else {
+                    $('#duration_display').val('');
+                    $('#overtime_display').val('');
+                }
+            }
+
+            $('#check_in_time, #check_out_time').on('change', calculateDurationOvertime);
+
             $('#addAllBtn').on('click', function() {
                 $('#bulk_user_id').val('');
                 $('#bulkModalTitle').text('All Attendance Update');
                 $('#bulkAttendanceModal').modal('show');
             });
 
-            $(document).on('click', '.staff-name-cell', function() {
+            $(document).on('click', '.open-staff-attendance-modal', function() {
                 const currentUserRole = '{{ auth()->user()->role }}';
-                if (currentUserRole === 'Staff') {
+                if (currentUserRole === 'staff') {
                     return;
                 }
 
@@ -377,6 +585,9 @@
 
                 $('#bulk_user_id').val(userId);
                 $('#bulkModalTitle').text(`${userName} Attendance Update`);
+                $('#bulkAttendanceForm')[0].reset();
+                $('#bulkAttendanceForm .text-danger').html('');
+                $('#bulk_status').val('P').trigger('change');
                 $('#bulkAttendanceModal').modal('show');
             });
 
@@ -396,10 +607,8 @@
             $('#bulkAttendanceForm').on('submit', function(e) {
                 e.preventDefault();
 
-                // Clear any inline errors before new request
                 $('#bulkAttendanceForm .text-danger').html('');
 
-                // Client-side validation
                 let hasError = false;
                 const startDate = $('#bulk_start_date').val();
                 const endDate = $('#bulk_end_date').val();
@@ -465,7 +674,6 @@
                         if (errors) {
                             let allErrors = [];
                             for (let key in errors) {
-                                // Display specific error message in the corresponding div
                                 $(`#error_bulk_${key}`).text(errors[key][0]);
                                 allErrors.push(errors[key][0]);
                             }
@@ -485,15 +693,15 @@
             // Function to toggle fields based on status
             function toggleAttendanceFields(status) {
                 if (status === 'P' || status === 'H') {
-                    $('#check_in_time').closest('.mb-2').show();
-                    $('#check_out_time').closest('.mb-2').show();
-                    $('#extraday-field').show(); // Show extraday field
-                    $('#reason').closest('.mb-2').hide();
+                    $('#check_in_time').closest('.col-md-6').show();
+                    $('#check_out_time').closest('.col-md-6').show();
+                    $('#extraday-field').show();
+                    $('#reason').closest('.col-md-12').hide();
                 } else {
-                    $('#check_in_time').closest('.mb-2').hide();
-                    $('#check_out_time').closest('.mb-2').hide();
-                    $('#extraday-field').hide(); // Hide extraday field
-                    $('#reason').closest('.mb-2').show();
+                    $('#check_in_time').closest('.col-md-6').show();
+                    $('#check_out_time').closest('.col-md-6').show();
+                    $('#extraday-field').hide();
+                    $('#reason').closest('.col-md-12').show();
                 }
             }
 
@@ -504,12 +712,10 @@
 
             // When opening modal
             $(document).on('click', '.attendance-cell', function() {
-                // Replace 'staff' with whatever your staff role identifier is
                 const currentUserRole = '{{ auth()->user()->role }}';
 
                 if (currentUserRole === 'staff') {
-                    // Staff should not open modal
-                    return; // exit function, do nothing
+                    return;
                 }
 
                 const status = $(this).data('status');
@@ -538,18 +744,19 @@
 
                 $('#attendanceForm .text-danger').html('');
                 $('#attendanceModal').modal('show');
+
+                // Calculate duration and overtime based on loaded times
+                calculateDurationOvertime();
             });
 
             // Submit attendance form
             $('#attendanceForm').on('submit', function(e) {
                 e.preventDefault();
 
-                // Get button and spinner elements
                 const saveBtn = $('#saveBtn');
                 const btnText = $('.btn-text');
                 const saveSpinner = $('#saveSpinner');
 
-                // Disable button and show loader
                 saveBtn.prop('disabled', true);
                 btnText.text('Saving...');
                 saveSpinner.removeClass('d-none');
@@ -560,7 +767,6 @@
                 let formData = new FormData($('#attendanceForm')[0]);
                 formData.append('selectedSubAdminId', selectedSubAdminId);
 
-                // Clear any inline errors before new request
                 $('#attendanceForm .text-danger').html('');
 
                 $.ajax({
@@ -570,8 +776,8 @@
                         "Authorization": "Bearer " + authToken,
                     },
                     data: formData,
-                    processData: false, // important for FormData
-                    contentType: false, // important for FormData
+                    processData: false,
+                    contentType: false,
                     success: function(res) {
                         saveBtn.prop('disabled', false);
                         btnText.text('Save');
@@ -584,11 +790,10 @@
                             confirmButtonColor: '#ff9f43',
                             confirmButtonText: 'OK'
                         }).then(() => {
-                            location.reload(); // reload to show updated table
+                            location.reload();
                         });
                     },
                     error: function(xhr) {
-
                         saveBtn.prop('disabled', false);
                         btnText.text('Save');
                         saveSpinner.addClass('d-none');
@@ -596,16 +801,13 @@
                         let errors = response ? response.errors : null;
 
                         if (errors) {
-                            // Combine all errors into one string for Swal
                             let allErrors = [];
                             for (let key in errors) {
                                 if (errors.hasOwnProperty(key)) {
-                                    // Display specific error message in the corresponding div
                                     $(`#error_${key}`).text(errors[key][0]);
                                     allErrors.push(errors[key][0]);
                                 }
                             }
-
                             Swal.fire({
                                 icon: 'error',
                                 title: 'Validation Error',
@@ -618,16 +820,18 @@
                     }
                 });
             });
-// Also reset button state when modal is closed
-$('#attendanceModal').on('hidden.bs.modal', function () {
-    const saveBtn = $('#saveBtn');
-    const btnText = $('.btn-text');
-    const saveSpinner = $('#saveSpinner');
 
-    saveBtn.prop('disabled', false);
-    btnText.text('Save');
-    saveSpinner.addClass('d-none');
-});
+            // Reset button state when modal is closed
+            $('#attendanceModal').on('hidden.bs.modal', function () {
+                const saveBtn = $('#saveBtn');
+                const btnText = $('.btn-text');
+                const saveSpinner = $('#saveSpinner');
+
+                saveBtn.prop('disabled', false);
+                btnText.text('Save');
+                saveSpinner.addClass('d-none');
+            });
         });
     </script>
+
 @endpush

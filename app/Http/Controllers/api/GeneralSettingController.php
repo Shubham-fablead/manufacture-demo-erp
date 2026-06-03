@@ -60,6 +60,7 @@ class GeneralSettingController extends Controller
         $request->validate([
             'shop_name'         => 'sometimes|required|string',
             'gst_num'           => 'nullable',
+            'cin_no'            => 'nullable|string',
             'low_stock'         => 'nullable',
             'state_code'        => 'nullable',
             'email'             => 'sometimes|required|email',
@@ -85,9 +86,6 @@ class GeneralSettingController extends Controller
             'send_mail'         => 'nullable|boolean',
             'tds_apply'         => 'nullable|boolean',
             'financial_year'    => 'nullable|boolean',
-            'customer_whatsapp_message' => 'nullable|boolean',
-            'admin_whatsapp_message' => 'nullable|boolean',
-            'appointment_reminder_hours_before' => 'nullable|integer|min:0',
             // 📊 Dashboard Settings validation
             'crm_section_enabled' => 'nullable|in:Enable,Disable',
             'hr_section_enabled' => 'nullable|in:Enable,Disable',
@@ -132,6 +130,7 @@ class GeneralSettingController extends Controller
         }
 
         $settings->gst_num           = $request->input('gst_num', $settings->gst_num);
+        $settings->cin_no            = $request->input('cin_no', $settings->cin_no);
         $settings->low_stock         = $request->input('low_stock', $settings->low_stock);
         $settings->name              = $request->input('shop_name', $settings->name);
         $settings->email             = $request->input('email', $settings->email);
@@ -170,6 +169,11 @@ class GeneralSettingController extends Controller
         $settings->appointment_reminder_hours_before = $request->has('appointment_reminder_hours_before')
             ? (int) $request->appointment_reminder_hours_before
             : ($settings->appointment_reminder_hours_before ?? 3);
+
+        // GPS / Location
+        $settings->office_latitude  = $request->office_latitude  ?: $settings->office_latitude;
+        $settings->office_longitude = $request->office_longitude ?: $settings->office_longitude;
+        $settings->office_radius    = $request->has('office_radius') ? (int) $request->office_radius : ($settings->office_radius ?? 200);
 
         // 📊 Dashboard Settings
         $settings->crm_section_enabled = $request->input('crm_section_enabled', $settings->crm_section_enabled ?? 'Enable');
@@ -260,6 +264,8 @@ class GeneralSettingController extends Controller
             'lunch_break'   => 'nullable',
             'open_time'     => 'required|date_format:H:i',
             'close_time'    => 'required|date_format:H:i',
+            'overtime_after_hours' => 'nullable|numeric|min:0',
+            'location_check_enabled' => 'nullable|in:0,1',
         ]);
 
         if ($validator->fails()) {
@@ -287,6 +293,8 @@ class GeneralSettingController extends Controller
             'lunch_break'   => $request->lunch_break,
             'open_time'     => $request->open_time,
             'close_time'    => $request->close_time,
+            'overtime_after_hours'   => $request->overtime_after_hours ?: null,
+            'location_check_enabled' => (int) ($request->location_check_enabled ?? 0),
         ]);
 
         return response()->json([

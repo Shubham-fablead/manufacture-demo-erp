@@ -23,15 +23,39 @@ class SalaryController extends Controller
     {
         return view('salary/salary_list');
     }
+
+    public function mySalary(Request $request)
+    {
+        $user = Auth::user();
+        // Only staff can access their own salary page
+        if ($user->role !== 'staff') {
+            abort(403, 'Unauthorized');
+        }
+        return view('salary/my_salary');
+    }
+
     public function viewList(Request $request)
     {
         $staffId = $request->input('staff_id');
         $month = $request->input('month', Carbon::now()->month);
         $year = $request->input('year', Carbon::now()->year);
+
+        $authUser = Auth::user();
+
+        // Staff can only view their own salary slip
+        if ($authUser->role === 'staff') {
+            $staffId = $authUser->id;
+        }
+
         $staff = User::find($staffId);
 
         if (!$staff) {
             return response()->json(['status' => false, 'message' => 'Staff not found.'], 404);
+        }
+
+        // Extra guard: staff cannot view another staff's salary
+        if ($authUser->role === 'staff' && (int) $staff->id !== (int) $authUser->id) {
+            abort(403, 'Unauthorized');
         }
 
         $salary = Salary::where('staff_id', $staffId)
@@ -40,12 +64,20 @@ class SalaryController extends Controller
             ->first();
 
         if (!$salary) {
-            return response()->json(['status' => false, 'message' => 'Salary not generated yet.'], 404);
+            // Try by month/year columns as well
+            $salary = Salary::where('staff_id', $staffId)
+                ->where('month', $month)
+                ->where('year', $year)
+                ->first();
+        }
+
+        if (!$salary) {
+            return back()->with('error', 'Salary not generated yet for this period.');
         }
 
         // Fetch settings
-        $settings = Setting::first();
-        
+        $settings = Setting::where('branch_id', $staff->branch_id)->first() ?? Setting::first();
+
         $data = [[
             'staff_id' => $staff->id,
             'staff_name' => $staff->name,
@@ -58,6 +90,6 @@ class SalaryController extends Controller
             'total_salary' => $salary->total_salary,
             'status' => $salary->status,
         ]];
-        return view('salary/staff_pdf',compact('data', 'month', 'year', 'settings'));
+        return view('salary/staff_pdf', compact('data', 'month', 'year', 'settings'));
     }
 }

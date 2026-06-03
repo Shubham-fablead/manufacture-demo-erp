@@ -86,4 +86,139 @@ class AttendanceController extends Controller
         }
         return view('attendance.add', compact('staffUsers'));
     }
+
+    public function manage()
+    {
+        return view('attendance.manage');
+    }
+
+    public function manageSummary(Request $request)
+    {
+        $user     = Auth::user();
+        $role     = $user->role;
+        $branchId = $user->id;
+        $subAdminId = session('selectedSubAdminId');
+
+        if ($role === 'admin' && !empty($subAdminId)) {
+            $branchId = (int) $subAdminId;
+        }
+
+        $month = (int) $request->query('month', date('n'));
+        $year  = (int) $request->query('year',  date('Y'));
+
+        $startDate        = Carbon::createFromDate($year, $month, 1)->startOfMonth();
+        $endDate          = Carbon::createFromDate($year, $month, 1)->endOfMonth();
+        $totalDaysInMonth = $startDate->daysInMonth;
+
+        $staffList = User::where('role', 'staff')
+            ->where('isDeleted', 0)
+            ->where('branch_id', $branchId)
+            ->get(['id', 'name', 'profile_image']);
+
+        $imagePath = env('ImagePath', '/');
+
+        $summary = [];
+        foreach ($staffList as $staff) {
+            $attendances = Attendance::where('user_id', $staff->id)
+                ->whereBetween('date', [$startDate->toDateString(), $endDate->toDateString()])
+                ->get();
+
+            $presentDays  = 0;
+            $absentDays   = 0;
+            $totalWorkMin = 0;
+            $totalOtMin   = 0;
+            $totalLateMin = 0;
+
+            foreach ($attendances as $att) {
+                $st = $att->status ?? 'A';
+                if ($st === 'P')     $presentDays += 1;
+                elseif ($st === 'H') $presentDays += 0.5;
+                elseif ($st === 'A') $absentDays  += 1;
+
+                $totalWorkMin += (int) round((float)($att->work_hours    ?? 0) * 60);
+                $totalOtMin   += (int) round((float)($att->overtime_hours ?? 0) * 60);
+                $totalLateMin += (int) round((float)($att->late_hours    ?? 0) * 60);
+            }
+
+            $fmt = fn(int $m) => floor($m / 60) . 'h ' . ($m % 60) . 'm';
+
+            $photoUrl = $staff->profile_image
+                ? url($imagePath . 'storage/' . $staff->profile_image)
+                : url($imagePath . 'admin/assets/img/profiles/avatar-02.jpg');
+
+            $summary[] = [
+                'id'           => $staff->id,
+                'name'         => ucwords($staff->name),
+                'photo'        => $photoUrl,
+                'total_days'   => $totalDaysInMonth,
+                'present_days' => $presentDays,
+                'work_hours'   => $fmt($totalWorkMin),
+                'overtime'     => $fmt($totalOtMin),
+                'late_hours'   => $fmt($totalLateMin),
+                'leaves'       => 0,
+                'absent'       => $absentDays,
+            ];
+        }
+
+        return response()->json(['status' => true, 'summary' => $summary]);
+    }
+
+    public function manageHistory(Request $request, $employee_id)
+    {
+        $month = (int) $request->query('month', date('n'));
+        $year  = (int) $request->query('year',  date('Y'));
+
+        $startDate = Carbon::createFromDate($year, $month, 1)->startOfMonth();
+        $endDate   = Carbon::createFromDate($year, $month, 1)->endOfMonth();
+
+        $employee = User::find($employee_id);
+        if (!$employee) {
+            return response()->json(['status' => false, 'message' => 'Employee not found.'], 404);
+        }
+
+        $allAttendances = Attendance::where('user_id', $employee_id)
+            ->whereBetween('date', [$startDate->toDateString(), $endDate->toDateString()])
+            ->get()->keyBy('date');
+
+        $records = [];
+        for ($day = clone $startDate; $day->lte($endDate); $day->addDay()) {
+            $dateStr = $day->toDateString();
+            $att     = $allAttendances->get($dateStr);
+            $status  = $att->status ?? null;
+
+            $isSunday = $day->dayOfWeek === Carbon::SUNDAY;
+            $isFuture = $day->isAfter(Carbon::today());
+
+            if ($isSunday && !$att)       $statusLabel = 'Week Off';
+            elseif (!$att && $isFuture)   $statusLabel = '-';
+            elseif (!$att)                $statusLabel = 'absent';
+            elseif ($status === 'P')      $statusLabel = 'present';
+            elseif ($status === 'H')      $statusLabel = 'Half Day';
+            elseif ($status === 'A')      $statusLabel = 'absent';
+            else                          $statusLabel = $status ?? '-';
+
+            $fmtHrs = function($val) {
+                if (!$val || $val <= 0) return '-';
+                $h = (int) floor($val);
+                $m = (int) round(fmod($val, 1) * 60);
+                return "{$h}h {$m}m";
+            };
+
+            $records[] = [
+                'date'       => $day->format('M d, Y'),
+                'check_in'   => $att->check_in_time  ?? '-',
+                'check_out'  => $att->check_out_time ?? '-',
+                'work_hours' => $fmtHrs($att->work_hours    ?? 0),
+                'overtime'   => $fmtHrs($att->overtime_hours ?? 0),
+                'late'       => $fmtHrs($att->late_hours     ?? 0),
+                'status'     => $statusLabel,
+            ];
+        }
+
+        return response()->json([
+            'status'   => true,
+            'employee' => ucwords($employee->name),
+            'records'  => array_reverse($records),
+        ]);
+    }
 }

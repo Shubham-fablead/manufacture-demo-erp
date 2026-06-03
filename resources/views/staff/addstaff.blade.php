@@ -8,11 +8,55 @@
             .form-group {
                 margin-bottom: 10px !important
             }
+
+            label.form-check-label {
+                font-size: 13px;
+            }
         }
 
         a.btn.back-button {
             background: #ff9f43;
             color: #fff;
+        }
+
+        .btn-capture-face {
+            background: #1b2850;
+            color: #fff;
+            width: 100%;
+            font-weight: 600;
+            padding: 8px;
+            border-radius: 5px;
+        }
+
+        .btn-capture-face:hover {
+            background: #2a3a6a;
+            color: #fff;
+        }
+
+        .btn-register-face {
+            border: 1px solid #ff9f43;
+            color: #ff9f43;
+            background: #fff;
+        }
+
+        .btn-register-face:hover {
+            background: #fff7ef;
+            color: #e8892f;
+        }
+
+        .face-recognition-video-shell {
+            border: 2px solid #ffedd5;
+            border-radius: 18px;
+            overflow: hidden;
+            background: linear-gradient(135deg, #111827, #374151);
+        }
+
+        .face-recognition-video {
+            width: 100%;
+            min-height: 340px;
+            object-fit: cover;
+            display: block;
+            background: #111827;
         }
 
         .staff-submit-loader {
@@ -60,6 +104,7 @@
             <div class="card-body">
                 <form id="customerForm" method="POST" enctype="multipart/form-data">
                     @csrf
+                    <input type="hidden" name="face_descriptor" id="face_descriptor">
                     <div class="row">
                         <!-- Customer Name -->
                         <div class="col-lg-3 col-sm-6 col-6">
@@ -108,6 +153,26 @@
                             </div>
                         </div>
 
+                        <!-- Salary -->
+                        <div class="col-lg-3 col-sm-6 col-6">
+                            <div class="form-group">
+                                <label>Salary <span class="text-danger">*</span></label>
+                                <input type="number" name="salary" id="salary" min="0" step="0.01"
+                                    class="form-control" placeholder="Enter salary amount">
+                                <div class="text-danger error-salary"></div>
+                            </div>
+                        </div>
+
+                        <!-- Joining Date -->
+                        <div class="col-lg-3 col-sm-6 col-6">
+                            <div class="form-group">
+                                <label>Joining Date <span class="text-danger">*</span></label>
+                                <input type="date" name="joining_date" id="joining_date"
+                                    class="form-control">
+                                <div class="text-danger error-joining_date"></div>
+                            </div>
+                        </div>
+
                         <!-- Country -->
                         <div class="col-lg-3 col-sm-6 col-6">
                             <div class="form-group">
@@ -126,22 +191,8 @@
                             </div>
                         </div>
 
-                        <!-- Staff Type -->
-                        <div class="col-lg-3 col-sm-6 col-6">
-                            <div class="form-group">
-                                <label>Staff Type</label>
-                                <select name="staff_type" id="staff_type" class="form-control">
-                                    <option value="">-- Select Staff Type --</option>
-                                    <option value="raw_material">Raw Material</option>
-                                    <option value="product">Product</option>
-                                    <option value="other">Other</option>
-                                </select>
-                                <span class="text-danger error-staff_type"></span>
-                            </div>
-                        </div>
-
                         <!-- Address -->
-                        <div class="col-lg-3 col-sm-6 col-6">
+                        <div class="col-lg-4 col-12">
                             <div class="form-group">
                                 <label>Address</label>
                                 <textarea name="address" id="address" class="form-control"></textarea>
@@ -150,7 +201,7 @@
                         </div>
 
                         <!-- Avatar Upload -->
-                        <div class="col-lg-3 col-sm-6 col-6">
+                        <div class="col-lg-4">
                             <div class="form-group">
                                 <label>Photo</label>
                                 <div class="image-upload">
@@ -169,6 +220,28 @@
                                     <img id="avatar-preview" src="" alt="Avatar Preview"
                                         style="max-width: 100px; border-radius: 8px;padding:4px;">
                                 </div>
+                            </div>
+                        </div>
+
+                        <!-- Face Photo Upload/Capture -->
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label>Face Photo <span class="text-muted small">(upload or use camera)</span></label>
+                                <div class="image-upload" id="face-photo-upload-box" style="margin: 0; position: relative; overflow: hidden; display: flex; justify-content: center; align-items: center; min-height: 120px;">
+                                    <input type="file" name="face_photo" id="face_photo_input" class="form-control" accept="image/*">
+                                    <div class="image-uploads" id="face-upload-content">
+                                        <img src="{{ env('ImagePath') . '/admin/assets/img/icons/upload.svg' }}" alt="Upload Icon">
+                                        <h4 id="face-photo-text">Drag and drop a file to upload</h4>
+                                    </div>
+                                    <img id="face-preview" src="" alt="Face Preview" style="display: none; max-width: 100%; max-height: 120px; border-radius: 8px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); pointer-events: none;">
+                                </div>
+                                <div class="text-danger error-face_photo"></div>
+                                
+                                <button type="button" class="btn btn-capture-face mt-2" id="captureFaceBtn">
+                                    <i class="fa-solid fa-camera me-1"></i>Capture Face via Camera
+                                </button>
+                                
+                                <input type="hidden" name="captured_photo" id="captured_photo">
                             </div>
                         </div>
 
@@ -264,9 +337,12 @@
             </div>
         </div>
     </div>
+    @include('partials.face-recognition-modal')
 @endsection
 
 @push('js')
+    <script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+    @include('partials.face-recognition-script')
     <script>
         function togglePasswordVisibility() {
             const passwordInput = document.getElementById('password');
@@ -284,6 +360,55 @@
     </script>
     <script>
         $(document).ready(function() {
+            if (typeof window.OmsaiFaceRecognition !== 'undefined') {
+                const faceRecognition = window.OmsaiFaceRecognition.init();
+
+                $('#captureFaceBtn').on('click', function() {
+                    const staffName = $('#customer_name').val().trim() || 'New Staff';
+
+                    faceRecognition.open({
+                        title: `Register Face for ${staffName}`,
+                        subtitle: 'Ask the staff member to face the camera and capture one clear frame.',
+                        captureLabel: 'Capture & Set',
+                        onCapture: async function(descriptor, modal, imageDataUrl) {
+                            $('#face_descriptor').val(JSON.stringify(descriptor));
+                            
+                            if (imageDataUrl) {
+                                // Update preview
+                                $('#face-preview').attr('src', imageDataUrl).show();
+                                $('#face-upload-content').hide();
+                                
+                                // Create a hidden input for the captured photo if it doesn't exist
+                                if ($('#captured_photo').length === 0) {
+                                    $('#customerForm').append('<input type="hidden" name="captured_photo" id="captured_photo">');
+                                }
+                                $('#captured_photo').val(imageDataUrl);
+                            }
+
+                            modal.showMatchInfo('Face captured successfully.');
+
+                            setTimeout(function() {
+                                modal.close();
+                            }, 600);
+                        }
+                    });
+                });
+            }
+
+            // Face photo file input change
+            $('#face_photo_input').on('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        $('#face-preview').attr('src', event.target.result).show();
+                        $('#face-upload-content').hide();
+                        // Optional: Clear captured photo if file is uploaded
+                        $('#captured_photo').val('');
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
 
             $('#avatar').on('change', function(e) {
                 const file = e.target.files[0];
@@ -415,6 +540,23 @@
                     hasError = true;
                 }
 
+                // ✅ Salary validation
+                let salary = $("#salary").val().trim();
+                if (salary === "") {
+                    $(".error-salary").html(" Salary is required. ");
+                    hasError = true;
+                } else if (parseFloat(salary) < 0) {
+                    $(".error-salary").html(" Salary must be a positive number. ");
+                    hasError = true;
+                }
+
+                // ✅ Joining Date validation
+                let joiningDate = $("#joining_date").val().trim();
+                if (joiningDate === "") {
+                    $(".error-joining_date").html(" Joining date is required. ");
+                    hasError = true;
+                }
+
                 // ✅ File upload validation
                 let avatar = $("#avatar")[0].files[0];
                 if (avatar) {
@@ -462,6 +604,10 @@
                 if (selectedSubAdminId) {
                     formData.append("sub_admin_id", selectedSubAdminId);
                 }
+                
+                // Add the default role as required by the API
+                formData.append("role", "staff");
+                
                 $.ajax({
                     url: "/api/createStaff", // Ensure API route is correct
                     type: "POST",
