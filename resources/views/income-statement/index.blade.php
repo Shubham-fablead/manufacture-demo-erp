@@ -117,8 +117,8 @@
                                     <tr>
                                         <th class="text-left" colspan="2">
                                             For the Period:
-                                            {{ \Carbon\Carbon::parse($data['period']['start'])->format('M d, Y') }}
-                                            to {{ \Carbon\Carbon::parse($data['period']['end'])->format('M d, Y') }}
+                                            {{ \Carbon\Carbon::parse($data['period']['start'])->format('d/m/Y') }}
+                                            to {{ \Carbon\Carbon::parse($data['period']['end'])->format('d/m/Y') }}
                                         </th>
                                     </tr>
                                 </thead>
@@ -295,11 +295,19 @@
                 const month = String(date.getMonth() + 1).padStart(2, '0');
                 const year = date.getFullYear();
 
-                return `${day}-${month}-${year}`;
+                return `${day}/${month}/${year}`;
             }
 
             function formatDateForSubmit(value) {
                 if (!value) return '';
+
+                if (value.includes('/')) {
+                    const parts = value.split('/');
+                    if (parts.length !== 3) return value;
+
+                    const [day, month, year] = parts;
+                    return `${year}-${month}-${day}`;
+                }
 
                 const parts = value.split('-');
                 if (parts.length !== 3) return value;

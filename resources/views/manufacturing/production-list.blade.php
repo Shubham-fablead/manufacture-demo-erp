@@ -251,6 +251,26 @@
                     : `${editAction}${deleteAction}${viewAction}`;
             }
 
+            function formatProductionDate(dateValue) {
+                if (!dateValue) return '-';
+
+                const dateString = String(dateValue).trim();
+                const match = dateString.match(/^(\d{4})-(\d{2})-(\d{2})/);
+
+                if (match) {
+                    return `${match[3]}/${match[2]}/${match[1]}`;
+                }
+
+                const parsedDate = new Date(dateString);
+                if (isNaN(parsedDate.getTime())) return dateString;
+
+                const day = String(parsedDate.getDate()).padStart(2, '0');
+                const month = String(parsedDate.getMonth() + 1).padStart(2, '0');
+                const year = parsedDate.getFullYear();
+
+                return `${day}/${month}/${year}`;
+            }
+
             function mobileCard(item) {
                 const statusClass = {
                     'completed': 'bg-lightgreen',
@@ -302,7 +322,7 @@
                             </div>
                             <div class="production-mobile-row">
                                 <span class="label">Date</span>
-                                <span class="value">${item.production_date || '-'}</span>
+                                <span class="value">${formatProductionDate(item.production_date)}</span>
                             </div>
                             <div class="production-mobile-actions">
                                 ${actionButtons(item, true)}
@@ -335,7 +355,7 @@
                             <td>${parseFloat(item.output_qty).toFixed(3)} ${item.product?.unit?.unit_name || ''}</td>
                             <td>${parseFloat(item.total_cost).toFixed(2)}</td>
                             <td><span class="badges ${statusClass}">${statusLabel}</span></td>
-                            <td>${item.production_date || '-'}</td>
+                            <td>${formatProductionDate(item.production_date)}</td>
                             <td>${actionButtons(item, false)}</td>
                         </tr>
                     `;
