@@ -3353,7 +3353,7 @@ class PurchaseController extends Controller
         foreach ($purchases as $purchase) {
             $sheet->setCellValue('A' . $row, $purchase->invoice_number);
             $sheet->setCellValue('B' . $row, $purchase->vendor_name);
-            $sheet->setCellValue('C' . $row, \Carbon\Carbon::parse($purchase->date)->format('Y-m-d'));
+            $sheet->setCellValue('C' . $row, \Carbon\Carbon::parse($purchase->date)->format('d/m/y'));
             $sheet->setCellValue('D' . $row, $purchase->product_names);
             $sheet->setCellValue('E' . $row, $purchase->product_quantities);
             $sheet->setCellValue('F' . $row, $purchase->product_prices);

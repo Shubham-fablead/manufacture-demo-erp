@@ -256,6 +256,100 @@
                 margin-bottom: 10px !important;
             }
         }
+
+        @media screen and (min-width: 768px) and (max-width: 1024px) {
+            .content {
+                max-width: 768px;
+                margin: 0 auto;
+                padding: 20px 10px 80px;
+            }
+
+            .purchase-header {
+                align-items: flex-start;
+                margin-bottom: 8px;
+            }
+
+            .purchase-header .page-title {
+                text-align: left;
+            }
+
+            .purchase-header .page-title h4 {
+                font-size: 16px;
+            }
+
+            .purchase-tabs {
+                gap: 6px;
+                margin-top: 8px;
+            }
+
+            .purchase-tab {
+                padding: 8px 10px;
+                font-size: 11px;
+                border-radius: 8px;
+            }
+
+            .gst-header {
+                justify-content: flex-end;
+                margin-top: 0;
+            }
+
+            .card {
+                margin-bottom: 0;
+            }
+
+            .card .card-body {
+                padding: 12px 10px 14px;
+            }
+
+            .form-row {
+                padding: 14px 10px 10px;
+                margin: 0 0 12px;
+                border-radius: 8px;
+            }
+
+            .form-row > [class*="col-"] {
+                flex: 0 0 100%;
+                max-width: 100%;
+                padding-left: 6px;
+                padding-right: 6px;
+            }
+
+            .form-row .form-group {
+                margin-bottom: 8px !important;
+            }
+
+            .form-row .add-row-btn {
+                margin-top: 0;
+                margin-bottom: 0;
+            }
+
+            .add-row,
+            .remove-row {
+                width: 100%;
+                height: 36px;
+                line-height: 1;
+                border-radius: 4px;
+            }
+
+            .form-group label {
+                font-size: 12px;
+                margin-bottom: 4px;
+            }
+
+            .form-control,
+            .select2-container--default .select2-selection--single {
+                min-height: 36px;
+                font-size: 12px;
+            }
+
+            .select2-container {
+                width: 100% !important;
+            }
+
+            .total-order {
+                margin-top: 4px;
+            }
+        }
     </style>
 
     <div class="content">

@@ -26,7 +26,7 @@
             display: none;
         }
 
-        @media screen and (max-width: 768px) {
+        @media screen and (max-width: 1199px) {
             .table-scroll-top {
                 display: block;
                 -webkit-overflow-scrolling: touch !important;
@@ -43,7 +43,7 @@
         }
 
         /* Desktop: show all columns normally */
-        @media (min-width: 769px) {
+        @media (min-width: 768px) {
 
             table.datanew thead th,
             table.datanew tbody td {
@@ -92,7 +92,7 @@
         }
 
         /* Mobile: hide non-essential columns, show Details toggle */
-        @media (max-width: 768px) {
+        @media (max-width: 767.98px) {
 
             table.datanew thead th:nth-child(n+2),
             table.datanew tbody td:nth-child(n+2) {
@@ -138,6 +138,8 @@
             .vendor-name {
                 display: inline-block !important;
                 /* max-width: calc(100% - 60px) !important; */
+                width: auto !important;
+                max-width: calc(100% - 60px) !important;
                 margin-left: 8px !important;
                 font-size: 14px !important;
                 word-break: break-word !important;
@@ -157,15 +159,79 @@
         }
 
         /* Tablet specific fixes */
-        @media screen and (width: 768px) {
+        @media screen and (min-width: 768px) and (max-width: 1199px) {
             .table-responsive {
                 overflow-x: auto !important;
                 -webkit-overflow-scrolling: touch !important;
             }
 
+            table.datanew {
+                width: 100% !important;
+                min-width: 700px !important;
+            }
+
+            table.datanew thead th,
+            table.datanew tbody td {
+                display: table-cell !important;
+                font-size: 12px !important;
+                padding: 8px 6px !important;
+                white-space: normal !important;
+                word-break: break-word !important;
+                overflow-wrap: anywhere !important;
+                vertical-align: middle !important;
+            }
+
+            table.datanew thead th:nth-child(n+2),
+            table.datanew tbody td:nth-child(n+2) {
+                display: table-cell !important;
+            }
+
             table.datanew thead th.details-column,
             table.datanew tbody td:nth-child(9) {
+                display: none !important;
+            }
+
+            table.datanew tbody td:first-child {
                 display: table-cell !important;
+                width: 120px !important;
+                max-width: 120px !important;
+            }
+
+            .vendor-wrapper {
+                display: flex !important;
+                align-items: center !important;
+                gap: 8px !important;
+                width: 100% !important;
+            }
+
+            .vendor-image {
+                width: 40px !important;
+                height: 40px !important;
+                min-width: 40px !important;
+            }
+
+            .vendor-name {
+                width: auto !important;
+                max-width: 70px !important;
+                margin-left: 0 !important;
+                white-space: normal !important;
+                word-break: break-word !important;
+                overflow-wrap: anywhere !important;
+            }
+
+            .vendor-wrapper .vendor-name[style] {
+                width: auto !important;
+            }
+
+            table.datanew thead th:nth-child(8),
+            table.datanew tbody td:nth-child(8) {
+                width: 90px !important;
+                min-width: 90px !important;
+            }
+
+            table.datanew thead th.details-column,
+            table.datanew tbody td:nth-child(9) {
+                display: none !important;
                 width: 60px !important;
                 min-width: 60px !important;
                 max-width: 60px !important;
@@ -390,7 +456,7 @@
                 </div> --}}
                 {{-- <div class="table-responsive">
                     <table class="table datanew"> --}}
-                        <div class="table-container">
+                        <div class="table-responsive table-container">
                     <table class="table datanew">
                         <thead>
                             <tr>
@@ -886,6 +952,7 @@
                     });
 
                     table.clear().rows.add(tableBody).draw();
+                    $('.table-responsive').scrollLeft(0);
 
                     // Sync top scrollbar (if you use it)
                     const topScroll = document.querySelector('.table-scroll-top');
@@ -894,6 +961,8 @@
                     if (topScroll && tableResponsive && tableElement) {
                         const topInnerDiv = topScroll.querySelector('div');
                         topInnerDiv.style.width = tableElement.scrollWidth + 'px';
+                        topScroll.scrollLeft = 0;
+                        tableResponsive.scrollLeft = 0;
                         topScroll.onscroll = () => tableResponsive.scrollLeft = topScroll.scrollLeft;
                         tableResponsive.onscroll = () => topScroll.scrollLeft = tableResponsive.scrollLeft;
                     }
@@ -1067,7 +1136,7 @@
 
     // Reset details when switching to desktop
     $(window).on('resize', function() {
-        if ($(window).width() > 768) {
+        if ($(window).width() >= 768) {
             $('.collapse').removeClass('show');
             $('.toggle-details i')
                 .removeClass('fa-minus-circle')
