@@ -176,6 +176,7 @@ class AuthController extends Controller
             ->select(
                 'pi.id as invoice_id',
                 'pi.invoice_number',
+                'pi.bill_no',
                 'pi.grand_total',
                 'pi.created_at as purchase_date',
 

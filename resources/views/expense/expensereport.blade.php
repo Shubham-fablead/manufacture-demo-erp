@@ -194,7 +194,9 @@
 
             /* Hide the Details toggle column on desktop */
             table.datanew thead th.details-column,
-            table.datanew tbody td.details-column {
+            table.datanew tbody td.details-column,
+            table.datanew thead th:last-child,
+            table.datanew tbody td:last-child {
                 display: none !important;
             }
 
@@ -1282,6 +1284,12 @@
                 ordering: true,
                 responsive: true,
                 info: false,
+                columnDefs: [{
+                    targets: 5,
+                    className: 'details-column',
+                    orderable: false,
+                    searchable: false
+                }],
                 language: {
                     emptyTable: "No expenses found.",
                     zeroRecords: "No expense record found."
