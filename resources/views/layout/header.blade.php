@@ -1135,6 +1135,9 @@
                 <button type="button" class="today-alert-tab" data-alert-tab="followups">
                     Follow Ups <span class="count-pill" id="todayFollowUpTabCount">0</span>
                 </button>
+                <button type="button" class="today-alert-tab" data-alert-tab="lowstock">
+                    Low Stock <span class="count-pill" id="todayLowStockTabCount">0</span>
+                </button>
             </div>
             <div id="todayAlertContent">
                 <div class="today-alert-empty">Loading today alerts...</div>
@@ -1156,8 +1159,10 @@
     // ==================== TODAY ALERTS FUNCTIONALITY ====================
     let todayAlertData = {
         meetings: [],
-        followups: []
+        followups: [],
+        lowstock: []
     };
+    let todayLowStockThreshold = 0;
     let activeTodayAlertTab = 'meetings';
 
     document.addEventListener('DOMContentLoaded', function() {
@@ -1191,9 +1196,7 @@
 
         document.querySelectorAll('.today-alert-tab').forEach(tab => {
             tab.addEventListener('click', function() {
-                activeTodayAlertTab = this.dataset.alertTab || 'meetings';
-                document.querySelectorAll('.today-alert-tab').forEach(item => item.classList.remove('active'));
-                this.classList.add('active');
+                setActiveTodayAlertTab(this.dataset.alertTab || 'meetings');
                 renderTodayAlerts();
             });
         });
@@ -1202,12 +1205,24 @@
         setInterval(loadTodayAlerts, 60000);
     }
 
-    function openTodayAlertModal() {
+    function openTodayAlertModal(tabName) {
         const backdrop = document.getElementById('todayAlertModalBackdrop');
         if (!backdrop) return;
 
+        if (tabName) {
+            setActiveTodayAlertTab(tabName);
+        }
         backdrop.style.display = 'flex';
         loadTodayAlerts().then(renderTodayAlerts);
+    }
+
+    window.openTodayAlertModal = openTodayAlertModal;
+
+    function setActiveTodayAlertTab(tabName) {
+        activeTodayAlertTab = tabName || 'meetings';
+        document.querySelectorAll('.today-alert-tab').forEach(item => {
+            item.classList.toggle('active', item.dataset.alertTab === activeTodayAlertTab);
+        });
     }
 
     function closeTodayAlertModal() {
@@ -1234,16 +1249,21 @@
         const query = `per_page=100&selectedSubAdminId=${encodeURIComponent(selectedSubAdminId)}`;
 
         try {
-            const [meetingsResponse, followUpsResponse] = await Promise.all([
+            const [meetingsResponse, followUpsResponse, dashboardResponse] = await Promise.all([
                 fetch(`/api/getAllMeetings?${query}`, { headers: getApiHeaders(), credentials: 'same-origin' }),
-                fetch(`/api/getAllFollowUps?${query}`, { headers: getApiHeaders(), credentials: 'same-origin' })
+                fetch(`/api/getAllFollowUps?${query}`, { headers: getApiHeaders(), credentials: 'same-origin' }),
+                fetch(`/api/dashboard-api?selectedSubAdminId=${encodeURIComponent(selectedSubAdminId)}`, { headers: getApiHeaders(), credentials: 'same-origin' })
             ]);
 
             const meetingsJson = meetingsResponse.ok ? await meetingsResponse.json() : { data: [] };
             const followUpsJson = followUpsResponse.ok ? await followUpsResponse.json() : { data: [] };
+            const dashboardJson = dashboardResponse.ok ? await dashboardResponse.json() : null;
 
             todayAlertData.meetings = (meetingsJson.data || []).filter(item => isTodayAlertDate(item.scheduled_on, item.formatted_scheduled_on));
             todayAlertData.followups = (followUpsJson.data || []).filter(item => isTodayAlertDate(item.follow_up_datetime, item.formatted_follow_up_datetime));
+            const lowStock = dashboardJson?.data?.lowStock;
+            todayLowStockThreshold = parseFloat(lowStock?.threshold || 0);
+            todayAlertData.lowstock = Array.isArray(lowStock?.products) ? lowStock.products : [];
 
             updateTodayAlertCounts();
             renderTodayAlerts();
@@ -1286,13 +1306,16 @@
     function updateTodayAlertCounts() {
         const meetingCount = todayAlertData.meetings.length;
         const followUpCount = todayAlertData.followups.length;
-        const totalCount = meetingCount + followUpCount;
+        const lowStockCount = todayAlertData.lowstock.length;
+        const totalCount = meetingCount + followUpCount + lowStockCount;
         const totalBadge = document.getElementById('todayAlertCount');
         const meetingBadge = document.getElementById('todayMeetingTabCount');
         const followUpBadge = document.getElementById('todayFollowUpTabCount');
+        const lowStockBadge = document.getElementById('todayLowStockTabCount');
 
         if (meetingBadge) meetingBadge.innerText = meetingCount;
         if (followUpBadge) followUpBadge.innerText = followUpCount;
+        if (lowStockBadge) lowStockBadge.innerText = lowStockCount;
 
         if (totalBadge) {
             if (totalCount > 0) {
@@ -1310,14 +1333,31 @@
 
         const rows = todayAlertData[activeTodayAlertTab] || [];
         if (!rows.length) {
-            content.innerHTML = `<div class="today-alert-empty">No ${activeTodayAlertTab === 'meetings' ? 'meetings' : 'follow ups'} for today</div>`;
+            const emptyLabel = activeTodayAlertTab === 'meetings'
+                ? 'meetings'
+                : (activeTodayAlertTab === 'followups' ? 'follow ups' : 'low stock products');
+            content.innerHTML = `<div class="today-alert-empty">No ${emptyLabel} for today</div>`;
             return;
         }
 
-        content.innerHTML = activeTodayAlertTab === 'meetings'
-            ? renderMeetingAlertTable(rows)
-            : renderFollowUpAlertTable(rows);
+        if (activeTodayAlertTab === 'meetings') {
+            content.innerHTML = renderMeetingAlertTable(rows);
+            return;
+        }
+
+        content.innerHTML = activeTodayAlertTab === 'followups'
+            ? renderFollowUpAlertTable(rows)
+            : renderLowStockAlertTable(rows);
     }
+
+    window.setTodayLowStockAlerts = function(lowStock) {
+        todayLowStockThreshold = parseFloat(lowStock?.threshold || 0);
+        todayAlertData.lowstock = Array.isArray(lowStock?.products) ? lowStock.products : [];
+        updateTodayAlertCounts();
+        if (activeTodayAlertTab === 'lowstock') {
+            renderTodayAlerts();
+        }
+    };
 
     function renderMeetingAlertTable(rows) {
         return `
@@ -1375,6 +1415,40 @@
                                 <td><a class="action-link" href="/follow-up-view/${item.id}" title="View"><i class="fa fa-eye"></i></a></td>
                             </tr>
                         `).join('')}
+                    </tbody>
+                </table>
+            </div>
+        `;
+    }
+
+    function renderLowStockAlertTable(rows) {
+        return `
+            <div style="font-size:13px;color:#555;margin-bottom:10px;">
+                The following products are below the threshold of <strong>${todayLowStockThreshold}</strong> units:
+            </div>
+            <div class="table-responsive">
+                <table class="today-alert-table">
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Current Qty</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${rows.map(item => {
+                            const qty = parseFloat(item.quantity || 0);
+                            const label = qty <= 0 ? 'Out of Stock' : 'Low Stock';
+                            return `
+                                <tr>
+                                    <td>${escapeHtml(item.name || 'N/A')}</td>
+                                    <td>${qty.toFixed(3)}</td>
+                                    <td><span class="badges ${qty <= 0 ? 'bg-lightred' : 'bg-lightyellow'}" style="font-size:11px;">${label}</span></td>
+                                    <td><a class="action-link" href="/product-view/${item.id}" title="View"><i class="fa fa-eye"></i></a></td>
+                                </tr>
+                            `;
+                        }).join('')}
                     </tbody>
                 </table>
             </div>

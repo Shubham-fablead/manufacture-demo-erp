@@ -58,6 +58,26 @@
             word-wrap: break-word;
         }
 
+        .bill-vendor-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .bill-vendor-info .vendor-name-mobile {
+            font-size: 11px;
+            color: #595b5d;
+            margin-top: 2px;
+            word-break: break-word;
+            white-space: normal;
+        }
+
+        .bill-vendor-info a {
+            display: inline-block;
+            font-weight: 500;
+            text-decoration: none;
+        }
+
         /* Desktop view - show header buttons, hide filter row buttons */
         @media screen and (min-width: 768px) {
             .desktop-export-buttons {
@@ -401,12 +421,25 @@
 
         .mobile-action-buttons-simple {
             display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
+            gap: 10px;
+            flex-wrap: nowrap;
             align-items: center;
             justify-content: flex-start;
             padding-top: 15px;
             border-top: 1px solid #e0e0e0;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .mobile-action-buttons-simple > a.btn-icon-mobile,
+        .mobile-action-buttons-simple > button.btn-icon-mobile,
+        .mobile-action-buttons-simple > .btn {
+            flex: 0 0 auto;
+            min-width: 40px;
+        }
+
+        .mobile-action-buttons-simple > .btn {
+            white-space: nowrap;
         }
 
         .btn-icon-mobile,
@@ -426,6 +459,9 @@
             padding: 0;
             margin: 0;
             box-sizing: border-box;
+            line-height: 1;
+            overflow: hidden;
+            flex-shrink: 0;
         }
 
         button.btn-icon-mobile {
@@ -441,10 +477,24 @@
 
         .btn-icon-mobile i {
             font-size: 16px;
+            line-height: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        .btn-icon-mobile.btn-history i {
+        .btn-icon-mobile svg {
+            width: 18px;
+            height: 18px;
+            display: block;
+            flex-shrink: 0;
+        }
+
+        .btn-icon-mobile.btn-history i,
+        .btn-icon-mobile.btn-history svg {
             font-size: 18px;
+            width: 20px;
+            height: 20px;
         }
 
         .mobile-badge {
@@ -1235,9 +1285,7 @@
                                 <th>Date</th>
                                 <th>Vendor Name</th>
                                 <th>Grand Total</th>
-                                <th>Purchase Status</th>
                                 <th>Payment Status</th>
-                                <th>Return Status</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -1426,7 +1474,12 @@
                         </div>
 
                         <div class="mb-3 d-none" id="bank_container">
-                            <label for="bank_id" class="form-label">Select Bank</label>
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <label for="bank_id" class="form-label mb-0">Select Bank</label>
+                                <button type="button" class="btn btn-sm btn-outline-primary" id="openAddBankModal" style="border-color:#ff9f43; color:#ff9f43;">
+                                    Add Bank
+                                </button>
+                            </div>
                             <select name="bank_id" id="bank_id" class="form-select">
                                 <option value="">Select Bank</option>
                                 @foreach ($banks as $bank)
@@ -1489,6 +1542,61 @@
         <div class="download-loader-box">
             <h4 id="downloadLoaderText">Generating PDF...</h4>
             <div class="spinner-border text-primary" role="status" aria-hidden="true"></div>
+        </div>
+    </div>
+
+    <!-- Add Bank Modal -->
+    <div class="modal fade" id="addBankModal" tabindex="-1" aria-labelledby="addBankModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form id="addBankForm">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addBankModalLabel">Add Bank</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-6 mb-3">
+                                <label class="form-label">Bank Name</label>
+                                <input type="text" class="form-control" id="add_bank_name" name="bank_name">
+                                <div class="text-danger small" id="addBankNameError"></div>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <label class="form-label">Account Number</label>
+                                <input type="text" class="form-control" id="add_account_number" name="account_number">
+                                <div class="text-danger small" id="addAccountNumberError"></div>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <label class="form-label">IFSC Code</label>
+                                <input type="text" class="form-control" id="add_ifsc_code" name="ifsc_code">
+                                <div class="text-danger small" id="addIfscCodeError"></div>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <label class="form-label">Branch Name</label>
+                                <input type="text" class="form-control" id="add_branch_name" name="branch_name">
+                                <div class="text-danger small" id="addBranchNameError"></div>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <label class="form-label">Opening Balance</label>
+                                <input type="number" class="form-control" id="add_opening_balance" name="opening_balance" min="0" step="0.01" value="0">
+                                <div class="text-danger small" id="addOpeningBalanceError"></div>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <label class="form-label">Status</label>
+                                <select class="form-select" id="add_bank_status" name="status">
+                                    <option value="1" selected>Active</option>
+                                    <option value="0">Inactive</option>
+                                </select>
+                                <div class="text-danger small" id="addBankStatusError"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-submit text-white" id="saveBankBtn" style="background-color: #ff9f43;">Save Bank</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 @endsection
@@ -1583,7 +1691,7 @@
             @endif
 
             return `
-                <td colspan="8" class="order-details-content">
+                <td colspan="6" class="order-details-content">
                     <div class="order-details-list">
                         <div class="order-detail-row-simple">
                             <span class="order-detail-label-simple">Date:</span>
@@ -1594,23 +1702,9 @@
                             <span class="order-detail-value-simple">${purchase.vendor_name || 'N/A'}</span>
                         </div>
                         <div class="order-detail-row-simple">
-                            <span class="order-detail-label-simple">Purchase Status:</span>
-                            <span class="order-detail-value-simple">
-                                <span class="mobile-badge bg-lightgreen">${purchase.purchase_status || purchase.status || 'N/A'}</span>
-                            </span>
-                        </div>
-                        <div class="order-detail-row-simple">
                             <span class="order-detail-label-simple">Payment Status:</span>
                             <span class="order-detail-value-simple">
                                 <span class="mobile-badge bg-lightgreen">${purchase.payment_status || 'N/A'}</span>
-                            </span>
-                        </div>
-                        <div class="order-detail-row-simple">
-                            <span class="order-detail-label-simple">Return Status:</span>
-                            <span class="order-detail-value-simple">
-                                ${parseFloat(purchase.total_return || 0) > 0 ?
-                                    `<span class="status-badge status-pending">Returned</span>` :
-                                    '<span class="status-badge status-completed">No return</span>'}
                             </span>
                         </div>
                         <div class="order-detail-row-simple">
@@ -1770,8 +1864,7 @@
 
         $(document).ready(function() {
             // Initialize table after data is loaded
-            let currentYear = new Date().getFullYear();
-            for (let i = 0; i < 4; i++) {
+            let currentYear = new Date().getFullYear();            for (let i = 0; i < 4; i++) {
                 let year = currentYear - i;
                 $("#filter-year").append(`<option value="${year}">${year}</option>`);
             }
@@ -2840,7 +2933,10 @@
                                     window.purchaseDataMap[o.id] = purchaseData;
 
                                     rows.push([
-                                        `<a href="/print-purchase/${o.id}" style="text-decoration: none;">${o.bill_no || ''}</a>`,
+                                        `<div class="bill-vendor-info">
+                                            <a href="/print-purchase/${o.id}">${o.bill_no || ''}</a>
+                                            <div class="vendor-name-mobile">${o.vendor_name || ''}</div>
+                                        </div>`,
                                         `<button class="mobile-toggle-btn-table" onclick="togglePurchaseRowDetails('${o.id}')" data-purchase-id="${o.id}">
                             <span class="toggle-icon">+</span>
                         </button>`,
@@ -2848,16 +2944,10 @@
                                             .created_at),
                                         `<span style="text-transform:capitalize;">${o.vendor_name || ''}</span>`,
                                         formattedAmount,
-                                        badge((o.purchase_status || o.status ||
-                                                ''), 'bg-lightgreen',
-                                            'bg-lightred'),
                                         (parseFloat(o.extra_paid || 0) > 0) ?
                                         `<span class="badges bg-lightred" style="text-transform:capitalize;">Extra Paid: ${currencySymbol}${formatCurrency(o.extra_paid)}</span>` :
                                         badge(o.payment_status, 'bg-lightgreen',
                                             'bg-lightred'),
-                                        parseFloat(o.total_return || 0) > 0 ?
-                                        `<span class="status-badge status-pending">Returned</span>` :
-                                        `<span class="status-badge status-completed">No return</span>`,
                                         actionLinks(o)
                                     ]);
                                 });
@@ -3069,6 +3159,85 @@
                     });
             });
 
+
+            // Handle Add Bank Modal
+            const addBankModalElement = document.getElementById('addBankModal');
+            const addBankModal = addBankModalElement ? new bootstrap.Modal(addBankModalElement) : null;
+
+            function resetAddBankForm() {
+                $('#addBankForm')[0].reset();
+                $('#add_opening_balance').val('0');
+                $('#add_bank_status').val('1');
+                $('#addBankForm .text-danger').text('');
+            }
+
+            function upsertBankOption(bank) {
+                if (!bank || !bank.id) return;
+                const bankId = String(bank.id);
+                const bankName = bank.bank_name || 'Unnamed Bank';
+                const existingOption = $('#bank_id option[value="' + bankId + '"]');
+                if (existingOption.length) {
+                    existingOption.text(bankName);
+                } else {
+                    $('#bank_id').append(new Option(bankName, bankId));
+                }
+                $('#bank_id').val(bankId).trigger('change');
+            }
+
+            $('#openAddBankModal').on('click', function() {
+                resetAddBankForm();
+                if (addBankModal) addBankModal.show();
+            });
+
+            $('#addBankModal').on('hidden.bs.modal', function() {
+                if ($('#makePaymentModal').hasClass('show')) {
+                    $('body').addClass('modal-open');
+                }
+            });
+
+            $('#addBankForm').on('submit', function(e) {
+                e.preventDefault();
+                $('#addBankForm .text-danger').text('');
+
+                const formData = new FormData(this);
+                const selectedSubAdminId = localStorage.getItem('selectedSubAdminId');
+                if (selectedSubAdminId) formData.append('selectedSubAdminId', selectedSubAdminId);
+
+                const saveButton = $('#saveBankBtn');
+                saveButton.prop('disabled', true).text('Saving...');
+
+                $.ajax({
+                    url: '/api/banks',
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    headers: {
+                        'X-CSRF-TOKEN': "{{ csrf_token() }}",
+                        "Authorization": "Bearer " + authToken
+                    },
+                    success: function(response) {
+                        upsertBankOption(response.data || null);
+                        if (addBankModal) addBankModal.hide();
+                        Swal.fire({ icon: 'success', title: 'Success', text: response.message || 'Bank added successfully.', confirmButtonText: 'OK' });
+                    },
+                    error: function(xhr) {
+                        const errors = xhr.responseJSON?.errors || {};
+                        $('#addBankNameError').text(errors.bank_name ? errors.bank_name[0] : '');
+                        $('#addAccountNumberError').text(errors.account_number ? errors.account_number[0] : '');
+                        $('#addIfscCodeError').text(errors.ifsc_code ? errors.ifsc_code[0] : '');
+                        $('#addBranchNameError').text(errors.branch_name ? errors.branch_name[0] : '');
+                        $('#addOpeningBalanceError').text(errors.opening_balance ? errors.opening_balance[0] : '');
+                        $('#addBankStatusError').text(errors.status ? errors.status[0] : '');
+                        if (!Object.keys(errors).length) {
+                            Swal.fire({ icon: 'error', title: 'Error', text: xhr.responseJSON?.message || 'Failed to add bank.', confirmButtonText: 'OK' });
+                        }
+                    },
+                    complete: function() {
+                        saveButton.prop('disabled', false).text('Save Bank');
+                    }
+                });
+            });
 
             // Handle delete action
             $(document).on("click", ".delete-order", function() {

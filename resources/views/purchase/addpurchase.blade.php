@@ -305,22 +305,57 @@
                 padding: 14px 10px 10px;
                 margin: 0 0 12px;
                 border-radius: 8px;
-            }
-
-            .form-row > [class*="col-"] {
-                flex: 0 0 100%;
-                max-width: 100%;
-                padding-left: 6px;
-                padding-right: 6px;
+                display: flex;
+                flex-wrap: wrap;
             }
 
             .form-row .form-group {
                 margin-bottom: 8px !important;
             }
 
-            .form-row .add-row-btn {
-                margin-top: 0;
-                margin-bottom: 0;
+            /* Row 1: Category Name + Product Name — 50% each */
+            .form-row > .col-lg-2.col-sm-12.col-6:nth-child(1),
+            .form-row > .col-lg-2.col-sm-12.col-6:nth-child(2) {
+                flex: 0 0 50%;
+                max-width: 50%;
+                padding-left: 6px;
+                padding-right: 6px;
+            }
+
+            /* Row 2: Product Price + Qty — 50% each */
+            .form-row > .col-lg-2.col-sm-12.col-6:nth-child(3),
+            .form-row > .col-lg-1.col-sm-12.col-6:nth-child(4) {
+                flex: 0 0 50%;
+                max-width: 50%;
+                padding-left: 6px;
+                padding-right: 6px;
+            }
+
+            /* Row 3: Disc% + Disc-Amt — 50% each */
+            .form-row > .col-lg-1.col-sm-12.col-6:nth-child(5),
+            .form-row > .col-lg-1.col-sm-12.col-6:nth-child(6) {
+                flex: 0 0 50%;
+                max-width: 50%;
+                padding-left: 6px;
+                padding-right: 6px;
+            }
+
+            /* Row 4: Total Amount — fills remaining space */
+            .form-row > .col-lg-2.col-sm-12.col-12:nth-child(7) {
+                flex: 1 1 auto;
+                max-width: calc(100% - 80px);
+                padding-left: 6px;
+                padding-right: 6px;
+            }
+
+            /* +/- button — compact, auto width */
+            .form-row > .col-lg-1.add-row-btn {
+                flex: 0 0 auto;
+                width: 80px;
+                max-width: 80px;
+                margin-top: 28px;
+                padding-left: 6px;
+                padding-right: 6px;
             }
 
             .add-row,
@@ -329,6 +364,10 @@
                 height: 36px;
                 line-height: 1;
                 border-radius: 4px;
+            }
+
+            .form-row .add-row-btn {
+                margin-bottom: 0;
             }
 
             .form-group label {
@@ -592,7 +631,10 @@
 
                     <div class="col-md-2 col-sm-12 col-lg-2 col-6 d-none" id="bank_container">
                         <div class="form-group">
-                            <label>Select Bank</label>
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <label class="mb-0">Select Bank</label>
+                                <button type="button" id="openAddBankModal" class="btn btn-sm" style="border: 1px solid #ff9f43; color: #ff9f43; padding: 2px 8px; font-size: 12px;">Add Bank</button>
+                            </div>
                             <select name="bank_id" id="bank_id" class="form-control select2">
                                 <option value="">Select Bank</option>
 
@@ -683,6 +725,61 @@
                     <a href="javascript:void(0);" class="btn btn-submit me-2">{{ $isEditPurchase ? 'Update' : 'Submit' }}</a>
                     <a href="{{ $isRowMaterialPurchase ? route('purchase.row_material.lists') : route('purchase.lists') }}" class="btn btn-cancel">Cancel</a>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Bank Modal -->
+    <div class="modal fade" id="addBankModal" tabindex="-1" aria-labelledby="addBankModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form id="addBankForm">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addBankModalLabel">Add Bank</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-6 mb-3">
+                                <label class="form-label">Bank Name</label>
+                                <input type="text" class="form-control" id="add_bank_name" name="bank_name">
+                                <div class="text-danger small" id="addBankNameError"></div>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <label class="form-label">Account Number</label>
+                                <input type="text" class="form-control" id="add_account_number" name="account_number">
+                                <div class="text-danger small" id="addAccountNumberError"></div>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <label class="form-label">IFSC Code</label>
+                                <input type="text" class="form-control" id="add_ifsc_code" name="ifsc_code">
+                                <div class="text-danger small" id="addIfscCodeError"></div>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <label class="form-label">Branch Name</label>
+                                <input type="text" class="form-control" id="add_branch_name" name="branch_name">
+                                <div class="text-danger small" id="addBranchNameError"></div>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <label class="form-label">Opening Balance</label>
+                                <input type="number" class="form-control" id="add_opening_balance" name="opening_balance" min="0" step="0.01" value="0">
+                                <div class="text-danger small" id="addOpeningBalanceError"></div>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <label class="form-label">Status</label>
+                                <select class="form-select" id="add_bank_status" name="status">
+                                    <option value="1" selected>Active</option>
+                                    <option value="0">Inactive</option>
+                                </select>
+                                <div class="text-danger small" id="addBankStatusError"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-submit text-white" id="saveBankBtn" style="background-color: #ff9f43;">Save Bank</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -1766,6 +1863,79 @@
                 return true;
             }
 
+            // Add Bank Modal handling
+            const addBankModalEl = document.getElementById('addBankModal');
+            const addBankModal = addBankModalEl ? new bootstrap.Modal(addBankModalEl) : null;
+
+            function resetAddBankForm() {
+                $('#addBankForm')[0].reset();
+                $('#add_opening_balance').val('0');
+                $('#add_bank_status').val('1');
+                $('#addBankForm .text-danger').text('');
+            }
+
+            function upsertBankOption(bank) {
+                if (!bank || !bank.id) return;
+                const bankId = String(bank.id);
+                const bankName = bank.bank_name || 'Unnamed Bank';
+                const existing = $('#bank_id option[value="' + bankId + '"]');
+                if (existing.length) {
+                    existing.text(bankName);
+                } else {
+                    $('#bank_id').append(new Option(bankName, bankId));
+                }
+                $('#bank_id').val(bankId).trigger('change');
+            }
+
+            $('#openAddBankModal').on('click', function() {
+                resetAddBankForm();
+                if (addBankModal) addBankModal.show();
+            });
+
+            $('#addBankForm').on('submit', function(e) {
+                e.preventDefault();
+                $('#addBankForm .text-danger').text('');
+
+                const formData = new FormData(this);
+                const selectedSubAdminId = localStorage.getItem('selectedSubAdminId');
+                if (selectedSubAdminId) formData.append('selectedSubAdminId', selectedSubAdminId);
+
+                const saveBtn = $('#saveBankBtn');
+                saveBtn.prop('disabled', true).text('Saving...');
+
+                $.ajax({
+                    url: '/api/banks',
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    headers: {
+                        'X-CSRF-TOKEN': "{{ csrf_token() }}",
+                        "Authorization": "Bearer " + authToken
+                    },
+                    success: function(response) {
+                        upsertBankOption(response.data || null);
+                        if (addBankModal) addBankModal.hide();
+                        Swal.fire({ icon: 'success', title: 'Success', text: response.message || 'Bank added successfully.', confirmButtonText: 'OK' });
+                    },
+                    error: function(xhr) {
+                        const errors = xhr.responseJSON?.errors || {};
+                        $('#addBankNameError').text(errors.bank_name?.[0] || '');
+                        $('#addAccountNumberError').text(errors.account_number?.[0] || '');
+                        $('#addIfscCodeError').text(errors.ifsc_code?.[0] || '');
+                        $('#addBranchNameError').text(errors.branch_name?.[0] || '');
+                        $('#addOpeningBalanceError').text(errors.opening_balance?.[0] || '');
+                        $('#addBankStatusError').text(errors.status?.[0] || '');
+                        if (!Object.keys(errors).length) {
+                            Swal.fire({ icon: 'error', title: 'Error', text: xhr.responseJSON?.message || 'Failed to add bank.' });
+                        }
+                    },
+                    complete: function() {
+                        saveBtn.prop('disabled', false).text('Save Bank');
+                    }
+                });
+            });
+
             // Form Validation
             function validateForm() {
                 let isValid = true;
@@ -1842,8 +2012,7 @@
 
 
             // Submit Form via AJAX
-            $(".btn-submit").click(function(e) {
-                e.preventDefault();
+            $(".btn-submit").click(function(e) {                e.preventDefault();
 
                 let $btn = $(this);
                 let originalContent = $btn.html();

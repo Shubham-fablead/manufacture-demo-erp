@@ -502,17 +502,32 @@
         }
 
         .icon-btn {
-            width: 28px;
-            height: 28px;
-            display: flex;
+            width: 38px;
+            height: 38px;
+            display: inline-flex;
             align-items: center;
             justify-content: center;
-            border-radius: 4px;
-            background: #f5f5f5;
+            border-radius: 50%;
+            border: 2px solid #1b2850;
+            background: transparent;
+            color: #1b2850;
+            text-decoration: none;
+            transition: all 0.3s;
+            padding: 0;
+            box-sizing: border-box;
+            overflow: hidden;
         }
 
         .icon-btn:hover {
-            background: #ececec;
+            background: #1b2850;
+            color: white;
+        }
+
+        .icon-btn svg {
+            width: 18px;
+            height: 18px;
+            display: block;
+            flex-shrink: 0;
         }
 
         .product-details-row {

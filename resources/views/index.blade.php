@@ -1276,7 +1276,7 @@
                                     <table class="table">
                                         <thead>
                                             <tr>
-                                                <th>Purchase ID</th>
+                                                <th>Bill No</th>
                                                 <th class="details-column">Details</th>
                                                 <th>Product Name</th>
                                                 <th>Grand Total</th>
@@ -1292,7 +1292,7 @@
                                                             <a href="/print-purchase/{{ $item->invoice_id }}"
                                                                 class="d-flex align-items-center text-decoration-none">
                                                                 <span
-                                                                    class="order-id">{{ $item->invoice_number ?? 'N/A' }}</span>
+                                                                    class="order-id">{{ $item->bill_no ?? 'N/A' }}</span>
                                                             </a>
                                                         </div>
 
@@ -1980,25 +1980,34 @@
                         // ✅ Low Stock Alert
                         const lowStock = response.data.lowStock;
                         if (lowStock && lowStock.threshold > 0 && lowStock.products && lowStock.products.length > 0) {
+                            if (typeof window.setTodayLowStockAlerts === 'function') {
+                                window.setTodayLowStockAlerts(lowStock);
+                            }
+
                             const sessionKey = 'lowStockAlertShown_' + new Date().toDateString();
                             if (!sessionStorage.getItem(sessionKey)) {
                                 sessionStorage.setItem(sessionKey, '1');
+                                if (typeof window.openTodayAlertModal === 'function') {
+                                    window.openTodayAlertModal('lowstock');
+                                }
+                                return;
 
                                 const rows = lowStock.products.map(function(p) {
                                     const qty = parseFloat(p.quantity);
                                     const badgeClass = qty <= 0 ? 'bg-lightred' : 'bg-lightyellow';
                                     const label = qty <= 0 ? 'Out of Stock' : 'Low Stock';
                                     return `<tr>
-                                        <td style="text-align:left;padding:6px 10px;">${p.name}</td>
+                                        <td style="text-align:left;padding:6px 10px;"><a href="/product-view/${p.id}" style="color:#ff9f43;text-decoration:underline;cursor:pointer;">${p.name}</a></td>
                                         <td style="text-align:center;padding:6px 10px;">${qty.toFixed(3)}</td>
                                         <td style="text-align:center;padding:6px 10px;"><span class="badges ${badgeClass}" style="font-size:11px;">${label}</span></td>
                                     </tr>`;
                                 }).join('');
 
                                 Swal.fire({
-                                    title: '⚠️ Low Stock Alert',
+                                    title: '',
                                     html: `
-                                        <p style="margin-bottom:10px;color:#555;">The following products are below the threshold of <strong>${lowStock.threshold}</strong> units:</p>
+                                        <div style="font-size:15px;font-weight:700;margin-bottom:10px;color:#333;">⚠️ Low Stock Alert</div>
+                                        <p style="margin-bottom:10px;color:#555;font-size:13px;">The following products are below the threshold of <strong>${lowStock.threshold}</strong> units:</p>
                                         <div style="max-height:300px;overflow-y:auto;">
                                             <table style="width:100%;border-collapse:collapse;font-size:13px;">
                                                 <thead>
@@ -2011,16 +2020,10 @@
                                                 <tbody>${rows}</tbody>
                                             </table>
                                         </div>`,
-                                    icon: 'warning',
-                                    confirmButtonText: 'View Products',
-                                    showCancelButton: true,
-                                    cancelButtonText: 'Dismiss',
-                                    confirmButtonColor: '#ff9f43',
+                                    showConfirmButton: false,
+                                    showCancelButton: false,
+                                    showCloseButton: true,
                                     width: '600px',
-                                }).then(function(result) {
-                                    if (result.isConfirmed) {
-                                        window.location.href = '/products';
-                                    }
                                 });
                             }
                         }

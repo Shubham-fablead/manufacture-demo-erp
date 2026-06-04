@@ -520,6 +520,7 @@ class LoginController extends Controller
                 'br.name as brand_name',
                 'pur.amount_total',
                 'pi.invoice_number',
+                'pi.bill_no',
                 'pi.grand_total'
             )
             ->orderBy('pur.created_at', 'desc')
@@ -589,7 +590,12 @@ class LoginController extends Controller
                 ->where('branch_id', $BranchID)
                 ->where('quantity', '<', $lowStockThreshold)
                 ->orderBy('quantity', 'asc')
-                ->get(['id', 'name', 'quantity', 'availablility'])
+                ->get([
+                    'id',
+                    'name',
+                    'quantity',
+                    'availablility',
+                ])
                 ->toArray();
         }
 
