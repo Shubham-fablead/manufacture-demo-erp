@@ -351,6 +351,48 @@
                     </li>
                 @endif
 
+                  {{-- GST Reports --}}
+                @if (app('hasPermission')(20, 'view'))
+                    <li class="submenu">
+                        <a href="javascript:void(0);">
+                            <i class="fas fa-chart-line"></i>
+
+                            <span> GST Reports</span> <span class="menu-arrow"></span>
+                        </a>
+                        <ul>
+                            @if (app('hasPermission')(20, 'view'))
+                                <li><a href="{{ route('gst.sales_list') }}">GST Report</a></li>
+                            @endif
+                            <!-- @if (app('hasPermission')(20, 'view'))
+<li><a href="{{ route('gst.reports.purchase') }}">GST Purchase Report</a></li>
+@endif -->
+
+                        </ul>
+                    </li>
+                @endif
+                {{-- Reports --}}
+                @if (app('hasPermission')(2, 'view') || app('hasPermission')(3, 'view') || app('hasPermission')(5, 'view'))
+                    <li class="submenu">
+                        <a href="javascript:void(0);">
+                            <img src="{{ env('ImagePath') . '/admin/assets/img/icons/time.svg' }}" alt="img">
+                            <span> Reports</span> <span class="menu-arrow"></span>
+                        </a>
+                        <ul>
+                            @if (app('hasPermission')(2, 'view'))
+                                <li><a href="{{ route('sales.report') }}">Sales Report</a></li>
+                            @endif
+
+                            @if (app('hasPermission')(3, 'view'))
+                                <li><a href="{{ route('purchase.report') }}">Purchase Report</a></li>
+                            @endif
+
+                            @if (app('hasPermission')(5, 'view'))
+                                <li><a href="{{ route('expense.report') }}">Expenses Report</a></li>
+                            @endif
+                        </ul>
+                    </li>
+                @endif
+
 
                 @if (in_array(auth()->user()->role, ['admin', 'hr', 'sub-admin', 'staff']))
                 {{-- ====== HR MODULE SECTION ====== --}}
@@ -460,47 +502,7 @@
                 @endif
 
                 @endif
-                {{-- GST Reports --}}
-                @if (app('hasPermission')(20, 'view'))
-                    <li class="submenu">
-                        <a href="javascript:void(0);">
-                            <i class="fas fa-chart-line"></i>
 
-                            <span> GST Reports</span> <span class="menu-arrow"></span>
-                        </a>
-                        <ul>
-                            @if (app('hasPermission')(20, 'view'))
-                                <li><a href="{{ route('gst.sales_list') }}">GST Report</a></li>
-                            @endif
-                            <!-- @if (app('hasPermission')(20, 'view'))
-<li><a href="{{ route('gst.reports.purchase') }}">GST Purchase Report</a></li>
-@endif -->
-
-                        </ul>
-                    </li>
-                @endif
-                {{-- Reports --}}
-                @if (app('hasPermission')(2, 'view') || app('hasPermission')(3, 'view') || app('hasPermission')(5, 'view'))
-                    <li class="submenu">
-                        <a href="javascript:void(0);">
-                            <img src="{{ env('ImagePath') . '/admin/assets/img/icons/time.svg' }}" alt="img">
-                            <span> Reports</span> <span class="menu-arrow"></span>
-                        </a>
-                        <ul>
-                            @if (app('hasPermission')(2, 'view'))
-                                <li><a href="{{ route('sales.report') }}">Sales Report</a></li>
-                            @endif
-
-                            @if (app('hasPermission')(3, 'view'))
-                                <li><a href="{{ route('purchase.report') }}">Purchase Report</a></li>
-                            @endif
-
-                            @if (app('hasPermission')(5, 'view'))
-                                <li><a href="{{ route('expense.report') }}">Expenses Report</a></li>
-                            @endif
-                        </ul>
-                    </li>
-                @endif
                 {{-- Settings --}}
                 @if (app('hasPermission')(14, 'view') || app('hasPermission')(15, 'view'))
                     <li class="submenu">

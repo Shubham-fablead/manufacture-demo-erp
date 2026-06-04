@@ -2649,7 +2649,7 @@ function escapeHtml(text) {
                         if (latitude !== undefined && longitude !== undefined) {
                             body.check_in_latitude  = latitude;
                             body.check_in_longitude = longitude;
-                            
+
                             try {
                                 btnIns.forEach(function(b) { b.innerHTML = '<i class="fa fa-spinner fa-spin"></i>&nbsp;Getting Address...'; });
                                 let geoRes = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`);
@@ -2660,7 +2660,7 @@ function escapeHtml(text) {
                             } catch (e) {
                                 console.warn('[CheckIn] Geocoding failed:', e);
                             }
-                            
+
                             btnIns.forEach(function(b) { b.innerHTML = '<i class="fa fa-spinner fa-spin"></i>&nbsp;Checking In...'; });
                         }
 
@@ -2753,7 +2753,7 @@ function escapeHtml(text) {
                         if (latitude !== undefined && longitude !== undefined) {
                             body.check_out_latitude  = latitude;
                             body.check_out_longitude = longitude;
-                            
+
                             try {
                                 btnOuts.forEach(function(b) { b.innerHTML = '<i class="fa fa-spinner fa-spin"></i>&nbsp;Getting Address...'; });
                                 let geoRes = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`);
@@ -2764,7 +2764,7 @@ function escapeHtml(text) {
                             } catch (e) {
                                 console.warn('[CheckOut] Geocoding failed:', e);
                             }
-                            
+
                             btnOuts.forEach(function(b) { b.innerHTML = '<i class="fa fa-spinner fa-spin"></i>&nbsp;Checking Out...'; });
                         }
 
@@ -2804,8 +2804,8 @@ function escapeHtml(text) {
                             Swal.fire({ toast:true, position:'top', icon:'error', title: err.message || 'Check Out failed. Please try again.', showConfirmButton:false, timer:5000 });
                         })
                         .finally(function() {
-                            btnOuts.forEach(function(b) { 
-                                b.disabled = false; 
+                            btnOuts.forEach(function(b) {
+                                b.disabled = false;
                                 b.innerHTML = '<i class="fa fa-sign-out-alt"></i>&nbsp;Check Out';
                             });
                         });
@@ -2827,8 +2827,8 @@ function escapeHtml(text) {
                                         html: 'Please allow location access in your browser and try again.',
                                         confirmButtonText: 'OK'
                                     });
-                                    btnOuts.forEach(function(b) { 
-                                        b.disabled = false; 
+                                    btnOuts.forEach(function(b) {
+                                        b.disabled = false;
                                         b.innerHTML = '<i class="fa fa-sign-out-alt"></i>&nbsp;Check Out';
                                     });
                                 } else {
@@ -2845,5 +2845,327 @@ function escapeHtml(text) {
 
         })();
     </script>
+ <style>
+        /* Additional styles for search results */
+        .list-group-item-action {
+            transition: all 0.2s ease;
+        }
+
+        .list-group-item-action:hover {
+            background-color: #fef9f0 !important;
+            transform: translateX(2px);
+        }
+
+        /* Notification animation */
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .notification-dropdown {
+            animation: slideDown 0.2s ease;
+        }
+
+        /* Scrollbar styling */
+        .notification-body::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .notification-body::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        .notification-body::-webkit-scrollbar-thumb {
+            background: #ff9f43;
+            border-radius: 5px;
+        }
+
+        .notification-body::-webkit-scrollbar-thumb:hover {
+            background: #ff8c2e;
+        }
+
+        .mobile-header-notification {
+            display: none;
+            position: absolute;
+            right: 84px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 5;
+            margin: 0;
+        }
+
+        .mobile-header-notification .nav-link {
+            padding: 8px 10px;
+            /* margin: -15px !important; */
+        }
+
+        @media (max-width: 1023px) {
+            .mobile-header-notification {
+                display: block;
+            }
+        }
+
+        @media (max-width: 575px) {
+            .mobile-header-notification {
+                right: 40px;
+            }
+
+            .mobile-header-notification .notification-dropdown {
+                right: -34px;
+                width: min(320px, calc(100vw - 24px));
+            }
+        }
+
+        /* Search input focus */
+        #customerSearch:focus {
+            border-color: #ff9f43;
+            box-shadow: 0 0 0 0.2rem rgba(255, 159, 67, 0.25);
+        }
+    </style>
+    <style>
+        @media only screen and (max-width: 767px) {
+            .select2-container {
+                min-width: unset !important;
+            }
+        }
+
+        /* iPhone SE */
+        @media screen and (max-width: 340px) {
+            .select2-container {
+                width: 123px !important;
+            }
+        }
+
+        @media screen and (min-width: 341px) and (max-width: 374px) {
+            .select2-container {
+                width: 140px !important;
+            }
+        }
+
+        /* iPhone XR / iPhone 11 */
+        @media screen and (min-width: 375px) and (max-width: 390px) {
+            .select2-container {
+                width: 145px !important;
+            }
+        }
+
+        /* iPhone XR / iPhone 11 */
+        @media screen and (min-width: 391px) and (max-width: 420px) {
+            .select2-container {
+                width: 165px !important;
+            }
+        }
+
+        /* iPhone XR / iPhone 11 */
+        @media screen and (min-width: 430px) and (max-width: 480px) {
+            .select2-container {
+                width: 175px !important;
+            }
+        }
+
+        @media screen and (min-width: 768px) and (max-width: 819px) {
+            .select2-container {
+                min-width: auto !important;
+            }
+
+            .select2-container {
+                width: 340px !important;
+            }
+        }
+
+        @media screen and (min-width: 820px) and (max-width: 1023px) {
+            .select2-container {
+                min-width: auto !important;
+            }
+
+            .select2-container {
+                width: 368px !important;
+            }
+
+            .header-new-order-button {
+                display: none !important;
+            }
+
+            #toggle_btn1 {
+                display: none !important;
+            }
+
+
+            .header-search {
+                display: none !important;
+            }
+
+            .header-search-container {
+                display: none !important;
+            }
+
+            .logo-view {
+                float: none;
+            }
+        }
+
+        @media screen and (width: 768px) and (height: 1024px) {
+            .header-new-order-button {
+                display: none !important;
+            }
+
+            .header-search {
+                display: none !important;
+            }
+
+            .header-search-container {
+                display: none !important;
+            }
+
+            .logo-view {
+                float: none;
+            }
+
+            #toggle_btn1 {
+                display: none !important;
+            }
+        }
+
+
+        @media screen and (width: 1024px) and (height: 1366px) {
+            .select2-container {
+                min-width: auto !important;
+            }
+
+            .select2-container {
+                width: 151px !important;
+            }
+
+            /* .header .header-left {
+                width: 78px !important;
+               } */
+            /* .web_button{
+                position: absolute;
+                z-index: 9999;
+               }
+
+
+               #toggle_btn1  {
+                display: none !important;
+               }
+               .header .mobile_btn {
+                display: block !important;
+               }
+        */
+            /* .header-search{
+                display: none !important;
+               }
+               .header-search-container{
+                display: none !important;
+               } */
+            .search-view {
+                width: 285px !important;
+            }
+
+            .logo-view {
+                float: none;
+                /* display: none !important; */
+            }
+
+            /* .header-new-order-button{
+                display: none !important;
+               } */
+            .mini-sidebar .header-left .logo-small {
+                display: none !important;
+            }
+
+            .hide-on-ipad-pro {
+                display: none !important;
+            }
+        }
+
+        @media screen and (width: 540px) and (height: 720px) {
+            .select2-container {
+                min-width: auto !important;
+            }
+
+            .select2-container {
+                width: 225px !important;
+            }
+        }
+
+        @media screen and (width: 1024px) and (height: 600px) {
+            .select2-container {
+                min-width: auto !important;
+            }
+
+            .select2-container {
+                width: 155px !important;
+            }
+
+            /* .header .header-left {
+                width: 78px !important;
+               } */
+            .web_button {
+                position: absolute;
+                z-index: 9999;
+            }
+
+            .search-view {
+                width: 285px !important;
+            }
+
+            .logo-view {
+                float: none;
+                /* display: none !important; */
+            }
+
+            .mini-sidebar .header-left .logo-small {
+                display: none !important;
+            }
+
+            div#toggle_btn1 {
+                position: relative !important;
+            }
+        }
+
+        @media screen and (width: 1280px) and (height: 800px) {
+            .select2-container {
+                min-width: auto !important;
+            }
+
+            .select2-container {
+                width: 215px !important;
+            }
+
+            /* .header .header-left {
+                width: 78px !important;
+               } */
+
+            .web_button {
+                position: absolute;
+                z-index: 9999;
+            }
+        }
+
+        .search-view {
+            width: 285px !important;
+        }
+
+        .logo-view {
+            float: none;
+            /* display: none !important; */
+        }
+
+        .mini-sidebar .header-left .logo-small {
+            display: none !important;
+        }
+
+        div#toggle_btn1 {
+            position: relative !important;
+        }
+    </style>
 
 @endpush
