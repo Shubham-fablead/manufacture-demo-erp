@@ -9,24 +9,10 @@
             background-color: #5d6d7e;
             color: #fff;
             border: none;
-            margin: 0 4px;
-            padding: 6px 15px;
+              margin: 0 3px;
+            padding: 4px 10px;
             border-radius: 6px;
             font-weight: bold;
-        }
-
-        .pagination .page-item:first-child .page-link,
-        .pagination .page-item:last-child .page-link {
-            background-color: #fff;
-            color: #6c757d;
-            border: 1px solid #dee2e6;
-        }
-
-        .pagination .page-item:first-child .page-link:hover,
-        .pagination .page-item:last-child .page-link:hover {
-            background-color: #f8f9fa;
-            color: #495057;
-            border-color: #dee2e6;
         }
 
         .pagination .page-item.active .page-link {
@@ -41,6 +27,21 @@
 
         .pagination .page-item.active .page-link:hover {
             background-color: #e68a35 !important;
+        }
+
+        /* Previous and Next buttons */
+        .pagination .page-item:first-child .page-link,
+        .pagination .page-item:last-child .page-link {
+            background-color: #fff;
+            color: #6c757d;
+            border: 1px solid #dee2e6;
+        }
+
+        .pagination .page-item:first-child .page-link:hover,
+        .pagination .page-item:last-child .page-link:hover {
+            background-color: #f8f9fa;
+            color: #495057;
+            border-color: #dee2e6;
         }
 
         .pagination .page-item.disabled .page-link {
@@ -95,15 +96,6 @@
             gap: 5px !important;
         }
 
-        /* Small-screen stability without changing desktop layout */
-        .page-header {
-            gap: 12px;
-        }
-
-        .page-header .page-btn .btn.btn-added {
-            white-space: nowrap;
-        }
-
         /* Unit name proper word wrapping */
         table.datanew tbody td:first-child {
             vertical-align: middle;
@@ -143,52 +135,6 @@
 
         /* Mobile responsive design */
         @media (max-width: 768px) {
-            .content {
-                padding: 12px 10px;
-            }
-
-            .page-header {
-                align-items: center;
-                margin-bottom: 12px;
-                flex-wrap: wrap;
-            }
-
-            .page-header .page-title h4 {
-                font-size: 16px;
-                margin-bottom: 0;
-            }
-
-            .page-header .page-btn {
-                margin-left: auto;
-            }
-
-            .page-header .page-btn .btn.btn-added {
-                padding: 6px 10px;
-                font-size: 12px;
-                line-height: 1;
-            }
-
-            .card {
-                border-radius: 10px;
-            }
-
-            .card-body {
-                padding: 12px 10px;
-            }
-
-            .search-set {
-                width: 100%;
-            }
-
-            .search-input {
-                width: 100%;
-            }
-
-            #search-input {
-                width: 100%;
-                min-height: 38px;
-                font-size: 13px;
-            }
 
             /* Hide non-essential columns, show Details toggle */
             table.datanew thead th:nth-child(3),
@@ -202,9 +148,11 @@
             table.datanew tbody td:nth-child(2) {
                 display: table-cell !important;
                 text-align: center;
-                vertical-align: top;
-                width: 52px;
-                padding-top: 8px;
+                vertical-align: top !important;
+                width: 56px !important;
+                min-width: 56px !important;
+                max-width: 56px !important;
+                padding: 12px 6px !important;
             }
 
             /* Hide desktop action buttons on mobile */
@@ -217,7 +165,7 @@
                 display: table-cell !important;
                 width: auto;
                 max-width: calc(100vw - 80px);
-                padding: 10px 8px;
+                padding: 12px 8px;
             }
 
             table.datanew tbody td:first-child>div {
@@ -229,13 +177,13 @@
                 align-items: center !important;
                 text-align: left !important;
                 width: 100%;
-                min-height: 40px;
+                min-height: 44px;
             }
 
             .unit-name {
                 display: block !important;
                 width: 100% !important;
-                font-size: 13px !important;
+                font-size: 14px !important;
                 line-height: 1.4 !important;
                 white-space: normal !important;
                 word-break: break-word !important;
@@ -248,15 +196,14 @@
                 display: inline-flex;
                 align-items: center;
                 justify-content: center;
-                width: 36px;
-                height: 36px;
+                width: 44px;
+                height: 44px;
                 text-decoration: none;
                 cursor: pointer;
-                margin-top: 0;
             }
 
             .toggle-details i {
-                font-size: 20px;
+                font-size: 24px;
                 transition: all 0.2s ease;
             }
 
@@ -266,7 +213,7 @@
                 border: 1px solid #e9ecef;
                 border-radius: 8px;
                 margin-top: 8px;
-                padding: 10px 12px;
+                padding: 12px;
             }
 
             .collapse .card-body p {
@@ -323,53 +270,16 @@
             .pagination-controls {
                 flex-direction: column;
                 gap: 15px;
-                align-items: flex-start !important;
             }
 
-            .pagination .page-item .page-link {
+            /* .pagination .page-item .page-link {
                 padding: 4px 12px;
                 font-size: 12px;
-            }
-
-            .pagination-controls > div {
-                width: 100%;
-                flex-wrap: wrap;
-                gap: 8px;
-            }
-
-            .pagination-controls nav {
-                width: 100%;
-            }
-
-            .pagination-controls .pagination {
-                justify-content: flex-start;
-                flex-wrap: wrap;
-                gap: 4px;
-            }
+            } */
         }
 
         /* Tablet specific fixes (769px–1024px) */
         @media (min-width: 769px) and (max-width: 1024px) {
-            .content {
-                padding: 14px 12px;
-            }
-
-            .page-header .page-title h4 {
-                font-size: 17px;
-            }
-
-            .page-header .page-btn .btn.btn-added {
-                padding: 6px 12px;
-                font-size: 12px;
-            }
-
-            .card-body {
-                padding: 14px;
-            }
-
-            #search-input {
-                max-width: 260px;
-            }
 
             /* Keep table structure intact */
             table.datanew tbody td,
@@ -696,7 +606,7 @@
                                         </a>
                                         <!-- Collapsible Details (visible only on mobile) with action buttons -->
                                         <div class="collapse d-lg-none" id="details-${unit.id}">
-                                            <div class="card card-body">
+                                            <div class=" card-body">
                                                 <p class="mb-2">
                                                     <strong><i class="far fa-calendar-alt me-1"></i> Created At:</strong>
                                                     ${createdAt}
@@ -816,59 +726,44 @@
                 $('#pagination-total').text(pagination.total);
 
                 let html = '';
-                const totalPages = pagination.last_page;
-                const currentPage = pagination.current_page;
-                const visiblePageCount = 2;
-                let startPage = Math.floor((currentPage - 1) / visiblePageCount) * visiblePageCount + 1;
-                let endPage = Math.min(totalPages, startPage + visiblePageCount - 1);
 
                 html += `
-                    <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
-                        <a class="page-link unit-page-link" href="javascript:void(0);" data-page="${currentPage - 1}">Previous</a>
+                    <li class="page-item ${pagination.current_page === 1 ? 'disabled' : ''}">
+                        <a class="page-link" href="javascript:void(0);" data-page="${pagination.current_page - 1}">Previous</a>
                     </li>
                 `;
 
-                if (startPage > 1) {
-                    html += `
-                        <li class="page-item">
-                            <a class="page-link unit-page-link" href="javascript:void(0);" data-page="${startPage - 1}" data-action="prev-group">..</a>
-                        </li>
-                    `;
+                let startPage = Math.max(1, pagination.current_page - 2);
+                let endPage = Math.min(pagination.last_page, startPage + 4);
+                if (endPage - startPage < 4) {
+                    startPage = Math.max(1, endPage - 4);
                 }
 
                 for (let i = startPage; i <= endPage; i++) {
-                    html += `
-                        <li class="page-item ${i === currentPage ? 'active' : ''}">
-                            <a class="page-link unit-page-link" href="javascript:void(0);" data-page="${i}">${i}</a>
-                        </li>
-                    `;
-                }
-
-                if (endPage < totalPages) {
-                    html += `
-                        <li class="page-item">
-                            <a class="page-link unit-page-link" href="javascript:void(0);" data-page="${endPage + 1}" data-action="next-group">..</a>
-                        </li>
-                    `;
+                    html += `<li class="page-item ${i === pagination.current_page ? 'active' : ''}">
+                        <a class="page-link" href="javascript:void(0);" data-page="${i}">${i}</a>
+                    </li>`;
                 }
 
                 html += `
-                    <li class="page-item ${currentPage === totalPages || totalPages === 0 ? 'disabled' : ''}">
-                        <a class="page-link unit-page-link" href="javascript:void(0);" data-page="${currentPage + 1}">Next</a>
+                    <li class="page-item ${pagination.current_page === pagination.last_page || pagination.last_page === 0 ? 'disabled' : ''}">
+                        <a class="page-link" href="javascript:void(0);" data-page="${pagination.current_page + 1}">Next</a>
                     </li>
                 `;
 
                 $('#pagination-numbers').html(html);
-                $('.pagination-controls').toggle(pagination.total > 0);
+                $('.pagination-controls').show();
             }
 
-            // Handle page number clicks
-            $(document).on('click', '.unit-page-link', function(e) {
+            // Handle page number clicks with ellipsis support
+            $(document).on('click', '#pagination-numbers .page-link', function(e) {
                 e.preventDefault();
                 let page = $(this).data('page');
                 let action = $(this).data('action');
 
+                // Handle ellipsis clicks to load next/previous groups
                 if (action === 'next-group') {
+                    // Load the page that starts the next group
                     if (page && page <= lastPage) {
                         fetchUnits(page);
                     }
@@ -876,6 +771,7 @@
                 }
 
                 if (action === 'prev-group') {
+                    // Load the previous group's starting page
                     let prevStartPage = Math.max(1, page - 2);
                     if (prevStartPage >= 1 && prevStartPage <= lastPage) {
                         fetchUnits(prevStartPage);
@@ -883,6 +779,7 @@
                     return;
                 }
 
+                // Regular page navigation
                 if (page && page !== currentPage && page >= 1 && page <= lastPage) {
                     fetchUnits(page);
                 }

@@ -374,7 +374,7 @@ class AuthController extends Controller
         // Search products by name, include category_id, gst_option, product_gst
         $products = Product::where('name', 'LIKE', "%{$query}%")
             ->take(10)
-            ->get(['id', 'name', 'price', 'images', 'category_id', 'gst_option', 'product_gst']);
+            ->get(['id', 'name', 'price', 'quantity', 'images', 'category_id', 'gst_option', 'product_gst']);
 
         // Search orders by order number or customer name
         $orders = Order::with('user:id,name')
@@ -421,6 +421,7 @@ class AuthController extends Controller
                     'id'          => $product->id,
                     'name'        => $product->name,
                     'price'       => $formatCurrency($product->price), // formatted price
+                    'quantity'    => $product->quantity ?? 0,
                     'category_id' => $product->category_id,
                     'gst_option'  => $product->gst_option,
                     'product_gst' => $product->product_gst,

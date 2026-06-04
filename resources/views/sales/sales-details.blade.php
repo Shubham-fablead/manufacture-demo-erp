@@ -203,7 +203,8 @@
                                 }
 
                                 $afterDiscount = $subtotal - $totalDiscountAmount;
-                                $finalTotal = $afterDiscount + $totalTaxAmount;
+                                $subTotalAmount = $subtotal + $totalTaxAmount - $totalDiscountAmount;
+                                $finalTotal = $subTotalAmount;
 
                                 $totalTaxAmount = 0;
                                 $taxDetails = [];
@@ -256,7 +257,7 @@
 
                                         <li id="priceAfterDiscountSummaryRow" @if ($totalDiscountAmount <= 0) style="display:none;" @endif>
                                             <h4>Subtotal</h4>
-                                            <h5>{{ formatCurrency($afterDiscount, $setting->currency_symbol ?? '₹', $setting->currency_position ?? 'left') }}</h5>
+                                            <h5>{{ formatCurrency($subTotalAmount, $setting->currency_symbol ?? '₹', $setting->currency_position ?? 'left') }}</h5>
                                         </li>
 
 
