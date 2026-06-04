@@ -78,7 +78,14 @@
             text-decoration: none;
         }
 
-        /* Desktop view - show header buttons, hide filter row buttons */
+        /* Hide vendor name sub-line on tablet and above */
+        @media screen and (min-width: 768px) {
+            .bill-vendor-info .vendor-name-mobile {
+                display: none !important;
+            }
+        }
+
+        /* Desktop and iPad view - show header buttons, hide filter row buttons */
         @media screen and (min-width: 768px) {
             .desktop-export-buttons {
                 display: flex !important;
@@ -89,7 +96,7 @@
             }
         }
 
-        /* Mobile view - hide header buttons, show filter row buttons */
+        /* Mobile view only - hide header buttons, show filter row buttons */
         @media screen and (max-width: 767px) {
             .desktop-export-buttons {
                 display: none !important;
@@ -311,8 +318,8 @@
             }
         }
 
-        /* Medium devices (tablets, 768px and up to 991px) */
-        @media screen and (min-width: 768px) and (max-width: 991.98px) {
+        /* Medium devices (tablets, 768px and up to 1199px) - covers iPad Mini, iPad Air, iPad Pro */
+        @media screen and (min-width: 768px) and (max-width: 1199.98px) {
             .table-responsive {
                 display: block !important;
                 overflow-x: auto;
@@ -324,16 +331,18 @@
             }
 
             .datanew {
-                font-size: 13px;
+                font-size: 12px;
                 width: 100% !important;
                 table-layout: auto;
             }
 
             .datanew th,
             .datanew td {
-                padding: 8px 6px;
+                padding: 7px 5px;
+                white-space: nowrap;
             }
 
+            /* Hide Details toggle column on tablet - show all data columns */
             .datanew th:nth-child(2),
             .datanew td:nth-child(2) {
                 display: none !important;
@@ -342,30 +351,66 @@
             .order-details-row {
                 display: none !important;
             }
+
+            /* Filter row tablet layout - 2 column grid */
+            .filter-row {
+                display: grid !important;
+                grid-template-columns: 1fr 1fr;
+                gap: 8px;
+                width: 100%;
+                margin: 0 !important;
+            }
+
+            .filter-row > [class*="col-"] {
+                width: 100% !important;
+                max-width: 100% !important;
+                flex: none !important;
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+
+            /* Total Pending/Paid - each takes 1 col, side by side, MOVED BELOW Date/Vendor */
+            .purchase-responsive-summary {
+                grid-column: span 1 !important;
+                order: 10 !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                display: block !important;
+            }
+
+            .purchase-summary-box {
+                width: 100% !important;
+                min-width: 0 !important;
+                justify-content: space-between !important;
+                height: 35px !important;
+                min-height: 35px !important;
+                padding: 0 12px !important;
+                font-size: 13px !important;
+                white-space: nowrap;
+            }
+
+            /* Hide mobile export buttons on tablet */
+            .filter-row > .col-12.export-buttons-row {
+                display: none !important;
+            }
+
+            /* Make all selects/inputs consistent height */
+            .filter-row input.form-control-sm,
+            .filter-row select.form-control-sm,
+            .filter-row .form-control {
+                height: 34px !important;
+                font-size: 13px !important;
+            }
+
+            .filter-row .search-input input {
+                height: 34px !important;
+            }
         }
 
-        /* Large devices (desktops, 992px and up) */
-        @media screen and (min-width: 992px) {
-            .table-responsive {
-                display: block !important;
-                overflow-x: auto;
-                width: 100% !important;
-            }
-
-            .mobile-order-card {
-                display: none;
-            }
-
-            .datanew {
-                font-size: 14px;
-                width: 100% !important;
-            }
-
-            .datanew th,
-            .datanew td {
-                padding: 12px 10px;
-            }
-
+        /* Desktop view - hide mobile Details toggle column */
+        @media screen and (min-width: 1200px) {
             .datanew th:nth-child(2),
             .datanew td:nth-child(2) {
                 display: none !important;
