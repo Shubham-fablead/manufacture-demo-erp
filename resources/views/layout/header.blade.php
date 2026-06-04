@@ -30,6 +30,13 @@
         width: 465px;
     }
 
+    .header .header-left .logo .logo-view {
+        max-width: 45% !important;
+        width: auto;
+        height: auto;
+        object-fit: contain;
+    }
+
     @media (max-width: 991px) {
         .web_button {
             display: none;
@@ -738,8 +745,10 @@
         }
 
         .header .header-left .logo .logo-view {
-            width: 85px !important;
-            max-width: 85px !important;
+            width: 90px !important;
+            max-width: 90px !important;
+            height: auto !important;
+            object-fit: contain;
             margin: 0 !important;
         }
 
@@ -782,7 +791,7 @@
 
         .header #subBrandSelect,
         .header #subBranchContainer .select2-container {
-            width: 84px !important;
+            width: 130px !important;
         }
 
         .header #subBranchContainer .select2-selection--single {
@@ -806,8 +815,8 @@
         }
 
         .header #subBranchContainer .select2-dropdown {
-            width: 120px !important;
-            min-width: 120px;
+            width: 100px !important;
+            min-width: 100px;
             z-index: 1060;
         }
 
@@ -908,7 +917,7 @@
     <div class="header-left active">
         <a href="{{ $logoRedirectRoute }}" class="logo">
             <img src="{{ !empty($settings) && !empty($settings->logo) ? env('ImagePath') . '/storage/' . $settings->logo : 'https://fableadtechnolabs.com/static/media/250x150%20(1).b3f5a4db48c7770366ef.webp' }}"
-                alt="" style="max-width: 55% !important;" class="logo-view">
+                alt="" class="logo-view">
         </a>
         <a href="{{ $logoRedirectRoute }}" class="logo-small">
             <img src="{{ !empty($settings) && !empty($settings->favicon) ? env('ImagePath') . '/storage/' . $settings->favicon : 'https://fableadtechnolabs.com/favicon-192x192.webp' }}"
@@ -3005,61 +3014,151 @@ function escapeHtml(text) {
     </style>
     <style>
         @media only screen and (max-width: 767px) {
-            .select2-container {
+            #subBranchContainer .select2-container {
                 min-width: unset !important;
             }
         }
 
         /* iPhone SE */
         @media screen and (max-width: 340px) {
-            .select2-container {
-                width: 123px !important;
+            #subBranchContainer {
+                width: 108px !important;
+            }
+
+            #subBranchContainer .d-flex {
+                width: 108px;
+            }
+
+            #subBrandSelect,
+            #subBranchContainer .select2-container {
+                width: 108px !important;
+            }
+
+            #subBranchContainer .select2-dropdown {
+                width: 108px !important;
+                min-width: 108px;
+            }
+
+            #subBranchContainer .select2-container {
+                width: 108px !important;
             }
         }
 
         @media screen and (min-width: 341px) and (max-width: 374px) {
-            .select2-container {
-                width: 140px !important;
+            #subBranchContainer {
+                width: 112px !important;
+            }
+
+            #subBranchContainer .d-flex {
+                width: 112px;
+            }
+
+            #subBrandSelect,
+            #subBranchContainer .select2-container {
+                width: 112px !important;
+            }
+
+            #subBranchContainer .select2-dropdown {
+                width: 112px !important;
+                min-width: 112px;
+            }
+
+            #subBranchContainer .select2-container {
+                width: 112px !important;
             }
         }
 
         /* iPhone XR / iPhone 11 */
         @media screen and (min-width: 375px) and (max-width: 390px) {
-            .select2-container {
-                width: 145px !important;
+            #subBranchContainer {
+                width: 118px !important;
+            }
+
+            #subBranchContainer .d-flex {
+                width: 118px;
+            }
+
+            #subBrandSelect,
+            #subBranchContainer .select2-container {
+                width: 118px !important;
+            }
+
+            #subBranchContainer .select2-dropdown {
+                width: 118px !important;
+                min-width: 118px;
+            }
+
+            #subBranchContainer .select2-container {
+                width: 118px !important;
             }
         }
 
         /* iPhone XR / iPhone 11 */
         @media screen and (min-width: 391px) and (max-width: 420px) {
-            .select2-container {
-                width: 165px !important;
+            #subBranchContainer {
+                width: 126px !important;
+            }
+
+            #subBranchContainer .d-flex {
+                width: 126px;
+            }
+
+            #subBrandSelect,
+            #subBranchContainer .select2-container {
+                width: 126px !important;
+            }
+
+            #subBranchContainer .select2-dropdown {
+                width: 126px !important;
+                min-width: 126px;
+            }
+
+            #subBranchContainer .select2-container {
+                width: 126px !important;
             }
         }
 
         /* iPhone XR / iPhone 11 */
         @media screen and (min-width: 430px) and (max-width: 480px) {
-            .select2-container {
-                width: 175px !important;
+            #subBranchContainer {
+                width: 134px !important;
+            }
+
+            #subBranchContainer .d-flex {
+                width: 134px;
+            }
+
+            #subBrandSelect,
+            #subBranchContainer .select2-container {
+                width: 134px !important;
+            }
+
+            #subBranchContainer .select2-dropdown {
+                width: 134px !important;
+                min-width: 134px;
+            }
+
+            #subBranchContainer .select2-container {
+                width: 134px !important;
             }
         }
 
         @media screen and (min-width: 768px) and (max-width: 819px) {
-            .select2-container {
+            #subBranchContainer .select2-container {
                 min-width: auto !important;
             }
 
-            .select2-container {
+            #subBranchContainer .select2-container {
                 width: 340px !important;
             }
         }
 
         @media screen and (min-width: 820px) and (max-width: 1023px) {
-            .select2-container {
+            #subBranchContainer .select2-container {
                 min-width: auto !important;
             }
 
-            .select2-container {
+            #subBranchContainer .select2-container {
                 width: 368px !important;
             }
 
@@ -3109,12 +3208,46 @@ function escapeHtml(text) {
 
 
         @media screen and (width: 1024px) and (height: 1366px) {
-            .select2-container {
+            .header .header-search-container.tab-view {
+                display: flex !important;
+                align-items: center;
+                flex-wrap: nowrap;
+                gap: 12px;
+                min-width: 0;
+                flex: 1 1 auto;
+            }
+
+            .header .header-search,
+            .header .header-new-order-button,
+            .header .hide-on-ipad-pro {
+                display: none !important;
+            }
+
+            #subBranchContainer .select2-container {
                 min-width: auto !important;
             }
 
-            .select2-container {
-                width: 151px !important;
+            #subBranchContainer {
+                width: 180px !important;
+                margin-right: 8px !important;
+            }
+
+            #subBranchContainer .d-flex {
+                width: 180px;
+            }
+
+            #subBrandSelect,
+            #subBranchContainer .select2-container {
+                width: 180px !important;
+            }
+
+            #subBranchContainer .select2-dropdown {
+                width: 160px !important;
+                min-width: 160px;
+            }
+
+            #subBranchContainer .select2-results__option {
+                white-space: normal;
             }
 
             /* .header .header-left {
@@ -3161,21 +3294,21 @@ function escapeHtml(text) {
         }
 
         @media screen and (width: 540px) and (height: 720px) {
-            .select2-container {
+            #subBranchContainer .select2-container {
                 min-width: auto !important;
             }
 
-            .select2-container {
+            #subBranchContainer .select2-container {
                 width: 225px !important;
             }
         }
 
         @media screen and (width: 1024px) and (height: 600px) {
-            .select2-container {
+            #subBranchContainer .select2-container {
                 min-width: auto !important;
             }
 
-            .select2-container {
+            #subBranchContainer .select2-container {
                 width: 155px !important;
             }
 
@@ -3206,11 +3339,11 @@ function escapeHtml(text) {
         }
 
         @media screen and (width: 1280px) and (height: 800px) {
-            .select2-container {
+            #subBranchContainer .select2-container {
                 min-width: auto !important;
             }
 
-            .select2-container {
+            #subBranchContainer .select2-container {
                 width: 215px !important;
             }
 

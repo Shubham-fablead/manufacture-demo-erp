@@ -153,8 +153,75 @@
 
         /* Responsive breakpoints for all screen sizes */
 
+        @media screen and (max-width: 1024px) {
+            html, body {
+                max-width: 100vw;
+                overflow-x: hidden !important;
+            }
+
+            .content {
+                max-width: 100vw;
+                overflow-x: hidden !important;
+            }
+
+            .table-top .filter-row {
+                flex-wrap: wrap;
+                width: 100%;
+                margin-left: 0;
+                margin-right: 0;
+            }
+
+            .table-top .filter-row > [class*="col-"] {
+                min-width: 0;
+            }
+
+            .table-top .filter-row .search-set,
+            .table-top .filter-row .search-input,
+            .table-top .filter-row .search-input input {
+                width: 100%;
+                min-width: 0;
+                box-sizing: border-box;
+            }
+
+            .table-top .filter-row .select2-container,
+            .table-top .filter-row select.form-control,
+            .table-top .filter-row #filter-date {
+                width: 100% !important;
+                min-width: 0 !important;
+                max-width: 100% !important;
+                box-sizing: border-box;
+            }
+
+            .table-top .filter-row .select2-container--default .select2-selection--single,
+            .table-top .filter-row .select2-selection--single {
+                width: 100% !important;
+                min-width: 0;
+                box-sizing: border-box;
+            }
+
+            .table-top .filter-row .select2-container--open,
+            .table-top .filter-row .select2-container--default {
+                max-width: 100% !important;
+            }
+
+            .table-top .filter-row .select2-dropdown {
+                width: 22% !important;
+                min-width: 0 !important;
+                max-width: 100% !important;
+            }
+
+            .table-top .filter-row .select2-results__option {
+                white-space: normal;
+                word-break: break-word;
+            }
+        }
+
         /* Extra small devices (phones, less than 576px) */
         @media screen and (max-width: 575.98px) {
+            body {
+                overflow-x: hidden !important;
+            }
+
             .table-scroll-top {
                 display: block;
             }
@@ -225,6 +292,15 @@
             .table-top {
                 flex-direction: row;
                 margin-bottom: 0 !important;
+            }
+
+            /* .table-top .filter-row {
+                gap: 8px;
+            } */
+
+            .table-top .filter-row .select2-dropdown {
+                width: 43% !important;
+                max-width: 100% !important;
             }
 
             .table-top .wordset {
@@ -404,6 +480,156 @@
             /* Hide expandable rows on tablets */
             .expense-details-row {
                 display: none !important;
+            }
+        }
+
+        /* iPad Pro portrait: keep filter section readable without changing functionality */
+        @media screen and (width: 1024px) and (height: 1366px) {
+            .table-top .filter-row {
+                align-items: flex-start !important;
+                row-gap: 10px;
+            }
+
+            .table-top .filter-row > .col-12.col-sm-2.col-lg-3 {
+                flex: 0 0 100%;
+                max-width: 100%;
+            }
+
+            .table-top .filter-row > .col-6.col-sm-2.col-lg-3,
+            .table-top .filter-row > .col-6.col-sm-2.col-lg-2 {
+                flex: 0 0 calc(25% - 9px);
+                max-width: calc(25% - 9px);
+            }
+
+            .table-top .filter-row .form-label {
+                font-size: 11px !important;
+                margin-bottom: 4px;
+            }
+
+            .table-top .filter-row .search-input input,
+            .table-top .filter-row select.form-control,
+            .table-top .filter-row #filter-date {
+                height: 34px !important;
+                font-size: 12px !important;
+            }
+
+            .table-top .filter-row .select2-filter + .select2-container .select2-selection--single {
+                height: 34px !important;
+            }
+
+            .table-top .filter-row .select2-filter + .select2-container .select2-selection__rendered {
+                line-height: 32px !important;
+                font-size: 12px !important;
+            }
+
+            .table-top .filter-row .select2-filter + .select2-container .select2-selection__arrow {
+                height: 32px !important;
+            }
+
+            .table-top .filter-row .export-buttons-row {
+                flex: 0 0 100%;
+                max-width: 100%;
+                margin-top: 0;
+            }
+        }
+
+        /* iPad mini portrait: match iPad Pro filter layout */
+        @media screen and (width: 768px) and (height: 1024px) {
+            .table-top .filter-row {
+                align-items: flex-start !important;
+                row-gap: 10px;
+            }
+
+            .table-top .filter-row > .col-12.col-sm-2.col-lg-3 {
+                flex: 0 0 100%;
+                max-width: 100%;
+            }
+
+            .table-top .filter-row > .col-6.col-sm-2.col-lg-3,
+            .table-top .filter-row > .col-6.col-sm-2.col-lg-2 {
+                flex: 0 0 calc(25% - 9px);
+                max-width: calc(25% - 9px);
+            }
+
+            .table-top .filter-row .form-label {
+                font-size: 11px !important;
+                margin-bottom: 4px;
+            }
+
+            .table-top .filter-row .search-input input,
+            .table-top .filter-row select.form-control,
+            .table-top .filter-row #filter-date {
+                height: 34px !important;
+                font-size: 12px !important;
+            }
+
+            .table-top .filter-row .select2-filter + .select2-container .select2-selection--single {
+                height: 34px !important;
+            }
+
+            .table-top .filter-row .select2-filter + .select2-container .select2-selection__rendered {
+                line-height: 32px !important;
+                font-size: 12px !important;
+            }
+
+            .table-top .filter-row .select2-filter + .select2-container .select2-selection__arrow {
+                height: 32px !important;
+            }
+
+            .table-top .filter-row .export-buttons-row {
+                flex: 0 0 100%;
+                max-width: 100%;
+                margin-top: 0;
+            }
+        }
+
+        /* iPad Air portrait: match the same filter layout */
+        @media screen and (width: 820px) and (height: 1180px) {
+            .table-top .filter-row {
+                align-items: flex-start !important;
+                row-gap: 10px;
+            }
+
+            .table-top .filter-row > .col-12.col-sm-2.col-lg-3 {
+                flex: 0 0 100%;
+                max-width: 100%;
+            }
+
+            .table-top .filter-row > .col-6.col-sm-2.col-lg-3,
+            .table-top .filter-row > .col-6.col-sm-2.col-lg-2 {
+                flex: 0 0 calc(25% - 9px);
+                max-width: calc(25% - 9px);
+            }
+
+            .table-top .filter-row .form-label {
+                font-size: 11px !important;
+                margin-bottom: 4px;
+            }
+
+            .table-top .filter-row .search-input input,
+            .table-top .filter-row select.form-control,
+            .table-top .filter-row #filter-date {
+                height: 34px !important;
+                font-size: 12px !important;
+            }
+
+            .table-top .filter-row .select2-filter + .select2-container .select2-selection--single {
+                height: 34px !important;
+            }
+
+            .table-top .filter-row .select2-filter + .select2-container .select2-selection__rendered {
+                line-height: 32px !important;
+                font-size: 12px !important;
+            }
+
+            .table-top .filter-row .select2-filter + .select2-container .select2-selection__arrow {
+                height: 32px !important;
+            }
+
+            .table-top .filter-row .export-buttons-row {
+                flex: 0 0 100%;
+                max-width: 100%;
+                margin-top: 0;
             }
         }
 
@@ -989,21 +1215,28 @@
                DataTable Init (ONCE)
             ======================= */
 
-                  $('.select2-filter').each(function() {
-            $(this).select2({
+            $('.select2-filter').each(function() {
+            const $filter = $(this);
+            const $dropdownParent = $filter.closest('.form-group').length
+                ? $filter.closest('.form-group')
+                : $filter.closest('.table-top');
+            $filter.select2({
                 width: '100%',
-                placeholder: $(this).data('placeholder'),
-                allowClear: true
+                placeholder: $filter.data('placeholder'),
+                allowClear: true,
+                dropdownParent: $dropdownParent
             });
         });
 
            $('#filter-year').select2({
                 allowClear: true,
-                width: '100%'
+                width: '100%',
+                dropdownParent: $('#filter-year').closest('.form-group')
             });
             $('#filter-month').select2({
                 allowClear: true,
-                width: '100%'
+                width: '100%',
+                dropdownParent: $('#filter-month').closest('.form-group')
             });
 
             let table;
@@ -1484,19 +1717,22 @@
             $('#filter-expense-type').select2({
                 placeholder: "All Expense Type",
                 allowClear: true,
-                width: '100%'
+                width: '100%',
+                dropdownParent: $('#filter-expense-type').closest('.form-group')
             });
 
             $('#filter-month').select2({
                 placeholder: "All Month",
                 allowClear: true,
-                width: '100%'
+                width: '100%',
+                dropdownParent: $('#filter-month').closest('.form-group')
             });
 
             $('#filter-year').select2({
                 placeholder: "All Year",
                 allowClear: true,
-                width: '100%'
+                width: '100%',
+                dropdownParent: $('#filter-year').closest('.form-group')
             });
 
             // console.log('Select2 initialized successfully');
