@@ -96,6 +96,16 @@
         }
 
         @media screen and (max-width: 1199px) {
+            html, body {
+                max-width: 100vw;
+                overflow-x: hidden !important;
+            }
+
+            .content {
+                max-width: 100vw;
+                overflow-x: hidden !important;
+            }
+
             .table-scroll-top {
                 display: block;
                 -webkit-overflow-scrolling: touch !important;
@@ -125,6 +135,40 @@
 
             .search-set {
                 margin-right: 1rem !important;
+            }
+
+            .product-toolbar-filters {
+                min-width: 0;
+            }
+
+            .product-toolbar-filters .form-group,
+            .product-toolbar-filters .category-width {
+                min-width: 0;
+            }
+
+            .product-toolbar-filters .select2-container,
+            .product-toolbar-filters select.form-control {
+                width: 100% !important;
+                min-width: 0 !important;
+                max-width: 100% !important;
+                box-sizing: border-box;
+            }
+
+            .product-toolbar-filters .select2-selection--single {
+                width: 100% !important;
+                min-width: 0 !important;
+                box-sizing: border-box;
+            }
+
+            .product-toolbar-filters .select2-dropdown {
+                width: 44% !important;
+                min-width: 0 !important;
+                max-width: 100% !important;
+            }
+
+            .product-toolbar-filters .select2-results__option {
+                white-space: normal;
+                word-break: break-word;
             }
         }
 
@@ -257,7 +301,166 @@
         .product-toolbar-actions .btn {
             white-space: nowrap;
         }
+        @media screen and (width: 1024px) and (height: 1366px) {
+    .product-toolbar-filters .select2-container {
+        width: 330px !important;
+    }
+     .product-toolbar-filters .select2-dropdown {
+                width: 100% !important;
+                min-width: 0 !important;
+                max-width: 100% !important;
+            }
+}
 
+        /* iPad mini portrait */
+        @media screen and (width: 768px) and (height: 1024px) {
+            .product-toolbar {
+                gap: 10px;
+                align-items: stretch;
+            }
+
+            .product-toolbar-filters {
+                width: 100%;
+                gap: 10px;
+                min-width: 0;
+            }
+
+            .product-toolbar-filters .form-group,
+            .product-toolbar-filters .category-width {
+                flex: 0 0 330px;
+                min-width: 330px;
+                max-width: 330px;
+            }
+
+            .product-toolbar-search {
+                flex: 1 1 100%;
+                min-width: 100%;
+            }
+
+            .product-toolbar-filters .select2-container,
+            .product-toolbar-filters select.form-control {
+                width: 330px !important;
+                min-width: 330px !important;
+                max-width: 330px !important;
+            }
+
+            .product-toolbar-filters .select2-selection--single {
+                width: 330px !important;
+                min-width: 330px !important;
+            }
+
+            .product-toolbar-filters .select2-dropdown {
+                width: 330px !important;
+                min-width: 330px !important;
+                max-width: 330px !important;
+            }
+
+            .product-toolbar-actions {
+                width: 100%;
+                margin-left: 0;
+                justify-content: space-between;
+            }
+        }
+
+        /* iPad Air portrait */
+        @media screen and (width: 820px) and (height: 1180px) {
+            .product-toolbar {
+                gap: 10px;
+                align-items: stretch;
+            }
+
+            .product-toolbar-filters {
+                width: 100%;
+                gap: 10px;
+                min-width: 0;
+            }
+
+            .product-toolbar-filters .form-group,
+            .product-toolbar-filters .category-width {
+                flex: 0 0 330px;
+                min-width: 330px;
+                max-width: 330px;
+            }
+
+            .product-toolbar-search {
+                flex: 1 1 100%;
+                min-width: 100%;
+            }
+
+            .product-toolbar-filters .select2-container,
+            .product-toolbar-filters select.form-control {
+                width: 330px !important;
+                min-width: 330px !important;
+                max-width: 330px !important;
+            }
+
+            .product-toolbar-filters .select2-selection--single {
+                width: 330px !important;
+                min-width: 330px !important;
+            }
+
+            .product-toolbar-filters .select2-dropdown {
+                width: 330px !important;
+                min-width: 330px !important;
+                max-width: 330px !important;
+            }
+
+            .product-toolbar-actions {
+                width: 100%;
+                margin-left: 0;
+                justify-content: space-between;
+            }
+        }
+
+        /* iPad mini portrait override after generic tablet rules */
+        @media screen and (width: 768px) and (height: 1024px) {
+            .product-toolbar {
+                gap: 10px !important;
+                align-items: stretch !important;
+            }
+
+            .product-toolbar-filters {
+                width: 100% !important;
+                gap: 10px !important;
+                min-width: 0 !important;
+            }
+
+            .product-toolbar-filters .form-group,
+            .product-toolbar-filters .category-width {
+                flex: 0 0 330px !important;
+                min-width: 330px !important;
+                max-width: 330px !important;
+            }
+
+            .product-toolbar-search {
+                flex: 1 1 100% !important;
+                min-width: 100% !important;
+            }
+
+            .product-toolbar-filters .select2-container,
+            .product-toolbar-filters select.form-control {
+                width: 330px !important;
+                min-width: 330px !important;
+                max-width: 330px !important;
+            }
+
+            .product-toolbar-filters .select2-selection--single {
+                width: 330px !important;
+                min-width: 330px !important;
+            }
+
+            .product-toolbar-filters .select2-dropdown {
+                width: 330px !important;
+                min-width: 330px !important;
+                max-width: 330px !important;
+            }
+
+            .product-toolbar-actions {
+                width: 100% !important;
+                margin-left: 0 !important;
+                justify-content: space-between !important;
+            }
+        }
         /* Desktop: show all columns normally */
         @media (min-width: 1200px) {
             .product-toolbar {
@@ -499,6 +702,21 @@
         .action-buttons .btn {
             font-size: 12px;
             padding: 4px 8px;
+        }
+
+        .action-buttons .icon-btn {
+            width: 28px;
+            height: 28px;
+            border: none !important;
+            background: transparent !important;
+            color: #1b2850;
+            padding: 0;
+            box-shadow: none !important;
+        }
+
+        .action-buttons .icon-btn:hover {
+            background: transparent !important;
+            color: #ff9f43;
         }
 
         .icon-btn {
@@ -830,7 +1048,17 @@
                 : '';
 
             // Initialize Select2 for custom class
-            $('.select-filter').select2();
+            $('.select-filter').each(function() {
+                const $filter = $(this);
+                const $dropdownParent = $filter.closest('.form-group').length
+                    ? $filter.closest('.form-group')
+                    : $filter.closest('.card-body');
+
+                $filter.select2({
+                    width: '100%',
+                    dropdownParent: $dropdownParent
+                });
+            });
 
             // Define the function FIRST
             function fetchProducts(page = 1) {
@@ -1011,7 +1239,7 @@
                                     quantityDisplay,
                                     // createdAt,
                                     `<div class="action-buttons">
-                                                @if (app('hasPermission')(17, 'view'))  
+                                                @if (app('hasPermission')(17, 'view'))
                                                  <a class=" btn btn-sm btn-primary" style="color:white; font-size: 13px;" href="/inventory-View/${product.id}">
                                                     History
                                                 </a>
