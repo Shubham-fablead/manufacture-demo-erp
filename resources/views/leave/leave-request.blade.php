@@ -21,6 +21,22 @@
             display: none;
         }
 
+        .leave-name-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .leave-name-info {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .table tbody tr td {
+            vertical-align: middle !important;
+        }
+
         /* Mobile: hide extra columns, show toggle */
         @media (max-width: 767px) {
             .leave-desktop-col {

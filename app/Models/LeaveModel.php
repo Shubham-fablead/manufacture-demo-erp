@@ -30,6 +30,8 @@ class LeaveModel extends Model
         'leave_type_id',
         'created_by',
         'status',
+        'half_day',
+        'half_day_type',
     ];
 
     public $timestamps = true;
@@ -41,6 +43,7 @@ class LeaveModel extends Model
         'no_of_day' => 'integer',
         'start_date' => 'date:Y-m-d',
         'end_date' => 'date:Y-m-d',
+        'half_day' => 'boolean',
     ];
 
     public function user(): BelongsTo

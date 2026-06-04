@@ -78,6 +78,7 @@ class GeneralSettingController extends Controller
             // ✅ New Rules validation
             'working_hours'     => 'nullable|numeric|min:0',
             'sunday_off'        => 'nullable|in:yes,no',
+            'saturday_off'      => 'nullable|in:yes,no',
             'grace_period'      => 'nullable|numeric|min:0',
             'lunch_break'       => 'nullable|numeric|min:0',
             'open_time'         => 'nullable|date_format:H:i',
@@ -146,6 +147,7 @@ class GeneralSettingController extends Controller
         // 🕒 Company Rules
         $settings->working_hours = $request->input('working_hours', $settings->working_hours);
         $settings->sunday_off    = $request->input('sunday_off', $settings->sunday_off);
+        $settings->saturday_off  = $request->input('saturday_off', $settings->saturday_off);
         $settings->grace_period  = $request->input('grace_period', $settings->grace_period);
         $settings->lunch_break   = $request->input('lunch_break', $settings->lunch_break);
         $settings->open_time     = $request->input('open_time', $settings->open_time);
@@ -260,6 +262,7 @@ class GeneralSettingController extends Controller
         $validator = Validator::make($request->all(), [
             'working_hours' => 'required',
             'sunday_off'    => 'required|in:yes,no',
+            'saturday_off'  => 'required|in:yes,no',
             'grace_period'  => 'required',
             'lunch_break'   => 'nullable',
             'open_time'     => 'required|date_format:H:i',
@@ -289,6 +292,7 @@ class GeneralSettingController extends Controller
         $settings->update([
             'working_hours' => $request->working_hours,
             'sunday_off'    => $request->sunday_off,
+            'saturday_off'  => $request->saturday_off,
             'grace_period'  => $request->grace_period,
             'lunch_break'   => $request->lunch_break,
             'open_time'     => $request->open_time,

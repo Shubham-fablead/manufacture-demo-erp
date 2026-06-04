@@ -51,7 +51,7 @@
 @push('js')
     <script>
         $(function() {
-            const token = localStorage.getItem('token');
+            const token = (typeof window.getAuthToken === 'function') ? window.getAuthToken() : (localStorage.getItem('authToken') || localStorage.getItem('token') || '');
             const routeLeaveTypeId = @json($leaveTypeId ?? null);
             const params = new URLSearchParams(window.location.search);
             const leaveTypeId = routeLeaveTypeId || params.get('id');
@@ -74,8 +74,7 @@
                 const payload = {
                     leave_type: $('#leave_type').val().trim(),
                     number_of_leaves: $('#number_of_leaves').val(),
-                    allow_half_day: $('#allow_half_day').val(),
-                    requires_approval: 1
+                    allow_half_day: $('#allow_half_day').val()
                 };
 
                 if (!payload.leave_type || payload.number_of_leaves === '') {

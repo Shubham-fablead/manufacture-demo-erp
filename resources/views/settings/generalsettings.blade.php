@@ -394,6 +394,24 @@
 
                             <div class="col-lg-3 col-sm-6">
                                 <div class="form-group">
+                                    <label>Saturday Off?</label>
+                                    <div class="d-flex align-items-center gap-3 mt-1">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="saturday_off"
+                                                id="saturday_yes" value="yes">
+                                            <label class="form-check-label" for="saturday_yes">Yes</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="saturday_off"
+                                                id="saturday_no" value="no" checked>
+                                            <label class="form-check-label" for="saturday_no">No</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-3 col-sm-6">
+                                <div class="form-group">
                                     <label>Grace Period<span class="manitory">*</span></label>
                                     <input type="time" id="grace_period" class="form-control" placeholder="e.g. 10">
                                 </div>
@@ -912,6 +930,13 @@
                             $("#sunday_yes").prop("checked", true);
                         } else {
                             $("#sunday_no").prop("checked", true);
+                        }
+
+                        // Saturday Off
+                        if (settings.saturday_off === "yes") {
+                            $("#saturday_yes").prop("checked", true);
+                        } else {
+                            $("#saturday_no").prop("checked", true);
                         }
 
                         // 🏦 General Info (already working)
@@ -1520,6 +1545,7 @@
                 formData.append("currency_position", $("#currency_position").val());
                 formData.append("currency_symbol", $("#currency_symbol").val());
                 formData.append("sunday_off", $("input[name='sunday_off']:checked").val() || "no");
+                formData.append("saturday_off", $("input[name='saturday_off']:checked").val() || "no");
                 formData.append("selectedSubAdminId", selectedSubAdminId);
                 if (logo) formData.append("logo", logo);
                 if (favicon) formData.append("favicon", favicon);
@@ -1575,6 +1601,7 @@
                 let formData = new FormData();
                 formData.append("working_hours", $("#working_hours").val());
                 formData.append("sunday_off", $("input[name='sunday_off']:checked").val());
+                formData.append("saturday_off", $("input[name='saturday_off']:checked").val());
                 formData.append("grace_period", $("#grace_period").val());
                 formData.append("lunch_break", $("#lunch_break").val());
                 formData.append("open_time", $("#open_time").val());

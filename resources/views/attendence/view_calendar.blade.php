@@ -1022,9 +1022,7 @@
                             <thead>
                                 <tr>
                                     <th>Check In</th>
-                                    <th>Check In Location</th>
                                     <th>Check Out</th>
-                                    <th>Check Out Location</th>
                                     <th>Duration</th>
                                     <th>Overtime</th>
                                 </tr>
@@ -1269,6 +1267,7 @@
         let users = [];
         let holidays = [];
         let saturdayOffDates = [];
+        let sundayOff = 'yes';
         const imageBasePath = "{{ rtrim(env('ImagePath', '/'), '/') }}";
         const defaultImagePath = `${imageBasePath}/admin/assets/img/customer/customer5.jpg`;
         const getProfileImageUrl = (profileImage) => {
@@ -1325,6 +1324,7 @@
                     users = data.data.users || [];
                     holidays = data.data.holidays || [];
                     saturdayOffDates = data.data.saturdayOffDates || [];
+                    sundayOff = data.data.sundayOff || 'yes';
                     populateUserFilter();
                     renderCalendar();
                 }
@@ -1398,7 +1398,7 @@
                 if (isToday) dateCard.classList.add('today');
                 if (holiday) dateCard.classList.add('holiday');
                 else if (saturdayOffDates.includes(dateStr)) dateCard.classList.add('saturday-off');
-                else if (dayOfWeek === 0) dateCard.classList.add('sunday');
+                else if (dayOfWeek === 0 && sundayOff === 'yes') dateCard.classList.add('sunday');
 
                 dateCard.innerHTML = `
                 <div class="date-card-day">${weekdays[dayOfWeek]}</div>
@@ -1416,7 +1416,7 @@
                     label.className = 'date-card-label saturday-off';
                     label.textContent = 'Sat Off';
                     dateCard.appendChild(label);
-                } else if (dayOfWeek === 0) {
+                } else if (dayOfWeek === 0 && sundayOff === 'yes') {
                     const label = document.createElement('div');
                     label.className = 'date-card-label sunday';
                     label.textContent = 'Sunday';
@@ -1462,7 +1462,7 @@
 
             // Check if it's a non-working day
             // if (holiday || saturdayOffDates.includes(selectedDate) || dayOfWeek === 0 || isFuture)
-            if (holiday || saturdayOffDates.includes(selectedDate) || isFuture){
+            if (holiday || saturdayOffDates.includes(selectedDate) || (dayOfWeek === 0 && sundayOff === 'yes') || isFuture){
                 mobileList.innerHTML = `
                 <div class="alert alert-info text-center">
                     ${holiday ? `<strong>Holiday:</strong> ${holiday.title}` :
@@ -1625,7 +1625,7 @@
                     dayDiv.classList.add('holiday');
                 } else if (saturdayOffDates.includes(dateStr)) {
                     dayDiv.classList.add('saturday-off');
-                } else if (dayOfWeek === 0) {
+                } else if (dayOfWeek === 0 && sundayOff === 'yes') {
                     dayDiv.classList.add('sunday');
                 }
 
@@ -1650,7 +1650,7 @@
                     satLabel.className = 'saturday-off-label';
                     satLabel.textContent = 'Sat Off';
                     dayDiv.appendChild(satLabel);
-                } else if (dayOfWeek === 0) {
+                } else if (dayOfWeek === 0 && sundayOff === 'yes') {
                     const sunLabel = document.createElement('span');
                     sunLabel.className = 'sunday-label';
                     sunLabel.textContent = 'Sunday';
@@ -1659,7 +1659,7 @@
 
                 // Employee attendance for this day
                 // if (!holiday && !saturdayOffDates.includes(dateStr) && dayOfWeek !== 0 && !isFuture)
-                if (!holiday && !saturdayOffDates.includes(dateStr) && !isFuture) {
+                if (!holiday && !saturdayOffDates.includes(dateStr) && !(dayOfWeek === 0 && sundayOff === 'yes') && !isFuture) {
                     filteredUsers.forEach(user => {
                         // Merge ALL records for this date
                         const attendance = resolveAttendance(user.attendance || [], dateStr);
@@ -1786,11 +1786,9 @@
                             <td>
                                 <input type="time" class="form-control checkin" data-id="new">
                             </td>
-                            <td><span class="text-muted small">-</span></td>
                             <td>
                                 <input type="time" class="form-control checkout" data-id="new">
                             </td>
-                            <td><span class="text-muted small">-</span></td>
                             <td>-</td>
                             <td>-</td>
                         </tr>
@@ -1802,9 +1800,6 @@
                                 ? r.duration
                                 : '<span style="color:#FF9F43;font-weight:600;">Active…</span>';
 
-                            const checkInLoc = r.check_in_location_name || '-';
-                            const checkOutLoc = r.check_out_location_name || '-';
-
                             rows += `
                             <tr>
                                 <td>
@@ -1812,13 +1807,11 @@
                                         data-id="${r.id}"
                                         value="${r.check_in_time || ''}">
                                 </td>
-                                <td><span class="badge bg-light text-dark border" style="font-size:0.8rem;"><i class="fas fa-map-marker-alt text-danger"></i> ${checkInLoc}</span></td>
                                 <td>
                                     <input type="time" class="form-control checkout"
                                         data-id="${r.id}"
                                         value="${r.check_out_time || ''}">
                                 </td>
-                                <td><span class="badge bg-light text-dark border" style="font-size:0.8rem;"><i class="fas fa-map-marker-alt text-danger"></i> ${checkOutLoc}</span></td>
                                 <td>${durationDisplay}</td>
                                 <td>${r.overtime && r.overtime !== '00:00:00' ? r.overtime : '-'}</td>
                             </tr>

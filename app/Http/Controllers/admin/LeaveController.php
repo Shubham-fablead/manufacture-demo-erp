@@ -52,7 +52,7 @@ class LeaveController extends Controller
 
         $leaveTypes = LeaveTypeModel::query()
             ->orderBy('leave_type')
-            ->get(['id', 'leave_type']);
+            ->get(['id', 'leave_type', 'allow_half_day']);
 
         $usersQuery = User::query()->select(['id', 'role']);
 
@@ -237,6 +237,8 @@ class LeaveController extends Controller
             'start_date' => ['required', 'date'],
             'end_date' => ['required', 'date', 'after_or_equal:start_date'],
             'status' => ['nullable', 'string', 'in:pending,approved,rejected,Pending,Approved,Rejected'],
+            'half_day' => ['nullable', 'in:0,1,true,false'],
+            'half_day_type' => ['nullable', 'string', 'in:first_half,second_half,First Half,Second Half'],
         ]);
 
         if ($validator->fails()) {
@@ -297,6 +299,8 @@ class LeaveController extends Controller
             'end_date'      => $endDate->toDateString(),
             'no_of_day'     => $noOfDays, // for backwards compatibility
             'status'        => $status,
+            'half_day'      => (int) ($validated['half_day'] ?? 0),
+            'half_day_type' => $validated['half_day_type'] ?? null,
         ]);
 
         return response()->json([   
