@@ -13,6 +13,20 @@
                 height: 115px !important;
             }
         }
+
+        @media screen and (min-width: 1200px) {
+            .dashboard-subsection-col {
+                flex: 0 0 20%;
+                max-width: 20%;
+            }
+        }
+
+        .form-select:disabled,
+        .form-control:disabled {
+            background-color: #e9ecef;
+            cursor: not-allowed;
+            opacity: 1;
+        }
     </style>
 
     <div class="content">
@@ -268,16 +282,6 @@
                                 </div>
                             </div>
 
-                            <div class="col-lg-3 col-sm-6 col-6">
-                                <div class="form-group">
-                                    <label>Customer WhatsApp Message</label>
-                                    <select id="customer_whatsapp_message" name="customer_whatsapp_message" class="form-select">
-                                        <option value="1">On</option>
-                                        <option value="0">Off</option>
-                                    </select>
-                                </div>
-                            </div>
-
                             <div class="col-lg-3 col-sm-12 col-6">
                                 <div class="form-group">
                                     <label>Customer WhatsApp Message</label>
@@ -294,28 +298,6 @@
                                     <label>Admin WhatsApp Message</label>
                                     <select id="admin_whatsapp_message" name="admin_whatsapp_message"
                                         class="form-select">
-                                        <option value="1">On</option>
-                                        <option value="0">Off</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div class="col-lg-3 col-sm-12 col-6">
-                                <div class="form-group">
-                                    <label>Meeting / Follow-up reminder (hours before)</label>
-                                    <input type="number" id="appointment_reminder_hours_before"
-                                        class="form-control" min="0" step="1"
-                                        placeholder="Enter reminder hours">
-                                    <small class="text-muted d-block mt-1">
-                                        Default 3 hours before the scheduled time.
-                                    </small>
-                                </div>
-                            </div>
-
-                            <div class="col-lg-3 col-sm-6 col-6">
-                                <div class="form-group">
-                                    <label>Admin WhatsApp Message</label>
-                                    <select id="admin_whatsapp_message" name="admin_whatsapp_message" class="form-select">
                                         <option value="1">On</option>
                                         <option value="0">Off</option>
                                     </select>
@@ -519,7 +501,7 @@
                         <h5 class="mb-3">CRM Dashboard Subsections</h5>
                         <p class="text-muted mb-3"><small>Control visibility of individual CRM dashboard components</small></p>
                         <div class="row mb-4">
-                            <div class="col-lg-4 col-sm-6">
+                            <div class="col-lg-4 col-sm-6 dashboard-subsection-col">
                                 <div class="form-group">
                                     <label>Lead Pipeline Box</label>
                                     <select id="crm_lead_pipeline_box" class="form-select">
@@ -528,7 +510,7 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-lg-4 col-sm-6">
+                            <div class="col-lg-4 col-sm-6 dashboard-subsection-col">
                                 <div class="form-group">
                                     <label>Conversion Box</label>
                                     <select id="crm_conversion_box" class="form-select">
@@ -537,7 +519,7 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-lg-4 col-sm-6">
+                            <div class="col-lg-4 col-sm-6 dashboard-subsection-col">
                                 <div class="form-group">
                                     <label>Follow-up Lead Box</label>
                                     <select id="crm_followup_lead_box" class="form-select">
@@ -546,7 +528,7 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-lg-4 col-sm-6">
+                            <div class="col-lg-4 col-sm-6 dashboard-subsection-col">
                                 <div class="form-group">
                                     <label>Meeting Momentum Box</label>
                                     <select id="crm_meeting_momentum_box" class="form-select">
@@ -555,7 +537,7 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-lg-4 col-sm-6">
+                            <div class="col-lg-4 col-sm-6 dashboard-subsection-col">
                                 <div class="form-group">
                                     <label>Lead Status Mix Chart</label>
                                     <select id="crm_lead_status_mix_chart" class="form-select">
@@ -564,7 +546,7 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-lg-4 col-sm-6">
+                            <div class="col-lg-4 col-sm-6 dashboard-subsection-col">
                                 <div class="form-group">
                                     <label>CRM Activity Trend Chart</label>
                                     <select id="crm_activity_trend_chart" class="form-select">
@@ -573,7 +555,7 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-lg-4 col-sm-6">
+                            <div class="col-lg-4 col-sm-6 dashboard-subsection-col">
                                 <div class="form-group">
                                     <label>Pipeline Quality Table</label>
                                     <select id="crm_pipeline_quality_table" class="form-select">
@@ -582,7 +564,7 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-lg-4 col-sm-6">
+                            <div class="col-lg-4 col-sm-6 dashboard-subsection-col">
                                 <div class="form-group">
                                     <label>Recent Leads Table</label>
                                     <select id="crm_recent_leads_table" class="form-select">
@@ -591,7 +573,7 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-lg-4 col-sm-6">
+                            <div class="col-lg-4 col-sm-6 dashboard-subsection-col">
                                 <div class="form-group">
                                     <label>Next 7 Days Table</label>
                                     <select id="crm_next_7_days_table" class="form-select">
@@ -608,7 +590,7 @@
                         <h5 class="mb-3">HR Dashboard Subsections</h5>
                         <p class="text-muted mb-3"><small>Control visibility of individual HR dashboard components</small></p>
                         <div class="row mb-4">
-                            <div class="col-lg-4 col-sm-6">
+                            <div class="col-lg-4 col-sm-6 dashboard-subsection-col">
                                 <div class="form-group">
                                     <label>Staff Strength Box</label>
                                     <select id="hr_staff_strength_box" class="form-select">
@@ -617,7 +599,7 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-lg-4 col-sm-6">
+                            <div class="col-lg-4 col-sm-6 dashboard-subsection-col">
                                 <div class="form-group">
                                     <label>Active Staff Box</label>
                                     <select id="hr_active_staff_box" class="form-select">
@@ -626,7 +608,7 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-lg-4 col-sm-6">
+                            <div class="col-lg-4 col-sm-6 dashboard-subsection-col">
                                 <div class="form-group">
                                     <label>Monthly Attendance Box</label>
                                     <select id="hr_monthly_attendance_box" class="form-select">
@@ -635,7 +617,7 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-lg-4 col-sm-6">
+                            <div class="col-lg-4 col-sm-6 dashboard-subsection-col">
                                 <div class="form-group">
                                     <label>Personal Progress Box</label>
                                     <select id="hr_personal_progress_box" class="form-select">
@@ -644,7 +626,7 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-lg-4 col-sm-6">
+                            <div class="col-lg-4 col-sm-6 dashboard-subsection-col">
                                 <div class="form-group">
                                     <label>7 Day Attendance Pattern Chart</label>
                                     <select id="hr_7day_attendance_chart" class="form-select">
@@ -653,7 +635,7 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-lg-4 col-sm-6">
+                            <div class="col-lg-4 col-sm-6 dashboard-subsection-col">
                                 <div class="form-group">
                                     <label>Salary Payout Trend Chart</label>
                                     <select id="hr_salary_payout_trend_chart" class="form-select">
@@ -662,7 +644,7 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-lg-4 col-sm-6">
+                            <div class="col-lg-4 col-sm-6 dashboard-subsection-col">
                                 <div class="form-group">
                                     <label>Payroll Snapshot Table</label>
                                     <select id="hr_payroll_snapshot_table" class="form-select">
@@ -671,7 +653,7 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-lg-4 col-sm-6">
+                            <div class="col-lg-4 col-sm-6 dashboard-subsection-col">
                                 <div class="form-group">
                                     <label>Attendance Watch Table</label>
                                     <select id="hr_attendance_watch_table" class="form-select">
@@ -680,7 +662,7 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-lg-4 col-sm-6">
+                            <div class="col-lg-4 col-sm-6 dashboard-subsection-col">
                                 <div class="form-group">
                                     <label>Payroll Status Table</label>
                                     <select id="hr_payroll_status_table" class="form-select">
@@ -697,7 +679,7 @@
                         <h5 class="mb-3">ERP Dashboard Subsections</h5>
                         <p class="text-muted mb-3"><small>Control visibility of individual ERP dashboard components</small></p>
                         <div class="row mb-4">
-                            <div class="col-lg-4 col-sm-6">
+                            <div class="col-lg-4 col-sm-6 dashboard-subsection-col">
                                 <div class="form-group">
                                     <label>Total Sales Amount Box</label>
                                     <select id="erp_total_sales_box" class="form-select">
@@ -706,7 +688,7 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-lg-4 col-sm-6">
+                            <div class="col-lg-4 col-sm-6 dashboard-subsection-col">
                                 <div class="form-group">
                                     <label>Total Purchase Amount Box</label>
                                     <select id="erp_total_purchase_box" class="form-select">
@@ -715,7 +697,7 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-lg-4 col-sm-6">
+                            <div class="col-lg-4 col-sm-6 dashboard-subsection-col">
                                 <div class="form-group">
                                     <label>Total Expense Amount Box</label>
                                     <select id="erp_total_expense_box" class="form-select">
@@ -724,7 +706,7 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-lg-4 col-sm-6">
+                            <div class="col-lg-4 col-sm-6 dashboard-subsection-col">
                                 <div class="form-group">
                                     <label>Sales Invoice Count Box</label>
                                     <select id="erp_sales_invoice_count_box" class="form-select">
@@ -733,7 +715,7 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-lg-4 col-sm-6">
+                            <div class="col-lg-4 col-sm-6 dashboard-subsection-col">
                                 <div class="form-group">
                                     <label>Purchase Invoice Count Box</label>
                                     <select id="erp_purchase_invoice_count_box" class="form-select">
@@ -742,7 +724,7 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-lg-4 col-sm-6">
+                            <div class="col-lg-4 col-sm-6 dashboard-subsection-col">
                                 <div class="form-group">
                                     <label>Customers Count Box</label>
                                     <select id="erp_customers_count_box" class="form-select">
@@ -751,7 +733,7 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-lg-4 col-sm-6">
+                            <div class="col-lg-4 col-sm-6 dashboard-subsection-col">
                                 <div class="form-group">
                                     <label>Vendors Count Box</label>
                                     <select id="erp_vendors_count_box" class="form-select">
@@ -760,7 +742,7 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-lg-4 col-sm-6">
+                            <div class="col-lg-4 col-sm-6 dashboard-subsection-col">
                                 <div class="form-group">
                                     <label>Sales Chart</label>
                                     <select id="erp_sales_chart" class="form-select">
@@ -769,7 +751,7 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-lg-4 col-sm-6">
+                            <div class="col-lg-4 col-sm-6 dashboard-subsection-col">
                                 <div class="form-group">
                                     <label>Purchase Chart</label>
                                     <select id="erp_purchase_chart" class="form-select">
@@ -778,7 +760,7 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-lg-4 col-sm-6">
+                            <div class="col-lg-4 col-sm-6 dashboard-subsection-col">
                                 <div class="form-group">
                                     <label>Latest Sales Table</label>
                                     <select id="erp_latest_sales_table" class="form-select">
@@ -787,7 +769,7 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-lg-4 col-sm-6">
+                            <div class="col-lg-4 col-sm-6 dashboard-subsection-col">
                                 <div class="form-group">
                                     <label>Latest Purchases Table</label>
                                     <select id="erp_latest_purchases_table" class="form-select">
@@ -972,193 +954,172 @@
                             ? '1'
                             : String(Number(settings.tds_apply))
                         );
-                        $("#show_crm_dashboard").val(
-                            settings.show_crm_dashboard === null || settings.show_crm_dashboard === undefined
-                            ? '1'
-                            : String(Number(settings.show_crm_dashboard))
-                        );
-                        $("#show_hr_dashboard").val(
-                            settings.show_hr_dashboard === null || settings.show_hr_dashboard === undefined
-                            ? '1'
-                            : String(Number(settings.show_hr_dashboard))
-                        );
-                        $("#show_erp_dashboard").val(
-                            settings.show_erp_dashboard === null || settings.show_erp_dashboard === undefined
-                            ? '1'
-                            : String(Number(settings.show_erp_dashboard))
-                        );
-                        
+                        $("#crm_section_enabled").val(normalizeDashboardSetting(
+                            settings.crm_section_enabled,
+                            settings.show_crm_dashboard,
+                            'Enable'
+                        ));
+                        $("#hr_section_enabled").val(normalizeDashboardSetting(
+                            settings.hr_section_enabled,
+                            settings.show_hr_dashboard,
+                            'Enable'
+                        ));
+                        $("#erp_section_enabled").val(normalizeDashboardSetting(
+                            settings.erp_section_enabled,
+                            settings.show_erp_dashboard,
+                            'Enable'
+                        ));
+
                         // CRM Subsection Settings
-                        $("#show_crm_lead_pipeline").val(
-                            settings.show_crm_lead_pipeline === null || settings.show_crm_lead_pipeline === undefined
-                            ? '1'
-                            : String(Number(settings.show_crm_lead_pipeline))
-                        );
-                        $("#show_crm_conversion").val(
-                            settings.show_crm_conversion === null || settings.show_crm_conversion === undefined
-                            ? '1'
-                            : String(Number(settings.show_crm_conversion))
-                        );
-                        $("#show_crm_followup_load").val(
-                            settings.show_crm_followup_load === null || settings.show_crm_followup_load === undefined
-                            ? '1'
-                            : String(Number(settings.show_crm_followup_load))
-                        );
-                        $("#show_crm_meeting_momentum").val(
-                            settings.show_crm_meeting_momentum === null || settings.show_crm_meeting_momentum === undefined
-                            ? '1'
-                            : String(Number(settings.show_crm_meeting_momentum))
-                        );
-                        $("#show_crm_lead_status_mix").val(
-                            settings.show_crm_lead_status_mix === null || settings.show_crm_lead_status_mix === undefined
-                            ? '1'
-                            : String(Number(settings.show_crm_lead_status_mix))
-                        );
-                        $("#show_crm_activity_trend").val(
-                            settings.show_crm_activity_trend === null || settings.show_crm_activity_trend === undefined
-                            ? '1'
-                            : String(Number(settings.show_crm_activity_trend))
-                        );
-                        $("#show_crm_pipeline_quality").val(
-                            settings.show_crm_pipeline_quality === null || settings.show_crm_pipeline_quality === undefined
-                            ? '1'
-                            : String(Number(settings.show_crm_pipeline_quality))
-                        );
-                        $("#show_crm_recent_leads").val(
-                            settings.show_crm_recent_leads === null || settings.show_crm_recent_leads === undefined
-                            ? '1'
-                            : String(Number(settings.show_crm_recent_leads))
-                        );
-                        $("#show_crm_next_7_days").val(
-                            settings.show_crm_next_7_days === null || settings.show_crm_next_7_days === undefined
-                            ? '1'
-                            : String(Number(settings.show_crm_next_7_days))
-                        );
+                        $("#crm_lead_pipeline_box").val(normalizeDashboardSetting(
+                            settings.crm_lead_pipeline_box,
+                            settings.show_crm_lead_pipeline,
+                            'Enable'
+                        ));
+                        $("#crm_conversion_box").val(normalizeDashboardSetting(
+                            settings.crm_conversion_box,
+                            settings.show_crm_conversion,
+                            'Enable'
+                        ));
+                        $("#crm_followup_lead_box").val(normalizeDashboardSetting(
+                            settings.crm_followup_lead_box,
+                            settings.show_crm_followup_load,
+                            'Enable'
+                        ));
+                        $("#crm_meeting_momentum_box").val(normalizeDashboardSetting(
+                            settings.crm_meeting_momentum_box,
+                            settings.show_crm_meeting_momentum,
+                            'Enable'
+                        ));
+                        $("#crm_lead_status_mix_chart").val(normalizeDashboardSetting(
+                            settings.crm_lead_status_mix_chart,
+                            settings.show_crm_lead_status_mix,
+                            'Enable'
+                        ));
+                        $("#crm_activity_trend_chart").val(normalizeDashboardSetting(
+                            settings.crm_activity_trend_chart,
+                            settings.show_crm_activity_trend,
+                            'Enable'
+                        ));
+                        $("#crm_pipeline_quality_table").val(normalizeDashboardSetting(
+                            settings.crm_pipeline_quality_table,
+                            settings.show_crm_pipeline_quality,
+                            'Enable'
+                        ));
+                        $("#crm_recent_leads_table").val(normalizeDashboardSetting(
+                            settings.crm_recent_leads_table,
+                            settings.show_crm_recent_leads,
+                            'Enable'
+                        ));
+                        $("#crm_next_7_days_table").val(normalizeDashboardSetting(
+                            settings.crm_next_7_days_table,
+                            settings.show_crm_next_7_days,
+                            'Enable'
+                        ));
 
                         // HR Subsection Settings
-                        $("#show_hr_staff_strength").val(
-                            settings.show_hr_staff_strength === null || settings.show_hr_staff_strength === undefined
-                            ? '1'
-                            : String(Number(settings.show_hr_staff_strength))
-                        );
-                        $("#show_hr_active_staff").val(
-                            settings.show_hr_active_staff === null || settings.show_hr_active_staff === undefined
-                            ? '1'
-                            : String(Number(settings.show_hr_active_staff))
-                        );
-                        $("#show_hr_monthly_attendance").val(
-                            settings.show_hr_monthly_attendance === null || settings.show_hr_monthly_attendance === undefined
-                            ? '1'
-                            : String(Number(settings.show_hr_monthly_attendance))
-                        );
-                        $("#show_hr_personal_progress").val(
-                            settings.show_hr_personal_progress === null || settings.show_hr_personal_progress === undefined
-                            ? '1'
-                            : String(Number(settings.show_hr_personal_progress))
-                        );
-                        $("#show_hr_attendance_pattern").val(
-                            settings.show_hr_attendance_pattern === null || settings.show_hr_attendance_pattern === undefined
-                            ? '1'
-                            : String(Number(settings.show_hr_attendance_pattern))
-                        );
-                        $("#show_hr_salary_payroll_trend").val(
-                            settings.show_hr_salary_payroll_trend === null || settings.show_hr_salary_payroll_trend === undefined
-                            ? '1'
-                            : String(Number(settings.show_hr_salary_payroll_trend))
-                        );
-                        $("#show_hr_payroll_snapshot").val(
-                            settings.show_hr_payroll_snapshot === null || settings.show_hr_payroll_snapshot === undefined
-                            ? '1'
-                            : String(Number(settings.show_hr_payroll_snapshot))
-                        );
-                        $("#show_hr_attendance_watch").val(
-                            settings.show_hr_attendance_watch === null || settings.show_hr_attendance_watch === undefined
-                            ? '1'
-                            : String(Number(settings.show_hr_attendance_watch))
-                        );
-                        $("#show_hr_payroll_status").val(
-                            settings.show_hr_payroll_status === null || settings.show_hr_payroll_status === undefined
-                            ? '1'
-                            : String(Number(settings.show_hr_payroll_status))
-                        );
+                        $("#hr_staff_strength_box").val(normalizeDashboardSetting(
+                            settings.hr_staff_strength_box,
+                            settings.show_hr_staff_strength,
+                            'Enable'
+                        ));
+                        $("#hr_active_staff_box").val(normalizeDashboardSetting(
+                            settings.hr_active_staff_box,
+                            settings.show_hr_active_staff,
+                            'Enable'
+                        ));
+                        $("#hr_monthly_attendance_box").val(normalizeDashboardSetting(
+                            settings.hr_monthly_attendance_box,
+                            settings.show_hr_monthly_attendance,
+                            'Enable'
+                        ));
+                        $("#hr_personal_progress_box").val(normalizeDashboardSetting(
+                            settings.hr_personal_progress_box,
+                            settings.show_hr_personal_progress,
+                            'Enable'
+                        ));
+                        $("#hr_7day_attendance_chart").val(normalizeDashboardSetting(
+                            settings.hr_7day_attendance_chart,
+                            settings.show_hr_attendance_pattern,
+                            'Enable'
+                        ));
+                        $("#hr_salary_payout_trend_chart").val(normalizeDashboardSetting(
+                            settings.hr_salary_payout_trend_chart,
+                            settings.show_hr_salary_payroll_trend,
+                            'Enable'
+                        ));
+                        $("#hr_payroll_snapshot_table").val(normalizeDashboardSetting(
+                            settings.hr_payroll_snapshot_table,
+                            settings.show_hr_payroll_snapshot,
+                            'Enable'
+                        ));
+                        $("#hr_attendance_watch_table").val(normalizeDashboardSetting(
+                            settings.hr_attendance_watch_table,
+                            settings.show_hr_attendance_watch,
+                            'Enable'
+                        ));
+                        $("#hr_payroll_status_table").val(normalizeDashboardSetting(
+                            settings.hr_payroll_status_table,
+                            settings.show_hr_payroll_status,
+                            'Enable'
+                        ));
 
                         // ERP Subsection Settings
-                        $("#show_erp_total_sales").val(
-                            settings.show_erp_total_sales === null || settings.show_erp_total_sales === undefined
-                            ? '1'
-                            : String(Number(settings.show_erp_total_sales))
-                        );
-                        $("#show_erp_total_purchase").val(
-                            settings.show_erp_total_purchase === null || settings.show_erp_total_purchase === undefined
-                            ? '1'
-                            : String(Number(settings.show_erp_total_purchase))
-                        );
-                        $("#show_erp_total_expense").val(
-                            settings.show_erp_total_expense === null || settings.show_erp_total_expense === undefined
-                            ? '1'
-                            : String(Number(settings.show_erp_total_expense))
-                        );
-                        $("#show_erp_sales_invoice_count").val(
-                            settings.show_erp_sales_invoice_count === null || settings.show_erp_sales_invoice_count === undefined
-                            ? '1'
-                            : String(Number(settings.show_erp_sales_invoice_count))
-                        );
-                        $("#show_erp_purchase_invoice_count").val(
-                            settings.show_erp_purchase_invoice_count === null || settings.show_erp_purchase_invoice_count === undefined
-                            ? '1'
-                            : String(Number(settings.show_erp_purchase_invoice_count))
-                        );
-                        $("#show_erp_customers_count").val(
-                            settings.show_erp_customers_count === null || settings.show_erp_customers_count === undefined
-                            ? '1'
-                            : String(Number(settings.show_erp_customers_count))
-                        );
-                        $("#show_erp_vendors_count").val(
-                            settings.show_erp_vendors_count === null || settings.show_erp_vendors_count === undefined
-                            ? '1'
-                            : String(Number(settings.show_erp_vendors_count))
-                        );
-                        $("#show_erp_sales_chart").val(
-                            settings.show_erp_sales_chart === null || settings.show_erp_sales_chart === undefined
-                            ? '1'
-                            : String(Number(settings.show_erp_sales_chart))
-                        );
-                        $("#show_erp_purchase_chart").val(
-                            settings.show_erp_purchase_chart === null || settings.show_erp_purchase_chart === undefined
-                            ? '1'
-                            : String(Number(settings.show_erp_purchase_chart))
-                        );
-                        $("#show_erp_recent_sales").val(
-                            settings.show_erp_recent_sales === null || settings.show_erp_recent_sales === undefined
-                            ? '1'
-                            : String(Number(settings.show_erp_recent_sales))
-                        );
-                        $("#show_erp_recent_purchases").val(
-                            settings.show_erp_recent_purchases === null || settings.show_erp_recent_purchases === undefined
-                            ? '1'
-                            : String(Number(settings.show_erp_recent_purchases))
-                        );
-                        $("#show_erp_recent_products").val(
-                            settings.show_erp_recent_products === null || settings.show_erp_recent_products === undefined
-                            ? '1'
-                            : String(Number(settings.show_erp_recent_products))
-                        );
-                        $("#customer_whatsapp_message").val(
-                            settings.customer_whatsapp_message === null || settings.customer_whatsapp_message === undefined
-                            ? '0'
-                            : String(Number(settings.customer_whatsapp_message))
-                        );
-                        $("#admin_whatsapp_message").val(
-                            settings.admin_whatsapp_message === null || settings.admin_whatsapp_message === undefined
-                            ? '0'
-                            : String(Number(settings.admin_whatsapp_message))
-                        );
-                        $("#appointment_reminder_hours_before").val(
-                            settings.appointment_reminder_hours_before === null || settings.appointment_reminder_hours_before === undefined
-                            ? '3'
-                            : settings.appointment_reminder_hours_before
-                        );
-
+                        $("#erp_total_sales_box").val(normalizeDashboardSetting(
+                            settings.erp_total_sales_box,
+                            settings.show_erp_total_sales,
+                            'Enable'
+                        ));
+                        $("#erp_total_purchase_box").val(normalizeDashboardSetting(
+                            settings.erp_total_purchase_box,
+                            settings.show_erp_total_purchase,
+                            'Enable'
+                        ));
+                        $("#erp_total_expense_box").val(normalizeDashboardSetting(
+                            settings.erp_total_expense_box,
+                            settings.show_erp_total_expense,
+                            'Enable'
+                        ));
+                        $("#erp_sales_invoice_count_box").val(normalizeDashboardSetting(
+                            settings.erp_sales_invoice_count_box,
+                            settings.show_erp_sales_invoice_count,
+                            'Enable'
+                        ));
+                        $("#erp_purchase_invoice_count_box").val(normalizeDashboardSetting(
+                            settings.erp_purchase_invoice_count_box,
+                            settings.show_erp_purchase_invoice_count,
+                            'Enable'
+                        ));
+                        $("#erp_customers_count_box").val(normalizeDashboardSetting(
+                            settings.erp_customers_count_box,
+                            settings.show_erp_customers_count,
+                            'Enable'
+                        ));
+                        $("#erp_vendors_count_box").val(normalizeDashboardSetting(
+                            settings.erp_vendors_count_box,
+                            settings.show_erp_vendors_count,
+                            'Enable'
+                        ));
+                        $("#erp_sales_chart").val(normalizeDashboardSetting(
+                            settings.erp_sales_chart,
+                            settings.show_erp_sales_chart,
+                            'Enable'
+                        ));
+                        $("#erp_purchase_chart").val(normalizeDashboardSetting(
+                            settings.erp_purchase_chart,
+                            settings.show_erp_purchase_chart,
+                            'Enable'
+                        ));
+                        $("#erp_latest_sales_table").val(normalizeDashboardSetting(
+                            settings.erp_latest_sales_table,
+                            settings.show_erp_recent_sales,
+                            'Enable'
+                        ));
+                        $("#erp_latest_purchases_table").val(normalizeDashboardSetting(
+                            settings.erp_latest_purchases_table,
+                            settings.show_erp_recent_purchases,
+                            'Enable'
+                        ));
                         if (settings.currency_position) {
                             $("#currency_position").val(settings.currency_position).trigger("change");
                         }
@@ -1199,33 +1160,49 @@
 
             loadGeneralSettings(); // Load on page load
 
+            function normalizeDashboardSetting(currentValue, legacyValue, defaultValue) {
+                if (currentValue === "Enable" || currentValue === "Disable") {
+                    return currentValue;
+                }
+
+                if (legacyValue !== null && legacyValue !== undefined && legacyValue !== "") {
+                    return String(Number(legacyValue)) === "1" ? "Enable" : "Disable";
+                }
+
+                return defaultValue;
+            }
+
             const dashboardMainSectionMap = {
-                crm: "#show_crm_dashboard",
-                hr: "#show_hr_dashboard",
-                erp: "#show_erp_dashboard"
+                crm: "#crm_section_enabled",
+                hr: "#hr_section_enabled",
+                erp: "#erp_section_enabled"
             };
             const dashboardSubsectionMap = {
-                crm: "#show_crm_lead_pipeline, #show_crm_conversion, #show_crm_followup_load, #show_crm_meeting_momentum, #show_crm_lead_status_mix, #show_crm_activity_trend, #show_crm_pipeline_quality, #show_crm_recent_leads, #show_crm_next_7_days",
-                hr: "#show_hr_staff_strength, #show_hr_active_staff, #show_hr_monthly_attendance, #show_hr_personal_progress, #show_hr_attendance_pattern, #show_hr_salary_payroll_trend, #show_hr_payroll_snapshot, #show_hr_attendance_watch, #show_hr_payroll_status",
-                erp: "#show_erp_total_sales, #show_erp_total_purchase, #show_erp_total_expense, #show_erp_sales_invoice_count, #show_erp_purchase_invoice_count, #show_erp_customers_count, #show_erp_vendors_count, #show_erp_sales_chart, #show_erp_purchase_chart, #show_erp_recent_sales, #show_erp_recent_purchases, #show_erp_recent_products"
+                crm: "#crm_lead_pipeline_box, #crm_conversion_box, #crm_followup_lead_box, #crm_meeting_momentum_box, #crm_lead_status_mix_chart, #crm_activity_trend_chart, #crm_pipeline_quality_table, #crm_recent_leads_table, #crm_next_7_days_table",
+                hr: "#hr_staff_strength_box, #hr_active_staff_box, #hr_monthly_attendance_box, #hr_personal_progress_box, #hr_7day_attendance_chart, #hr_salary_payout_trend_chart, #hr_payroll_snapshot_table, #hr_attendance_watch_table, #hr_payroll_status_table",
+                erp: "#erp_total_sales_box, #erp_total_purchase_box, #erp_total_expense_box, #erp_sales_invoice_count_box, #erp_purchase_invoice_count_box, #erp_customers_count_box, #erp_vendors_count_box, #erp_sales_chart, #erp_purchase_chart, #erp_latest_sales_table, #erp_latest_purchases_table"
             };
 
             function syncDashboardSectionState() {
                 Object.keys(dashboardMainSectionMap).forEach(function(section) {
-                    const isEnabled = $(dashboardMainSectionMap[section]).val() === "1";
+                    const isEnabled = $(dashboardMainSectionMap[section]).val() === "Enable";
                     $(dashboardSubsectionMap[section]).prop("disabled", !isEnabled);
                 });
             }
 
+            function setDashboardSubsectionState(sectionKey, value) {
+                $(dashboardSubsectionMap[sectionKey]).val(value);
+            }
+
             function applyMainSectionState(sectionKey) {
-                const isEnabled = $(dashboardMainSectionMap[sectionKey]).val() === "1";
-                $(dashboardSubsectionMap[sectionKey]).val(isEnabled ? "1" : "0");
+                const isEnabled = $(dashboardMainSectionMap[sectionKey]).val() === "Enable";
+                setDashboardSubsectionState(sectionKey, isEnabled ? "Enable" : "Disable");
                 syncDashboardSectionState();
             }
 
-            $("#show_crm_dashboard, #show_hr_dashboard, #show_erp_dashboard").on("change", function() {
+            $("#crm_section_enabled, #hr_section_enabled, #erp_section_enabled").on("change", function() {
                 const id = $(this).attr("id");
-                const sectionKey = id === "show_crm_dashboard" ? "crm" : (id === "show_hr_dashboard" ? "hr" : "erp");
+                const sectionKey = id === "crm_section_enabled" ? "crm" : (id === "hr_section_enabled" ? "hr" : "erp");
                 applyMainSectionState(sectionKey);
             });
 
@@ -1554,6 +1531,10 @@
                 formData.append("invoice_size", $("#invoice_size").val());
                 formData.append("send_mail", $("#send_mail").val());
                 formData.append("financial_year", $("#financial_year").val());
+                formData.append("tds_apply", $("#tds_apply").val());
+                formData.append("customer_whatsapp_message", $("#customer_whatsapp_message").val());
+                formData.append("admin_whatsapp_message", $("#admin_whatsapp_message").val());
+                formData.append("appointment_reminder_hours_before", $("#appointment_reminder_hours_before").val() || 3);
 
                 // Send AJAX
                 $.ajax({

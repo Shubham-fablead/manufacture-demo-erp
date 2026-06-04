@@ -16,6 +16,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Milon\Barcode\DNS1D;
@@ -25,12 +26,28 @@ use Illuminate\Validation\Rule;
 
 class ProductController extends Controller
 {
+    private function normalizeBranchId($value): ?int
+    {
+        if ($value === null) {
+            return null;
+        }
+
+        $value = trim((string) $value);
+
+        if ($value === '' || in_array(strtolower($value), ['null', 'undefined'], true)) {
+            return null;
+        }
+
+        return is_numeric($value) ? (int) $value : null;
+    }
+
     public function getAllProduct(Request $request)
     {
         $user = Auth::guard('api')->user();
+        $requestedBranchId = $this->normalizeBranchId($request->sub_branch_id);
 
         $branchId = match (strtolower($user->role)) {
-            'admin'     => $request->sub_branch_id ?: $user->id,
+            'admin'     => $requestedBranchId ?? $user->id,
             'sub-admin' => $user->id,
             'staff'     => $user->branch_id,
             default     => $user->id,
@@ -123,13 +140,14 @@ class ProductController extends Controller
     public function export_product(Request $request)
     {
         $user = Auth::guard('api')->user();
+        $requestedBranchId = $this->normalizeBranchId($request->selectedSubAdminId);
 
         /* -------------------------------------------------
      | 1️⃣ Resolve Branch ID (single, clean logic)
      -------------------------------------------------*/
         $branchId = match ($user->role) {
             'staff' => $user->branch_id,
-            'admin' => $request->selectedSubAdminId ?: $user->id,
+            'admin' => $requestedBranchId ?? $user->id,
             default => $user->id,
         };
 
@@ -305,13 +323,14 @@ class ProductController extends Controller
     public function export_product_pdf(Request $request)
     {
         $user = Auth::guard('api')->user();
+        $requestedBranchId = $this->normalizeBranchId($request->selectedSubAdminId);
 
         /* -------------------------------------------------
      | 1️⃣ Resolve Branch ID (single source of truth)
      -------------------------------------------------*/
         $branchId = match ($user->role) {
             'staff' => $user->branch_id,
-            'admin' => $request->selectedSubAdminId ?: $user->id,
+            'admin' => $requestedBranchId ?? $user->id,
             default => $user->id,
         };
 
@@ -832,8 +851,14 @@ class ProductController extends Controller
 
     public function importProducts(Request $request)
     {
-        $user     = Auth::guard('api')->user();
-        $branchId = $user->id; // User's branch ID
+        $user = Auth::guard('api')->user();
+        $requestedBranchId = $this->normalizeBranchId($request->sub_admin_id);
+        $branchId = match (strtolower($user->role ?? '')) {
+            'sub-admin' => $user->id,
+            'staff' => $user->branch_id,
+            'admin' => $requestedBranchId ?? $user->id,
+            default => $user->id,
+        };
 
         $request->validate([
             'csv_file' => 'required|mimes:csv,txt|max:2048',
@@ -842,127 +867,183 @@ class ProductController extends Controller
         $file = $request->file('csv_file');
         $path = $file->getRealPath();
         $data = array_map('str_getcsv', file($path));
+        $productAvailabilityColumn = Schema::hasColumn('products', 'availablility') ? 'availablility' : 'availability';
+        $productCreatedByColumn = Schema::hasColumn('products', 'created_by') ? 'created_by' : 'create_by';
+        $productBranchColumn = Schema::hasColumn('products', 'branch_id');
+        $productVendorColumn = Schema::hasColumn('products', 'vendor_id');
+        $productUnitColumn = Schema::hasColumn('products', 'unit_id');
 
-        if (count($data) > 0) {
-            $header = array_shift($data);
+        if (count($data) === 0) {
+            return response()->json([
+                'status' => false,
+                'message' => 'CSV file is empty!',
+            ]);
+        }
 
-            $insertedCount = 0;
-            $updatedSKUs   = [];
-            $invalidSKUs   = [];
+        $header = array_shift($data);
+        $normalizedHeader = array_map(function ($column) {
+            $column = strtolower(trim((string) $column));
+            $column = preg_replace('/[^a-z0-9]+/', '_', $column);
+            return trim($column, '_');
+        }, $header);
 
-            foreach ($data as $row) {
-                $name         = strtolower(trim($row[0] ?? ''));
-                $categoryName = strtolower(trim($row[1] ?? ''));
-                $brandName    = isset($row[2]) ? strtolower(trim($row[2])) : null;
-                $sku          = trim($row[3] ?? '');
-                $quantity     = (int) ($row[4] ?? 0);
-                $unit        = isset($row[5]) ? strtolower(trim($row[5])) : null; // Assuming unit is at index 5
-                $price        = $row[6] ?? 0;
-                $status       = strtolower(trim($row[7] ?? 'inactive'));
-                $availability = strtolower(trim($row[8] ?? 'out of stock'));
-                $description  = isset($row[9]) ? strtolower(trim($row[9])) : null;
+        $requiredColumns = [
+            'product_name',
+            'category_name',
+            'sku',
+            'quantity',
+            'price',
+            'status',
+            'availability',
+        ];
 
-                // ✅ New fields
-                $capacity    = isset($row[10]) ? trim($row[10]) : null;
-                $voltage     = isset($row[11]) ? trim($row[11]) : null;
-                $warranty    = isset($row[12]) ? trim($row[12]) : null;
-                $expiry_date = isset($row[13]) ? trim($row[13]) : null;
+        $missingColumns = array_values(array_diff($requiredColumns, $normalizedHeader));
 
-                if ($expiry_date) {
-                    try {
-                        $expiry_date = \Carbon\Carbon::createFromFormat('m/d/Y', $expiry_date)->format('Y-m-d');
-                    } catch (\Exception $e) {
-                        $expiry_date = null; // invalid date
-                    }
-                }
+        if (! empty($missingColumns)) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Missing required CSV columns: ' . implode(', ', $missingColumns),
+            ], 422);
+        }
 
-                // ❌ Invalid SKU format
-                if (! preg_match('/^\d+$/', $sku)) {
-                    $invalidSKUs[] = $sku;
-                    continue;
-                }
-
-                // ✅ Create or fetch category for the same branch
-                $category = Category::firstOrCreate(
-                    ['name' => $categoryName, 'branch_id' => $branchId],
-                    ['isDeleted' => 0]
-                );
-
-                // ✅ Create or fetch brand for the same branch
-                $brand = $brandName ? Brand::firstOrCreate(
-                    ['name' => $brandName, 'branch_id' => $branchId],
-                    ['isDeleted' => 0]
-                ) : null;
-
-                $unit = $unit ? Unit::firstOrCreate(
-                    ['unit_name' => $unit, 'created_by' => $branchId],
-                    ['isDeleted' => 0]
-                ) : null;
-
-                // ✅ Check if product with same SKU exists in the same branch
-                $product = Product::where('SKU', $sku)
-                    ->where('branch_id', $branchId)
-                    ->first();
-
-                if ($product) {
-                    $product->quantity += $quantity;
-                    // Update new fields if needed
-                    $product->capacity    = $capacity;
-                    $product->voltage     = $voltage;
-                    $product->warranty    = $warranty;
-                    $product->expiry_date = $expiry_date;
-                    $product->save();
-                    $updatedSKUs[] = $sku;
-                } else {
-                    Product::create([
-                        'name'         => $name,
-                        'category_id'  => $category->id,
-                        'brand_id'     => $brand?->id,
-                        'SKU'          => $sku,
-                        'quantity'     => $quantity,
-                        'unit_id'      => $unit?->id,
-                        'price'        => $price,
-                        'status'       => $status,
-                        'availability' => $availability,
-                        'description'  => $description,
-                        'branch_id'    => $branchId,
-                        // ✅ New fields
-                        'capacity'     => $capacity,
-                        'voltage'      => $voltage,
-                        'warranty'     => $warranty,
-                        'expiry_date'  => $expiry_date,
-                    ]);
-                    $insertedCount++;
+        $columnIndex = array_flip($normalizedHeader);
+        $getValue = static function (array $row, array $keys, $default = null) use ($columnIndex) {
+            foreach ($keys as $key) {
+                if (array_key_exists($key, $columnIndex)) {
+                    return $row[$columnIndex[$key]] ?? $default;
                 }
             }
 
-            // ✅ Return response
-            if ($insertedCount > 0 || count($updatedSKUs) > 0) {
-                return response()->json([
-                    "status"       => true,
-                    "message"      => $insertedCount > 0
-                        ? "$insertedCount product(s) imported successfully."
-                        : "Existing product(s) updated with additional quantity.",
-                    "updated_skus" => $updatedSKUs,
-                    "invalid_skus" => $invalidSKUs,
-                ]);
-            } elseif (! empty($invalidSKUs)) {
-                return response()->json([
-                    "status"       => false,
-                    "message"      => "No new products imported.",
-                    "invalid_skus" => $invalidSKUs,
-                ]);
-            } else {
-                return response()->json([
-                    "status"  => false,
-                    "message" => "CSV file is empty or contains invalid data.",
-                ]);
+            return $default;
+        };
+
+        $insertedCount = 0;
+        $updatedSKUs = [];
+        $invalidSKUs = [];
+
+        foreach ($data as $row) {
+            if (count(array_filter($row, fn($value) => trim((string) $value) !== '')) === 0) {
+                continue;
             }
+
+            $name = trim((string) $getValue($row, ['product_name', 'name'], ''));
+            $categoryName = strtolower(trim((string) $getValue($row, ['category_name', 'category'], '')));
+            $brandName = strtolower(trim((string) $getValue($row, ['brand_name', 'brand'], '')));
+            $sku = trim((string) $getValue($row, ['sku'], ''));
+            $quantity = (int) $getValue($row, ['quantity'], 0);
+            $unitName = strtolower(trim((string) $getValue($row, ['unit', 'unit_name'], '')));
+            $price = trim((string) $getValue($row, ['price'], ''));
+            $status = strtolower(trim((string) $getValue($row, ['status'], 'inactive')));
+            $availability = strtolower(trim((string) $getValue($row, ['availability'], 'out_stock')));
+            $description = trim((string) $getValue($row, ['description'], ''));
+
+            if ($name === '' || $categoryName === '' || $sku === '' || $price === '') {
+                $invalidSKUs[] = $sku !== '' ? $sku : 'missing-sku-row';
+                continue;
+            }
+
+            if (! preg_match('/^\d+$/', $sku)) {
+                $invalidSKUs[] = $sku;
+                continue;
+            }
+
+            if (! is_numeric($price)) {
+                $invalidSKUs[] = $sku;
+                continue;
+            }
+
+            $status = in_array($status, ['active', 'inactive'], true) ? $status : 'inactive';
+            $availability = str_replace([' ', '-'], '_', $availability);
+            $availability = in_array($availability, ['in_stock', 'out_stock'], true) ? $availability : 'out_stock';
+
+            $category = Category::firstOrCreate(
+                ['name' => $categoryName, 'branch_id' => $branchId],
+                ['isDeleted' => 0]
+            );
+
+            $brand = $brandName !== '' ? Brand::firstOrCreate(
+                ['name' => $brandName, 'branch_id' => $branchId],
+                ['isDeleted' => 0]
+            ) : null;
+
+            $unit = $unitName !== '' ? Unit::firstOrCreate(
+                ['unit_name' => $unitName, 'created_by' => $branchId],
+                ['is_delete' => 0]
+            ) : null;
+
+            $product = Product::where('SKU', $sku)
+                ->where('branch_id', $branchId)
+                ->first();
+
+            if ($product) {
+                $product->quantity += $quantity;
+                $product->price = (float) $price;
+                $product->status = $status;
+                $product->{$productAvailabilityColumn} = $availability;
+                $product->description = $description !== '' ? $description : $product->description;
+
+                if ($unit && $productUnitColumn) {
+                    $product->unit_id = $unit->id;
+                }
+
+                $product->save();
+                $updatedSKUs[] = $sku;
+                continue;
+            }
+
+            $productData = [
+                'category_id' => $category->id,
+                'brand_id' => $brand?->id,
+                'name' => $name,
+                'SKU' => $sku,
+                'description' => $description !== '' ? $description : null,
+                'price' => (float) $price,
+                'quantity' => $quantity,
+                'isDeleted' => 0,
+                'status' => $status,
+                $productAvailabilityColumn => $availability,
+                $productCreatedByColumn => $user->id,
+            ];
+
+            if ($productVendorColumn) {
+                $productData['vendor_id'] = 1;
+            }
+
+            if ($productBranchColumn) {
+                $productData['branch_id'] = $branchId;
+            }
+
+            if ($productUnitColumn) {
+                $productData['unit_id'] = $unit?->id;
+            }
+
+            Product::create($productData);
+
+            $insertedCount++;
+        }
+
+        if ($insertedCount > 0 || count($updatedSKUs) > 0) {
+            return response()->json([
+                'status' => true,
+                'message' => $insertedCount > 0
+                    ? "$insertedCount product(s) imported successfully."
+                    : 'Existing product(s) updated with additional quantity.',
+                'updated_skus' => $updatedSKUs,
+                'invalid_skus' => $invalidSKUs,
+            ]);
+        }
+
+        if (! empty($invalidSKUs)) {
+            return response()->json([
+                'status' => false,
+                'message' => 'No new products imported.',
+                'invalid_skus' => $invalidSKUs,
+            ]);
         }
 
         return response()->json([
-            "status"  => false,
-            "message" => "CSV file is empty!",
+            'status' => false,
+            'message' => 'CSV file is empty or contains invalid data.',
         ]);
     }
 
@@ -1123,3 +1204,4 @@ class ProductController extends Controller
         ]);
     }
 }
+

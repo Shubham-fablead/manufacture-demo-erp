@@ -537,6 +537,8 @@
             align-items: center;
             padding: 10px 0;
             border-bottom: 1px solid #f0f0f0;
+            flex-wrap: wrap;
+            gap: 8px;
         }
 
         .order-detail-row-simple:last-of-type {
@@ -547,12 +549,16 @@
             font-weight: 600;
             color: #595b5d;
             font-size: 14px;
+            flex: 0 1 auto;
+            min-width: 120px;
         }
 
         .order-detail-value-simple {
             color: #1b2850;
             font-size: 14px;
             text-align: right;
+            flex: 1 1 auto;
+            word-break: break-word;
         }
 
         .mobile-action-buttons-simple {
@@ -735,8 +741,11 @@
         .mobile-detail-row {
             display: flex;
             justify-content: space-between;
-            padding: 8px 0;
+            align-items: center;
+            padding: 10px 0;
             border-bottom: 1px solid #f0f0f0;
+            flex-wrap: wrap;
+            gap: 8px;
         }
 
         .mobile-detail-row:last-child {
@@ -747,12 +756,16 @@
             font-weight: 600;
             color: #595b5d;
             font-size: 14px;
+            flex: 0 1 auto;
+            min-width: 120px;
         }
 
         .mobile-detail-value {
             color: #1b2850;
             font-size: 14px;
             text-align: right;
+            flex: 1 1 auto;
+            word-break: break-word;
         }
 
         .mobile-action-buttons {
@@ -848,7 +861,7 @@
         .sales-filter-toolbar .filter-field .custom-select2,
         .sales-filter-toolbar .filter-field .form-group,
         .sales-filter-toolbar .filter-field .search-set {
-            margin-bottom: 0 !important;
+            margin-bottom: 2px !important;
         }
 
         .sales-filter-toolbar .filter-field .form-control,
@@ -1073,6 +1086,23 @@
             color: #28c76f;
             border-color: #b7ebcd;
             background: #effcf4;
+        }
+
+        @media screen and (max-width: 767.98px) {
+            .summary-badges-row {
+                flex-direction: column;
+                gap: 8px;
+                width: 100%;
+            }
+
+            .summary-badge-box {
+                display: flex;
+                justify-content: flex-start;
+                width: 100%;
+                max-width: 100%;
+                white-space: normal;
+                word-break: break-word;
+            }
         }
     </style>
     @if (session('error'))
@@ -1887,6 +1917,10 @@
                         </div>
                         <div class="mobile-order-details" id="mobile-details-${order.id}">
                             <div class="mobile-detail-row">
+                                <span class="mobile-detail-label">Order Number:</span>
+                                <span class="mobile-detail-value">${order.order_number || 'N/A'}</span>
+                            </div>
+                            <div class="mobile-detail-row">
                                 <span class="mobile-detail-label">Date:</span>
                                 <span class="mobile-detail-value">${order.created_date || 'N/A'}</span>
                             </div>
@@ -1899,31 +1933,31 @@
                                 <span class="mobile-detail-value">${getMobileStatusBadge(order.quotation_status || 'sales', 'quotation')}</span>
                             </div>
                             <div class="mobile-detail-row">
-                <span class="mobile-detail-label">Payment Status:</span>
-                <span class="mobile-detail-value">
-                    ${getMobileStatusBadge(order.payment_status, 'payment', order.extra_paid || 0)}
-                </span>
-            </div>
-            <div class="mobile-detail-row">
-                <span class="mobile-detail-label">Return Status:</span>
-                <span class="mobile-detail-value">
-                    ${getMobileStatusBadge(parseFloat(order.total_return || 0) > 0 ? 'returned' : '', 'return')}
-                </span>
-            </div>
-            ${order.extra_paid > 0 ? `
-                                                    <div class="mobile-detail-row">
-                                                        <span class="mobile-detail-label" style="color: #dc3545;">Extra Paid:</span>
-                                                        <span class="mobile-detail-value" style="color: #dc3545; font-weight: bold;">
-                                                            ${currencySymbol}${parseFloat(order.extra_paid || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                                                        </span>
-                                                    </div>
-                                                ` : ''}
-            <div class="mobile-detail-row">
-                <span class="mobile-detail-label">Payment Method:</span>
-                <span class="mobile-detail-value">
-                    ${getMobileStatusBadge(order.payment_method, 'method')}
-                </span>
-            </div>
+                                <span class="mobile-detail-label">Payment Status:</span>
+                                <span class="mobile-detail-value">
+                                    ${getMobileStatusBadge(order.payment_status, 'payment', order.extra_paid || 0)}
+                                </span>
+                            </div>
+                            <div class="mobile-detail-row">
+                                <span class="mobile-detail-label">Return Status:</span>
+                                <span class="mobile-detail-value">
+                                    ${getMobileStatusBadge(parseFloat(order.total_return || 0) > 0 ? 'returned' : '', 'return')}
+                                </span>
+                            </div>
+                            ${order.extra_paid > 0 ? `
+                                <div class="mobile-detail-row">
+                                    <span class="mobile-detail-label" style="color: #dc3545;">Extra Paid:</span>
+                                    <span class="mobile-detail-value" style="color: #dc3545; font-weight: bold;">
+                                        ${currencySymbol}${parseFloat(order.extra_paid || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                    </span>
+                                </div>
+                            ` : ''}
+                            <div class="mobile-detail-row">
+                                <span class="mobile-detail-label">Payment Method:</span>
+                                <span class="mobile-detail-value">
+                                    ${getMobileStatusBadge(order.payment_method, 'method')}
+                                </span>
+                            </div>
                             <div class="mobile-detail-row">
                                 <span class="mobile-detail-label">Total:</span>
                                 <span class="mobile-detail-value" style="font-weight: bold; color: #ff9f43;">${displayAmount}</span>
@@ -1934,13 +1968,13 @@
                             </div>
                             ${parseFloat(order.remaining_amount || 0) > 0 &&
                             (order.quotation_status || 'sales').toLowerCase() === 'sales' ? `
-                                                                    <div class="mobile-detail-row">
-                                                                        <span class="mobile-detail-label">Remaining:</span>
-                                                                        <span class="mobile-detail-value" style="color: #dc3545; font-weight: bold;">
-                                                                            ${currencySymbol}${parseFloat(order.remaining_amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                                                                        </span>
-                                                                    </div>
-                                                                    ` : ''}
+                                <div class="mobile-detail-row">
+                                    <span class="mobile-detail-label">Remaining:</span>
+                                    <span class="mobile-detail-value" style="color: #dc3545; font-weight: bold;">
+                                        ${currencySymbol}${parseFloat(order.remaining_amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                    </span>
+                                </div>
+                            ` : ''}
                             <div class="mobile-action-buttons">
                                 ${actionBtns}
                             </div>
@@ -2049,12 +2083,22 @@
         <td colspan="9" class="order-details-content">
             <div class="order-details-list">
                 <div class="order-detail-row-simple">
+                    <span class="order-detail-label-simple">Order Number:</span>
+                    <span class="order-detail-value-simple">${order.order_number || 'N/A'}</span>
+                </div>
+                <div class="order-detail-row-simple">
                     <span class="order-detail-label-simple">Date:</span>
                     <span class="order-detail-value-simple">${order.created_date || 'N/A'}</span>
                 </div>
                 <div class="order-detail-row-simple">
                     <span class="order-detail-label-simple">Customer Name:</span>
                     <span class="order-detail-value-simple">${order.user?.name || 'N/A'}</span>
+                </div>
+                <div class="order-detail-row-simple">
+                    <span class="order-detail-label-simple">Quotation/Sale:</span>
+                    <span class="order-detail-value-simple">
+                        ${getStatusBadge(order.quotation_status || 'sales', 'quotation')}
+                    </span>
                 </div>
                 <div class="order-detail-row-simple">
                     <span class="order-detail-label-simple">Payment Status:</span>
@@ -2069,13 +2113,13 @@
                     </span>
                 </div>
                 ${(order.extra_paid || 0) > 0 ? `
-                                                        <div class="order-detail-row-simple">
-                                                            <span class="order-detail-label-simple" style="color: #dc3545;">Extra Paid:</span>
-                                                            <span class="order-detail-value-simple" style="color: #dc3545; font-weight: bold;">
-                                                                ${currencySymbol}${parseFloat(order.extra_paid).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} (Advance/Refund)
-                                                            </span>
-                                                        </div>
-                                                    ` : ''}
+                    <div class="order-detail-row-simple">
+                        <span class="order-detail-label-simple" style="color: #dc3545;">Extra Paid:</span>
+                        <span class="order-detail-value-simple" style="color: #dc3545; font-weight: bold;">
+                            ${currencySymbol}${parseFloat(order.extra_paid).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} (Advance/Refund)
+                        </span>
+                    </div>
+                ` : ''}
                 <div class="order-detail-row-simple">
                     <span class="order-detail-label-simple">Payment Method:</span>
                     <span class="order-detail-value-simple">
@@ -2092,13 +2136,13 @@
                 </div>
                 ${parseFloat(order.remaining_amount || 0) > 0 &&
 (order.quotation_status || 'sales').toLowerCase() === 'sales' ? `
-                                                        <div class="order-detail-row-simple">
-                                                            <span class="order-detail-label-simple">Remaining:</span>
-                                                            <span class="order-detail-value-simple" style="color: #dc3545; font-weight: bold;">
-                                                                ${currencySymbol}${parseFloat(order.remaining_amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                                                            </span>
-                                                        </div>
-                                                    ` : ''}
+                    <div class="order-detail-row-simple">
+                        <span class="order-detail-label-simple">Remaining:</span>
+                        <span class="order-detail-value-simple" style="color: #dc3545; font-weight: bold;">
+                            ${currencySymbol}${parseFloat(order.remaining_amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        </span>
+                    </div>
+                ` : ''}
             </div>
             <div class="mobile-action-buttons-simple">
                 ${actionBtns}

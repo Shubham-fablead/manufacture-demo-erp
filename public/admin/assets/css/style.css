@@ -4440,11 +4440,11 @@ span.select2-container.select2-container--default.select2-container--open {
 }
 
 .sidebar .sidebar-menu {
-    padding: 20px;
+    padding: 12px 14px;
 }
 
 .sidebar .sidebar-menu>ul>li {
-    margin-bottom: 10px
+    margin-bottom: 2px
 }
 
 .sidebar .sidebar-menu>ul>li.active a {
@@ -4452,7 +4452,7 @@ span.select2-container.select2-container--default.select2-container--open {
 }
 
 .sidebar .sidebar-menu>ul>li>a {
-    padding: 10px 15px;
+    padding: 4px 12px;
     position: relative;
     color: #212b36
 }
@@ -4522,11 +4522,11 @@ span.select2-container.select2-container--default.select2-container--open {
     font-size: 18px;
     line-height: 18px;
     position: absolute;
-    top: 12px;
-    right: 15px;
-    transform: translate(0, 0);
-    -webkit-transform: translate(0, 0);
-    -ms-transform: translate(0, 0);
+    top: 50%;
+    right: 12px;
+    transform: translateY(-50%);
+    -webkit-transform: translateY(-50%);
+    -ms-transform: translateY(-50%);
     -webkit-transition: all .2s ease;
     -ms-transition: all .2s ease;
     transition: all .2s ease
@@ -4539,9 +4539,9 @@ span.select2-container.select2-container--default.select2-container--open {
 }
 
 .sidebar .sidebar-menu>ul>li>a.subdrop .menu-arrow {
-    transform: rotate(90deg);
-    -webkit-transform: rotate(90deg);
-    -ms-transform: rotate(90deg)
+    transform: translateY(-50%) rotate(90deg);
+    -webkit-transform: translateY(-50%) rotate(90deg);
+    -ms-transform: translateY(-50%) rotate(90deg)
 }
 
 .sidebar .sidebar-menu>ul>li.active a {
@@ -4560,7 +4560,7 @@ span.select2-container.select2-container--default.select2-container--open {
 .sidebar .sidebar-menu>ul>li.submenu ul {
     background: #fafbfe;
     border-radius: 5px;
-    padding: 10px 0;
+    padding: 4px 0;
     display: none
 }
 
@@ -4570,7 +4570,7 @@ span.select2-container.select2-container--default.select2-container--open {
     color: #212b36;
     position: relative;
     display: block;
-    padding: 8px 8px 8px 40px
+    padding: 6px 8px 6px 36px
 }
 
 .sidebar .sidebar-menu>ul>li.submenu ul li a.active {
@@ -4589,7 +4589,7 @@ span.select2-container.select2-container--default.select2-container--open {
     height: 10px;
     border-radius: 50px;
     position: absolute;
-    top: 13px;
+    top: 11px;
     left: 16px
 }
 

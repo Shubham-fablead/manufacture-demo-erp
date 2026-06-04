@@ -21,7 +21,7 @@
                     <!-- <h6>Full details of a product</h6> -->
                 </div>
                 <div class="page-btn">
-                    <a href="{{ env('ImagePath').'admin/assets/csvfile/Productimportfile.csv' }}" class="btn btn-submit w-100" download>Download Sample File</a>
+                    <a href="{{ route('product.import.sample') }}" class="btn btn-submit w-100">Download Sample File</a>
                 </div>
             </div>
 
@@ -74,7 +74,7 @@
                                     </li>
                                     <li>
                                         <h4>SKU Code</h4>
-                                        <h6 class="manitorygreen">This Field is required</h6>
+                                        <h6 class="manitorygreen">This Field is required<br>numeric only</h6>
                                     </li>
                                     <li>
                                         <h4>Product Price</h4>
@@ -121,6 +121,10 @@
             e.preventDefault();
 
             var authToken = localStorage.getItem("authToken");
+            var selectedSubAdminId = localStorage.getItem("selectedSubAdminId");
+            if (selectedSubAdminId === 'null' || selectedSubAdminId === 'undefined' || selectedSubAdminId === '') {
+                selectedSubAdminId = '';
+            }
             var csv_file = $('#csv_file')[0].files[0];
 
             if (!csv_file) {
@@ -136,6 +140,10 @@
 
             var formData = new FormData();
             formData.append("csv_file", csv_file);
+
+            if (selectedSubAdminId) {
+                formData.append("sub_admin_id", selectedSubAdminId);
+            }
 
             $.ajax({
                 url: "/api/importProducts",
@@ -205,10 +213,16 @@
                             confirmButtonText: 'OK'
                         });
                     } else {
+                        let errorMessage = xhr.responseJSON?.message || 'An unexpected error occurred.';
+
+                        if (xhr.responseJSON?.invalid_skus?.length > 0) {
+                            errorMessage += `<br><br><strong>Invalid SKUs:</strong> ${xhr.responseJSON.invalid_skus.join(', ')}`;
+                        }
+
                         Swal.fire({
                             icon: 'error',
                             title: 'Error',
-                            text: 'An unexpected error occurred.',
+                            html: errorMessage,
                             confirmButtonColor: '#ff9f43',
                             confirmButtonText: 'OK'
                         });

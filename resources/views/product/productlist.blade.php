@@ -806,7 +806,13 @@
             let lastPage = 1;
             let perPage = 10;
             let searchQuery = '';
-            const selectedSubAdminId = localStorage.getItem('selectedSubAdminId');
+            const rawSelectedSubAdminId = localStorage.getItem('selectedSubAdminId');
+            const selectedSubAdminId = rawSelectedSubAdminId &&
+                rawSelectedSubAdminId !== 'null' &&
+                rawSelectedSubAdminId !== 'undefined' &&
+                rawSelectedSubAdminId !== ''
+                ? rawSelectedSubAdminId
+                : '';
 
             // Initialize Select2 for custom class
             $('.select-filter').select2();
@@ -829,7 +835,9 @@
                         search: searchQuery,
                         category_id: categoryId,
                         brand_id: brandId,
-                        sub_branch_id: selectedSubAdminId
+                        ...(selectedSubAdminId ? {
+                            sub_branch_id: selectedSubAdminId
+                        } : {})
                     },
                     success: function(response) {
                         if (response.status) {
@@ -1267,7 +1275,10 @@
         $('#exportAllChallan').click(function() {
             let selectedCategory = $('#filterCategory').val() || '';
             let selectedBrand = $('#filterBrand').val() || '';
-            const selectedSubAdminId = localStorage.getItem("selectedSubAdminId");
+            let selectedSubAdminId = localStorage.getItem("selectedSubAdminId");
+            if (selectedSubAdminId === 'null' || selectedSubAdminId === 'undefined' || selectedSubAdminId === '') {
+                selectedSubAdminId = '';
+            }
             let authToken = localStorage.getItem("authToken");
 
             let url =
@@ -1334,7 +1345,10 @@
         $('#exportPdf').click(function() {
             let selectedCategory = $('#filterCategory').val() || '';
             let selectedBrand = $('#filterBrand').val() || '';
-            const selectedSubAdminId = localStorage.getItem("selectedSubAdminId");
+            let selectedSubAdminId = localStorage.getItem("selectedSubAdminId");
+            if (selectedSubAdminId === 'null' || selectedSubAdminId === 'undefined' || selectedSubAdminId === '') {
+                selectedSubAdminId = '';
+            }
             let authToken = localStorage.getItem("authToken");
 
             let url =

@@ -32,7 +32,15 @@ class UnitController extends Controller
         $branchId = $userBranchId;
 
         $validated = Validator::make($request->all(), [
-            'unitname' => 'required|unique:units,unit_name|string|max:255',
+            'unitname' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('units', 'unit_name')->where(function ($query) use ($branchId) {
+                    return $query->where('created_by', $branchId)
+                        ->where('is_delete', 0);
+                }),
+            ],
         ]);
         $validated->setAttributeNames(['unitname' => 'Unit Name']);
 
@@ -171,9 +179,10 @@ class UnitController extends Controller
                 'string',
                 'max:255',
                 Rule::unique('units', 'unit_name')
-                    ->ignore($id) // <- ignore current unit
-                    ->where(function ($query) {
-                        return $query->where('is_delete', 0);
+                    ->ignore($id)
+                    ->where(function ($query) use ($branchId) {
+                        return $query->where('created_by', $branchId)
+                            ->where('is_delete', 0);
                     }),
             ],
         ], [

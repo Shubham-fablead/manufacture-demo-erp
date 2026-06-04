@@ -24,12 +24,14 @@ class Product extends Model
         'quantity',
         'unit_id',
         'isDeleted',
+        'availability',
         'availablility',
         'status',
         'gst_option',
         'product_gst',
         'created_at',
         'updated_at',
+        'created_by',
         'create_by',
     ];
 

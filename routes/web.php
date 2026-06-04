@@ -156,6 +156,17 @@ Route::middleware(['auth:web', 'auto.permission'])->group(function () {
     Route::get('/product-detail/{id}', [ProductController::class, 'product_detail'])->name('product.detail');
     Route::get('/import-product', [ProductController::class, 'product_import'])->name('product.import');
     Route::get('/product-view/{id}', [ProductController::class, 'product_view'])->name('product.view');
+  Route::get('/product/import/sample-file', function () {
+        $filePath = public_path('admin/assets/csvfile/Productimportfile.csv');
+
+        if (! file_exists($filePath)) {
+            abort(404, 'Sample file not found.');
+        }
+
+        return response()->download($filePath, 'Productimportfile.csv', [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+        ]);
+    })->name('product.import.sample');
 
 
     //Row material

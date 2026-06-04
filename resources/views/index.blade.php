@@ -481,14 +481,18 @@
             font-size: 12px !important;
         }
 
-        /* Mobile table styles for sales/purchases */
+        /* Mobile table styles for sales/purchases and dashboard detail tables */
         .dataview table thead th:nth-child(n+3),
-        .dataview table tbody td:nth-child(n+3) {
+        .dataview table tbody td:nth-child(n+3),
+        .mobile-toggle-table table thead th:nth-child(n+3),
+        .mobile-toggle-table table tbody td:nth-child(n+3) {
             display: none !important;
         }
 
         .dataview table thead th.details-column,
-        .dataview table tbody td:nth-child(2) {
+        .dataview table tbody td:nth-child(2),
+        .mobile-toggle-table table thead th.details-column,
+        .mobile-toggle-table table tbody td:nth-child(2) {
             display: table-cell !important;
             text-align: center;
             vertical-align: top !important;
@@ -496,38 +500,48 @@
             padding-top: 10px;
         }
 
-        .dataview .toggle-details i {
+        .dataview .toggle-details i,
+        .mobile-toggle-table .toggle-details i {
             font-size: 18px;
             transition: transform 0.3s ease;
         }
 
-        .dataview .toggle-details {
+        .dataview .toggle-details,
+        .mobile-toggle-table .toggle-details {
             display: inline-flex;
             align-items: flex-start;
             justify-content: center;
             line-height: 1;
         }
 
-        /* Order ID column styling */
-        .dataview table tbody td:first-child {
+        /* First column styling */
+        .dataview table tbody td:first-child,
+        .mobile-toggle-table table tbody td:first-child {
             display: flex !important;
             align-items: center !important;
             max-width: calc(100vw - 100px) !important;
         }
 
-        .dataview .order-id {
+        .dataview .order-id,
+        .mobile-toggle-table .order-id {
             display: inline-block !important;
             max-width: calc(100% - 50px) !important;
             margin-left: 8px !important;
             font-size: 14px !important;
             word-break: break-word !important;
         }
+
+        .mobile-toggle-table .order-id {
+            margin-left: 0 !important;
+        }
     }
 
     /* Desktop: hide details toggle column */
     @media (min-width: 768px) {
         .dataview table thead th.details-column,
-        .dataview table tbody td:nth-child(2) {
+        .dataview table tbody td:nth-child(2),
+        .mobile-toggle-table table thead th.details-column,
+        .mobile-toggle-table table tbody td:nth-child(2) {
             display: none !important;
         }
 
@@ -1525,14 +1539,37 @@
                                     <h5 class="card-title mb-0">Pipeline Quality</h5>
                                     <a href="{{ route('lead.list') }}" class="btn btn-sm btn-primary">View All</a>
                                 </div>
-                                <div class="table-responsive">
+                                <div class="table-responsive mobile-toggle-table">
                                     <table class="table mb-0">
-                                        <thead><tr><th>Status</th><th>Leads</th><th>Share</th></tr></thead>
+                                        <thead><tr><th>Status</th><th class="details-column">Details</th><th>Leads</th><th>Share</th></tr></thead>
                                         <tbody>
                                             @forelse ($leadStatusMix as $status => $total)
-                                                <tr><td>{{ $status }}</td><td>{{ $total }}</td><td>{{ $leadTotal > 0 ? round(($total / $leadTotal) * 100) : 0 }}%</td></tr>
+                                                <tr>
+                                                    <td>
+                                                        <div>
+                                                            <span class="order-id ms-0">{{ $status }}</span>
+                                                            <div class="collapse mobile-details-collapse d-md-none" id="pipeline-quality-{{ $loop->index }}">
+                                                                <div class="mobile-details-row">
+                                                                    <span class="mobile-details-label">Leads:</span>
+                                                                    <span class="mobile-details-value">{{ $total }}</span>
+                                                                </div>
+                                                                <div class="mobile-details-row">
+                                                                    <span class="mobile-details-label">Share:</span>
+                                                                    <span class="mobile-details-value">{{ $leadTotal > 0 ? round(($total / $leadTotal) * 100) : 0 }}%</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td class="details-column">
+                                                        <a href="#pipeline-quality-{{ $loop->index }}" class="toggle-details" data-bs-toggle="collapse">
+                                                            <i class="fas fa-plus-circle" style="color: #ff9f43;"></i>
+                                                        </a>
+                                                    </td>
+                                                    <td class="d-none d-md-table-cell">{{ $total }}</td>
+                                                    <td class="d-none d-md-table-cell">{{ $leadTotal > 0 ? round(($total / $leadTotal) * 100) : 0 }}%</td>
+                                                </tr>
                                             @empty
-                                                <tr><td colspan="3" class="text-center text-muted">No pipeline data</td></tr>
+                                                <tr><td colspan="4" class="text-center text-muted">No pipeline data</td></tr>
                                             @endforelse
                                         </tbody>
                                     </table>
@@ -1547,18 +1584,38 @@
                                     <h5 class="card-title mb-0">Recent Leads</h5>
                                     <a href="{{ route('lead.list') }}" class="btn btn-sm btn-primary">View All</a>
                                 </div>
-                                <div class="table-responsive">
+                                <div class="table-responsive mobile-toggle-table">
                                     <table class="table mb-0">
-                                        <thead><tr><th>Lead</th><th>Status</th><th>Owner</th></tr></thead>
+                                        <thead><tr><th>Lead</th><th class="details-column">Details</th><th>Status</th><th>Owner</th></tr></thead>
                                         <tbody>
                                             @forelse ($recentLeads as $lead)
                                                 <tr>
-                                                    <td>{{ $lead->name }}<br><small>{{ $lead->company_name }}</small></td>
-                                                    <td><span class="status-pill">{{ $lead->lead_status ?? 'N/A' }}</span></td>
-                                                    <td>{{ $lead->assignedUser?->name ?? 'N/A' }}</td>
+                                                    <td>
+                                                        <div>
+                                                            <span class="order-id ms-0">{{ $lead->name }}</span>
+                                                            <div><small>{{ $lead->company_name }}</small></div>
+                                                            <div class="collapse mobile-details-collapse d-md-none" id="recent-lead-{{ $lead->id }}">
+                                                                <div class="mobile-details-row">
+                                                                    <span class="mobile-details-label">Status:</span>
+                                                                    <span class="mobile-details-value">{{ $lead->lead_status ?? 'N/A' }}</span>
+                                                                </div>
+                                                                <div class="mobile-details-row">
+                                                                    <span class="mobile-details-label">Owner:</span>
+                                                                    <span class="mobile-details-value">{{ $lead->assignedUser?->name ?? 'N/A' }}</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td class="details-column">
+                                                        <a href="#recent-lead-{{ $lead->id }}" class="toggle-details" data-bs-toggle="collapse">
+                                                            <i class="fas fa-plus-circle" style="color: #ff9f43;"></i>
+                                                        </a>
+                                                    </td>
+                                                    <td class="d-none d-md-table-cell"><span class="status-pill">{{ $lead->lead_status ?? 'N/A' }}</span></td>
+                                                    <td class="d-none d-md-table-cell">{{ $lead->assignedUser?->name ?? 'N/A' }}</td>
                                                 </tr>
                                             @empty
-                                                <tr><td colspan="3" class="text-center text-muted">No recent leads</td></tr>
+                                                <tr><td colspan="4" class="text-center text-muted">No recent leads</td></tr>
                                             @endforelse
                                         </tbody>
                                     </table>
@@ -1573,14 +1630,38 @@
                                     <h5 class="card-title mb-0">Next 7 Days</h5>
                                     <a href="{{ route('followup.list') }}" class="btn btn-sm btn-primary">View All</a>
                                 </div>
-                                <div class="table-responsive">
+                                <div class="table-responsive mobile-toggle-table">
                                     <table class="table mb-0">
-                                        <thead><tr><th>Work</th><th>Party</th><th>Due</th></tr></thead>
+                                        <thead><tr><th>Work</th><th class="details-column">Details</th><th>Party</th><th>Due</th></tr></thead>
                                         <tbody>
                                             @forelse ($crmNextItems as $item)
-                                                <tr><td>{{ $item['work'] }}<br><small>{{ $item['owner'] }}</small></td><td>{{ $item['party'] }}</td><td>{{ $item['due'] }}</td></tr>
+                                                <tr>
+                                                    <td>
+                                                        <div>
+                                                            <span class="order-id ms-0">{{ $item['work'] }}</span>
+                                                            <div><small>{{ $item['owner'] }}</small></div>
+                                                            <div class="collapse mobile-details-collapse d-md-none" id="next-seven-days-{{ $loop->index }}">
+                                                                <div class="mobile-details-row">
+                                                                    <span class="mobile-details-label">Party:</span>
+                                                                    <span class="mobile-details-value">{{ $item['party'] }}</span>
+                                                                </div>
+                                                                <div class="mobile-details-row">
+                                                                    <span class="mobile-details-label">Due:</span>
+                                                                    <span class="mobile-details-value">{{ $item['due'] }}</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td class="details-column">
+                                                        <a href="#next-seven-days-{{ $loop->index }}" class="toggle-details" data-bs-toggle="collapse">
+                                                            <i class="fas fa-plus-circle" style="color: #ff9f43;"></i>
+                                                        </a>
+                                                    </td>
+                                                    <td class="d-none d-md-table-cell">{{ $item['party'] }}</td>
+                                                    <td class="d-none d-md-table-cell">{{ $item['due'] }}</td>
+                                                </tr>
                                             @empty
-                                                <tr><td colspan="3" class="text-center text-muted">No upcoming CRM work</td></tr>
+                                                <tr><td colspan="4" class="text-center text-muted">No upcoming CRM work</td></tr>
                                             @endforelse
                                         </tbody>
                                     </table>
@@ -1672,13 +1753,13 @@
 
                 <div class="row g-3 mt-1">
                     @if ($dashboardSettings['hr_payroll_snapshot_table'] === 'Enable')
-                        <div class="col-lg-4"><div class="panel-card"><h5 class="card-title">Payroll</h5><table class="table mb-0"><tbody><tr><td>Paid this month</td><td class="text-end">{{ $currencySymbol }} {{ number_format($paidSalaryTotal, 2) }}</td></tr><tr><td>Salary pending staff</td><td class="text-end">{{ $pendingPayrollCount }}</td></tr></tbody></table></div></div>
+                        <div class="col-lg-4"><div class="panel-card"><div class="d-flex justify-content-between align-items-center mb-2"><h5 class="card-title mb-0">Payroll</h5><a href="{{ route('payroll.list') }}" class="btn btn-sm btn-primary">View All</a></div><div class="table-responsive mobile-toggle-table"><table class="table mb-0"><thead><tr><th>Summary</th><th class="details-column">Details</th><th>Value</th></tr></thead><tbody><tr><td><div><span class="order-id ms-0">Paid this month</span><div class="collapse mobile-details-collapse d-md-none" id="payroll-paid-month"><div class="mobile-details-row"><span class="mobile-details-label">Value:</span><span class="mobile-details-value">{{ $currencySymbol }} {{ number_format($paidSalaryTotal, 2) }}</span></div></div></div></td><td class="details-column"><a href="#payroll-paid-month" class="toggle-details" data-bs-toggle="collapse"><i class="fas fa-plus-circle" style="color: #ff9f43;"></i></a></td><td class="text-end d-none d-md-table-cell">{{ $currencySymbol }} {{ number_format($paidSalaryTotal, 2) }}</td></tr><tr><td><div><span class="order-id ms-0">Salary pending staff</span><div class="collapse mobile-details-collapse d-md-none" id="payroll-pending-staff"><div class="mobile-details-row"><span class="mobile-details-label">Value:</span><span class="mobile-details-value">{{ $pendingPayrollCount }}</span></div></div></div></td><td class="details-column"><a href="#payroll-pending-staff" class="toggle-details" data-bs-toggle="collapse"><i class="fas fa-plus-circle" style="color: #ff9f43;"></i></a></td><td class="text-end d-none d-md-table-cell">{{ $pendingPayrollCount }}</td></tr></tbody></table></div></div></div>
                     @endif
                     @if ($dashboardSettings['hr_attendance_watch_table'] === 'Enable')
-                        <div class="col-lg-4"><div class="panel-card"><h5 class="card-title">Attendance</h5><table class="table mb-0"><thead><tr><th>Staff</th><th>Present</th><th>Absent</th></tr></thead><tbody>@forelse ($attendanceWatch as $staff)<tr><td>{{ $staff['name'] }}</td><td>{{ $staff['present'] }}</td><td>{{ $staff['absent'] }}</td></tr>@empty<tr><td colspan="3" class="text-center text-muted">No staff found</td></tr>@endforelse</tbody></table></div></div>
+                        <div class="col-lg-4"><div class="panel-card"><div class="d-flex justify-content-between align-items-center mb-2"><h5 class="card-title mb-0">Attendance</h5><a href="{{ route('attendance.list') }}" class="btn btn-sm btn-primary">View All</a></div><div class="table-responsive mobile-toggle-table"><table class="table mb-0"><thead><tr><th>Staff</th><th class="details-column">Details</th><th>Present</th><th>Absent</th></tr></thead><tbody>@forelse ($attendanceWatch as $index => $staff)<tr><td><div><span class="order-id ms-0">{{ $staff['name'] }}</span><div class="collapse mobile-details-collapse d-md-none" id="attendance-watch-{{ $index }}"><div class="mobile-details-row"><span class="mobile-details-label">Present:</span><span class="mobile-details-value">{{ $staff['present'] }}</span></div><div class="mobile-details-row"><span class="mobile-details-label">Absent:</span><span class="mobile-details-value">{{ $staff['absent'] }}</span></div></div></div></td><td class="details-column"><a href="#attendance-watch-{{ $index }}" class="toggle-details" data-bs-toggle="collapse"><i class="fas fa-plus-circle" style="color: #ff9f43;"></i></a></td><td class="d-none d-md-table-cell">{{ $staff['present'] }}</td><td class="d-none d-md-table-cell">{{ $staff['absent'] }}</td></tr>@empty<tr><td colspan="4" class="text-center text-muted">No staff found</td></tr>@endforelse</tbody></table></div></div></div>
                     @endif
                     @if ($dashboardSettings['hr_payroll_status_table'] === 'Enable')
-                        <div class="col-lg-4"><div class="panel-card"><h5 class="card-title">Payroll Status</h5><table class="table mb-0"><thead><tr><th>Staff</th><th>Status</th><th>Amount</th></tr></thead><tbody>@forelse ($currentMonthSalaries->take(4) as $salary)<tr><td>{{ $salary->staff?->name ?? 'N/A' }}</td><td><span class="status-pill">{{ $salary->status ?? 'Pending' }}</span></td><td>{{ $currencySymbol }} {{ number_format($salary->total_salary ?? 0, 2) }}</td></tr>@empty<tr><td colspan="3" class="text-center text-muted">No payroll records</td></tr>@endforelse</tbody></table></div></div>
+                        <div class="col-lg-4"><div class="panel-card"><div class="d-flex justify-content-between align-items-center mb-2"><h5 class="card-title mb-0">Payroll Status</h5><a href="{{ route('payroll.list') }}" class="btn btn-sm btn-primary">View All</a></div><div class="table-responsive mobile-toggle-table"><table class="table mb-0"><thead><tr><th>Staff</th><th class="details-column">Details</th><th>Status</th><th>Amount</th></tr></thead><tbody>@forelse ($currentMonthSalaries->take(4) as $salary)<tr><td><div><span class="order-id ms-0">{{ $salary->staff?->name ?? 'N/A' }}</span><div class="collapse mobile-details-collapse d-md-none" id="payroll-status-{{ $salary->id }}"><div class="mobile-details-row"><span class="mobile-details-label">Status:</span><span class="mobile-details-value">{{ $salary->status ?? 'Pending' }}</span></div><div class="mobile-details-row"><span class="mobile-details-label">Amount:</span><span class="mobile-details-value">{{ $currencySymbol }} {{ number_format($salary->total_salary ?? 0, 2) }}</span></div></div></div></td><td class="details-column"><a href="#payroll-status-{{ $salary->id }}" class="toggle-details" data-bs-toggle="collapse"><i class="fas fa-plus-circle" style="color: #ff9f43;"></i></a></td><td class="d-none d-md-table-cell"><span class="status-pill">{{ $salary->status ?? 'Pending' }}</span></td><td class="d-none d-md-table-cell">{{ $currencySymbol }} {{ number_format($salary->total_salary ?? 0, 2) }}</td></tr>@empty<tr><td colspan="4" class="text-center text-muted">No payroll records</td></tr>@endforelse</tbody></table></div></div></div>
                     @endif
                 </div>
             </div>

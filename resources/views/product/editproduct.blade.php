@@ -210,7 +210,7 @@
                                 <span class="error_barcode text-danger"></span>
                             </div>
                         </div>
-                        <div class="col-lg-3 col-sm-6 col-12">
+                        <div class="col-lg-3 col-sm-6 col-6">
                             <div class="form-group">
                                 <label class="form-label-icon"><i class="fa-solid fa-align-left"></i> Description</label>
                                 <textarea class="form-control" name="description" id="description"></textarea>
@@ -218,7 +218,7 @@
                             </div>
                         </div>
 
-                        <div class="col-lg-6 col-sm-6 col-12">
+                        <div class="col-lg-6 col-sm-6 col-6">
                             <div class="form-group">
                                 <label class="form-label-icon"><i class="fa-solid fa-image"></i> Product Image</label>
                                 <div class="image-upload">
