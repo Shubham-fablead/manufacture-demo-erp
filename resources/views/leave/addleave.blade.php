@@ -108,24 +108,17 @@
                                     </div>
                                 </div>
 
+                                <!-- Leave Type -->
                                 <div class="col-md-4">
                                     <div class="d-flex justify-content-between align-items-center">
                                         <label class="form-label leave-sm-emp mb-0">Leave Type</label>
-
-                                        <?php if ($role == 'admin' || $role == 'hr') : ?>
-                                        <!-- <button type="button" class="btn btn-sm d-flex align-items-center rounded"
-                                            style="background-color:#FF9F43; color:#fff;" data-bs-toggle="modal"
-                                            data-bs-target="#addLeaveModal">
-                                            <i class="mdi mdi-plus me-1"></i> Add Leave Type
-                                        </button> -->
-                                        <?php endif; ?>
                                     </div>
 
                                     <div class="input-group mt-2">
                                         <select class="form-select" name="leave_id" id="leave_id">
                                             <option value="" disabled selected>Select Leave Type</option>
                                             <?php foreach ($leaveTypes as $leaveType) : ?>
-                                            <option value="<?= $leaveType['id'] ?>">
+                                            <option value="<?= $leaveType['id'] ?>" data-allow-half-day="<?= $leaveType['allow_half_day'] ?>">
                                                 <?= e($leaveType['leave_type']) ?>
                                             </option>
                                             <?php endforeach; ?>
@@ -133,10 +126,27 @@
                                     </div>
                                 </div>
 
-                                <!-- Reason -->
-                                <div class="col-md-4">
-                                    <label class="form-label leave-sm-emp">Reason</label>
-                                    <textarea class="form-control" name="reason" placeholder="Enter Reason" rows="4"></textarea>
+                                <!-- Duration (Full Day / Half Day) -->
+                                <div class="col-md-4" id="half_day_container">
+                                    <label class="form-label leave-sm-emp">Duration</label>
+                                    <div class="input-group">
+                                        <select class="form-select" name="half_day" id="half_day">
+                                            <option value="0" selected>Full Day</option>
+                                            <option value="1">Half Day</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <!-- Half Day Type (First Half / Second Half) -->
+                                <div class="col-md-4" id="half_day_type_container" style="display: none;">
+                                    <label class="form-label leave-sm-emp">Half Day Type</label>
+                                    <div class="input-group">
+                                        <select class="form-select" name="half_day_type" id="half_day_type">
+                                            <option value="" disabled selected>Select Half Day Type</option>
+                                            <option value="First Half">First Half</option>
+                                            <option value="Second Half">Second Half</option>
+                                        </select>
+                                    </div>
                                 </div>
 
                                 <!-- No. of Days -->
@@ -163,6 +173,7 @@
                                         <input type="date" class="form-control" name="end_date" />
                                     </div>
                                 </div>
+
                                 <?php if ($role == 'admin' || $role == 'hr') : ?>
                                 <div class="col-md-4">
                                     <label class="form-label leave-sm-emp">Status</label>
@@ -174,6 +185,15 @@
                                             <option value="rejected">rejected</option>
                                         </select>
                                     </div>
+                                </div>
+                                <div class="col-md-8">
+                                    <label class="form-label leave-sm-emp">Reason</label>
+                                    <textarea class="form-control" name="reason" placeholder="Enter Reason" rows="3"></textarea>
+                                </div>
+                                <?php else : ?>
+                                <div class="col-md-12">
+                                    <label class="form-label leave-sm-emp">Reason</label>
+                                    <textarea class="form-control" name="reason" placeholder="Enter Reason" rows="3"></textarea>
                                 </div>
                                 <?php endif; ?>
                             </div>
@@ -198,9 +218,52 @@
         document.addEventListener("DOMContentLoaded", function() {
             const today = new Date().toISOString().split('T')[0];
             document.getElementById("start_date").setAttribute("min", today);
+
+            // Change listener on Leave Type select
+            $('#leave_id').on('change', function() {
+                const selectedOption = $(this).find('option:selected');
+                const allowHalfDay = selectedOption.data('allow-half-day');
+                
+                if (parseInt(allowHalfDay) === 1) {
+                    $('#half_day option[value="1"]').prop('disabled', false);
+                } else {
+                    $('#half_day option[value="1"]').prop('disabled', true);
+                    $('#half_day').val('0').trigger('change');
+                }
+            });
+
+            // Change listener on Leave Day Type select
+            $('#half_day').on('change', function() {
+                const isHalfDay = $(this).val() === '1';
+                const noOfDaysInput = $('input[name="no_of_day"]');
+                const endDateInput = $('input[name="end_date"]');
+                const startDateInput = $('#start_date');
+
+                if (isHalfDay) {
+                    $('#half_day_type_container').show();
+                    noOfDaysInput.val('1').prop('readonly', true);
+                    if (startDateInput.val()) {
+                        endDateInput.val(startDateInput.val()).prop('readonly', true);
+                    } else {
+                        endDateInput.prop('readonly', true);
+                    }
+                } else {
+                    $('#half_day_type_container').hide();
+                    $('#half_day_type').val('');
+                    noOfDaysInput.prop('readonly', false);
+                    endDateInput.prop('readonly', false);
+                }
+            });
+
+            // Copy start date to end date if Half Day is selected and start date changes
+            $('#start_date').on('change', function() {
+                if ($('#half_day').val() === '1') {
+                    $('input[name="end_date"]').val($(this).val());
+                }
+            });
         });
         $(document).ready(function() {
-            const token = localStorage.getItem('token'); // JWT token
+            const token = (typeof window.getAuthToken === 'function') ? window.getAuthToken() : (localStorage.getItem('authToken') || localStorage.getItem('token') || ''); // JWT token
             const form = document.querySelector('#LeaveForm');
             const fieldAliases = {
                 no_of_days: 'no_of_day',
@@ -253,6 +316,10 @@
                     'start_date',
                     'end_date',
                 ];
+
+                if ($('#half_day').val() === '1') {
+                    requiredFields.push('half_day_type');
+                }
 
                 // If user is admin or HR, validate status too
                 const role = "{{ $role }}";

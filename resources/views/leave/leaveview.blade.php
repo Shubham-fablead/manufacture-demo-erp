@@ -1659,7 +1659,7 @@
         function fetchLeaveData(employeeId = null) {
             if (isLoading) return Promise.resolve();
 
-            const token = localStorage.getItem('token') || localStorage.getItem('authToken');
+            const token = (typeof window.getAuthToken === 'function') ? window.getAuthToken() : (localStorage.getItem('authToken') || localStorage.getItem('token') || '');
             let apiUrl = '/api/leave';
 
             if (employeeId) {
@@ -1782,7 +1782,7 @@
         }
 
         function fetchEmployees() {
-            const token = localStorage.getItem('token') || localStorage.getItem('authToken');
+            const token = (typeof window.getAuthToken === 'function') ? window.getAuthToken() : (localStorage.getItem('authToken') || localStorage.getItem('token') || '');
 
             return $.ajax({
                 url: '/api/leave',
@@ -1948,7 +1948,7 @@
         }
 
         $('#updateLeaveStatus').click(function() {
-            const token = localStorage.getItem('token') || localStorage.getItem('authToken');
+            const token = (typeof window.getAuthToken === 'function') ? window.getAuthToken() : (localStorage.getItem('authToken') || localStorage.getItem('token') || '');
             const leaveId = $('#leaveId').val();
 
             if (!leaveId) {

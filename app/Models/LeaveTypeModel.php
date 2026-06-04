@@ -16,16 +16,12 @@ class LeaveTypeModel extends Model
         'leave_type',
         'number_of_leaves',
         'allow_half_day',
-        'requires_approval',
-        'created_by',
     ];
 
     public $timestamps = true;
 
     protected $casts = [
         'allow_half_day' => 'boolean',
-        'requires_approval' => 'boolean',
         'number_of_leaves' => 'integer',
-        'created_by' => 'integer',
     ];
 }

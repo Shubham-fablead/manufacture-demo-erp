@@ -121,7 +121,6 @@ class LeaveTypeController extends Controller
             'leave_type' => ['required', 'string', 'max:255'],
             'number_of_leaves' => ['required', 'integer', 'min:0'],
             'allow_half_day' => ['required', 'in:0,1'],
-            'requires_approval' => ['nullable', 'in:0,1'],
         ]);
 
         $leaveTypeName = $this->normalizeName($validated['leave_type']);
@@ -136,8 +135,6 @@ class LeaveTypeController extends Controller
             'leave_type' => $leaveTypeName,
             'number_of_leaves' => (int) $validated['number_of_leaves'],
             'allow_half_day' => (int) $validated['allow_half_day'],
-            'requires_approval' => (int) ($validated['requires_approval'] ?? 1),
-            'created_by' => auth('api')->id(),
         ]);
 
         return response()->json([
@@ -165,7 +162,6 @@ class LeaveTypeController extends Controller
             'leave_type' => ['required', 'string', 'max:255'],
             'number_of_leaves' => ['required', 'integer', 'min:0'],
             'allow_half_day' => ['required', 'in:0,1'],
-            'requires_approval' => ['nullable', 'in:0,1'],
         ]);
 
         $leaveTypeName = $this->normalizeName($validated['leave_type']);
@@ -180,7 +176,6 @@ class LeaveTypeController extends Controller
             'leave_type' => $leaveTypeName,
             'number_of_leaves' => (int) $validated['number_of_leaves'],
             'allow_half_day' => (int) $validated['allow_half_day'],
-            'requires_approval' => (int) ($validated['requires_approval'] ?? $record->requires_approval ?? 1),
         ]);
 
         return response()->json([
@@ -254,8 +249,6 @@ class LeaveTypeController extends Controller
             'leave_type' => $leaveTypeName,
             'number_of_leaves' => (int) $validated['number_of_leaves'],
             'allow_half_day' => (int) $request->input('allow_half_day', 0),
-            'requires_approval' => (int) $request->input('requires_approval', 1),
-            'created_by' => auth('api')->id(),
         ]);
 
         return response()->json([

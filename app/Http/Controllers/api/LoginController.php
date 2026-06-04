@@ -75,74 +75,6 @@ class LoginController extends Controller
 
 
             if ($user->role === 'staff') {
-                $today = now('Asia/Kolkata')->format('Y-m-d');
-                $currentTime = now('Asia/Kolkata')->format('H:i:s');
-
-                // 🔹 Fetch branch settings
-                $settings = Setting::where('branch_id', $user->branch_id)->first();
-
-                $openTime = $settings->open_time ?? '09:00:00';
-                $graceTime = $settings->grace_period ?? null; // example: "14:54"
-
-                // 🔸 Determine attendance status
-                $status = 'P'; // default Present
-                if ($graceTime && $currentTime > $graceTime) {
-                    $status = 'H'; // Half Day if login after grace period time
-                }
-
-                // 🔹 Find today's attendance
-                $attendance = Attendance::where('user_id', $user->id)
-                    ->where('date', $today)
-                    ->first();
-
-                // Case 1: Already logged in (no checkout)
-                if ($attendance && empty($attendance->check_out_time)) {
-                    return response()->json([
-                        'status' => false,
-                        'message' => 'You are already logged in today. Please logout before logging in again.'
-                    ], 400);
-                }
-
-                // Case 2: Already checked in & out — show warning (popup)
-                if ($attendance && !empty($attendance->check_in_time) && !empty($attendance->check_out_time) && !$force) {
-                    return response()->json([
-                        'status' => true,
-                        'warning' => true,
-                        'message' => 'You have already checked in and checked out once today. Do you still want to log in again?',
-                        'user' => $user,
-                        'token' => $token,
-                        'redirect' => route('auth.profile'),
-                        'permissions' => $formattedPermissions,
-                        'showAppointments' => false,
-                    ]);
-                }
-
-                // 🔹 Record attendance
-                LogAttendance::create([
-                    'user_id' => $user->id,
-                    'check_date' => $today,
-                    'check_in' => $currentTime,
-                    'checkout_out' => null,
-                    'branch_id' => $user->branch_id ?? '0',
-                ]);
-
-                if (!$attendance) {
-                    Attendance::create([
-                        'user_id' => $user->id,
-                        'branch_id' => $user->branch_id ?? '0',
-                        'date' => $today,
-                        'check_in_time' => $currentTime,
-                        'check_out_time' => null,
-                        'status' => $status, // ✅ P or H depending on login time
-                    ]);
-                } else {
-                    $attendance->update([
-                        // 'check_in_time' => $currentTime,
-                        'check_out_time' => null,
-                        // 'status' => $status,
-                    ]);
-                }
-
                 $redirect = route('auth.profile');
             }
 
@@ -225,7 +157,7 @@ class LoginController extends Controller
 
         $token               = $staff->createToken('LaravelPassportToken')->accessToken;
         $formattedPermissions = $this->formatPermissionsForUser($staff);
-        $redirect            = route('auth.dashboard');
+        $redirect            = ($staff->role === 'staff') ? route('auth.profile') : route('auth.dashboard');
         $this->createLoginNotification($staff);
 
         return response()->json([

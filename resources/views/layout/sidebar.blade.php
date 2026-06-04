@@ -407,6 +407,9 @@
                             @if (app('hasPermission')(28, 'add'))
                                 <li><a href="{{ route('leave.add') }}">Add Leave</a></li>
                             @endif
+                            @if (app('hasPermission')(14, 'view'))
+                                <li><a href="{{ route('leave-type.view') }}">Leave Type</a></li>
+                            @endif
                         </ul>
                     </li>
                 @endif

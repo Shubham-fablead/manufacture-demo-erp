@@ -151,7 +151,7 @@ class AttendanceeController extends Controller
         $settings = \App\Models\Setting::where('branch_id', $user->branch_id ?? 0)->first() 
                  ?? \App\Models\Setting::first();
 
-        if ($settings && $settings->office_latitude && $settings->office_longitude) {
+        if ($settings && $settings->location_check_enabled && $settings->office_latitude && $settings->office_longitude) {
             if ($latitude === null || $longitude === null) {
                 return response()->json([
                     'error' => 'Location access is required for check-in. Please allow location permission and try again.',
@@ -196,11 +196,12 @@ class AttendanceeController extends Controller
         $initStatus = $now->gte(\Carbon\Carbon::today('Asia/Kolkata')->setTime(14, 0, 0)) ? 'H' : 'P';
 
         // Calculate late minutes
-        $openTimeStr = $settings->open_time ?? '09:00:00';
+        $openTimeStr = $this->normalizeTime($settings->open_time ?? '09:00:00');
         $openTime = \Carbon\Carbon::createFromFormat('H:i:s', $openTimeStr, 'Asia/Kolkata')->setDateFrom($now);
         $graceTimeStr = $settings->grace_period ?? null;
         if ($graceTimeStr) {
-            $openTime = \Carbon\Carbon::createFromFormat('H:i', substr($graceTimeStr, 0, 5), 'Asia/Kolkata')->setDateFrom($now);
+            $graceTimeStr = $this->normalizeTime($graceTimeStr);
+            $openTime = \Carbon\Carbon::createFromFormat('H:i:s', $graceTimeStr, 'Asia/Kolkata')->setDateFrom($now);
         }
 
         $isLate = 0;
@@ -258,7 +259,7 @@ class AttendanceeController extends Controller
         $settings = \App\Models\Setting::where('branch_id', $user->branch_id ?? 0)->first()
                  ?? \App\Models\Setting::first();
 
-        if ($settings && $settings->office_latitude && $settings->office_longitude) {
+        if ($settings && $settings->location_check_enabled && $settings->office_latitude && $settings->office_longitude) {
             if ($latitude === null || $longitude === null) {
                 return response()->json([
                     'error' => 'Location access is required for check-out. Please allow location permission and try again.',
@@ -452,6 +453,13 @@ class AttendanceeController extends Controller
             ->orderBy('holiday_date')
             ->get(['id', 'title', 'holiday_date']);
 
+        $settings = null;
+        if ($user) {
+            $settings = \App\Models\Setting::where('branch_id', $user->branch_id ?? 0)->first()
+                     ?? \App\Models\Setting::first();
+        }
+        $sundayOff = $settings->sunday_off ?? 'yes';
+
         $rules = $this->companyRules();
         $leaveMap = $this->buildLeaveMap($leaveRows, $start, $end);
         $attendanceMap = $this->buildAttendanceMap($attendanceRows);
@@ -493,6 +501,7 @@ class AttendanceeController extends Controller
                 'saturdayOffDates' => $this->getSaturdayOffDates($start, $end, $rules),
                 'isIncludedHoliday' => !empty($rules?->include_holidays_in_working_days) ? '1' : '0',
                 'serverToday' => $this->today()->toDateString(),
+                'sundayOff' => $sundayOff,
             ],
         ]);
     }
@@ -765,7 +774,6 @@ class AttendanceeController extends Controller
                     'date' => $date,
                     'check_in_time' => $this->normalizeTime($row['check_in_time'] ?? null),
                     'check_out_time' => $this->normalizeTime($row['check_out_time'] ?? null),
-                    'meal_break' => $mealBreak,
                     'updated_at' => $now,
                 ];
 
@@ -808,9 +816,16 @@ class AttendanceeController extends Controller
         $mealBreak = $this->companyRules()?->lunch_break ?? '00:30:00';
         $now = $this->today()->toDateTimeString();
 
+        $userBranchId = DB::table('users')->where('id', $payload['user_id'])->value('branch_id');
+        $settings = \App\Models\Setting::where('branch_id', $userBranchId ?? 0)->first()
+                 ?? \App\Models\Setting::first();
+
+        $isSundayOff = ($settings->sunday_off ?? 'yes') === 'yes';
+        $isSaturdayOff = ($settings->saturday_off ?? 'no') === 'yes';
+
         foreach (CarbonPeriod::create($payload['from_date'], $payload['to_date']) as $day) {
             $date = $day->toDateString();
-            if ($day->isSunday() || isset($holidayMap[$date])) {
+            if (($isSundayOff && $day->isSunday()) || ($isSaturdayOff && $day->isSaturday()) || isset($holidayMap[$date])) {
                 continue;
             }
 
@@ -825,7 +840,6 @@ class AttendanceeController extends Controller
                 'date' => $date,
                 'check_in_time' => $payload['status'] === 'absent' ? null : $this->normalizeTime($payload['check_in_time'] ?? null),
                 'check_out_time' => $payload['status'] === 'absent' ? null : $this->normalizeTime($payload['check_out_time'] ?? null),
-                'meal_break' => $mealBreak,
                 'status' => $payload['status'],
                 'updated_at' => $now,
             ];
@@ -957,7 +971,6 @@ class AttendanceeController extends Controller
             'branch_id' => $user->branch_id ?: $this->branchIdFor($user),
             'date' => $today,
             'check_in_time' => $checkInTime,
-            'meal_break' => $rules->lunch_break ?? '00:30:00',
             'work_hours' => '00:00:00',
             'overtime' => '00:00:00',
             'status' => 'present',
@@ -1013,7 +1026,7 @@ class AttendanceeController extends Controller
             if (!empty($record->check_in_time) && !empty($record->check_out_time)) {
                 $calc = $this->calculateWorkHours(
                     $date,
-                    $record->meal_break ?: ($rules->lunch_break ?? '00:30:00'),
+                    ($rules->lunch_break ?? '00:30:00'),
                     $record->check_in_time,
                     $record->check_out_time,
                     $rules
@@ -1263,6 +1276,27 @@ class AttendanceeController extends Controller
 
     protected function getSaturdayOffDates(Carbon $start, Carbon $end, ?CompanyRulesModel $rules): array
     {
+        $user = $this->apiUser();
+        $settings = null;
+        if ($user) {
+            $settings = \App\Models\Setting::where('branch_id', $user->branch_id ?? 0)->first()
+                     ?? \App\Models\Setting::first();
+        }
+
+        if ($settings && ($settings->saturday_off ?? 'no') === 'yes') {
+            $dates = [];
+            $cursor = $start->copy()->startOfMonth();
+            while ($cursor->lte($end)) {
+                foreach (CarbonPeriod::create($cursor->copy()->startOfMonth(), $cursor->copy()->endOfMonth()) as $day) {
+                    if ($day->isSaturday() && $day->betweenIncluded($start, $end)) {
+                        $dates[] = $day->toDateString();
+                    }
+                }
+                $cursor->addMonth()->startOfMonth();
+            }
+            return array_values(array_unique($dates));
+        }
+
         if (empty($rules?->saturday_off_enabled) || empty($rules?->saturday_off_pattern)) {
             return [];
         }
