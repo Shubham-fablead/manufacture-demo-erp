@@ -466,31 +466,41 @@
 
         .mobile-action-buttons-simple {
             display: flex;
-            gap: 10px;
+            gap: 5px;
             flex-wrap: nowrap;
             align-items: center;
             justify-content: flex-start;
-            padding-top: 15px;
+            padding-top: 12px;
             border-top: 1px solid #e0e0e0;
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
         }
 
         .mobile-action-buttons-simple > a.btn-icon-mobile,
-        .mobile-action-buttons-simple > button.btn-icon-mobile,
+        .mobile-action-buttons-simple > button.btn-icon-mobile {
+            flex: 0 0 auto;
+            min-width: 26px;
+        }
+
         .mobile-action-buttons-simple > .btn {
             flex: 0 0 auto;
-            min-width: 40px;
         }
 
         .mobile-action-buttons-simple > .btn {
             white-space: nowrap;
         }
 
+        .mobile-action-buttons-simple .make-payment-btn {
+            margin-right: 0 !important;
+            padding: 5px 7px;
+            font-size: 10px;
+            line-height: 1.2;
+        }
+
         .btn-icon-mobile,
         button.btn-icon-mobile {
-            width: 40px;
-            height: 40px;
+            width: 26px;
+            height: 26px;
             border-radius: 50%;
             display: inline-flex;
             align-items: center;
@@ -521,7 +531,7 @@
         }
 
         .btn-icon-mobile i {
-            font-size: 16px;
+            font-size: 12px;
             line-height: 1;
             display: flex;
             align-items: center;
@@ -537,9 +547,9 @@
 
         .btn-icon-mobile.btn-history i,
         .btn-icon-mobile.btn-history svg {
-            font-size: 18px;
-            width: 20px;
-            height: 20px;
+            font-size: 12px;
+            width: 14px;
+            height: 14px;
         }
 
         .mobile-badge {
@@ -588,12 +598,12 @@
             }
 
             .btn-icon-mobile {
-                width: 42px;
-                height: 42px;
+                width: 28px;
+                height: 28px;
             }
 
             .btn-icon-mobile i {
-                font-size: 17px;
+                font-size: 13px;
             }
         }
 
@@ -1714,10 +1724,10 @@
                 <i class="fas fa-history"></i>
             </button>`;
 
-            // Download icon button
+            // View icon button
             @if (app('hasPermission')(3, 'view'))
-                actionBtns += `<a class="btn-icon-mobile btn-download" href="/print-purchase/${purchase.id}" title="Download Invoice">
-                    <i class="fas fa-download"></i>
+                actionBtns += `<a class="btn-icon-mobile btn-view" href="/purchase-view/${purchase.id}" title="View Purchase">
+                    <i class="fas fa-eye"></i>
                 </a>`;
             @endif
 
