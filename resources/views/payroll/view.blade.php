@@ -771,16 +771,13 @@
                             if (currentUserRole !== 'staff') {
                                actionButtons = `
                                     <a href="/payroll/profile/${payroll.id}" class="text-primary me-2">
-                                        <i class="fa fa-eye"></i>
+                                        <img src="{{ env('ImagePath') . 'admin/assets/img/icons/eye.svg' }}" alt="View">
                                     </a>
                                     <a href="/payroll/${payroll.id}" class="text-warning me-2">
-                                        <i class="fa fa-pen"></i>
+                                        <img src="{{ env('ImagePath') . 'admin/assets/img/icons/edit.svg' }}" alt="Edit">
                                     </a>
                                     <a href="#" class="text-danger delete-payroll me-2" data-id="${payroll.id}">
-                                        <i class="fa fa-trash"></i>
-                                    </a>
-                                    <a href="/payroll/download-slip/${payroll.id}" class="text-success me-2">
-                                        <i class="fa fa-download"></i>
+                                        <img src="{{ env('ImagePath') . 'admin/assets/img/icons/delete.svg' }}" alt="Delete">
                                     </a>
                                 `;
                                 mobileActionsHtml = `
@@ -794,7 +791,9 @@
                                 `;
                             } else {
                                 actionButtons = `
-                                    <a href="/payroll/profile/${payroll.id}" class="text-primary me-2" title="View"><i class="fa fa-eye"></i></a>
+                                    <a href="/payroll/profile/${payroll.id}" class="text-primary me-2" title="View">
+                                        <img src="{{ env('ImagePath') . 'admin/assets/img/icons/eye.svg' }}" alt="View">
+                                    </a>
 
                                 `;
                                 mobileActionsHtml = `
