@@ -135,6 +135,21 @@
             flex-wrap: wrap;
         }
 
+        .purchase-title-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .purchase-type-radios {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+
         .purchase-tab {
             display: inline-flex;
             align-items: center;
@@ -172,6 +187,14 @@
             .purchase-header .page-title h4 {
                 font-size: 16px;
                 margin-bottom: 0;
+            }
+
+            .purchase-title-row {
+                gap: 10px;
+            }
+
+            .purchase-type-radios {
+                gap: 10px;
             }
 
             .purchase-header .page-title {
@@ -394,7 +417,21 @@
     <div class="content">
         <div class="page-header purchase-header">
             <div class="page-title">
-                <h4>{{ $pageTitle }}</h4>
+                <div class="purchase-title-row">
+                    <h4>{{ $pageTitle }}</h4>
+                    <div class="purchase-type-radios">
+                        <label class="custom-radio-label">
+                            <input type="radio" name="purchase_type_option" value="product"
+                                data-url="{{ route('purchase.add') }}" {{ $isRowMaterialPurchase ? '' : 'checked' }} />
+                            Product Purchase
+                        </label>
+                        <label class="custom-radio-label">
+                            <input type="radio" name="purchase_type_option" value="row-material"
+                                data-url="{{ route('purchase.row_material.add') }}" {{ $isRowMaterialPurchase ? 'checked' : '' }} />
+                            Row Material Purchase
+                        </label>
+                    </div>
+                </div>
                 <div class="purchase-tabs">
                     <a href="{{ route('purchase.add') }}" class="purchase-tab {{ $isRowMaterialPurchase ? '' : 'active' }}">Product Purchase</a>
                     <a href="{{ route('purchase.row_material.add') }}" class="purchase-tab {{ $isRowMaterialPurchase ? 'active' : '' }}">Row Material Purchase</a>
@@ -798,6 +835,14 @@
     <script>
         $(document).ready(function() {
             var authToken = localStorage.getItem("authToken");
+
+            $(document).on('change', 'input[name="purchase_type_option"]', function() {
+                const url = $(this).data('url');
+                if (url) {
+                    window.location.href = url;
+                }
+            });
+
             // Initialize Select2
             $(".vendor-select,.product-select,.category-select,#bank_id,.payment-mode-select,.purchase-status-select,.paid-type-container")
                 .select2({
