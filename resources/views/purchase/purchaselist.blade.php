@@ -466,7 +466,7 @@
 
         .mobile-action-buttons-simple {
             display: flex;
-            gap: 5px;
+            gap: 10px;
             flex-wrap: nowrap;
             align-items: center;
             justify-content: flex-start;
@@ -479,7 +479,7 @@
         .mobile-action-buttons-simple > a.btn-icon-mobile,
         .mobile-action-buttons-simple > button.btn-icon-mobile {
             flex: 0 0 auto;
-            min-width: 26px;
+            min-width: 32px;
         }
 
         .mobile-action-buttons-simple > .btn {
@@ -499,17 +499,17 @@
 
         .btn-icon-mobile,
         button.btn-icon-mobile {
-            width: 26px;
-            height: 26px;
+            width: 32px;
+            height: 32px;
             border-radius: 50%;
             display: inline-flex;
             align-items: center;
             justify-content: center;
             text-decoration: none;
             color: #1b2850;
-            background: transparent;
+            background: #f8f9fa;
             transition: all 0.3s;
-            border: 2px solid #1b2850;
+            border: 0;
             cursor: pointer;
             padding: 0;
             margin: 0;
@@ -520,18 +520,18 @@
         }
 
         button.btn-icon-mobile {
-            border: 2px solid #1b2850;
-            background: transparent;
+            border: 0;
+            background: #f8f9fa;
         }
 
         .btn-icon-mobile:hover {
-            background: #1b2850;
-            color: white;
-            transform: scale(1.1);
+            background: #e9ecef;
+            color: #1b2850;
+            transform: translateY(-2px);
         }
 
         .btn-icon-mobile i {
-            font-size: 12px;
+            font-size: 13px;
             line-height: 1;
             display: flex;
             align-items: center;
@@ -547,9 +547,13 @@
 
         .btn-icon-mobile.btn-history i,
         .btn-icon-mobile.btn-history svg {
-            font-size: 12px;
-            width: 14px;
-            height: 14px;
+            font-size: 13px;
+            width: 16px;
+            height: 16px;
+        }
+
+        .btn-icon-mobile.btn-delete i {
+            color: #dc3545;
         }
 
         .mobile-badge {
@@ -893,7 +897,7 @@
 
         @media (max-width: 575.98px) {
             .content {
-                padding: 74px 14px 74px !important;
+                padding: 14px 14px 74px !important;
                 background: #eef3fa;
             }
 
