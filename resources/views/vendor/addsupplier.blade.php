@@ -94,10 +94,20 @@
                         <div class="col-lg-3 col-sm-6 col-6">
                             <div class="form-group">
                                 <label>State Code</label>
-                                <input type="text" name="state_code" id="state_code" class="form-control">
+                                <input type="text" name="state_code" id="state_code" class="form-control" placeholder="e.g. 24">
                                 <div class="text-danger error-state_code"></div>
                             </div>
                         </div>
+
+                        <!-- State Name (auto-filled) -->
+                        <div class="col-lg-3 col-sm-6 col-6">
+                            <div class="form-group">
+                                <label>State Name</label>
+                                <input type="text" name="state_name" id="state_name" class="form-control" readonly placeholder="Auto-filled">
+                                <div class="text-danger error-state_name"></div>
+                            </div>
+                        </div>
+
                         <div class="col-lg-3 col-sm-6 col-6">
                             <div class="form-group">
                                 <label>PAN Number</label>
@@ -105,7 +115,7 @@
                                 <span class="text-danger error-pan_number"></span>
                             </div>
                         </div>
-                        <div class="col-lg-3 col-sm-6 col-6">
+                        <div class="col-lg-4 col-sm-6 col-12">
                             <div class="form-group">
                                 <label>GST Number</label>
                                 <div class="gst-input-wrap">
@@ -118,7 +128,7 @@
                                 <span class="text-danger error-gst_number"></span>
                             </div>
                         </div>
-                        <div class="col-lg-6 col-12">
+                        <div class="col-lg-4 col-12">
                             <div class="form-group">
                                 <label>Address</label>
                                 <textarea name="address" id="address" class="form-control"></textarea>
@@ -126,7 +136,7 @@
                             </div>
                         </div>
 
-                        <div class="col-lg-6">
+                        <div class="col-lg-4 col-12">
                             <div class="form-group">
                                 <label>Photo</label>
                                 <div class="image-upload">
@@ -163,6 +173,47 @@
         $(document).ready(function() {
             var authToken = localStorage.getItem("authToken");
             let $gstLoader = $('#gst-loader');
+
+            // State code → name lookup
+            var stateCodeToName = {
+                "01": "Jammu and Kashmir",
+                "02": "Himachal Pradesh",
+                "03": "Punjab",
+                "04": "Chandigarh",
+                "05": "Uttarakhand",
+                "06": "Haryana",
+                "07": "Delhi",
+                "08": "Rajasthan",
+                "09": "Uttar Pradesh",
+                "10": "Bihar",
+                "11": "Sikkim",
+                "12": "Arunachal Pradesh",
+                "13": "Nagaland",
+                "14": "Manipur",
+                "15": "Mizoram",
+                "16": "Tripura",
+                "17": "Meghalaya",
+                "18": "Assam",
+                "19": "West Bengal",
+                "20": "Jharkhand",
+                "21": "Odisha",
+                "22": "Chhattisgarh",
+                "23": "Madhya Pradesh",
+                "24": "Gujarat",
+                "25": "Daman and Diu",
+                "26": "Dadra and Nagar Haveli",
+                "27": "Maharashtra",
+                "28": "Andhra Pradesh",
+                "29": "Karnataka",
+                "30": "Goa",
+                "31": "Lakshadweep",
+                "32": "Kerala",
+                "33": "Tamil Nadu",
+                "34": "Puducherry",
+                "35": "Andaman and Nicobar Islands",
+                "36": "Telangana",
+                "37": "Andhra Pradesh (New)"
+            };
 
             $('#gst_number').on('input', function() {
                 let $gstInput = $(this);
@@ -243,6 +294,9 @@
                         } else {
                             $('#state_code').val(stateName);
                         }
+                        // Auto-fill state name field
+                        $('#state_name').val(stateName);
+
                         // Populate fields based on API response
                         $('#supplier_name').val(res.legal_name || '');
                         $('#address').val(res.primary_address || '');
@@ -275,6 +329,10 @@
 
                 this.value = this.value.replace(/[^0-9]/g, '').substring(0, 3);
 
+                // Auto-fill state name
+                var code = this.value.replace(/[^0-9]/g, '');
+                var padded = code.padStart(2, '0');
+                $('#state_name').val(stateCodeToName[padded] || '');
             });
             // $('#state_code').on('input', function() {
             //     this.value = this.value.replace(/[^a-zA-Z\s]/g, '');

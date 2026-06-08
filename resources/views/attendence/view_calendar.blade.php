@@ -1300,6 +1300,7 @@
         const populateUserFilter = () => {
             const userFilter = document.getElementById('user-filter');
             if (!userFilter) return; // Filter doesn't exist for employee users
+            const selectedUserId = userFilter.value;
 
             userFilter.innerHTML = '<option value="">Select Staff</option>';
 
@@ -1313,10 +1314,37 @@
                 option.textContent = user.employee_name;
                 userFilter.appendChild(option);
             });
+
+            if (selectedUserId && users.some(user => String(user.user_id) === String(selectedUserId))) {
+                userFilter.value = selectedUserId;
+            }
+
+            if (window.jQuery && jQuery.fn.select2) {
+                jQuery(userFilter).trigger('change.select2');
+            }
+        };
+
+        const getSelectedUserId = () => {
+            const userFilterEl = document.getElementById('user-filter');
+            if (!userFilterEl) return '';
+
+            const selectedValue = userFilterEl.value;
+            if (!selectedValue) return '';
+
+            if (users.some(user => String(user.user_id) === String(selectedValue))) {
+                return selectedValue;
+            }
+
+            const selectedText = userFilterEl.options[userFilterEl.selectedIndex]?.textContent?.trim();
+            const selectedUser = users.find(user => user.employee_name === selectedText || user.employee_name === selectedValue);
+
+            return selectedUser ? selectedUser.user_id : selectedValue;
         };
 
         const loadAttendance = async (month, year) => {
             try {
+                currentMonth = parseInt(month);
+                currentYear = parseInt(year);
                 const response = await fetch(`/api/attendance/getAttendance/${month}/${year}`, { headers });
                 const data = await response.json();
 
@@ -1442,8 +1470,7 @@
         };
 
         const renderMobileAttendanceList = () => {
-            const userFilterEl = document.getElementById('user-filter');
-            const selectedUserId = userFilterEl ? userFilterEl.value : '';
+            const selectedUserId = getSelectedUserId();
             const mobileList = document.getElementById('mobile-attendance-list');
             const todayDate = new Date().toISOString().split('T')[0];
 
@@ -1572,8 +1599,7 @@
             const todayDate = new Date().toISOString().split('T')[0];
             const selectedMonth = parseInt(document.getElementById('month-select').value);
             const selectedYear = parseInt(document.getElementById('year-select').value);
-            const userFilterEl = document.getElementById('user-filter');
-            const selectedUserId = userFilterEl ? userFilterEl.value : '';
+            const selectedUserId = getSelectedUserId();
 
             const daysInMonth = new Date(selectedYear, selectedMonth, 0).getDate();
             const firstDay = new Date(selectedYear, selectedMonth - 1, 1).getDay();
@@ -1728,25 +1754,40 @@
         window.renderDesktopCalendar = renderDesktopCalendar;
 
         // Event listeners
-        document.getElementById('month-select').addEventListener('change', () => {
+        const handleMonthChange = () => {
             currentMonth = parseInt(document.getElementById('month-select').value);
+            selectedDate = `${currentYear}-${String(currentMonth).padStart(2, '0')}-01`;
             loadAttendance(currentMonth, currentYear);
-        });
+        };
 
-        document.getElementById('year-select').addEventListener('change', () => {
+        const handleYearChange = () => {
             currentYear = parseInt(document.getElementById('year-select').value);
+            selectedDate = `${currentYear}-${String(currentMonth).padStart(2, '0')}-01`;
             loadAttendance(currentMonth, currentYear);
-        });
+        };
 
+        const handleUserFilterChange = () => {
+            if (isMobile) {
+                renderMobileAttendanceList();
+            } else {
+                renderCalendar();
+            }
+        };
+
+        const monthSelectEl = document.getElementById('month-select');
+        const yearSelectEl = document.getElementById('year-select');
         const userFilterEl = document.getElementById('user-filter');
-        if (userFilterEl) {
-            userFilterEl.addEventListener('change', () => {
-                if (isMobile) {
-                    renderMobileAttendanceList();
-                } else {
-                    renderCalendar();
-                }
-            });
+
+        if (window.jQuery) {
+            jQuery(monthSelectEl).on('change', handleMonthChange);
+            jQuery(yearSelectEl).on('change', handleYearChange);
+            jQuery(userFilterEl).on('change', handleUserFilterChange);
+        } else {
+            monthSelectEl.addEventListener('change', handleMonthChange);
+            yearSelectEl.addEventListener('change', handleYearChange);
+            if (userFilterEl) {
+                userFilterEl.addEventListener('change', handleUserFilterChange);
+            }
         }
 
         // Load initial data

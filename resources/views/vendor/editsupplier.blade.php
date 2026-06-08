@@ -78,9 +78,15 @@
                     <div class="col-lg-3 col-sm-6 col-6">
                         <div class="form-group">
                             <label>State Code</label>
-                            <input type="text" id="state_code" class="form-control">
+                            <input type="text" id="state_code" class="form-control" placeholder="e.g. 24">
                             <span class="text-danger error-state_code"></span>
-
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-sm-6 col-6">
+                        <div class="form-group">
+                            <label>State Name</label>
+                            <input type="text" id="state_name" class="form-control" readonly placeholder="Auto-filled">
+                            <span class="text-danger error-state_name"></span>
                         </div>
                     </div>
                     <div class="col-lg-3 col-sm-6 col-6">
@@ -88,26 +94,23 @@
                             <label>PAN Number</label>
                             <input type="text" id="pan_number" maxlength="10" class="form-control">
                             <span class="text-danger error-pan_number"></span>
-
                         </div>
                     </div>
-                    <div class="col-lg-3 col-sm-6 col-6">
+                    <div class="col-lg-4 col-sm-6 col-12">
                         <div class="form-group">
                             <label>GST Number</label>
                             <input type="text" id="gst_number" maxlength="15" class="form-control">
                             <span class="text-danger error-gst_number"></span>
-
                         </div>
                     </div>
-                    <div class="col-lg-6 col-12">
+                    <div class="col-lg-4 col-12">
                         <div class="form-group">
                             <label>Address</label>
                             <textarea id="address" class="form-control"></textarea>
                             <span class="text-danger error-address"></span>
-
                         </div>
                     </div>
-                    <div class="col-lg-6">
+                    <div class="col-lg-4 col-12">
                         <div class="form-group">
                             <label>Photo</label>
                             <div class="image-upload">
@@ -124,7 +127,6 @@
                                     style="max-width: 150px; border-radius: 8px;">
                             </div>
                             <span class="text-danger error-avatar"></span>
-
                         </div>
                     </div>
                     <div class="col-lg-12">
@@ -142,6 +144,54 @@
     <script>
         $(document).ready(function() {
 
+            // State code → name lookup
+            var stateCodeToName = {
+                "01": "Jammu and Kashmir",
+                "02": "Himachal Pradesh",
+                "03": "Punjab",
+                "04": "Chandigarh",
+                "05": "Uttarakhand",
+                "06": "Haryana",
+                "07": "Delhi",
+                "08": "Rajasthan",
+                "09": "Uttar Pradesh",
+                "10": "Bihar",
+                "11": "Sikkim",
+                "12": "Arunachal Pradesh",
+                "13": "Nagaland",
+                "14": "Manipur",
+                "15": "Mizoram",
+                "16": "Tripura",
+                "17": "Meghalaya",
+                "18": "Assam",
+                "19": "West Bengal",
+                "20": "Jharkhand",
+                "21": "Odisha",
+                "22": "Chhattisgarh",
+                "23": "Madhya Pradesh",
+                "24": "Gujarat",
+                "25": "Daman and Diu",
+                "26": "Dadra and Nagar Haveli",
+                "27": "Maharashtra",
+                "28": "Andhra Pradesh",
+                "29": "Karnataka",
+                "30": "Goa",
+                "31": "Lakshadweep",
+                "32": "Kerala",
+                "33": "Tamil Nadu",
+                "34": "Puducherry",
+                "35": "Andaman and Nicobar Islands",
+                "36": "Telangana",
+                "37": "Andhra Pradesh (New)"
+            };
+
+            function resolveStateName(code) {
+                if (!code) return '';
+                var raw = String(code).split(' - ')[0].trim();
+                var padded = raw.padStart(2, '0');
+                return stateCodeToName[padded] || '';
+            }
+
             $('#state_code').on('input', function() {
 
                 let value = this.value;
@@ -154,6 +204,8 @@
                 // Only number allow + max 3 digit
                 this.value = value.replace(/[^0-9]/g, '').substring(0, 3);
 
+                // Auto-fill state name
+                $('#state_name').val(resolveStateName(this.value));
             });
 
             $("#phone").on("input", function() {
@@ -200,6 +252,8 @@
                         $("#country").val(customer.details.country);
                         $("#city").val(customer.details.city);
                         $("#state_code").val(customer.state_code);
+                        // Auto-fill state name
+                        $("#state_name").val(resolveStateName(customer.state_code || ""));
                         $("#address").val(customer.details.address);
                         $("#pan_number").val(customer.pan_number);
                         $("#gst_number").val(customer.gst_number);
@@ -275,6 +329,7 @@
                 formData.append("country", $("#country").val());
                 formData.append("city", $("#city").val());
                 formData.append("state_code", $("#state_code").val());
+                formData.append("state_name", $("#state_name").val());
                 formData.append("address", $("#address").val());
                 formData.append("pan_number", $("#pan_number").val());
                 formData.append("gst_number", $("#gst_number").val());
