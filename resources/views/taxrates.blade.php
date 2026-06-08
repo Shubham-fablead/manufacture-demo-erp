@@ -489,7 +489,7 @@
                                 <label>Status</label>
                                 <select class="select">
                                     <option value="active"> Active</option>
-                                    <option value="inactive"> DeActive</option>
+                                    <option value="inactive"> Inactive</option>
                                 </select>
                             </div>
                         </div>
@@ -532,7 +532,7 @@
                                 <label>Status</label>
                                 <select class="select">
                                     <option value="active"> Active</option>
-                                    <option value="inactive"> DeActive</option>
+                                    <option value="inactive"> Inactive</option>
                                 </select>
                             </div>
                         </div>
@@ -557,7 +557,7 @@
         function buildTaxRateExpandableRowContent(tax) {
             const statusBadge = tax.status === "active" ?
                 '<span class="badge bg-success">Active</span>' :
-                '<span class="badge bg-danger">DeActive</span>';
+                '<span class="badge bg-danger">Inactive</span>';
 
             // Build action buttons HTML
             let actionButtons = '';
@@ -722,7 +722,7 @@
 
                             let statusBadge = tax.status === "active" ?
                                 '<span class="badge bg-success">Active</span>' :
-                                '<span class="badge bg-danger">DeActive</span>';
+                                '<span class="badge bg-danger">Inactive</span>';
 
                             // Toggle button for Details column
                             const detailsToggle = `

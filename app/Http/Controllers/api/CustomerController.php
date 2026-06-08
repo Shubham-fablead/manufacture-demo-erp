@@ -16,6 +16,57 @@ use Illuminate\Validation\Rule;
 class CustomerController extends Controller
 {
     /* ---------------------------------------------------------
+       Helper: Resolve State Name from Code
+    --------------------------------------------------------- */
+    private function stateName($code)
+    {
+        $states = [
+            '01' => 'Jammu and Kashmir',
+            '02' => 'Himachal Pradesh',
+            '03' => 'Punjab',
+            '04' => 'Chandigarh',
+            '05' => 'Uttarakhand',
+            '06' => 'Haryana',
+            '07' => 'Delhi',
+            '08' => 'Rajasthan',
+            '09' => 'Uttar Pradesh',
+            '10' => 'Bihar',
+            '11' => 'Sikkim',
+            '12' => 'Arunachal Pradesh',
+            '13' => 'Nagaland',
+            '14' => 'Manipur',
+            '15' => 'Mizoram',
+            '16' => 'Tripura',
+            '17' => 'Meghalaya',
+            '18' => 'Assam',
+            '19' => 'West Bengal',
+            '20' => 'Jharkhand',
+            '21' => 'Odisha',
+            '22' => 'Chhattisgarh',
+            '23' => 'Madhya Pradesh',
+            '24' => 'Gujarat',
+            '25' => 'Daman and Diu',
+            '26' => 'Dadra and Nagar Haveli',
+            '27' => 'Maharashtra',
+            '28' => 'Andhra Pradesh',
+            '29' => 'Karnataka',
+            '30' => 'Goa',
+            '31' => 'Lakshadweep',
+            '32' => 'Kerala',
+            '33' => 'Tamil Nadu',
+            '34' => 'Puducherry',
+            '35' => 'Andaman and Nicobar Islands',
+            '36' => 'Telangana',
+            '37' => 'Andhra Pradesh (New)',
+        ];
+
+        // Normalise: accept "24" or "24 - Gujarat" or " 24 "
+        $normalised = str_pad(trim((string) $code), 2, '0', STR_PAD_LEFT);
+
+        return $states[$normalised] ?? '';
+    }
+
+    /* ---------------------------------------------------------
        Helper: Resolve Branch ID
     --------------------------------------------------------- */
     private function resolveBranchId($authUser, Request $request)
@@ -225,6 +276,7 @@ class CustomerController extends Controller
                 'pan_number' => $request->pan_number,
                 'role'       => 'customer',
                 'state_code' => $request->state_code,
+                'state_name' => $this->stateName($request->state_code),
                 'branch_id'  => $branchId,
                 'created_by' => $authUser->id,
                 'status'     => 1,
@@ -385,6 +437,7 @@ class CustomerController extends Controller
             'gst_number' => $request->gst_number,
             'pan_number' => $request->pan_number,
             'state_code' => $request->state_code,
+            'state_name' => $this->stateName($request->state_code),
         ]);
 
         // if ($request->hasFile('avatar')) {
@@ -442,6 +495,7 @@ class CustomerController extends Controller
             'role'          => $user->role,
             'profile_image' => $user->profile_image,
             'state_code'    => $user->state_code,
+            'state_name'    => $user->state_name,
             'address'       => optional($user->userDetail)->address ?? 'N/A',
             'city'          => optional($user->userDetail)->city ?? 'N/A',
             'country'       => optional($user->userDetail)->country ?? 'N/A',

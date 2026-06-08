@@ -198,10 +198,9 @@ class AttendanceeController extends Controller
         // Calculate late minutes
         $openTimeStr = $this->normalizeTime($settings->open_time ?? '09:00:00');
         $openTime = \Carbon\Carbon::createFromFormat('H:i:s', $openTimeStr, 'Asia/Kolkata')->setDateFrom($now);
-        $graceTimeStr = $settings->grace_period ?? null;
-        if ($graceTimeStr) {
-            $graceTimeStr = $this->normalizeTime($graceTimeStr);
-            $openTime = \Carbon\Carbon::createFromFormat('H:i:s', $graceTimeStr, 'Asia/Kolkata')->setDateFrom($now);
+        $gracePeriodMinutes = (int) ($settings->grace_period ?? 0);
+        if ($gracePeriodMinutes > 0) {
+            $openTime->addMinutes($gracePeriodMinutes);
         }
 
         $isLate = 0;

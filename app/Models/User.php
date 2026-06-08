@@ -26,6 +26,7 @@ class User extends Authenticatable
         'phone',
         'role',
         'state_code',
+        'state_name',
         'gst_number',
         'pan_number',
         'password',
