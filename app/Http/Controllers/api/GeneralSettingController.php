@@ -75,6 +75,8 @@ class GeneralSettingController extends Controller
             'branch' => 'sometimes|required|string',
             'ac_no' => 'sometimes|required|string',
             'ifsc_code' => 'sometimes|required|string',
+            'tax_deduction_amount' => 'nullable|numeric|min:0',
+            'salary_amount_exceeds' => 'nullable|numeric|min:0',
             // ✅ New Rules validation
             'working_hours'     => 'nullable|numeric|min:0',
             'sunday_off'        => 'nullable|in:yes,no',
@@ -144,6 +146,8 @@ class GeneralSettingController extends Controller
         $settings->branch = $request->input('branch', $settings->branch);
         $settings->ac_no = $request->input('ac_no', $settings->ac_no);
         $settings->ifsc_code = $request->input('ifsc_code', $settings->ifsc_code);
+        $settings->tax_deduction_amount = $request->input('tax_deduction_amount', $settings->tax_deduction_amount);
+        $settings->salary_amount_exceeds = $request->input('salary_amount_exceeds', $settings->salary_amount_exceeds);
         // 🕒 Company Rules
         $settings->working_hours = $request->input('working_hours', $settings->working_hours);
         $settings->sunday_off    = $request->input('sunday_off', $settings->sunday_off);

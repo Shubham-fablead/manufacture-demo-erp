@@ -36,6 +36,8 @@ use Illuminate\Support\Facades\Storage;
             'lunch_break',
             'open_time',
             'close_time',
+            'tax_deduction_amount',
+            'salary_amount_exceeds',
             'invoice_size',
             'send_mail',
             'tds_apply',

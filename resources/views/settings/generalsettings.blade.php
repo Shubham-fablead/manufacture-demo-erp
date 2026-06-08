@@ -352,7 +352,7 @@
                             <div class="col-lg-3 col-sm-6">
                                 <div class="form-group">
                                     <label>Working Hours (per day)<span class="manitory">*</span></label>
-                                    <input type="time" id="working_hours" class="form-control" placeholder="e.g. 8">
+                                    <input type="number" step="0.5" id="working_hours" class="form-control" placeholder="e.g. 8.5">
                                 </div>
                             </div>
 
@@ -394,8 +394,8 @@
 
                             <div class="col-lg-3 col-sm-6">
                                 <div class="form-group">
-                                    <label>Grace Period<span class="manitory">*</span></label>
-                                    <input type="time" id="grace_period" class="form-control" placeholder="e.g. 10">
+                                    <label>Grace Period (minutes)<span class="manitory">*</span></label>
+                                    <input type="number" id="grace_period" class="form-control" placeholder="e.g. 30" min="0">
                                 </div>
                             </div>
 
@@ -425,6 +425,21 @@
                                     <label>Overtime After (hours)</label>
                                     <input type="number" step="0.5" id="overtime_after_hours" class="form-control" placeholder="e.g. 9">
                                     <small class="text-muted">Hours after which overtime starts (e.g. 9 for 8h shift + 1h grace)</small>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-3 col-sm-6">
+                                <div class="form-group">
+                                    <label>Tax Deduction Amount</label>
+                                    <input type="number" step="0.01" id="tax_deduction_amount" class="form-control" placeholder="e.g. 200.00">
+                                    <small class="text-muted">Tax deduction will be applied only when the salary amount exceeds this value.</small>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-3 col-sm-6">
+                                <div class="form-group">
+                                    <label>Salary Amount Exceeds</label>
+                                    <input type="number" step="0.01" id="salary_amount_exceeds" class="form-control" placeholder="e.g. 13999.98">
                                 </div>
                             </div>
 
@@ -889,10 +904,8 @@
                         const settings = response.settings;
 
                         // 🏢 Company Rules
-                        $("#working_hours").val(settings.working_hours ? settings.working_hours
-                            .substring(0, 5) : '');
-                        $("#grace_period").val(settings.grace_period ? settings.grace_period.substring(
-                            0, 5) : '');
+                        $("#working_hours").val(settings.working_hours ?? '');
+                        $("#grace_period").val(settings.grace_period ?? '');
                         $("#lunch_break").val(settings.lunch_break ?? '');
                         $("#open_time").val(settings.open_time ? settings.open_time.substring(0, 5) :
                             '');
@@ -939,6 +952,8 @@
                         $("#ac_no").val(settings.ac_no);
                         $("#ifsc_code").val(settings.ifsc_code);
                         $("#invoice_size").val(settings.invoice_size || 'big');
+                        $("#tax_deduction_amount").val(settings.tax_deduction_amount ?? '');
+                        $("#salary_amount_exceeds").val(settings.salary_amount_exceeds ?? '');
                         $("#send_mail").val(
                             settings.send_mail === null || settings.send_mail === undefined
                             ? '1'
@@ -1529,6 +1544,8 @@
                 if (qr_code) formData.append("qr_code", qr_code);
                 formData.append("_token", "{{ csrf_token() }}");
                 formData.append("invoice_size", $("#invoice_size").val());
+                formData.append("tax_deduction_amount", $("#tax_deduction_amount").val());
+                formData.append("salary_amount_exceeds", $("#salary_amount_exceeds").val());
                 formData.append("send_mail", $("#send_mail").val());
                 formData.append("financial_year", $("#financial_year").val());
                 formData.append("tds_apply", $("#tds_apply").val());
