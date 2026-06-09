@@ -806,7 +806,7 @@
                                     $('#saturday_pay_type').val(data.company_rules.saturday_pay_type ?? 'unpaid');
                                     $('#enable_tax').val(data.company_rules.enable_tax ?? 1);
                                     $('#tax_type').val(data.company_rules.tax_type ?? 'percentage');
-                                    $('#salary_above_tax').val(data.salary_above_tax ?? 12000);
+                                    $('#salary_above_tax').val(data.salary_above_tax ?? 14000);
 
                                     // Update working days display based on month_year
                                     const monthYear = $('#month_year').val();
@@ -902,7 +902,7 @@
 
                     // Set tax deduction (can be updated in edit mode)
                     $('#tax_deduction').val(data.tax ?? 0).data('original-tax', data.tax ?? 0);
-                    $('#salary_above_tax').val(data.salary_above_tax ?? 12000);
+                    $('#salary_above_tax').val(data.salary_above_tax ?? 14000);
 
                     // Store company rules in hidden fields
                     $('#payroll_type').val(data.company_rules.payroll_type ?? 'monthly');
@@ -1154,9 +1154,9 @@
             const perDaySalary = salaryAmount / daysInMonth;
             const perHourSalary = perDaySalary / (parseFloat($('#working_hours_per_day').val()) || 8);
             // Tax calculation
-            const salaryAboveTax = parseFloat($('#salary_above_tax').val()) || 12000;
+            const salaryAboveTax = parseFloat($('#salary_above_tax').val()) || 14000;
             const taxValue = parseFloat($('#tax_deduction').data('original-tax')) || 0;
-            const taxDeduction = salaryAmount > salaryAboveTax ? taxValue : 0;
+            const taxDeduction = salaryAmount >= salaryAboveTax ? taxValue : 0;
             $('#tax_deduction').val(taxDeduction);
             // Leave deduction - account for paid leave covering both full days and half days
             // Calculate how paid leave covers full days and half days

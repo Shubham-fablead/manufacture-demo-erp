@@ -18,6 +18,13 @@ class UserDetail extends Model
         'pan_number',
 
         'country',
+        'department_id',
+        'designation_id',
+        'joining_date',
+        'shift_time',
+        'working_location',
+        'salary',
+        'face_photo',
         'isDeleted',
         'created_at',
         'updated_at',

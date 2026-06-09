@@ -162,8 +162,12 @@
                                     <div class="upload-hint" id="leadImageHint">or click to choose a file</div>
                                 </div>
                             </label>
-                            <input type="file" class="lead-image-input" id="lead_image_input" name="image" accept="image/*">
-                            {{-- <div class="text-muted small mt-1">Allowed: AVIF, WEBP, JPG, JPEG, PNG, GIF, BMP, SVG. Max 2MB.</div> --}}
+                            <input type="file" class="lead-image-input" id="lead_image_input" name="image" accept="image/jpeg,image/jpg,image/png">
+                            <div id="leadImagePreviewWrap" style="display:none; margin-top:8px; text-align:center;">
+                                <img id="leadImagePreview" src="" alt="Preview"
+                                    style="max-width:100%; max-height:150px; border-radius:6px; border:1px solid #e5e7eb; object-fit:cover;">
+                                <div id="leadImagePreviewName" style="font-size:12px; color:#6b7280; margin-top:4px;"></div>
+                            </div>
                             <div class="text-danger field-error" data-field="image"></div>
                         </div>
                         <div class="col-12 d-flex  gap-2">
@@ -280,6 +284,8 @@
         const imageText = document.getElementById('leadImageText');
         const imageHint = document.getElementById('leadImageHint');
 
+        const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+
         function updateImageLabel(file) {
             if (file) {
                 imageText.textContent = file.name;
@@ -290,8 +296,43 @@
             }
         }
 
+        function showImagePreview(file) {
+            const previewWrap = document.getElementById('leadImagePreviewWrap');
+            const previewImg  = document.getElementById('leadImagePreview');
+            const previewName = document.getElementById('leadImagePreviewName');
+            const errorDiv    = document.querySelector('[data-field="image"]');
+
+            if (!file) {
+                previewWrap.style.display = 'none';
+                previewImg.src = '';
+                previewName.textContent = '';
+                return;
+            }
+
+            if (!allowedTypes.includes(file.type)) {
+                previewWrap.style.display = 'none';
+                if (errorDiv) errorDiv.textContent = 'Only JPG, JPEG and PNG files are allowed.';
+                // Clear the input
+                imageInput.value = '';
+                updateImageLabel(null);
+                return;
+            }
+
+            if (errorDiv) errorDiv.textContent = '';
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                previewImg.src = e.target.result;
+                previewName.textContent = file.name;
+                previewWrap.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        }
+
         imageInput?.addEventListener('change', function() {
-            updateImageLabel(this.files?.[0]);
+            const file = this.files?.[0];
+            updateImageLabel(file);
+            showImagePreview(file);
         });
 
         dropzone?.addEventListener('dragover', function(e) {
@@ -308,7 +349,9 @@
             this.classList.remove('is-dragover');
             if (e.dataTransfer?.files?.length) {
                 imageInput.files = e.dataTransfer.files;
-                updateImageLabel(imageInput.files[0]);
+                const file = imageInput.files[0];
+                updateImageLabel(file);
+                showImagePreview(file);
             }
         });
     });

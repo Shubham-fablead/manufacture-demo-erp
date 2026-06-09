@@ -1,4 +1,9 @@
-<!-- Group Payroll Management -->
+@php
+    use App\Models\Setting;
+    $taxSettings = Setting::first();
+    $taxDeductionAmount = (float)($taxSettings->tax_deduction_amount ?? 0);
+    $salaryAmountExceeds = (float)($taxSettings->salary_amount_exceeds ?? 0);
+@endphp
 @extends('layout.app')
 @section('title', 'Salary Details')
 @section('content')
@@ -260,7 +265,6 @@
               <thead>
                 <tr>
                   <th>Name</th>
-                  <th>Base Salary</th>
                   <th>Leaves</th>
                   <th>Half-day</th>
                   <!-- <th>Paid Leave</th> -->
@@ -291,25 +295,22 @@
                           <img src="{{ env('ImagePath') }}/storage/{{ $emp['profile_image'] ?: 'customer/customer5.jpg' }}"
                             alt="Profile"
                             style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover; flex-shrink: 0;">
-                          <span class="capitalize-text" style="
-                            word-break: break-word;
-                            white-space: normal;
-                            overflow-wrap: break-word;
-                          "><?= e($emp["firstname"]) ?></span>
+                          <div>
+                            <span class="capitalize-text" style="word-break:break-word;white-space:normal;overflow-wrap:break-word;display:block;"><?= e($emp["firstname"]) ?></span>
+                            <small class="text-muted">₹<?= number_format($emp["salary"], 2) ?></small>
+                          </div>
                         <?php } else { ?>
                           <img src="<?= !empty($emp["profile_image"]) ? e($emp["profile_image"]) : "/public/admin/assets/img/customer/customer5.jpg" ?>"
                             alt="Profile"
                             style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover; flex-shrink: 0;">
-                          <span style="
-                            word-break: break-word;
-                            white-space: normal;
-                            overflow-wrap: break-word;
-                          "><?= e($emp["firstname"]) ?></span>
+                          <div>
+                            <span style="word-break:break-word;white-space:normal;overflow-wrap:break-word;display:block;"><?= e($emp["firstname"]) ?></span>
+                            <small class="text-muted">₹<?= number_format($emp["salary"], 2) ?></small>
+                          </div>
                         <?php } ?>
                       </div>
                     </a>
                   </td>
-                    <td data-label="Base Salary">₹<?= number_format($emp["salary"], 2) ?></td>
                     <td data-label="Leaves">
                       <!-- <div class="form-control form-control-sm" style="background-color: #f8f9fa; border: 1px solid #dee2e6; cursor: default;"> -->
 
@@ -317,7 +318,7 @@
                           value="<?= $emp["leaves"] ?>"
                           data-index="<?= $index ?>"
                           data-salary="<?= $emp["salary"] ?>"
-                          data-tax="<?= $emp["tax_amount"] ?? 0 ?>"
+                          data-tax="<?= ($emp['salary'] >= $salaryAmountExceeds && $salaryAmountExceeds > 0) ? $taxDeductionAmount : 0 ?>"
                           data-days="<?= $emp["days_in_month"] ?>"
                           data-month="<?= date("Y-m", strtotime($month)) ?>">
                       <!-- </div> -->
@@ -329,7 +330,7 @@
                           value="<?= $emp["half_days"] ?>"
                           data-index="<?= $index ?>"
                           data-salary="<?= $emp["salary"] ?>"
-                          data-tax="<?= $emp["tax_amount"] ?? 0 ?>"
+                          data-tax="<?= ($emp['salary'] >= $salaryAmountExceeds && $salaryAmountExceeds > 0) ? $taxDeductionAmount : 0 ?>"
                           data-days="<?= $emp["days_in_month"] ?>"
                           data-month="<?= date("Y-m", strtotime($month)) ?>">
                       <!-- </div> -->
@@ -443,6 +444,9 @@
 
 <script>
   document.addEventListener('DOMContentLoaded', function() {
+    // Tax rule from settings
+    const TAX_DEDUCTION_AMOUNT = {{ $taxDeductionAmount }};
+    const SALARY_AMOUNT_EXCEEDS = {{ $salaryAmountExceeds }};
     const now = new Date();
     // Set to last month by default
     const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
@@ -615,8 +619,12 @@
       const halfDays = parseFloat(halfInput.value) || 0;
       const advancePayment = parseFloat(row.querySelector('.advance-input').value) || 0;
       const salary = parseFloat(leaveInput.dataset.salary) || 0;
-      const tax = parseFloat(leaveInput.dataset.tax) || 0;
       const daysInMonth = parseInt(leaveInput.dataset.days) || 30;
+
+      // Apply tax rule: if salary >= threshold → tax deduction amount, else 0
+      const tax = (SALARY_AMOUNT_EXCEEDS > 0 && salary >= SALARY_AMOUNT_EXCEEDS)
+        ? TAX_DEDUCTION_AMOUNT
+        : 0;
 
       // Same formula as payroll.blade.php
       const perDay = salary / daysInMonth;
@@ -628,6 +636,13 @@
       const salaryDeduction = (leaves * perDay) + (halfDays * (perDay / 2));
       // Net = Base - Deduction + Overtime - Tax - Advance Payment
       const netSalary = salary - salaryDeduction + overtimePay - tax - advancePayment;
+
+      // Update Tax cell (index 8 = 9th td)
+      const cells = row.querySelectorAll('td');
+      const taxCell = cells[8];
+      if (taxCell && !taxCell.querySelector('.tax-edit')) {
+        taxCell.textContent = tax.toFixed(2);
+      }
 
       // Update visible cells
       const deductionSpan = row.querySelector('.deduction-cell span');
@@ -911,4 +926,3 @@
 </script>
 
 @endsection
-
