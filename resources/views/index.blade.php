@@ -854,7 +854,24 @@
         font-size: 11px;
     }
 
-    .overview-section .status-pill {
+    .overview-section .crm-table-scroll {
+        max-height: 220px;
+        overflow-y: auto;
+    }
+
+    .overview-section .crm-table-scroll::-webkit-scrollbar {
+        width: 4px;
+    }
+
+    .overview-section .crm-table-scroll::-webkit-scrollbar-track {
+        background: #f1f3f5;
+        border-radius: 4px;
+    }
+
+    .overview-section .crm-table-scroll::-webkit-scrollbar-thumb {
+        background: #ff9f43;
+        border-radius: 4px;
+    }
         display: inline-block;
         padding: 3px 8px;
         border-radius: 10px;
@@ -1447,7 +1464,149 @@
                     @endif
                 </div>
 
+             
+
                 <div class="row g-3 mt-1">
+                    @if ($dashboardSettings['crm_pipeline_quality_table'] === 'Enable')
+                        <div class="col-lg-4">
+                            <div class="panel-card">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <h5 class="card-title mb-0">Pipeline Quality</h5>
+                                    <a href="{{ route('lead.list') }}" class="btn btn-sm btn-primary">View All</a>
+                                </div>
+                                <div class="table-responsive mobile-toggle-table crm-table-scroll">
+                                    <table class="table mb-0">
+                                        <thead><tr><th>Status</th><th class="details-column">Details</th><th>Leads</th><th>Share</th></tr></thead>
+                                        <tbody>
+                                            @forelse ($leadStatusMix as $status => $total)
+                                                <tr>
+                                                    <td>
+                                                        <div>
+                                                            <span class="order-id ms-0">{{ $status }}</span>
+                                                            <div class="collapse mobile-details-collapse d-md-none" id="pipeline-quality-{{ $loop->index }}">
+                                                                <div class="mobile-details-row">
+                                                                    <span class="mobile-details-label">Leads:</span>
+                                                                    <span class="mobile-details-value">{{ $total }}</span>
+                                                                </div>
+                                                                <div class="mobile-details-row">
+                                                                    <span class="mobile-details-label">Share:</span>
+                                                                    <span class="mobile-details-value">{{ $leadTotal > 0 ? round(($total / $leadTotal) * 100) : 0 }}%</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td class="details-column">
+                                                        <a href="#pipeline-quality-{{ $loop->index }}" class="toggle-details" data-bs-toggle="collapse">
+                                                            <i class="fas fa-plus-circle" style="color: #ff9f43;"></i>
+                                                        </a>
+                                                    </td>
+                                                    <td class="d-none d-md-table-cell">{{ $total }}</td>
+                                                    <td class="d-none d-md-table-cell">{{ $leadTotal > 0 ? round(($total / $leadTotal) * 100) : 0 }}%</td>
+                                                </tr>
+                                            @empty
+                                                <tr><td colspan="4" class="text-center text-muted">No pipeline data</td></tr>
+                                            @endforelse
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
+                    @if ($dashboardSettings['crm_recent_leads_table'] === 'Enable')
+                        <div class="col-lg-4">
+                            <div class="panel-card">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <h5 class="card-title mb-0">Recent Leads</h5>
+                                    <a href="{{ route('lead.list') }}" class="btn btn-sm btn-primary">View All</a>
+                                </div>
+                                <div class="table-responsive mobile-toggle-table crm-table-scroll">
+                                    <table class="table mb-0">
+                                        <thead><tr><th>Lead</th><th class="details-column">Details</th><th>Status</th><th>Owner</th></tr></thead>
+                                        <tbody>
+                                            @forelse ($recentLeads as $lead)
+                                                <tr>
+                                                    <td>
+                                                        <div>
+                                                            <span class="order-id ms-0">{{ $lead->name }}</span>
+                                                            <div><small>{{ $lead->company_name }}</small></div>
+                                                            <div class="collapse mobile-details-collapse d-md-none" id="recent-lead-{{ $lead->id }}">
+                                                                <div class="mobile-details-row">
+                                                                    <span class="mobile-details-label">Status:</span>
+                                                                    <span class="mobile-details-value">{{ $lead->lead_status ?? 'N/A' }}</span>
+                                                                </div>
+                                                                <div class="mobile-details-row">
+                                                                    <span class="mobile-details-label">Owner:</span>
+                                                                    <span class="mobile-details-value">{{ $lead->assignedUser?->name ?? 'N/A' }}</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td class="details-column">
+                                                        <a href="#recent-lead-{{ $lead->id }}" class="toggle-details" data-bs-toggle="collapse">
+                                                            <i class="fas fa-plus-circle" style="color: #ff9f43;"></i>
+                                                        </a>
+                                                    </td>
+                                                    <td class="d-none d-md-table-cell"><span class="status-pill">{{ $lead->lead_status ?? 'N/A' }}</span></td>
+                                                    <td class="d-none d-md-table-cell">{{ $lead->assignedUser?->name ?? 'N/A' }}</td>
+                                                </tr>
+                                            @empty
+                                                <tr><td colspan="4" class="text-center text-muted">No recent leads</td></tr>
+                                            @endforelse
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
+                    @if ($dashboardSettings['crm_next_7_days_table'] === 'Enable')
+                        <div class="col-lg-4">
+                            <div class="panel-card">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <h5 class="card-title mb-0">Next 7 Days</h5>
+                                    <a href="{{ route('followup.list') }}" class="btn btn-sm btn-primary">View All</a>
+                                </div>
+                                <div class="table-responsive mobile-toggle-table crm-table-scroll">
+                                    <table class="table mb-0">
+                                        <thead><tr><th>Work</th><th class="details-column">Details</th><th>Party</th><th>Due</th></tr></thead>
+                                        <tbody>
+                                            @forelse ($crmNextItems as $item)
+                                                <tr>
+                                                    <td>
+                                                        <div>
+                                                            <span class="order-id ms-0">{{ $item['work'] }}</span>
+                                                            <div><small>{{ $item['owner'] }}</small></div>
+                                                            <div class="collapse mobile-details-collapse d-md-none" id="next-seven-days-{{ $loop->index }}">
+                                                                <div class="mobile-details-row">
+                                                                    <span class="mobile-details-label">Party:</span>
+                                                                    <span class="mobile-details-value">{{ $item['party'] }}</span>
+                                                                </div>
+                                                                <div class="mobile-details-row">
+                                                                    <span class="mobile-details-label">Due:</span>
+                                                                    <span class="mobile-details-value">{{ $item['due'] }}</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td class="details-column">
+                                                        <a href="#next-seven-days-{{ $loop->index }}" class="toggle-details" data-bs-toggle="collapse">
+                                                            <i class="fas fa-plus-circle" style="color: #ff9f43;"></i>
+                                                        </a>
+                                                    </td>
+                                                    <td class="d-none d-md-table-cell">{{ $item['party'] }}</td>
+                                                    <td class="d-none d-md-table-cell">{{ $item['due'] }}</td>
+                                                </tr>
+                                            @empty
+                                                <tr><td colspan="4" class="text-center text-muted">No upcoming CRM work</td></tr>
+                                            @endforelse
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
+                </div>
+
+                   <div class="row g-3 mt-1">
                     @if ($dashboardSettings['crm_lead_status_mix_chart'] === 'Enable')
                         <div class="col-lg-5">
                             <div class="panel-card">
@@ -1525,146 +1684,6 @@
                                             <div class="month-label">{{ $activity['label'] }}</div>
                                         </div>
                                     @endforeach
-                                </div>
-                            </div>
-                        </div>
-                    @endif
-                </div>
-
-                <div class="row g-3 mt-1">
-                    @if ($dashboardSettings['crm_pipeline_quality_table'] === 'Enable')
-                        <div class="col-lg-4">
-                            <div class="panel-card">
-                                <div class="d-flex justify-content-between align-items-center mb-2">
-                                    <h5 class="card-title mb-0">Pipeline Quality</h5>
-                                    <a href="{{ route('lead.list') }}" class="btn btn-sm btn-primary">View All</a>
-                                </div>
-                                <div class="table-responsive mobile-toggle-table">
-                                    <table class="table mb-0">
-                                        <thead><tr><th>Status</th><th class="details-column">Details</th><th>Leads</th><th>Share</th></tr></thead>
-                                        <tbody>
-                                            @forelse ($leadStatusMix as $status => $total)
-                                                <tr>
-                                                    <td>
-                                                        <div>
-                                                            <span class="order-id ms-0">{{ $status }}</span>
-                                                            <div class="collapse mobile-details-collapse d-md-none" id="pipeline-quality-{{ $loop->index }}">
-                                                                <div class="mobile-details-row">
-                                                                    <span class="mobile-details-label">Leads:</span>
-                                                                    <span class="mobile-details-value">{{ $total }}</span>
-                                                                </div>
-                                                                <div class="mobile-details-row">
-                                                                    <span class="mobile-details-label">Share:</span>
-                                                                    <span class="mobile-details-value">{{ $leadTotal > 0 ? round(($total / $leadTotal) * 100) : 0 }}%</span>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </td>
-                                                    <td class="details-column">
-                                                        <a href="#pipeline-quality-{{ $loop->index }}" class="toggle-details" data-bs-toggle="collapse">
-                                                            <i class="fas fa-plus-circle" style="color: #ff9f43;"></i>
-                                                        </a>
-                                                    </td>
-                                                    <td class="d-none d-md-table-cell">{{ $total }}</td>
-                                                    <td class="d-none d-md-table-cell">{{ $leadTotal > 0 ? round(($total / $leadTotal) * 100) : 0 }}%</td>
-                                                </tr>
-                                            @empty
-                                                <tr><td colspan="4" class="text-center text-muted">No pipeline data</td></tr>
-                                            @endforelse
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                    @endif
-                    @if ($dashboardSettings['crm_recent_leads_table'] === 'Enable')
-                        <div class="col-lg-4">
-                            <div class="panel-card">
-                                <div class="d-flex justify-content-between align-items-center mb-2">
-                                    <h5 class="card-title mb-0">Recent Leads</h5>
-                                    <a href="{{ route('lead.list') }}" class="btn btn-sm btn-primary">View All</a>
-                                </div>
-                                <div class="table-responsive mobile-toggle-table">
-                                    <table class="table mb-0">
-                                        <thead><tr><th>Lead</th><th class="details-column">Details</th><th>Status</th><th>Owner</th></tr></thead>
-                                        <tbody>
-                                            @forelse ($recentLeads as $lead)
-                                                <tr>
-                                                    <td>
-                                                        <div>
-                                                            <span class="order-id ms-0">{{ $lead->name }}</span>
-                                                            <div><small>{{ $lead->company_name }}</small></div>
-                                                            <div class="collapse mobile-details-collapse d-md-none" id="recent-lead-{{ $lead->id }}">
-                                                                <div class="mobile-details-row">
-                                                                    <span class="mobile-details-label">Status:</span>
-                                                                    <span class="mobile-details-value">{{ $lead->lead_status ?? 'N/A' }}</span>
-                                                                </div>
-                                                                <div class="mobile-details-row">
-                                                                    <span class="mobile-details-label">Owner:</span>
-                                                                    <span class="mobile-details-value">{{ $lead->assignedUser?->name ?? 'N/A' }}</span>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </td>
-                                                    <td class="details-column">
-                                                        <a href="#recent-lead-{{ $lead->id }}" class="toggle-details" data-bs-toggle="collapse">
-                                                            <i class="fas fa-plus-circle" style="color: #ff9f43;"></i>
-                                                        </a>
-                                                    </td>
-                                                    <td class="d-none d-md-table-cell"><span class="status-pill">{{ $lead->lead_status ?? 'N/A' }}</span></td>
-                                                    <td class="d-none d-md-table-cell">{{ $lead->assignedUser?->name ?? 'N/A' }}</td>
-                                                </tr>
-                                            @empty
-                                                <tr><td colspan="4" class="text-center text-muted">No recent leads</td></tr>
-                                            @endforelse
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                    @endif
-                    @if ($dashboardSettings['crm_next_7_days_table'] === 'Enable')
-                        <div class="col-lg-4">
-                            <div class="panel-card">
-                                <div class="d-flex justify-content-between align-items-center mb-2">
-                                    <h5 class="card-title mb-0">Next 7 Days</h5>
-                                    <a href="{{ route('followup.list') }}" class="btn btn-sm btn-primary">View All</a>
-                                </div>
-                                <div class="table-responsive mobile-toggle-table">
-                                    <table class="table mb-0">
-                                        <thead><tr><th>Work</th><th class="details-column">Details</th><th>Party</th><th>Due</th></tr></thead>
-                                        <tbody>
-                                            @forelse ($crmNextItems as $item)
-                                                <tr>
-                                                    <td>
-                                                        <div>
-                                                            <span class="order-id ms-0">{{ $item['work'] }}</span>
-                                                            <div><small>{{ $item['owner'] }}</small></div>
-                                                            <div class="collapse mobile-details-collapse d-md-none" id="next-seven-days-{{ $loop->index }}">
-                                                                <div class="mobile-details-row">
-                                                                    <span class="mobile-details-label">Party:</span>
-                                                                    <span class="mobile-details-value">{{ $item['party'] }}</span>
-                                                                </div>
-                                                                <div class="mobile-details-row">
-                                                                    <span class="mobile-details-label">Due:</span>
-                                                                    <span class="mobile-details-value">{{ $item['due'] }}</span>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </td>
-                                                    <td class="details-column">
-                                                        <a href="#next-seven-days-{{ $loop->index }}" class="toggle-details" data-bs-toggle="collapse">
-                                                            <i class="fas fa-plus-circle" style="color: #ff9f43;"></i>
-                                                        </a>
-                                                    </td>
-                                                    <td class="d-none d-md-table-cell">{{ $item['party'] }}</td>
-                                                    <td class="d-none d-md-table-cell">{{ $item['due'] }}</td>
-                                                </tr>
-                                            @empty
-                                                <tr><td colspan="4" class="text-center text-muted">No upcoming CRM work</td></tr>
-                                            @endforelse
-                                        </tbody>
-                                    </table>
                                 </div>
                             </div>
                         </div>
