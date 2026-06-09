@@ -316,6 +316,8 @@
 
                         <input type="number" name="leaves[]" class="form-control form-control-sm leave-input"
                           value="<?= $emp["leaves"] ?>"
+                          min="0"
+                          max="<?= $emp["days_in_month"] ?>"
                           data-index="<?= $index ?>"
                           data-salary="<?= $emp["salary"] ?>"
                           data-tax="<?= ($emp['salary'] >= $salaryAmountExceeds && $salaryAmountExceeds > 0) ? $taxDeductionAmount : 0 ?>"
@@ -464,28 +466,27 @@
         { selector: null, name: 'tax', type: 'number' }
       ];
 
-      // Overtime Rate and Tax are not direct inputs, so we need to find their cells
-      // Overtime Rate: 7th column (index 6), Tax: 9th column (index 8)
+      // Overtime Rate: 6th column (index 5), Tax: 8th column (index 7)
       const cells = row.querySelectorAll('td');
       if (editable) {
         // Overtime Rate
-        let otRateCell = cells[6];
+        let otRateCell = cells[5];
         let otRateVal = otRateCell.textContent.replace('x','').trim();
         otRateCell.innerHTML = `<input type="number" step="0.01" min="0" class="form-control form-control-sm ot-rate-edit" value="${otRateVal}">x`;
         // Tax
-        let taxCell = cells[8];
+        let taxCell = cells[7];
         let taxVal = taxCell.textContent.trim();
         taxCell.innerHTML = `<input type="number" step="0.01" min="0" class="form-control form-control-sm tax-edit" value="${taxVal}">`;
       } else {
         // Overtime Rate
-        let otRateCell = cells[6];
+        let otRateCell = cells[5];
         let otRateInput = otRateCell.querySelector('.ot-rate-edit');
         if (otRateInput) {
           let val = parseFloat(otRateInput.value) || 1;
           otRateCell.innerHTML = `<div class="form-control form-control-sm" style="background-color:#f8f9fa;border:1px solid #dee2e6;min-width:60px;">${val.toFixed(2)}x</div>`;
         }
         // Tax
-        let taxCell = cells[8];
+        let taxCell = cells[7];
         let taxInput = taxCell.querySelector('.tax-edit');
         if (taxInput) {
           let val = parseFloat(taxInput.value) || 0;
@@ -531,8 +532,8 @@
         const totalOvertimeHours = (row.querySelector('.total-overtime-hours-input') && row.querySelector('.total-overtime-hours-input').value) || 0;
         const month = row.querySelector('.single-month').value;
         // Overtime Rate and Tax from new inputs
-        const otRate = row.querySelector('.ot-rate-edit') ? row.querySelector('.ot-rate-edit').value : (row.cells[6].textContent.replace('x','').trim());
-        const tax = row.querySelector('.tax-edit') ? row.querySelector('.tax-edit').value : row.cells[8].textContent.trim();
+        const otRate = row.querySelector('.ot-rate-edit') ? row.querySelector('.ot-rate-edit').value : (row.cells[5].textContent.replace('x','').trim());
+        const tax = row.querySelector('.tax-edit') ? row.querySelector('.tax-edit').value : row.cells[7].textContent.trim();
         // Deductions and net salary
         const deduction = row.querySelector('.deduction-input').value;
         const netSalary = row.querySelector('.net-salary-input').value;
@@ -637,9 +638,9 @@
       // Net = Base - Deduction + Overtime - Tax - Advance Payment
       const netSalary = salary - salaryDeduction + overtimePay - tax - advancePayment;
 
-      // Update Tax cell (index 8 = 9th td)
+      // Update Tax cell (index 7 = 8th td, after Base Salary column was removed)
       const cells = row.querySelectorAll('td');
-      const taxCell = cells[8];
+      const taxCell = cells[7];
       if (taxCell && !taxCell.querySelector('.tax-edit')) {
         taxCell.textContent = tax.toFixed(2);
       }
@@ -669,8 +670,21 @@
 
     leaveInputs.forEach(input => {
       const row = input.closest('tr');
-      input.addEventListener('input', () => updateRowCalculations(row));
-      input.addEventListener('change', () => updateRowCalculations(row));
+      const maxDays = parseInt(input.dataset.days) || 31;
+
+      function clampLeave() {
+        let val = parseFloat(this.value);
+        if (!isNaN(val) && val > maxDays) {
+          this.value = maxDays;
+        }
+        if (!isNaN(val) && val < 0) {
+          this.value = 0;
+        }
+        updateRowCalculations(row);
+      }
+
+      input.addEventListener('input', clampLeave);
+      input.addEventListener('change', clampLeave);
     });
 
     halfDayInputs.forEach(input => {

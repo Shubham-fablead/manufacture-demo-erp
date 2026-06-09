@@ -1109,7 +1109,7 @@
             @if ($dashboardSettings['erp_section_enabled'] === 'Enable')
                 {{-- Sales Chart --}}
                 @if (in_array($role, ['inventory-manager', 'sales-manager', 'admin', 'sub-admin']) && $dashboardSettings['erp_sales_chart'] === 'Enable')
-                    <div class="col-lg-6 col-sm-12 col-12 d-flex">
+                    <div class="col-lg-6 col-md-6 col-sm-12 col-12 d-flex">
                         <div class="card flex-fill">
                             <div class="card-header d-flex justify-content-between align-items-center">
                                 <div class="card-title mb-0">Sales</div>
@@ -1129,7 +1129,7 @@
                 @endif
                 {{-- Purchase Chart --}}
                 @if (in_array($role, ['inventory-manager', 'purchase-manager', 'admin', 'sub-admin']) && $dashboardSettings['erp_purchase_chart'] === 'Enable')
-                    <div class="col-lg-6 col-sm-12 col-12 d-flex">
+                    <div class="col-lg-6 col-md-6 col-sm-12 col-12 d-flex">
                         <div class="card flex-fill">
                             <div class="card-header d-flex justify-content-between align-items-center">
                                 <div class="card-title mb-0">Purchases</div>
@@ -1608,7 +1608,7 @@
 
                    <div class="row g-3 mt-1">
                     @if ($dashboardSettings['crm_lead_status_mix_chart'] === 'Enable')
-                        <div class="col-lg-5">
+                        <div class="col-lg-5 col-md-6">
                             <div class="panel-card">
                                 <h5 class="card-title">Lead Status Mix</h5>
                                 @php
@@ -1663,7 +1663,7 @@
                         </div>
                     @endif
                     @if ($dashboardSettings['crm_activity_trend_chart'] === 'Enable')
-                        <div class="col-lg-7">
+                        <div class="col-lg-7 col-md-6">
                             <div class="panel-card">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <h5 class="card-title mb-0">CRM Activity Trend</h5>
