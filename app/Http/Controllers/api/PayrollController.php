@@ -190,6 +190,7 @@ class PayrollController extends Controller
         $userId = (int) $request->query('user_id');
         $details = DB::table('user_details')->where('user_id', $userId)->first();
         $rules = CompanyRulesModel::query()->first();
+        $settings = Setting::query()->first();
 
         $overtimeMultiplier = 1;
         if ($details && $details->department_id) {
@@ -211,8 +212,8 @@ class PayrollController extends Controller
 
         return response()->json([
             'salary' => (float) ($details->salary ?? 0),
-            'tax' => (float) ($rules?->tax ?? 0),
-            'salary_above_tax' => (float) ($rules?->salary_above_tax ?? 0),
+            'tax' => (float) ($settings?->tax_deduction_amount ?? 200),
+            'salary_above_tax' => (float) ($settings?->salary_amount_exceeds ?? 14000),
             'acc_number' => '',
             'bank_name' => '',
             'ifsc_code' => '',
@@ -280,11 +281,13 @@ class PayrollController extends Controller
             $attendanceSummary = null;
         }
 
+        $settings = Setting::query()->first();
+
         return response()->json([
             'status' => 'success',
             'data' => $record,
-            'tax' => (float) ($rules?->tax ?? 0),
-            'salary_above_tax' => (float) ($rules?->salary_above_tax ?? 0),
+            'tax' => (float) ($settings?->tax_deduction_amount ?? 200),
+            'salary_above_tax' => (float) ($settings?->salary_amount_exceeds ?? 14000),
             'working_days' => $attendanceSummary['working_days'] ?? 0,
             'worked_hours' => $attendanceSummary['worked_hours'] ?? (float) ($record->worked_hours ?? 0),
             'debug' => ['calculation_error' => $calculationError],
@@ -492,10 +495,14 @@ class PayrollController extends Controller
         $month = $request->query('month', now()->subMonth()->format('Y-m'));
         [$start, $end] = $this->monthBoundsFromString($month);
         $rules = CompanyRulesModel::query()->first();
+        $settings = Setting::query()->first();
+        $taxAmount = (float) ($settings?->tax_deduction_amount ?? 200);
+        $taxThreshold = (float) ($settings?->salary_amount_exceeds ?? 14000);
 
-        $employees = $this->payrollUsers()->map(function ($user) use ($start, $end, $month, $rules) {
+        $employees = $this->payrollUsers()->map(function ($user) use ($start, $end, $month, $rules, $taxAmount, $taxThreshold) {
             $salary = (float) ($user->detail_salary ?? 0);
             $summary = $this->buildMonthlySummary($user->id, $start, $end, $salary, 0, $rules);
+            $taxDeduction = $salary >= $taxThreshold ? $taxAmount : 0;
             $existing = PayrollModel::query()
                 ->where('user_id', $user->id)
                 ->where('month_year', $month)
@@ -520,6 +527,10 @@ class PayrollController extends Controller
                 ->first();
 
             $pendingAdvance = max(0, (float)($advanceSummary->total_amount ?? 0) - (float)($advanceSummary->total_paid ?? 0));
+            $salaryDeduction = (float) ($existing?->salary_deduction ?? $summary['salary_deduction']);
+            $overtimePay = (float) ($existing?->overtime_pay ?? $summary['overtime_pay']);
+            $advancePayment = (float) ($existing?->bonuses ?? $pendingAdvance);
+            $netSalary = $salary - $salaryDeduction + $overtimePay - $taxDeduction - $advancePayment;
 
             return [
                 'id' => $user->id,
@@ -530,19 +541,19 @@ class PayrollController extends Controller
                 'leaves' => $existing ? $existing->total_leaves : ($summary['total_days'] - $summary['present_day_count']),
                 'half_days' => $existing ? $existing->total_half_day : $summary['half_days'],
                 'used_paid_leaves' => $existing?->used_paid_leaves ?? 0,
-                'salary_deduction' => $existing?->salary_deduction ?? $summary['salary_deduction'],
-                'net_salary' => $existing?->net_salary ?? $summary['net_salary'],
-                'tax' => number_format((float) ($existing?->tax_deduction ?? $summary['tax_deduction']), 2),
-                'tax_amount' => (float) ($existing?->tax_deduction ?? $summary['tax_deduction']),
+                'salary_deduction' => $salaryDeduction,
+                'net_salary' => $netSalary,
+                'tax' => number_format($taxDeduction, 2),
+                'tax_amount' => $taxDeduction,
                 'days_in_month' => $end->day,
                 'per_day' => $summary['per_day_salary'],
                 'per_hour' => $summary['per_hour_salary'],
-                'overtime_pay' => $existing?->overtime_pay ?? $summary['overtime_pay'],
+                'overtime_pay' => $overtimePay,
                 'total_overtime_hours' => $existing?->total_overtime_hours ?? $summary['total_overtime_hours'],
                 'overtime_multiplier' => $overtimeMultiplier,
                 'late_deduction' => $summary['late_deduction'],
                 'base_deduction' => $summary['salary_deduction'],
-                'advance_payment' => $existing?->bonuses ?? $pendingAdvance,
+                'advance_payment' => $advancePayment,
                 'is_saved' => (bool) $existing,
             ];
         })->values()->all();
@@ -1144,6 +1155,18 @@ $netSalary = round($earnedSalary + $overtimePay - $taxDeduction, 2);
 
     private function taxDeduction(float $salaryAmount, ?CompanyRulesModel $rules): float
     {
+        $settings = Setting::query()->first();
+        $taxAmount = (float) ($settings?->tax_deduction_amount ?? 200);
+        $threshold = (float) ($settings?->salary_amount_exceeds ?? 14000);
+
+        if ($salaryAmount >= $threshold) {
+            return $taxAmount;
+        }
+
+        if ($settings) {
+            return 0;
+        }
+
         if (! $rules || ! $rules->enable_tax) {
             return 0;
         }

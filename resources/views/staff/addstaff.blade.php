@@ -156,9 +156,9 @@
                         <!-- Salary -->
                         <div class="col-lg-3 col-sm-6 col-6">
                             <div class="form-group">
-                                <label>Salary <span class="text-danger">*</span></label>
+                                <label>Salary</label>
                                 <input type="number" name="salary" id="salary" min="0" step="0.01"
-                                    class="form-control" placeholder="Enter salary amount">
+                                    class="form-control" placeholder="Enter salary amount (optional)">
                                 <div class="text-danger error-salary"></div>
                             </div>
                         </div>
@@ -542,10 +542,7 @@
 
                 // ✅ Salary validation
                 let salary = $("#salary").val().trim();
-                if (salary === "") {
-                    $(".error-salary").html(" Salary is required. ");
-                    hasError = true;
-                } else if (parseFloat(salary) < 0) {
+                if (salary !== "" && parseFloat(salary) < 0) {
                     $(".error-salary").html(" Salary must be a positive number. ");
                     hasError = true;
                 }
@@ -607,6 +604,12 @@
                 
                 // Add the default role as required by the API
                 formData.append("role", "staff");
+                
+                // Ensure salary is always sent (number inputs can be omitted by browsers when empty)
+                const salaryVal = $("#salary").val();
+                if (salaryVal !== "") {
+                    formData.set("salary", salaryVal);
+                }
                 
                 $.ajax({
                     url: "/api/createStaff", // Ensure API route is correct

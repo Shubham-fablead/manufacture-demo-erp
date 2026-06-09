@@ -32,6 +32,10 @@ class GeneralSettingController extends Controller
         // dd($selectedSubAdminId);
         // Common: fetch settings (filter by branch if needed)
         $settings = Setting::where('branch_id', $selectedSubAdminId)->first();
+        if ($settings) {
+            $settings->tax_deduction_amount = $settings->tax_deduction_amount ?? 200;
+            $settings->salary_amount_exceeds = $settings->salary_amount_exceeds ?? 14000;
+        }
 
         return response()->json([
             'status'   => true,
@@ -146,8 +150,12 @@ class GeneralSettingController extends Controller
         $settings->branch = $request->input('branch', $settings->branch);
         $settings->ac_no = $request->input('ac_no', $settings->ac_no);
         $settings->ifsc_code = $request->input('ifsc_code', $settings->ifsc_code);
-        $settings->tax_deduction_amount = $request->input('tax_deduction_amount', $settings->tax_deduction_amount);
-        $settings->salary_amount_exceeds = $request->input('salary_amount_exceeds', $settings->salary_amount_exceeds);
+        $settings->tax_deduction_amount = $request->filled('tax_deduction_amount')
+            ? $request->input('tax_deduction_amount')
+            : ($settings->tax_deduction_amount ?? 200);
+        $settings->salary_amount_exceeds = $request->filled('salary_amount_exceeds')
+            ? $request->input('salary_amount_exceeds')
+            : ($settings->salary_amount_exceeds ?? 14000);
         // 🕒 Company Rules
         $settings->working_hours = $request->input('working_hours', $settings->working_hours);
         $settings->sunday_off    = $request->input('sunday_off', $settings->sunday_off);

@@ -424,15 +424,7 @@
             font-size: 13px;
             font-weight: 500;
         }
-
-        .login-footer {
-            position: relative;
-            z-index: 1;
-            flex: 0 0 auto;
-            padding-top: clamp(6px, 1.4vh, 12px);
-            text-align: center;
-            color: #667085;
-        }
+/
 
         .login-footer h1 {
             margin: 0;
@@ -445,9 +437,9 @@
             text-decoration: none;
         }
 
-        .login-footer h1:not(.login-footer-title) {
+        /* .login-footer h1:not(.login-footer-title) {
             display: none;
-        }
+        } */
 
         @media screen and (max-width: 768px) {
             body.account-page {
@@ -640,9 +632,18 @@
             </div>
         </div>
     </div>
-    <footer style="position: fixed; bottom: 0; left: 0; right: 0; text-align: center; padding: 10px 0; background-color: #f4f4f4; height: 50px; z-index: 1000; box-shadow: 0 -2px 5px rgba(0,0,0,0.1);">
+    {{-- <footer style="position: fixed; bottom: 0; left: 0; right: 0; text-align: center; padding: 10px 0; background-color: #f4f4f4; height: 50px; z-index: 1000; box-shadow: 0 -2px 5px rgba(0,0,0,0.1);">
         <h1 style="font-size: 14px; font-weight: 600; margin: 0;">© <?= date('Y') ?> <a href="https://fableadtechnolabs.com" target="_blank" style="color: inherit; text-decoration: none;">Copyright - Fablead Developers Technolab</a></h1>
-    </footer>
+    </footer> --}}
+
+    <footer style="position: fixed; bottom: 0; left: 0; right: 0; text-align: center; padding: 10px 0;  z-index: 1000; box-shadow: none;">
+    <h1 style="font-size: 14px; font-weight: 600; margin: 0;">
+        © <?= date('Y') ?>
+        <a href="https://fableadtechnolabs.com" target="_blank" style="color: inherit; text-decoration: none;">
+            Copyright - Fablead Developers Technolab
+        </a>
+    </h1>
+</footer>
 
     <script src="{{ env('ImagePath') . 'admin/assets/js/jquery-3.6.0.min.js'}}"></script>
 
