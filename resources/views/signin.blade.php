@@ -595,6 +595,15 @@
                                 </div>
                                 <small id="passwordError" class="text-danger"></small>
                             </div>
+                              <div class="signin-options">
+                                <label class="remember-login">
+                                    <input type="checkbox" id="remember">
+                                    <span>Remember me</span>
+                                </label>
+                                <!-- <div class="alreadyuser">
+                                    <a href="{{-- route('auth.forgetpassword') --}}" class="hover-a forgot-link">Forgot password?</a>
+                                </div> -->
+                            </div>
 
                             <div class="form-login">
                                 <div class="alreadyuser">

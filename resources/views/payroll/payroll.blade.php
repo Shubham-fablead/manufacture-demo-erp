@@ -185,7 +185,7 @@
                                 <!-- <div class="input-group-prepend">
                                     <span class="input-group-text"><i class="mdi mdi-airplane fs-5"></i></span>
                                 </div> -->
-                                <input type="number" class="form-control" id="total_leaves" name="total_leaves" value="0" step="any" />
+                                <input type="number" class="form-control" id="total_leaves" name="total_leaves" value="0" min="0" max="31" step="any" />
                             </div>
                         </div>
 
@@ -195,7 +195,7 @@
                                 <!-- <div class="input-group-prepend">
                                     <span class="input-group-text"><i class="mdi mdi-airplane fs-5"></i></span>
                                 </div> -->
-                                <input type="number" class="form-control" id="total_halfday_leaves" name="total_halfday_leaves" value="0" step="any" />
+                                <input type="number" class="form-control" id="total_halfday_leaves" name="total_halfday_leaves" value="0" min="0" max="62" step="any" />
                             </div>
                         </div>
 
@@ -304,14 +304,14 @@
                         <div class="col-md-3 form-group">
                             <label class="form-label">Working Days</label>
                             <div class="input-group">
-                                <input type="number" class="form-control" id="working_days_display" name="working_days_display" step="any" />
+                                <input type="number" class="form-control" id="working_days_display" name="working_days_display" min="0" max="31" step="any" />
                             </div>
                         </div>
 
                         <div class="col-md-3 form-group" id="presentDaysInfo" style="display:none;">
                             <label class="form-label">Present Days</label>
                             <div class="input-group">
-                                <input type="number" class="form-control" id="present_days_display" name="present_days_display" step="any" />
+                                <input type="number" class="form-control" id="present_days_display" name="present_days_display" min="0" max="31" step="any" />
                             </div>
                         </div>
 
@@ -447,6 +447,38 @@
             return new Date(year, month, 0).getDate();
         }
 
+        function clampNumber(value, min, max) {
+            const number = parseFloat(value);
+            if (Number.isNaN(number)) return min;
+            return Math.min(Math.max(number, min), max);
+        }
+
+        function getMaxPayrollDays() {
+            return Math.min(getDaysInCurrentMonth(), 31);
+        }
+
+        function normalizePayrollDayInputs() {
+            const maxDays = getMaxPayrollDays();
+            const workingDays = clampNumber($('#working_days_display').val() || maxDays, 0, maxDays);
+            const presentDays = clampNumber($('#present_days_display').val() || 0, 0, workingDays || maxDays);
+            const fullLeaves = clampNumber($('#total_leaves').val() || 0, 0, workingDays || maxDays);
+            const remainingHalfDaySlots = Math.max(((workingDays || maxDays) - fullLeaves) * 2, 0);
+            const halfDayLeaves = clampNumber($('#total_halfday_leaves').val() || 0, 0, remainingHalfDaySlots);
+
+            $('#working_days_display').attr('max', maxDays).val(workingDays);
+            $('#present_days_display').attr('max', workingDays || maxDays).val(presentDays);
+            $('#total_leaves').attr('max', workingDays || maxDays).val(fullLeaves);
+            $('#total_halfday_leaves').attr('max', remainingHalfDaySlots).val(halfDayLeaves);
+
+            return { maxDays, workingDays, presentDays, fullLeaves, halfDayLeaves };
+        }
+
+        function setWorkingDaysDisplay(value) {
+            const workingDays = clampNumber(value || 0, 0, getMaxPayrollDays());
+            $('#working_days_display').val(workingDays);
+            normalizePayrollDayInputs();
+        }
+
         $('#salary_amount, #tax_deduction, #used_paid_leaves').on('input', function() {
             calculateNetSalary();
         });
@@ -456,27 +488,33 @@
         });
 
         function frontendManualRecalculate(changedFieldId) {
-            const baseSalary = parseFloat($('#salary_amount').val()) || 0;
-            const workingDays = parseFloat($('#working_days_display').val()) || getDaysInCurrentMonth();
-            const presentDays = parseFloat($('#present_days_display').val()) || 0;
-            const totalLeaves = parseFloat($('#total_leaves').val()) || 0;
+            const baseSalary    = parseFloat($('#salary_amount').val()) || 0;
+            const workingDays   = parseFloat($('#working_days_display').val()) || getDaysInCurrentMonth();
+            const totalLeaves   = parseFloat($('#total_leaves').val()) || 0;
             const halfDayLeaves = parseFloat($('#total_halfday_leaves').val()) || 0;
-            
-            let overtimeHours = parseFloat($('#display_overtime_hours').val()) || 0;
-            let overtimePay = parseFloat($('#display_overtime_pay').val()) || 0;
+
+            let overtimeHours      = parseFloat($('#display_overtime_hours').val()) || 0;
+            let overtimePay        = parseFloat($('#display_overtime_pay').val()) || 0;
             const overtimeMultiplier = parseFloat($('#overtime_rate_multiplier').val()) || 1;
-            
-            const tax = parseFloat($('#tax_deduction').val()) || 0;
+
+            const tax           = parseFloat($('#tax_deduction').val()) || 0;
             const advancePayment = parseFloat($('#advance_payment').val()) || 0;
 
-            const perDaySalary = workingDays > 0 ? (baseSalary / workingDays) : 0;
-            const hourlyRate = workingDays > 0 ? (baseSalary / (workingDays * 8)) : 0;
+            if (workingDays <= 0 || baseSalary <= 0) return;
 
-            // Recalculate Deductions based on leaves
-            const salaryDeduction = (totalLeaves * perDaySalary) + (halfDayLeaves * (perDaySalary / 2));
+            const perDaySalary = baseSalary / workingDays;
+            const hourlyRate   = perDaySalary / 8;
+
+            // Clamp leaves so they can't exceed working days
+            const clampedLeaves   = Math.min(totalLeaves, workingDays);
+            const clampedHalfDays = Math.min(halfDayLeaves, (workingDays - clampedLeaves) * 2);
+
+            const salaryDeduction = Math.min(
+                (clampedLeaves * perDaySalary) + (clampedHalfDays * (perDaySalary / 2)),
+                baseSalary
+            );
             $('#salary_deduction').val(salaryDeduction.toFixed(2));
 
-            // Recalculate Overtime Pay only if overtime hours or type was changed
             if (changedFieldId !== 'display_overtime_pay') {
                 overtimePay = overtimeHours * hourlyRate * overtimeMultiplier;
                 $('#display_overtime_pay').val(overtimePay.toFixed(2));
@@ -485,12 +523,10 @@
                 $('#overtime_pay').val(overtimePay.toFixed(2));
             }
 
-            // Sync hidden total overtime
             $('#total_overtime_hours').val(overtimeHours);
 
-            // Recalculate Net Salary
             const netSalary = baseSalary - salaryDeduction + overtimePay - advancePayment - tax;
-            $('#net_salary').val(netSalary.toFixed(2));
+            $('#net_salary').val(Math.max(netSalary, 0).toFixed(2));
         }
 
         $('#include_paid_leave').on('change', function() {
@@ -592,6 +628,8 @@
 
             $('.invalid-feedback').remove();
             $('.is-invalid').removeClass('is-invalid');
+            normalizePayrollDayInputs();
+            frontendManualRecalculate();
 
             const updateBaseUrl = `<?= url("api/payroll/update") ?>`;
             let url = isEditMode
@@ -820,7 +858,7 @@
                                             data: { year: year, month: month },
                                             dataType: 'json',
                                             success: function(res) {
-                                                $('#working_days_display').val(res.working_days || 0);
+                                                setWorkingDaysDisplay(res.working_days || 0);
 
                                                 // Update unpaid leaves display
                                                 const totalLeaves = parseFloat($('#total_leaves').val()) || 0;
@@ -933,7 +971,7 @@
                             data: { year: year, month: month },
                             dataType: 'json',
                             success: function(res) {
-                                $('#working_days_display').val(res.working_days || 0);
+                                setWorkingDaysDisplay(res.working_days || 0);
                             }
                         });
                     }
@@ -1035,7 +1073,7 @@
                 dataType: 'json',
                 success: function(res) {
                     $('#loader').hide();
-                    $('#working_days_display').val(res.working_days || 0);
+                    setWorkingDaysDisplay(res.working_days || 0);
                     calculateNetSalary();
                 },
                 error: function() {
@@ -1070,15 +1108,20 @@
                 success: function(res) {
                     if (res.status !== 'success') return;
 
-                    const data = res.data;
+                    const data        = res.data;
+                    const maxDays     = getMaxPayrollDays();
+                    // Working days comes from API — just cap at the month's actual day count
+                    const workingDays = Math.min(parseFloat(data.working_days || 0), maxDays);
                     const presentDays = parseFloat(data.present_days || 0);
-                    const workingDays = parseFloat(data.working_days || 0);
-                    const perDaySalary = parseFloat(data.per_day_salary || 0) || (workingDays > 0 ? (baseSalary / workingDays) : 0);
-                    const payableDays = Math.min(presentDays + usedPaidLeaves, workingDays || (presentDays + usedPaidLeaves));
+                    const perDaySalary = workingDays > 0 ? (baseSalary / workingDays) : 0;
 
-                    // Tax from backend calculation
+                    // Leaves — read from form (user may have edited); cap at working days
+                    const totalLeaves   = Math.min(parseFloat($('#total_leaves').val()) || 0, workingDays);
+                    const halfDayLeaves = Math.min(parseFloat($('#total_halfday_leaves').val()) || 0, (workingDays - totalLeaves) * 2);
+
+                    // Tax from backend
                     $('#tax_deduction').val(data.tax_deduction);
-                    $('#working_days_display').val(workingDays || 0);
+                    setWorkingDaysDisplay(workingDays);
                     $('#present_days_display').val(presentDays);
                     $('#unpaid_leaves_display').val(data.unpaid_leaves || 0);
 
@@ -1109,7 +1152,7 @@
                         $('#presentDaysInfo').show();
                     }
 
-                    // Overtime from backend calc
+                    // Overtime
                     let overtimePay = 0;
                     if (data.overtime_pay && parseFloat(data.overtime_pay) > 0) {
                         overtimePay = parseFloat(data.overtime_pay);
@@ -1124,10 +1167,14 @@
                         $('.overtime-info').show();
                     }
 
-                    const earnedSalary = payableDays * perDaySalary;
-                    const salaryDeduction = Math.max(baseSalary - earnedSalary, 0);
-                    const tax = parseFloat(data.tax_deduction || 0);
-                    const netSalary = earnedSalary + overtimePay - tax - advancePayment;
+                    // Deduction = leaves * per-day + half-days * per-half-day
+                    const salaryDeduction = Math.min(
+                        (totalLeaves * perDaySalary) + (halfDayLeaves * (perDaySalary / 2)),
+                        baseSalary
+                    );
+                    const earnedSalary = Math.max(baseSalary - salaryDeduction, 0);
+                    const tax          = parseFloat(data.tax_deduction || 0);
+                    const netSalary    = earnedSalary + overtimePay - tax - advancePayment;
 
                     $('#salary_deduction').val(salaryDeduction.toFixed(2));
                     $('#net_salary').val(Math.max(netSalary, 0).toFixed(2));
@@ -1143,66 +1190,63 @@
          * Fallback simple calculation (use working days from API when available, same as group view)
          */
         function simpleCalculateNetSalary() {
-            const salaryAmount = parseFloat($('#salary_amount').val()) || 0;
+            const salaryAmount   = parseFloat($('#salary_amount').val()) || 0;
             const advancePayment = parseFloat($('#advance_payment').val()) || 0;
             const usedPaidLeaves = parseFloat($('#used_paid_leaves').val()) || 0;
-            const allowedPaidLeaves = parseFloat($('#total_leaves').val()) || 0;
-            const halfDays = parseFloat($('#total_halfday_leaves').val()) || 0;
-            const payrollType = $('#payroll_type').val() || 'monthly';
-            const workingDaysDisplay = parseInt($('#working_days_display').val(), 10);
-            const daysInMonth = (workingDaysDisplay > 0) ? workingDaysDisplay : getDaysInCurrentMonth();
-            const perDaySalary = salaryAmount / daysInMonth;
+            const payrollType    = $('#payroll_type').val() || 'monthly';
+
+            // Working days — use what's already displayed (set by API), fall back to month days
+            const workingDaysRaw = parseFloat($('#working_days_display').val()) || 0;
+            const daysInMonth    = workingDaysRaw > 0 ? workingDaysRaw : getDaysInCurrentMonth();
+
+            // Leaves — cap against working days
+            const totalLeaves   = Math.min(parseFloat($('#total_leaves').val()) || 0, daysInMonth);
+            const halfDays      = Math.min(parseFloat($('#total_halfday_leaves').val()) || 0, (daysInMonth - totalLeaves) * 2);
+
+            const perDaySalary  = salaryAmount / daysInMonth;
             const perHourSalary = perDaySalary / (parseFloat($('#working_hours_per_day').val()) || 8);
-            // Tax calculation
+
+            // Tax
             const salaryAboveTax = parseFloat($('#salary_above_tax').val()) || 14000;
-            const taxValue = parseFloat($('#tax_deduction').data('original-tax')) || 0;
-            const taxDeduction = salaryAmount >= salaryAboveTax ? taxValue : 0;
+            const taxValue       = parseFloat($('#tax_deduction').data('original-tax')) || 0;
+            const taxDeduction   = salaryAmount >= salaryAboveTax ? taxValue : 0;
             $('#tax_deduction').val(taxDeduction);
-            // Leave deduction - account for paid leave covering both full days and half days
-            // Calculate how paid leave covers full days and half days
-            const fullDaysCoveredByPaidLeave = Math.min(Math.floor(usedPaidLeaves), allowedPaidLeaves);
-            const halfDaysCoveredByPaidLeave = (usedPaidLeaves - fullDaysCoveredByPaidLeave) * 2; // 0.5 = 1 half day
 
-            // Unpaid full days
-            const unpaidFullDays = Math.max(allowedPaidLeaves - fullDaysCoveredByPaidLeave, 0);
-            // Unpaid half days (half days not covered by paid leave)
-            const unpaidHalfDays = Math.max(halfDays - halfDaysCoveredByPaidLeave, 0);
+            // Paid-leave offset
+            const fullDaysCovered  = Math.min(Math.floor(usedPaidLeaves), totalLeaves);
+            const halfDaysCovered  = (usedPaidLeaves - fullDaysCovered) * 2;
+            const unpaidFullDays   = Math.max(totalLeaves - fullDaysCovered, 0);
+            const unpaidHalfDays   = Math.max(halfDays - halfDaysCovered, 0);
 
-            const halfDayDeduction = unpaidHalfDays * (perDaySalary / 2);
-            const leaveDeduction = unpaidFullDays * perDaySalary;
-            const totalDeduction = leaveDeduction + halfDayDeduction;
-            const earnedSalary = Math.max(salaryAmount - totalDeduction, 0);
-            $('#salary_deduction').val(Math.max(salaryAmount - earnedSalary, 0).toFixed(2));
+            const salaryDeduction  = Math.min(
+                (unpaidFullDays * perDaySalary) + (unpaidHalfDays * (perDaySalary / 2)),
+                salaryAmount
+            );
+            const earnedSalary = Math.max(salaryAmount - salaryDeduction, 0);
+
+            $('#salary_deduction').val(salaryDeduction.toFixed(2));
             $('#unpaid_leaves_display').val(unpaidFullDays);
             $('#working_days_display').val(daysInMonth);
+
             let netSalary = earnedSalary - taxDeduction - advancePayment;
-            // Payroll type specific info
+
+            // Payroll type labels
             if (payrollType === 'hourly') {
-                $('#payrollTypeInfo').show();
-                $('#payrollTypeLabel').text('Payroll Type');
-                $('#payrollTypeValue').val('Hourly');
-                $('#workedHoursInfo').show();
-                $('#worked_hours_display').val($('#worked_hours').val() || 0);
-                $('#perHourRateInfo').show();
-                $('#per_hour_rate_display').val(perHourSalary.toFixed(2));
+                $('#payrollTypeInfo').show(); $('#payrollTypeLabel').text('Payroll Type'); $('#payrollTypeValue').val('Hourly');
+                $('#workedHoursInfo').show(); $('#worked_hours_display').val($('#worked_hours').val() || 0);
+                $('#perHourRateInfo').show(); $('#per_hour_rate_display').val(perHourSalary.toFixed(2));
                 $('#presentDaysInfo').hide();
             } else if (payrollType === 'daily') {
-                $('#payrollTypeInfo').show();
-                $('#payrollTypeLabel').text('Payroll Type');
-                $('#payrollTypeValue').val('Daily');
-                $('#presentDaysInfo').show();
-                $('#present_days_display').val($('#total_present_days').val() || 0);
-                $('#workedHoursInfo').hide();
-                $('#perHourRateInfo').hide();
+                $('#payrollTypeInfo').show(); $('#payrollTypeLabel').text('Payroll Type'); $('#payrollTypeValue').val('Daily');
+                $('#presentDaysInfo').show(); $('#present_days_display').val($('#total_present_days').val() || 0);
+                $('#workedHoursInfo').hide(); $('#perHourRateInfo').hide();
             } else {
-                $('#payrollTypeInfo').show();
-                $('#payrollTypeLabel').text('Payroll Type');
-                $('#payrollTypeValue').val('Monthly');
-                $('#workedHoursInfo').hide();
-                $('#perHourRateInfo').hide();
+                $('#payrollTypeInfo').show(); $('#payrollTypeLabel').text('Payroll Type'); $('#payrollTypeValue').val('Monthly');
+                $('#workedHoursInfo').hide(); $('#perHourRateInfo').hide();
                 $('#presentDaysInfo').show();
                 $('#present_days_display').val(Math.max(daysInMonth - unpaidFullDays - (unpaidHalfDays / 2), 0));
             }
+
             $('#net_salary').val(Math.max(netSalary, 0).toFixed(2));
         }
 

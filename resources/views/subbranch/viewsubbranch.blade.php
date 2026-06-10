@@ -9,11 +9,9 @@
             <h4>Branch View</h4>
         </div>
         <div class="page-btn">
-            @if (app('hasPermission')(8, 'view'))
             <a href="{{ route('subbranch.list') }}" class="btn btn-added">
                 Back
             </a>
-            @endif
         </div>
     </div>
     <div class="">
