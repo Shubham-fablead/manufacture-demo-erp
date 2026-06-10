@@ -27,6 +27,108 @@
             cursor: not-allowed;
             opacity: 1;
         }
+
+        /* ===== TABLET MULTI-STEP WIZARD (768px – 1199px) ===== */
+        @media screen and (min-width: 576px) and (max-width: 1199px) {
+
+            /* Step indicator bar */
+            .shop-wizard-steps {
+                display: flex !important;
+                align-items: center;
+                justify-content: center;
+                gap: 0;
+                margin-bottom: 24px;
+                background: #f8f9fa;
+                border-radius: 50px;
+                padding: 5px;
+            }
+            .shop-wizard-steps .wizard-step-btn {
+                flex: 1;
+                text-align: center;
+                padding: 8px 10px;
+                border-radius: 50px;
+                font-size: 13px;
+                font-weight: 500;
+                color: #6c757d;
+                background: transparent;
+                border: none;
+                cursor: pointer;
+                transition: background .2s, color .2s;
+                white-space: nowrap;
+            }
+            .shop-wizard-steps .wizard-step-btn.active {
+                background: #ff9f43;
+                color: #fff;
+                box-shadow: 0 2px 8px rgba(255,159,67,.35);
+            }
+
+            /* Hide all wizard panels by default; show active */
+            .shop-wizard-panel {
+                display: none !important;
+            }
+            .shop-wizard-panel.wizard-active {
+                display: block !important;
+            }
+
+            /* On tablet, each field is half-width (2 per row) */
+            #shop-settings .shop-wizard-panel .col-lg-3,
+            #shop-settings .shop-wizard-panel .col-sm-6,
+            #shop-settings .shop-wizard-panel .col-6 {
+                flex: 0 0 50% !important;
+                max-width: 50% !important;
+            }
+            /* Address & GPS take full width on tablet */
+            #shop-settings .shop-wizard-panel .col-sm-6.full-tablet {
+                flex: 0 0 100% !important;
+                max-width: 100% !important;
+            }
+
+            /* Next / Back / Submit wizard buttons */
+            .wizard-nav-btns {
+                display: flex !important;
+                gap: 10px;
+                margin-top: 16px;
+            }
+            .wizard-nav-btns .btn-wizard-next,
+            .wizard-nav-btns .btn-wizard-back,
+            .wizard-nav-btns .btn-wizard-submit {
+                flex: 1;
+                padding: 10px;
+                border-radius: 8px;
+                font-weight: 600;
+                font-size: 14px;
+            }
+            .wizard-nav-btns .btn-wizard-next,
+            .wizard-nav-btns .btn-wizard-submit {
+                background: #ff9f43;
+                color: #fff;
+                border: none;
+            }
+            .wizard-nav-btns .btn-wizard-back {
+                background: #f8f9fa;
+                color: #495057;
+                border: 1px solid #dee2e6;
+            }
+
+            /* Hide the original desktop submit row on tablet */
+            .desktop-submit {
+                display: none !important;
+            }
+        }
+
+        /* On large screens (≥1200px) hide wizard chrome, show original layout */
+        @media screen and (min-width: 1200px) {
+            .shop-wizard-steps { display: none !important; }
+            .shop-wizard-panel { display: contents !important; }
+            .wizard-nav-btns   { display: none !important; }
+        }
+
+        /* On small phones (<576px) hide wizard chrome, show original layout */
+        @media screen and (max-width: 575px) {
+            .shop-wizard-steps { display: none !important; }
+            .shop-wizard-panel { display: contents !important; }
+            .wizard-nav-btns   { display: none !important; }
+        }
     </style>
 
     <div class="content">
@@ -67,277 +169,321 @@
                 <div class="tab-content mt-4" id="settingsTabsContent">
                     <!-- ================= SHOP SETTINGS TAB ================= -->
                     <div class="tab-pane fade show active" id="shop-settings" role="tabpanel" aria-labelledby="shop-tab">
-                        <div class="row">
-                            <div class="col-lg-3 col-sm-6 col-6">
-                                <div class="form-group">
-                                    <label>Shop Name<span class="manitory">*</span></label>
-                                    <input type="text" id="shop_name" placeholder="Enter Title">
-                                </div>
-                            </div>
 
-                            <div class="col-lg-3 col-sm-6 col-6">
-                                <div class="form-group">
-                                    <label>Shop Email<span class="manitory">*</span></label>
-                                    <input type="text" id="email" placeholder="Enter email">
-                                </div>
-                            </div>
-
-                            <div class="col-lg-3 col-sm-6 col-6">
-                                <div class="form-group">
-                                    <label>Shop Phone<span class="manitory">*</span></label>
-                                    <input type="text" id="phone" placeholder="Enter Phone">
-                                </div>
-                            </div>
-
-                            <div class="col-lg-3 col-sm-6 col-6">
-                                <div class="form-group">
-                                    <label>State Code</label>
-                                    <input type="text" id="state_code" placeholder="Enter State Code">
-                                </div>
-                            </div>
-
-                            <div class="col-lg-3 col-sm-6 col-6">
-                                <div class="form-group">
-                                    <label>GST Number</label>
-                                    <input type="text" id="gst_num" placeholder="Enter GST Number">
-                                </div>
-                            </div>
-
-                            <div class="col-lg-3 col-sm-6 col-6">
-                                <div class="form-group">
-                                    <label>CIN Number</label>
-                                    <input type="text" id="cin_no" placeholder="Enter CIN Number">
-                                </div>
-                            </div>
-
-                            <div class="col-lg-3 col-sm-6 col-6">
-                                <div class="form-group">
-                                    <label>Bank Name<span class="manitory">*</span></label>
-                                    <input type="text" id="bank_name" placeholder="Enter Bank Name">
-                                </div>
-                            </div>
-
-                            <div class="col-lg-3 col-sm-6 col-6">
-                                <div class="form-group">
-                                    <label>Branch<span class="manitory">*</span></label>
-                                    <input type="text" id="branch" placeholder="Enter Branch">
-                                </div>
-                            </div>
-
-                            <div class="col-lg-3 col-sm-6 col-6">
-                                <div class="form-group">
-                                    <label>A/C No.<span class="manitory">*</span></label>
-                                    <input type="number" id="ac_no" class="form-control" placeholder="Enter A/C No.">
-                                </div>
-                            </div>
-
-                            <div class="col-lg-3 col-sm-6 col-6">
-                                <div class="form-group">
-                                    <label>IFSC Code<span class="manitory">*</span></label>
-                                    <input type="text" id="ifsc_code" placeholder="Enter IFSC Code">
-                                </div>
-                            </div>
-
-                            <div class="col-lg-3 col-sm-6 col-6">
-                                <div class="form-group">
-                                    <label>Shop Currency Symbol <span class="manitory">*</span></label>
-                                    <select id="currency_symbol" class="form-select">
-                                        <option value="₹" selected>₹ (Indian Rupee)</option>
-                                        <option value="$">$ (US Dollar)</option>
-                                        <option value="€">€ (Euro)</option>
-                                        <option value="£">£ (British Pound)</option>
-                                        <option value="¥">¥ (Japanese Yen)</option>
-                                        <option value="₩">₩ (South Korean Won)</option>
-                                        <option value="₽">₽ (Russian Ruble)</option>
-                                        <option value="₺">₺ (Turkish Lira)</option>
-                                        <option value="₫">₫ (Vietnamese Dong)</option>
-                                        <option value="฿">฿ (Thai Baht)</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div class="col-lg-3 col-sm-6 col-6">
-                                <div class="form-group">
-                                    <label for="currency_position" class="form-label">
-                                        Currency Symbol Position
-                                    </label>
-                                    <select class="form-select" id="currency_position" name="currency_position"
-                                        required>
-                                        <option value="left">Left (e.g. ₹100 or $100)</option>
-                                        <option value="right">Right (e.g. 100₹ or 100$)</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div class="col-lg-3 col-sm-6 col-6">
-                                <div class="form-group">
-                                    <label>Low Stock Warning Quantity</label>
-                                    <input type="number" id="low_stock" class="form-control"
-                                        placeholder="Enter Low Stock Warning Quantity">
-                                    <small id="lowStockError" class="text-danger d-none">Low Stock Quantity cannot be
-                                        negative.</small>
-                                </div>
-                            </div>
-
-                            <div class="col-lg-3 col-sm-6">
-                                <div class="form-group">
-                                    <label>Shop Address<span class="manitory">*</span></label>
-                                    <textarea id="address" placeholder="Enter Address" rows="3" class="form-control"></textarea>
-                                    <div class="d-flex justify-content-between align-items-start mt-1">
-                                        <small id="coordinateLookupStatus" class="text-muted" style="line-height:1.2;"></small>
-                                        <button type="button" class="btn btn-sm btn-primary ms-2 flex-shrink-0" id="btnFetchCoordinates" style="padding: 2px 8px; font-size: 11px;">Get GPS from Address</button>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-lg-3 col-sm-6 col-6">
-                                <div class="form-group">
-                                    <label>Shop Logo</label>
-                                    <div class="image-upload">
-                                        <input type="file" id="logo" accept="image/*">
-                                        <div class="image-uploads">
-                                            <img src="{{ env('ImagePath') . 'admin/assets/img/icons/upload.svg' }}"
-                                                alt="img">
-                                            <h4>Drag and drop a file to upload</h4>
-                                        </div>
-                                    </div>
-                                    <img id="logo_preview" src="" alt="Logo Preview"
-                                        style="display:none; max-width: 100px; margin-top: 10px;">
-                                </div>
-                            </div>
-
-                            <div class="col-lg-3 col-sm-6 col-6">
-                                <div class="form-group">
-                                    <label>Shop Favicon</label>
-                                    <div class="image-upload">
-                                        <input type="file" id="favicon" accept="image/*">
-                                        <div class="image-uploads">
-                                            <img src="{{ env('ImagePath') . 'admin/assets/img/icons/upload.svg' }}"
-                                                alt="img">
-                                            <h4>Drag and drop a file to upload</h4>
-                                        </div>
-                                    </div>
-                                    <img id="favicon_preview" src="" alt="Favicon Preview"
-                                        style="display:none; max-width: 50px; margin-top: 10px;">
-                                </div>
-                            </div>
-
-                            <div class="col-lg-3 col-sm-6 col-6">
-                                <div class="form-group">
-                                    <label>Shop QR Code Image</label>
-                                    <div class="image-upload">
-                                        <input type="file" id="qr_code" accept="image/*">
-                                        <div class="image-uploads">
-                                            <img src="{{ env('ImagePath') . 'admin/assets/img/icons/upload.svg' }}"
-                                                alt="img">
-                                            <h4>Drag and drop a file to upload</h4>
-                                        </div>
-                                    </div>
-                                    <img id="qr_preview" src="" alt="QR Preview"
-                                        style="display:none; max-width: 50px; margin-top: 10px;">
-                                </div>
-                            </div>
-
-                            <div class="col-lg-3 col-sm-6 col-6">
-                                <div class="form-group">
-                                    <label>Invoice Size</label>
-                                    <select id="invoice_size" name="invoice_size" class="form-select">
-                                        <option value="small"
-                                            {{ old('invoice_size', $setting->invoice_size ?? 'big') == 'small' ? 'selected' : '' }}>
-                                            Small Size Invoice</option>
-                                        <option value="big"
-                                            {{ old('invoice_size', $setting->invoice_size ?? 'big') == 'big' ? 'selected' : '' }}>
-                                            Big Size Invoice</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div class="col-lg-3 col-sm-6 col-6">
-                                <div class="form-group">
-                                    <label>Send Mail</label>
-                                    <select id="send_mail" name="send_mail" class="form-select">
-                                        <option value="1">On</option>
-                                        <option value="0">Off</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div class="col-lg-3 col-sm-6 col-6">
-                                <div class="form-group">
-                                    <label>Financial Year</label>
-                                    <select id="financial_year" name="financial_year" class="form-select">
-                                        <option value="1">On</option>
-                                        <option value="0">Off</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div class="col-lg-3 col-sm-6 col-6">
-                                <div class="form-group">
-                                    <label>TDS Apply</label>
-                                    <select id="tds_apply" name="tds_apply" class="form-select">
-                                        <option value="1">On</option>
-                                        <option value="0">Off</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div class="col-lg-3 col-sm-12 col-6">
-                                <div class="form-group">
-                                    <label>Customer WhatsApp Message</label>
-                                    <select id="customer_whatsapp_message" name="customer_whatsapp_message"
-                                        class="form-select">
-                                        <option value="1">On</option>
-                                        <option value="0">Off</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div class="col-lg-3 col-sm-12 col-6">
-                                <div class="form-group">
-                                    <label>Admin WhatsApp Message</label>
-                                    <select id="admin_whatsapp_message" name="admin_whatsapp_message"
-                                        class="form-select">
-                                        <option value="1">On</option>
-                                        <option value="0">Off</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div class="col-lg-3 col-sm-6 col-6">
-                                <div class="form-group">
-                                    <label>Office Latitude</label>
-                                    <input type="text" id="office_latitude" class="form-control" placeholder="e.g. 21.1268432">
-                                </div>
-                            </div>
-
-                            <div class="col-lg-3 col-sm-6 col-6">
-                                <div class="form-group">
-                                    <label>Office Longitude</label>
-                                    <input type="text" id="office_longitude" class="form-control" placeholder="e.g. 73.1051204">
-                                </div>
-                            </div>
-
-                            <div class="col-lg-3 col-sm-6 col-6">
-                                <div class="form-group">
-                                    <label>Radius (m)</label>
-                                    <input type="number" id="office_radius" class="form-control" placeholder="e.g. 200" min="0" value="200">
-                                    <small class="text-muted">Staff must be within this distance from office GPS to clock in.</small>
-                                </div>
-                            </div>
-
-                            <div class="col-lg-3 col-sm-6 col-6">
-                                <div class="form-group">
-                                    <label>Meeting / Follow-up reminder (hours before)</label>
-                                    <input type="number" id="appointment_reminder_hours_before"
-                                        name="appointment_reminder_hours_before"
-                                        class="form-control" placeholder="e.g. 3" min="1">
-                                    <small class="text-muted">IST. Default 3. Use matching WhatsApp
-                                        templates (e.g. meeting_reminder_3_hours_before).</small>
-                                </div>
-                            </div>
+                        {{-- ── Tablet wizard step indicator (hidden on desktop & phone via CSS) ── --}}
+                        <div class="shop-wizard-steps" id="shopWizardSteps" style="display:none;">
+                            <button type="button" class="wizard-step-btn active" data-step="1">Basic Info</button>
+                            <button type="button" class="wizard-step-btn" data-step="2">Finance & Address</button>
+                            <button type="button" class="wizard-step-btn" data-step="3">Media & Delivery</button>
                         </div>
 
+                        <div class="row">
+
+                            {{-- ══════════════ STEP 1 – Basic Info ══════════════ --}}
+                            <div class="shop-wizard-panel wizard-active col-12 px-0" id="shopWizardPanel1">
+                                <div class="row">
+                                    <div class="col-lg-3 col-sm-6 col-6">
+                                        <div class="form-group">
+                                            <label>Shop Name<span class="manitory">*</span></label>
+                                            <input type="text" id="shop_name" placeholder="Enter Title">
+                                        </div>
+                                    </div>
+
+                                    <div class="col-lg-3 col-sm-6 col-6">
+                                        <div class="form-group">
+                                            <label>Shop Email<span class="manitory">*</span></label>
+                                            <input type="text" id="email" placeholder="Enter email">
+                                        </div>
+                                    </div>
+
+                                    <div class="col-lg-3 col-sm-6 col-6">
+                                        <div class="form-group">
+                                            <label>Shop Phone<span class="manitory">*</span></label>
+                                            <input type="text" id="phone" placeholder="Enter Phone">
+                                        </div>
+                                    </div>
+
+                                    <div class="col-lg-3 col-sm-6 col-6">
+                                        <div class="form-group">
+                                            <label>State Code</label>
+                                            <input type="text" id="state_code" placeholder="Enter State Code">
+                                        </div>
+                                    </div>
+
+                                    <div class="col-lg-3 col-sm-6 col-6">
+                                        <div class="form-group">
+                                            <label>GST Number</label>
+                                            <input type="text" id="gst_num" placeholder="Enter GST Number">
+                                        </div>
+                                    </div>
+
+                                    <div class="col-lg-3 col-sm-6 col-6">
+                                        <div class="form-group">
+                                            <label>CIN Number</label>
+                                            <input type="text" id="cin_no" placeholder="Enter CIN Number">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {{-- Wizard nav for step 1 --}}
+                                <div class="wizard-nav-btns" style="display:none;">
+                                    <button type="button" class="btn btn-wizard-next" data-wizard-next="2">Next</button>
+                                </div>
+                            </div>{{-- /panel 1 --}}
+
+                            {{-- ══════════════ STEP 2 – Finance & Address ══════════════ --}}
+                            <div class="shop-wizard-panel col-12 px-0" id="shopWizardPanel2">
+                                <div class="row">
+                                    <div class="col-lg-3 col-sm-6 col-6">
+                                        <div class="form-group">
+                                            <label>Bank Name<span class="manitory">*</span></label>
+                                            <input type="text" id="bank_name" placeholder="Enter Bank Name">
+                                        </div>
+                                    </div>
+
+                                    <div class="col-lg-3 col-sm-6 col-6">
+                                        <div class="form-group">
+                                            <label>Branch<span class="manitory">*</span></label>
+                                            <input type="text" id="branch" placeholder="Enter Branch">
+                                        </div>
+                                    </div>
+
+                                    <div class="col-lg-3 col-sm-6 col-6">
+                                        <div class="form-group">
+                                            <label>A/C No.<span class="manitory">*</span></label>
+                                            <input type="number" id="ac_no" class="form-control" placeholder="Enter A/C No.">
+                                        </div>
+                                    </div>
+
+                                    <div class="col-lg-3 col-sm-6 col-6">
+                                        <div class="form-group">
+                                            <label>IFSC Code<span class="manitory">*</span></label>
+                                            <input type="text" id="ifsc_code" placeholder="Enter IFSC Code">
+                                        </div>
+                                    </div>
+
+                                    <div class="col-lg-3 col-sm-6 col-6">
+                                        <div class="form-group">
+                                            <label>Shop Currency Symbol <span class="manitory">*</span></label>
+                                            <select id="currency_symbol" class="form-select">
+                                                <option value="₹" selected>₹ (Indian Rupee)</option>
+                                                <option value="$">$ (US Dollar)</option>
+                                                <option value="€">€ (Euro)</option>
+                                                <option value="£">£ (British Pound)</option>
+                                                <option value="¥">¥ (Japanese Yen)</option>
+                                                <option value="₩">₩ (South Korean Won)</option>
+                                                <option value="₽">₽ (Russian Ruble)</option>
+                                                <option value="₺">₺ (Turkish Lira)</option>
+                                                <option value="₫">₫ (Vietnamese Dong)</option>
+                                                <option value="฿">฿ (Thai Baht)</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-lg-3 col-sm-6 col-6">
+                                        <div class="form-group">
+                                            <label for="currency_position" class="form-label">
+                                                Currency Symbol Position
+                                            </label>
+                                            <select class="form-select" id="currency_position" name="currency_position"
+                                                required>
+                                                <option value="left">Left (e.g. ₹100 or $100)</option>
+                                                <option value="right">Right (e.g. 100₹ or 100$)</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-lg-3 col-sm-6 col-6">
+                                        <div class="form-group">
+                                            <label>Low Stock Warning Quantity</label>
+                                            <input type="number" id="low_stock" class="form-control"
+                                                placeholder="Enter Low Stock Warning Quantity">
+                                            <small id="lowStockError" class="text-danger d-none">Low Stock Quantity cannot be
+                                                negative.</small>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-lg-3 col-sm-6 full-tablet">
+                                        <div class="form-group">
+                                            <label>Shop Address<span class="manitory">*</span></label>
+                                            <textarea id="address" placeholder="Enter Address" rows="3" class="form-control"></textarea>
+                                            <div class="d-flex justify-content-between align-items-start mt-1">
+                                                <small id="coordinateLookupStatus" class="text-muted" style="line-height:1.2;"></small>
+                                                <button type="button" class="btn btn-sm btn-primary ms-2 flex-shrink-0" id="btnFetchCoordinates" style="padding: 2px 8px; font-size: 11px;">Get GPS from Address</button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-lg-3 col-sm-6 col-6">
+                                        <div class="form-group">
+                                            <label>Office Latitude</label>
+                                            <input type="text" id="office_latitude" class="form-control" placeholder="e.g. 21.1268432">
+                                        </div>
+                                    </div>
+
+                                    <div class="col-lg-3 col-sm-6 col-6">
+                                        <div class="form-group">
+                                            <label>Office Longitude</label>
+                                            <input type="text" id="office_longitude" class="form-control" placeholder="e.g. 73.1051204">
+                                        </div>
+                                    </div>
+
+                                    <div class="col-lg-3 col-sm-6 col-6">
+                                        <div class="form-group">
+                                            <label>Radius (m)</label>
+                                            <input type="number" id="office_radius" class="form-control" placeholder="e.g. 200" min="0" value="200">
+                                            <small class="text-muted">Staff must be within this distance from office GPS to clock in.</small>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-lg-3 col-sm-6 col-6">
+                                        <div class="form-group">
+                                            <label>Meeting / Follow-up reminder (hours before)</label>
+                                            <input type="number" id="appointment_reminder_hours_before"
+                                                name="appointment_reminder_hours_before"
+                                                class="form-control" placeholder="e.g. 3" min="1">
+                                            <small class="text-muted">IST. Default 3. Use matching WhatsApp
+                                                templates (e.g. meeting_reminder_3_hours_before).</small>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {{-- Wizard nav for step 2 --}}
+                                <div class="wizard-nav-btns" style="display:none;">
+                                    <button type="button" class="btn btn-wizard-back" data-wizard-back="1">Back</button>
+                                    <button type="button" class="btn btn-wizard-next" data-wizard-next="3">Next</button>
+                                </div>
+                            </div>{{-- /panel 2 --}}
+
+                            {{-- ══════════════ STEP 3 – Media & Delivery ══════════════ --}}
+                            <div class="shop-wizard-panel col-12 px-0" id="shopWizardPanel3">
+                                <div class="row">
+                                    <div class="col-lg-3 col-sm-6 col-6">
+                                        <div class="form-group">
+                                            <label>Shop Logo</label>
+                                            <div class="image-upload">
+                                                <input type="file" id="logo" accept="image/*">
+                                                <div class="image-uploads">
+                                                    <img src="{{ env('ImagePath') . 'admin/assets/img/icons/upload.svg' }}"
+                                                        alt="img">
+                                                    <h4>Drag and drop a file to upload</h4>
+                                                </div>
+                                            </div>
+                                            <img id="logo_preview" src="" alt="Logo Preview"
+                                                style="display:none; max-width: 100px; margin-top: 10px;">
+                                        </div>
+                                    </div>
+
+                                    <div class="col-lg-3 col-sm-6 col-6">
+                                        <div class="form-group">
+                                            <label>Shop Favicon</label>
+                                            <div class="image-upload">
+                                                <input type="file" id="favicon" accept="image/*">
+                                                <div class="image-uploads">
+                                                    <img src="{{ env('ImagePath') . 'admin/assets/img/icons/upload.svg' }}"
+                                                        alt="img">
+                                                    <h4>Drag and drop a file to upload</h4>
+                                                </div>
+                                            </div>
+                                            <img id="favicon_preview" src="" alt="Favicon Preview"
+                                                style="display:none; max-width: 50px; margin-top: 10px;">
+                                        </div>
+                                    </div>
+
+                                    <div class="col-lg-3 col-sm-6 col-6">
+                                        <div class="form-group">
+                                            <label>Shop QR Code Image</label>
+                                            <div class="image-upload">
+                                                <input type="file" id="qr_code" accept="image/*">
+                                                <div class="image-uploads">
+                                                    <img src="{{ env('ImagePath') . 'admin/assets/img/icons/upload.svg' }}"
+                                                        alt="img">
+                                                    <h4>Drag and drop a file to upload</h4>
+                                                </div>
+                                            </div>
+                                            <img id="qr_preview" src="" alt="QR Preview"
+                                                style="display:none; max-width: 50px; margin-top: 10px;">
+                                        </div>
+                                    </div>
+
+                                    <div class="col-lg-3 col-sm-6 col-6">
+                                        <div class="form-group">
+                                            <label>Invoice Size</label>
+                                            <select id="invoice_size" name="invoice_size" class="form-select">
+                                                <option value="small"
+                                                    {{ old('invoice_size', $setting->invoice_size ?? 'big') == 'small' ? 'selected' : '' }}>
+                                                    Small Size Invoice</option>
+                                                <option value="big"
+                                                    {{ old('invoice_size', $setting->invoice_size ?? 'big') == 'big' ? 'selected' : '' }}>
+                                                    Big Size Invoice</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-lg-3 col-sm-6 col-6">
+                                        <div class="form-group">
+                                            <label>Send Mail</label>
+                                            <select id="send_mail" name="send_mail" class="form-select">
+                                                <option value="1">On</option>
+                                                <option value="0">Off</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-lg-3 col-sm-6 col-6">
+                                        <div class="form-group">
+                                            <label>Financial Year</label>
+                                            <select id="financial_year" name="financial_year" class="form-select">
+                                                <option value="1">On</option>
+                                                <option value="0">Off</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-lg-3 col-sm-6 col-6">
+                                        <div class="form-group">
+                                            <label>TDS Apply</label>
+                                            <select id="tds_apply" name="tds_apply" class="form-select">
+                                                <option value="1">On</option>
+                                                <option value="0">Off</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-lg-3 col-sm-12 col-6">
+                                        <div class="form-group">
+                                            <label>Customer WhatsApp Message</label>
+                                            <select id="customer_whatsapp_message" name="customer_whatsapp_message"
+                                                class="form-select">
+                                                <option value="1">On</option>
+                                                <option value="0">Off</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-lg-3 col-sm-12 col-6">
+                                        <div class="form-group">
+                                            <label>Admin WhatsApp Message</label>
+                                            <select id="admin_whatsapp_message" name="admin_whatsapp_message"
+                                                class="form-select">
+                                                <option value="1">On</option>
+                                                <option value="0">Off</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {{-- Wizard nav for step 3 (has Submit) --}}
+                                <div class="wizard-nav-btns" style="display:none;">
+                                    <button type="button" class="btn btn-wizard-back" data-wizard-back="2">Back</button>
+                                    <a href="javascript:void(0);" class="btn btn-wizard-submit"
+                                        id="btn-setting-submit-wizard">Submit</a>
+                                </div>
+                            </div>{{-- /panel 3 --}}
+
+                        </div>{{-- /.row --}}
+
+                        {{-- Desktop submit (hidden on tablet via CSS) --}}
                         <div class="row desktop-submit">
                             <div class="col-lg-12">
                                 <a href="javascript:void(0);" class="btn btn-submit me-2"
@@ -1729,6 +1875,68 @@
                 });
             });
 
+
+            // ================== SHOP SETTINGS TABLET WIZARD ==================
+            (function initShopWizard() {
+                var TABLET_MIN = 576, TABLET_MAX = 1199;
+
+                function isTablet() {
+                    return window.innerWidth >= TABLET_MIN && window.innerWidth <= TABLET_MAX;
+                }
+
+                function goToStep(step) {
+                    $(".shop-wizard-panel").removeClass("wizard-active");
+                    $("#shopWizardPanel" + step).addClass("wizard-active");
+                    $(".wizard-step-btn").removeClass("active");
+                    $('.wizard-step-btn[data-step="' + step + '"]').addClass("active");
+                    $("html, body").animate({ scrollTop: $("#shop-settings").offset().top - 80 }, 200);
+                }
+
+                function applyWizardMode() {
+                    if (isTablet()) {
+                        $("#shopWizardSteps").show();
+                        $(".shop-wizard-panel .wizard-nav-btns").show();
+                        // Only show the active panel
+                        var activeStep = parseInt($(".wizard-step-btn.active").data("step")) || 1;
+                        $(".shop-wizard-panel").removeClass("wizard-active");
+                        $("#shopWizardPanel" + activeStep).addClass("wizard-active");
+                    } else {
+                        $("#shopWizardSteps").hide();
+                        $(".shop-wizard-panel .wizard-nav-btns").hide();
+                        // All panels visible on desktop/phone
+                        $(".shop-wizard-panel").addClass("wizard-active");
+                    }
+                }
+
+                $(document).on("click", ".wizard-step-btn", function () {
+                    if (!isTablet()) return;
+                    goToStep(parseInt($(this).data("step")));
+                });
+
+                $(document).on("click", ".btn-wizard-next", function () {
+                    if (!isTablet()) return;
+                    goToStep(parseInt($(this).data("wizard-next")));
+                });
+
+                $(document).on("click", ".btn-wizard-back", function () {
+                    if (!isTablet()) return;
+                    goToStep(parseInt($(this).data("wizard-back")));
+                });
+
+                // Wizard submit button → delegates to the real submit handler
+                $(document).on("click", "#btn-setting-submit-wizard", function (e) {
+                    e.preventDefault();
+                    $("#btn-setting-submit").trigger("click");
+                });
+
+                applyWizardMode();
+
+                var resizeTimer;
+                $(window).on("resize", function () {
+                    clearTimeout(resizeTimer);
+                    resizeTimer = setTimeout(applyWizardMode, 150);
+                });
+            })();
 
 
         });
