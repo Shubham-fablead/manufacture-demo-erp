@@ -541,6 +541,7 @@ class PayrollController extends Controller
                 'leaves' => $existing ? $existing->total_leaves : ($summary['total_days'] - $summary['present_day_count']),
                 'half_days' => $existing ? $existing->total_half_day : $summary['half_days'],
                 'used_paid_leaves' => $existing?->used_paid_leaves ?? 0,
+                'present_days' => $summary['present_days'],
                 'salary_deduction' => $salaryDeduction,
                 'net_salary' => $netSalary,
                 'tax' => number_format($taxDeduction, 2),

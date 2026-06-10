@@ -910,8 +910,11 @@
                 <h4>All Products</h4>
                 <!--<h6>Manage your products</h6>-->
             </div>
-            <div class="page-btn">
+            <div class="page-btn d-flex gap-2">
                 @if (app('hasPermission')(1, 'add'))
+                    <a href="{{ route('product.import') }}" class="btn btn-sm" style="background:#1b2850; color:#fff; white-space:nowrap;">
+                        <i class="fas fa-file-import me-1"></i> Import Products
+                    </a>
                     <a href="{{ route('product.add') }}" class="btn btn-sm btn-added"><img
                             src="{{ env('ImagePath') . '/admin/assets/img/icons/plus.svg' }}" alt="img"
                             class="me-1">New
