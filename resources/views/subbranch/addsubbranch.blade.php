@@ -47,7 +47,7 @@
                         <!-- Email -->
                         <div class="col-lg-3 col-sm-6 col-6">
                             <div class="form-group">
-                                <label>Email <span class="text-danger">*</span></label>
+                                <label>Email</label>
                                 <input type="email" name="email" id="email" class="form-control" autocomplete="off">
                                 <div class="text-danger error-email"></div>
                             </div>
@@ -56,7 +56,7 @@
                         <!-- Password -->
                         <div class="col-lg-3 col-sm-6 col-6">
                             <div class="form-group">
-                                <label>Password <span class="text-danger">*</span></label>
+                                <label>Password</label>
                                 <div class="position-relative">
                                     <input type="password" name="password" id="password" class="form-control"
                                         autocomplete="off">
@@ -241,15 +241,6 @@
                     $(".error-customer_name").html(" Staff name must not exceed 80 characters. ");
                     hasError = true;
                 }
-                let email = $("#email").val().trim();
-                let emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                if (email === "") {
-                    $(".error-email").html(" Email is required. ");
-                    hasError = true;
-                } else if (!emailPattern.test(email)) {
-                    $(".error-email").html(" Please enter a valid email address. ");
-                    hasError = true;
-                }
 
                 let phone = $("#phone").val().trim();
                 let phonePattern = /^[0-9]{10}$/; // exactly 10 digits
@@ -262,14 +253,6 @@
                 }
 
 
-                let password = $("#password").val().trim();
-                if (password === "") {
-                    $(".error-password").html(" Password is required. ");
-                    hasError = true;
-                } else if (password.length < 8) {
-                    $(".error-password").html(" Password must be at least 8 characters. ");
-                    hasError = true;
-                }
 
                 let avatar = $("#avatar")[0].files[0];
                 if (avatar) {

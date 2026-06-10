@@ -268,7 +268,7 @@
                   <th>Leaves</th>
                   <th>Half-day</th>
                   <!-- <th>Paid Leave</th> -->
-                  <th>Per-Day Salary</th>
+                  <th>Present Days</th>
                   <th>Overtime Hours</th>
                   <th>Overtime Rate</th>
                   <th>Overtime Pay</th>
@@ -349,7 +349,9 @@
                         data-halfdays="<?= $emp["half_days"] ?>"
                         data-month="<?= date("Y-m", strtotime($month)) ?>">
                     </td> -->
-                    <td data-label="Per-Day Salary">₹<?= number_format($emp["per_day"], 2) ?><br><small class="text-muted">₹<?= number_format($emp["per_hour"] ?? ($emp["per_day"] / 8), 2) ?>/hr</small></td>
+                    <td data-label="Present Days">
+                      <?= number_format((float)($emp['present_days'] ?? 0), 0) ?>
+                    </td>
                     <td data-label="Overtime Hours">
                       <div class="form-control form-control-sm" style="background-color:#f8f9fa;border:1px solid #dee2e6;min-width:80px;"><?= number_format((float)($emp['total_overtime_hours'] ?? 0), 2) ?></div>
                     </td>

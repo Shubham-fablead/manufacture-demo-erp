@@ -40,6 +40,38 @@
             margin-left: 2px;
         }
 
+        .btn-add-quick {
+            background: #ff9f43;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            height: 30px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 12px;
+            font-size: 12px;
+            font-weight: 500;
+            white-space: nowrap;
+            line-height: 1;
+        }
+
+        .btn-add-quick:hover {
+            background: #e08a2f;
+            color: #fff;
+        }
+
+        .label-with-btn {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 6px;
+        }
+
+        .label-with-btn .form-label-icon {
+            margin-bottom: 0;
+        }
+
 
     </style>
     <div class="content">
@@ -67,7 +99,10 @@
 
                         <div class="col-lg-3 col-sm-6 col-6">
                             <div class="form-group">
-                                <label class="form-label-icon"><i class="fa-solid fa-layer-group"></i> Category <span class="required">*</span></label>
+                                <div class="label-with-btn">
+                                    <label class="form-label-icon"><i class="fa-solid fa-layer-group"></i> Category <span class="required">*</span></label>
+                                    <button type="button" class="btn btn-add-quick" onclick="openQuickAdd('category')">Add Category</button>
+                                </div>
                                 <select class="select" name="category_id" id="category_id">
                                     <option value="">Choose Category</option>
                                 </select>
@@ -77,10 +112,12 @@
 
                         <div class="col-lg-3 col-sm-6 col-6">
                             <div class="form-group">
-                                <label class="form-label-icon"><i class="fa-solid fa-tag"></i> Brand</label>
+                                <div class="label-with-btn">
+                                    <label class="form-label-icon"><i class="fa-solid fa-tag"></i> Brand</label>
+                                    <button type="button" class="btn btn-add-quick" onclick="openQuickAdd('brand')">Add Brand</button>
+                                </div>
                                 <select class="select" name="brand_id" id="brand_id">
                                     <option value="">Choose Brand</option>
-
                                 </select>
                                 <span class="error_brand_id text-danger"></span>
                             </div>
@@ -135,7 +172,10 @@
 
                         <div class="col-lg-3 col-sm-6 col-6">
                             <div class="form-group">
-                                <label class="form-label-icon"><i class="fa-solid fa-ruler-combined"></i> Unit <span class="required">*</span></label>
+                                <div class="label-with-btn">
+                                    <label class="form-label-icon"><i class="fa-solid fa-ruler-combined"></i> Unit <span class="required">*</span></label>
+                                    <button type="button" class="btn btn-add-quick" onclick="openQuickAdd('unit')">Add Unit</button>
+                                </div>
                                 <select class="select" name="unit_id" id="unit_id">
                                     <option value="">Choose Unit</option>
                                 </select>
@@ -336,6 +376,20 @@
                 errorSpan.text(""); // clear error if valid
             }
         });
+
+        // 🔹 Quick Add button handler — opens the existing custom modal
+        function openQuickAdd(type) {
+            const labels = { brand: 'Brand', category: 'Category', unit: 'Unit' };
+            $('#customModalLabel').text('Add New ' + (labels[type] || type));
+            $('#custom_name').val('');
+            $(".error_model").text('');
+
+            // Set globals used by the existing saveCustomBtn handler
+            window._quickAddType = type;
+            window._quickAddCustomValue = null;
+
+            $('#customModal').modal('show');
+        }
         $(document).ready(function() {
             $(document).on('click', '.submit', function(e) {
                 e.preventDefault();
@@ -636,6 +690,12 @@
                 const name = $('#custom_name').val().trim();
                 let sub_admin_id = sub_branch_id;
 
+                // Support quick-add button (fallback to window globals if local vars are null)
+                if (!currentType && window._quickAddType) {
+                    currentType = window._quickAddType;
+                    currentCustomValue = window._quickAddCustomValue;
+                }
+
                 $(".error_model").text(""); // reset error
 
                 if (name === "") {
@@ -818,6 +878,8 @@
                 modalOpen = false;
                 currentCustomValue = null;
                 currentType = null;
+                window._quickAddType = null;
+                window._quickAddCustomValue = null;
             });
 
             // ✅ Page load par call karo
@@ -1096,6 +1158,8 @@
                 modalOpen = false;
                 currentCustomValue = null;
                 currentType = null;
+                window._quickAddType = null;
+                window._quickAddCustomValue = null;
             });
 
             // 🔹 GST Option Change Handler

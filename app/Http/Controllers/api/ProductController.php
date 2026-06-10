@@ -452,30 +452,11 @@ class ProductController extends Controller
             'name'          => 'required|string|max:255',
             'description'   => 'nullable|string',
             'price'         => 'required|numeric|gt:0',
-            'SKU' => [
-                'required',
-                'string',
-                'max:255',
-                Rule::unique('products', 'SKU')
-                    ->where(function ($q) use ($branchId) {
-                        return $q->where('branch_id', $branchId)
-                                ->where('isDeleted', 0); // 👈 IMPORTANT
-                    }),
-            ],
-            // 'hsn_code' => ['required', 'string', 'max:255', Rule::unique('products', 'hsn_code')->where(fn($q) => $q->where('branch_id', $branchId)),],
-            'hsn_code' => 'nullable',
-            'barcode' => [
-                'nullable',
-                'string',
-                'max:255',
-                Rule::unique('products', 'barcode')
-                    ->where(function ($q) use ($branchId) {
-                        return $q->where('branch_id', $branchId)
-                                ->where('isDeleted', 0);
-                    }),
-            ],
+            'SKU'           => 'nullable|string|max:255',
+            'hsn_code'      => 'nullable',
+            'barcode'       => 'nullable|string|max:255',
             'quantity'      => 'required|integer|gt:0',
-            'unit_id' => 'required|numeric',
+            'unit_id'       => 'required|numeric',
             'status'        => 'nullable|in:active,inactive',
             'availablility' => 'nullable|in:in_stock,out_stock',
             'gst_option'    => 'nullable|in:with_gst,without_gst',
@@ -629,30 +610,9 @@ class ProductController extends Controller
             'name'          => 'required|string|max:255',
             'description'   => 'nullable|string',
             'price'         => 'required|numeric|gt:0',
-            'SKU' => [
-                'required',
-                'string',
-                'max:255',
-                Rule::unique('products', 'SKU')
-                    ->where(function ($q) use ($branchId) {
-                        return $q->where('branch_id', $branchId)
-                                ->where('isDeleted', 0); // 👈 ADD THIS
-                    })
-                    ->ignore($request->product_id),
-            ],
-            // 'hsn_code' => ['required', 'string', 'max:255', Rule::unique('products', 'hsn_code')->where(fn($q) => $q->where('branch_id', $branchId))->ignore($request->product_id),],
-            'hsn_code' => 'nullable',
-            'barcode' => [
-                'nullable',
-                'string',
-                'max:255',
-                Rule::unique('products', 'barcode')
-                    ->where(function ($q) use ($branchId) {
-                        return $q->where('branch_id', $branchId)
-                                ->where('isDeleted', 0); // 👈 ADD THIS
-                    })
-                    ->ignore($request->product_id),
-            ],
+            'SKU'           => 'nullable|string|max:255',
+            'hsn_code'      => 'nullable',
+            'barcode'       => 'nullable|string|max:255',
             'quantity'      => 'required|integer|gt:0',
             'unit_id' => 'required|numeric',
             'status'        => 'nullable|in:active,inactive',

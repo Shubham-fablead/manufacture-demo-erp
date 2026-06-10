@@ -30,10 +30,10 @@ class SubBranchController extends Controller
 
         $rules = [
             'customer_name' => 'required|string|max:80',
-            'email' => 'required|email|unique:users,email',
+            'email' => 'nullable|email|unique:users,email',
             'phone' => 'required|numeric|digits:10|unique:users,phone',
             'password' => [
-                'required',
+                'nullable',
                 'string',
                 'min:8',
                 'max:255',
@@ -65,7 +65,6 @@ class SubBranchController extends Controller
         $customer->name     = $request->customer_name;
         $customer->email    = $request->email;
         $customer->phone    = $request->phone;
-        $customer->password = Hash::make($request->password);
 
         if ($request->hasFile('avatar')) {
             $path                    = $request->file('avatar')->store('staff', 'public');
@@ -74,6 +73,11 @@ class SubBranchController extends Controller
 
         $customer->role   = 'sub-admin';
         $customer->status = 1;
+
+        if (!empty($request->password)) {
+            $customer->password = Hash::make($request->password);
+        }
+
         $customer->save();
 
         // ✅ Create user details
