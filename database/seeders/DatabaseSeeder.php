@@ -19,5 +19,9 @@ class DatabaseSeeder extends Seeder
             'role' => 'admin',
             'status' => 1,
         ]);
+
+        $this->call([
+            ModuleSeeder::class,
+        ]);
     }
 }

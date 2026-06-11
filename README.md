@@ -69,9 +69,10 @@ Fablead ERP System is a Laravel-based manufacturing ERP designed to manage raw m
 
    Use the same host consistently. Do not mix `localhost` and `127.0.0.1`.
 
-5. Run migrations and Passport.
+5. Run migrations, seed modules, and install Passport.
    ```bash
    php artisan migrate
+   php artisan db:seed --class=ModuleSeeder
    php artisan passport:install --force
    ```
 
@@ -79,6 +80,8 @@ Fablead ERP System is a Laravel-based manufacturing ERP designed to manage raw m
    ```text
    database/inventory_and_billing.sql
    ```
+
+   > If you imported the demo SQL, the modules table is already populated. You can still run the seeder safely — it uses `updateOrInsert` so it will not create duplicates.
 
 7. Link storage.
    ```bash
@@ -199,6 +202,44 @@ This application uses two layers of authentication:
 - `ImagePath` should end with a trailing slash.
 - Keep the same base URL throughout the session, especially during local development.
 - If images or CSS do not load, check `ImagePath` first.
+
+## Seeders
+
+### ModuleSeeder
+
+Seeds the `modules` table with all permission modules used for staff role-based access control.
+
+Run it on a fresh install after migration:
+
+```bash
+php artisan db:seed --class=ModuleSeeder
+```
+
+It is safe to re-run at any time. It uses `updateOrInsert` so existing rows are updated and missing rows are inserted without creating duplicates.
+
+Modules seeded:
+
+| ID | Module Name       |
+|----|-------------------|
+| 1  | Products          |
+| 2  | Sales and Orders  |
+| 3  | Purchases         |
+| 4  | Invoices          |
+| 5  | Expenses          |
+| 6  | Categories        |
+| 8  | Staff             |
+| 9  | Customers         |
+| 10 | Vendors           |
+| 16 | Manage Accounting |
+| 17 | Manage Inventory  |
+| 23 | Advance Pay       |
+| 26 | Attendance        |
+| 27 | Transaction       |
+| 28 | Leaves            |
+| 29 | Payroll           |
+| 30 | FollowUps         |
+| 31 | Meetings          |
+| 32 | Manage Leads      |
 
 ## Troubleshooting
 

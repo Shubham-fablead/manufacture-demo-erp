@@ -14,7 +14,7 @@ class StaffController extends Controller
     }
     public function add_staff(Request $request)
     {
-        $modules = Module::all();
+        $modules = Module::orderBy('id')->get();
         return view('staff/addstaff',compact('modules'));
     }
     public function edit_staff(Request $request)

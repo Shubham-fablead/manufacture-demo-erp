@@ -278,16 +278,16 @@
                     </li>
                 @endif
                 {{-- transaction --}}
-                @if (app('hasPermission')(27, 'view'))
+                @if (app('hasPermission')(28, 'view'))
                     <li class="submenu">
                         <a href="javascript:void(0);">
                             <i class="fas fa-book"></i>
                             <span>Cash & Bank</span> <span class="menu-arrow"></span></a>
                         <ul>
-                            @if (app('hasPermission')(27, 'view'))
+                            @if (app('hasPermission')(28, 'view'))
                                 <li><a href="{{ route('transaction.bankbook') }}">Bank Book</a></li>
                             @endif
-                            @if (app('hasPermission')(27, 'view'))
+                            @if (app('hasPermission')(28, 'view'))
                                 <li><a href="{{ route('transaction.cashbook') }}">Cash Book</a></li>
                             @endif
                         </ul>
@@ -295,7 +295,7 @@
                 @endif
 
                 {{-- Credit Notes --}}
-                @if (app('hasPermission')(27, 'view'))
+                @if (app('hasPermission')(28, 'view'))
                     <li class="submenu">
                         <a href="javascript:void(0);">
                             <i class="fa fa-credit-card me-2"></i>
@@ -304,7 +304,7 @@
 
                             <span>Credit/Debit Notes</span> <span class="menu-arrow"></span></a>
                         <ul>
-                            @if (app('hasPermission')(27, 'view'))
+                            @if (app('hasPermission')(28, 'view'))
                                 <li>
                                     <a href="{{ route('credit-notes-items.index') }}">
                                         Credit Notes
