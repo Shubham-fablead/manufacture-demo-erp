@@ -305,7 +305,8 @@ class StaffController extends Controller
             'nullable',
             'email',
             Rule::unique('users', 'email')->where(function ($query) use ($userBranchId) {
-                return $query->where('branch_id', $userBranchId)->where('isDeleted', 0);
+                return $query->where('branch_id', $userBranchId)->where('isDeleted', 0)
+                    ->whereIn('role', ['staff', 'hr']);
             }),
         ],
         'role'          => 'required|in:staff,hr',
@@ -314,7 +315,8 @@ class StaffController extends Controller
             'numeric',
             'digits:10',
             Rule::unique('users')->where(function ($query) use ($userBranchId) {
-                return $query->where('branch_id', $userBranchId)->where('isDeleted', 0);
+                return $query->where('branch_id', $userBranchId)->where('isDeleted', 0)
+                    ->whereIn('role', ['staff', 'hr']);
             }),
         ],
         'gst_number'    => 'nullable|string|max:15',
@@ -714,7 +716,8 @@ class StaffController extends Controller
                 'nullable',
                 'email',
                 Rule::unique('users', 'email')->ignore($id)->where(function ($query) use ($userBranchId) {
-                    return $query->where('branch_id', $userBranchId)->where('isDeleted', 0);
+                    return $query->where('branch_id', $userBranchId)->where('isDeleted', 0)
+                        ->whereIn('role', ['staff', 'hr']);
                 }),
             ],
             'phone'      => [
@@ -722,7 +725,8 @@ class StaffController extends Controller
                 'numeric',
                 'digits:10',
                 Rule::unique('users')->ignore($id)->where(function ($query) use ($userBranchId) {
-                    return $query->where('branch_id', $userBranchId)->where('isDeleted', 0);
+                    return $query->where('branch_id', $userBranchId)->where('isDeleted', 0)
+                        ->whereIn('role', ['staff', 'hr']);
                 }),
             ],
             'country'    => 'nullable|string|max:100',

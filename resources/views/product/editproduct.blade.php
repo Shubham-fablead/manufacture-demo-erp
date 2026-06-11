@@ -42,6 +42,38 @@
             color: #dc3545;
             margin-left: 2px;
         }
+
+        .btn-add-quick {
+            background: #ff9f43;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            height: 30px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 12px;
+            font-size: 12px;
+            font-weight: 500;
+            white-space: nowrap;
+            line-height: 1;
+        }
+
+        .btn-add-quick:hover {
+            background: #e08a2f;
+            color: #fff;
+        }
+
+        .label-with-btn {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 6px;
+        }
+
+        .label-with-btn .form-label-icon {
+            margin-bottom: 0;
+        }
     </style>
     <div class="content">
         {{-- <div class="page-header">
@@ -74,7 +106,10 @@
 
                         <div class="col-lg-3 col-sm-6 col-6">
                             <div class="form-group">
-                                <label class="form-label-icon"><i class="fa-solid fa-layer-group"></i> Category <span class="required">*</span></label>
+                                <div class="label-with-btn">
+                                    <label class="form-label-icon"><i class="fa-solid fa-layer-group"></i> Category <span class="required">*</span></label>
+                                    <button type="button" class="btn btn-add-quick" onclick="openQuickAdd('category')">Add Category</button>
+                                </div>
                                 <select class="select" name="category_id" id="category_id">
                                     <option value="">Choose Category</option>
 
@@ -85,7 +120,10 @@
 
                         <div class="col-lg-3 col-sm-6 col-6">
                             <div class="form-group">
-                                <label class="form-label-icon"><i class="fa-solid fa-tag"></i> Brand</label>
+                                <div class="label-with-btn">
+                                    <label class="form-label-icon"><i class="fa-solid fa-tag"></i> Brand</label>
+                                    <button type="button" class="btn btn-add-quick" onclick="openQuickAdd('brand')">Add Brand</button>
+                                </div>
                                 <select class="select" name="brand_id" id="brand_id">
                                     <option value="">Choose Brand</option>
 
@@ -144,7 +182,10 @@
 
                         <div class="col-lg-3 col-sm-6 col-6">
                             <div class="form-group">
-                                <label class="form-label-icon"><i class="fa-solid fa-ruler-combined"></i> Unit</label>
+                                <div class="label-with-btn">
+                                    <label class="form-label-icon"><i class="fa-solid fa-ruler-combined"></i> Unit</label>
+                                    <button type="button" class="btn btn-add-quick" onclick="openQuickAdd('unit')">Add Unit</button>
+                                </div>
                                 <select class="select" name="unit_id" id="unit_id">
                                     <option value="">Choose Unit</option>
                                 </select>
@@ -401,6 +442,25 @@
                     errorSpan.text(""); // clear error if valid
                 }
             });
+
+            // 🔹 Shared state for quick-add modal (must be outer scope)
+            let currentType = null;
+            let currentCustomValue = null;
+            let modalOpen = false;
+
+            // 🔹 Quick Add button handler — opens the existing custom modal
+            function openQuickAdd(type) {
+                const labels = { brand: 'Brand', category: 'Category', unit: 'Unit' };
+                $('#customModalLabel').text('Add New ' + (labels[type] || type));
+                $('#custom_name').val('');
+                $(".error_model").text('');
+
+                // Set globals used by the saveCustomBtn handler
+                currentType = type;
+                currentCustomValue = null;
+
+                $('#customModal').modal('show');
+            }
 
             $(document).ready(function() {
                 $(document).on('click', '.submit', function(e) {
@@ -706,10 +766,6 @@
                     }
                 });
 
-                let modalOpen = false;
-                let currentType = null;
-                let currentCustomValue = null;
-
                 // 🔹 Listen for Select2 New Tag
                 $('#brand_id, #category_id, #product_type_id', '#unit_id').on('select2:select', function(e) {
                     let data = e.params.data;
@@ -763,6 +819,13 @@
                     } else if (currentType === "category") {
                         url = "/api/addcategory";
                         targetDropdown = "#category_id";
+                    } else if (currentType === "unit") {
+                        url = "/api/add-units";
+                        targetDropdown = "#unit_id";
+                        postData = {
+                            unitname: name,
+                            selectedSubAdminId: sub_branch_id
+                        };
                     }
                     // else if (currentType === "product_type") {
                     //     url = "/api/product-type-add";
@@ -790,6 +853,12 @@
                             } else if (currentType === "category") {
                                 id = response.category.id;
                                 text = response.category.name;
+                            } else if (currentType === "unit") {
+                                let unitData = response.data ?? response.unit ?? null;
+                                if (unitData) {
+                                    id = unitData.id;
+                                    text = unitData.unit_name ?? unitData.name ?? '';
+                                }
                             } else if (currentType === "product_type") {
                                 id = response.data.id;
                                 text = response.data.name;
@@ -814,6 +883,8 @@
                                 get_brand(id);
                             } else if (currentType === "category") {
                                 get_category(id);
+                            } else if (currentType === "unit") {
+                                get_unit(id);
                             }
                             //  else if (currentType === "product_type") {
                             //     get_product_type(id);

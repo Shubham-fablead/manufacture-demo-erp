@@ -172,7 +172,8 @@ class SupplierController extends Controller
                 'email',
                 Rule::unique('users', 'email')->where(function ($query) use ($userBranchId) {
                     return $query->where('branch_id', $userBranchId)
-                        ->where('isDeleted', 0);
+                        ->where('isDeleted', 0)
+                        ->where('role', 'vendor');
                 }),
             ],
 
@@ -182,7 +183,8 @@ class SupplierController extends Controller
                 'regex:/^[0-9]{10}$/',
                 Rule::unique('users', 'phone')->where(function ($query) use ($userBranchId) {
                     return $query->where('branch_id', $userBranchId)
-                        ->where('isDeleted', 0);
+                        ->where('isDeleted', 0)
+                        ->where('role', 'vendor');
                 }),
             ],
 
@@ -325,7 +327,8 @@ class SupplierController extends Controller
                 'email',
                 Rule::unique('users', 'email')->ignore($id)->where(function ($query) use ($userBranchId) {
                     return $query->where('branch_id', $userBranchId)
-                        ->where('isDeleted', 0);
+                        ->where('isDeleted', 0)
+                        ->where('role', 'vendor');
                 }),
             ],
 
@@ -335,7 +338,8 @@ class SupplierController extends Controller
                 'regex:/^[0-9]{10}$/',
                 Rule::unique('users', 'phone')->ignore($id)->where(function ($query) use ($userBranchId) {
                     return $query->where('branch_id', $userBranchId)
-                        ->where('isDeleted', 0);
+                        ->where('isDeleted', 0)
+                        ->where('role', 'vendor');
                 }),
             ],
 
