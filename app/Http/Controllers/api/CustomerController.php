@@ -218,7 +218,8 @@ class CustomerController extends Controller
                 'email',
                 Rule::unique('users', 'email')->where(function ($query) use ($branchId) {
                     return $query->where('branch_id', $branchId)
-                        ->where('isDeleted', 0);
+                        ->where('isDeleted', 0)
+                        ->where('role', 'customer');
                 }),
             ],
 
@@ -228,7 +229,8 @@ class CustomerController extends Controller
                 'regex:/^[0-9]{10}$/', // numbers only
                 Rule::unique('users', 'phone')->where(function ($query) use ($branchId) {
                     return $query->where('branch_id', $branchId)
-                        ->where('isDeleted', 0);
+                        ->where('isDeleted', 0)
+                        ->where('role', 'customer');
                 }),
             ],
 
@@ -390,7 +392,8 @@ class CustomerController extends Controller
                 'email',
                 Rule::unique('users', 'email')->ignore($id)->where(function ($query) use ($branchId) {
                     return $query->where('branch_id', $branchId)
-                        ->where('isDeleted', 0);
+                        ->where('isDeleted', 0)
+                        ->where('role', 'customer');
                 }),
             ],
 
@@ -400,7 +403,8 @@ class CustomerController extends Controller
                 'regex:/^[0-9]{10}$/', // numbers only
                 Rule::unique('users', 'phone')->ignore($id)->where(function ($query) use ($branchId) {
                     return $query->where('branch_id', $branchId)
-                        ->where('isDeleted', 0);
+                        ->where('isDeleted', 0)
+                        ->where('role', 'customer');
                 }),
             ],
 
