@@ -978,8 +978,9 @@ class SalesController extends Controller
             }
 
             $preTdsTotal = $productTotalBeforeTds + $shippingAmount + $labourSubtotal;
-            $tdsPercentage = $isTdsEnabled ? max(0, min(100, (float) ($request->tds_percentage ?? 0))) : 0;
-            $tdsAmount = $isTdsEnabled ? round(($preTdsTotal * $tdsPercentage) / 100, 2) : 0;
+            // TDS applies on product subtotal only (not shipping or labour)
+            $tdsPercentage = max(0, min(100, (float) ($request->tds_percentage ?? 0)));
+            $tdsAmount = round(($productTotalBeforeTds * $tdsPercentage) / 100, 2);
             $roundedTotal = max(0, round($preTdsTotal - $tdsAmount));
 
             /*
@@ -2339,10 +2340,10 @@ public function update_sale(Request $request)
             }
         }
         $preTdsGrandTotal = ($totalProductsWithGstAndDiscount - $discountAmount) + ($request->shipping ?? 0) + $labourSubtotal;
-        $settings = Setting::where('branch_id', $branchIdToUse)->first();
-        $isTdsEnabled = (bool) ($settings->tds_apply ?? false);
-        $tdsPercentage = $isTdsEnabled ? max(0, min(100, (float) ($request->tds_percentage ?? 0))) : 0;
-        $tdsAmount = $isTdsEnabled ? round(($preTdsGrandTotal * $tdsPercentage) / 100, 2) : 0;
+        // TDS applies on product subtotal only (not shipping or labour)
+        $productOnlyBase = $totalProductsWithGstAndDiscount - $discountAmount;
+        $tdsPercentage = max(0, min(100, (float) ($request->tds_percentage ?? 0)));
+        $tdsAmount = round(($productOnlyBase * $tdsPercentage) / 100, 2);
         $grandTotal = max(0, round($preTdsGrandTotal - $tdsAmount));
 
         $isQuotationOrder = $updatedQuotationStatus === 'quotation';

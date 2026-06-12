@@ -223,17 +223,7 @@
                                             <input type="text" id="cin_no" placeholder="Enter CIN Number">
                                         </div>
                                     </div>
-                                </div>
 
-                                {{-- Wizard nav for step 1 --}}
-                                <div class="wizard-nav-btns" style="display:none;">
-                                    <button type="button" class="btn btn-wizard-next" data-wizard-next="2">Next</button>
-                                </div>
-                            </div>{{-- /panel 1 --}}
-
-                            {{-- ══════════════ STEP 2 – Finance & Address ══════════════ --}}
-                            <div class="shop-wizard-panel col-12 px-0" id="shopWizardPanel2">
-                                <div class="row">
                                     <div class="col-lg-3 col-sm-6 col-6">
                                         <div class="form-group">
                                             <label>Bank Name<span class="manitory">*</span></label>
@@ -247,7 +237,17 @@
                                             <input type="text" id="branch" placeholder="Enter Branch">
                                         </div>
                                     </div>
+                                </div>
 
+                                {{-- Wizard nav for step 1 --}}
+                                <div class="wizard-nav-btns" style="display:none;">
+                                    <button type="button" class="btn btn-wizard-next" data-wizard-next="2">Next</button>
+                                </div>
+                            </div>{{-- /panel 1 --}}
+
+                            {{-- ══════════════ STEP 2 – Finance & Address ══════════════ --}}
+                            <div class="shop-wizard-panel col-12 px-0" id="shopWizardPanel2">
+                                <div class="row">
                                     <div class="col-lg-3 col-sm-6 col-6">
                                         <div class="form-group">
                                             <label>A/C No.<span class="manitory">*</span></label>
