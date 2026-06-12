@@ -3344,8 +3344,8 @@
                 const tdsPercentage = Math.max(0, Math.min(100, tdsPercentageInput));
 
                 const preTdsTotal = priceAfterGlobalDiscount + totalProductGst + shipping + labourTotal;
-                // TDS is calculated on product subtotal only (not shipping or labour)
-                const tdsBasis = priceAfterGlobalDiscount + totalProductGst;
+                // TDS is calculated on product subtotal only (not GST, shipping or labour)
+                const tdsBasis = priceAfterGlobalDiscount;
                 const tdsAmount = isTdsEnabled ? (tdsBasis * tdsPercentage) / 100 : 0;
 
                 let finalTotal = preTdsTotal - tdsAmount;

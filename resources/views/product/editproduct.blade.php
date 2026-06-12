@@ -300,6 +300,7 @@
                         <div class="mb-3">
                             <label for="custom_name" class="form-label">Name</label>
                             <input type="text" class="form-control" id="custom_name" placeholder="Enter name">
+                            <span class="text-danger error_model small d-block mt-1"></span>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -307,7 +308,6 @@
                             onclick="modalOpen=false;">Cancel</button>
                         <button type="button" class="btn btn-primary" id="saveCustomBtn">Save</button>
                     </div>
-                    <span class="text-danger error_model"></span>
                 </div>
             </div>
         </div>
@@ -803,8 +803,10 @@
 
                     if (name === "") {
                         $(".error_model").text("Please enter a name");
+                        $('#custom_name').css('border-color', '#dc3545').focus();
                         return;
                     }
+                    $('#custom_name').css('border-color', '');
 
                     let url = "";
                     let targetDropdown = "";
@@ -907,6 +909,23 @@
                             console.error(xhr.responseText);
                         }
                     });
+                });
+
+                // Reset modal on close — clear border and error
+                $('#customModal').on('hidden.bs.modal', function() {
+                    modalOpen = false;
+                    currentCustomValue = null;
+                    currentType = null;
+                    $('#custom_name').val('').css('border-color', '');
+                    $(".error_model").text('');
+                });
+
+                // Clear error as user types
+                $(document).off('input.editModalValidation', '#custom_name').on('input.editModalValidation', '#custom_name', function() {
+                    if ($(this).val().trim() !== '') {
+                        $(this).css('border-color', '');
+                        $(".error_model").text('');
+                    }
                 });
 
                 // 🔹 GST Option Change Handler
