@@ -288,15 +288,15 @@
                     <div class="mb-3">
                         <label for="custom_name" class="form-label">Name</label>
                         <input type="text" class="form-control" id="custom_name" placeholder="Enter name">
-                        <span class="error_custom_name text-danger"></span>
+                        <span class="error_custom_name text-danger small d-block mt-1"></span>
                     </div>
+                    <span class="text-danger error_model small d-block"></span>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
                         onclick="modalOpen=false;">Cancel</button>
                     <button type="button" class="btn btn-primary" id="saveCustomBtn">Save</button>
                 </div>
-                <span class="text-danger error_model"></span>
             </div>
         </div>
     </div>
@@ -700,8 +700,10 @@
 
                 if (name === "") {
                     $(".error_model").text("Please enter a name");
+                    $('#custom_name').css('border-color', '#dc3545').focus();
                     return;
                 }
+                $('#custom_name').css('border-color', '');
 
                 let url = "";
                 let targetDropdown = "";
@@ -880,6 +882,16 @@
                 currentType = null;
                 window._quickAddType = null;
                 window._quickAddCustomValue = null;
+                $('#custom_name').val('').css('border-color', '');
+                $(".error_model").text('');
+            });
+
+            // Clear error on input
+            $(document).off('input.modalValidation', '#custom_name').on('input.modalValidation', '#custom_name', function() {
+                if ($(this).val().trim() !== '') {
+                    $(this).css('border-color', '');
+                    $(".error_model").text('');
+                }
             });
 
             // ✅ Page load par call karo

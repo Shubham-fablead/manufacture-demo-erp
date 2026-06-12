@@ -1412,7 +1412,7 @@
                 <div class="overview-title">
                     <div>
                         <h4>CRM Pipeline Overview</h4>
-                        <p>Lead movement, customer conversion, and pending relationship work.</p>
+                        /* <p>Lead movement, customer conversion, and pending relationship work.</p> */
                     </div>
                     <a href="{{ route('lead.list') }}" class="btn btn-sm btn-primary">View Leads</a>
                 </div>
@@ -1697,7 +1697,7 @@
                 <div class="overview-title">
                     <div>
                         <h4>HR Workforce Overview</h4>
-                        <p>Staff strength, attendance performance, payroll progress, and advance exposure.</p>
+                        /* <p>Staff strength, attendance performance, payroll progress, and advance exposure.</p> */
                     </div>
                     <a href="{{ route('staff.list') }}" class="btn btn-sm btn-primary">View Staff</a>
                 </div>

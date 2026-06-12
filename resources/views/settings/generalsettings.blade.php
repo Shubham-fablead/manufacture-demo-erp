@@ -28,8 +28,8 @@
             opacity: 1;
         }
 
-        /* ===== TABLET MULTI-STEP WIZARD (768px – 1199px) ===== */
-        @media screen and (min-width: 576px) and (max-width: 1199px) {
+        /* ===== MOBILE + TABLET MULTI-STEP WIZARD (up to 1199px) ===== */
+        @media screen and (max-width: 1199px) {
 
             /* Step indicator bar */
             .shop-wizard-steps {
@@ -70,14 +70,14 @@
                 display: block !important;
             }
 
-            /* On tablet, each field is half-width (2 per row) */
+            /* Each field is half-width (2 per row) */
             #shop-settings .shop-wizard-panel .col-lg-3,
             #shop-settings .shop-wizard-panel .col-sm-6,
             #shop-settings .shop-wizard-panel .col-6 {
                 flex: 0 0 50% !important;
                 max-width: 50% !important;
             }
-            /* Address & GPS take full width on tablet */
+            /* Address & GPS take full width */
             #shop-settings .shop-wizard-panel .col-sm-6.full-tablet {
                 flex: 0 0 100% !important;
                 max-width: 100% !important;
@@ -110,24 +110,18 @@
                 border: 1px solid #dee2e6;
             }
 
-            /* Hide the original desktop submit row on tablet */
+            /* Hide the original desktop submit row */
             .desktop-submit {
                 display: none !important;
             }
         }
 
-        /* On large screens (≥1200px) hide wizard chrome, show original layout */
-        @media screen and (min-width: 1200px) {
-            .shop-wizard-steps { display: none !important; }
-            .shop-wizard-panel { display: contents !important; }
-            .wizard-nav-btns   { display: none !important; }
-        }
-
-        /* On small phones (<576px) hide wizard chrome, show original layout */
-        @media screen and (max-width: 575px) {
-            .shop-wizard-steps { display: none !important; }
-            .shop-wizard-panel { display: contents !important; }
-            .wizard-nav-btns   { display: none !important; }
+        /* On small phones, make step labels shorter so they fit */
+        @media screen and (max-width: 400px) {
+            .shop-wizard-steps .wizard-step-btn {
+                font-size: 11px;
+                padding: 7px 6px;
+            }
         }
     </style>
 
@@ -1878,7 +1872,7 @@
 
             // ================== SHOP SETTINGS TABLET WIZARD ==================
             (function initShopWizard() {
-                var TABLET_MIN = 576, TABLET_MAX = 1199;
+                var TABLET_MIN = 0, TABLET_MAX = 1199;
 
                 function isTablet() {
                     return window.innerWidth >= TABLET_MIN && window.innerWidth <= TABLET_MAX;
