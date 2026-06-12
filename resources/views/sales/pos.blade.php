@@ -1756,8 +1756,8 @@
                                     </div>
                                 </div>
                             </div>
-                            @if ((bool) ($setting->tds_apply ?? false))
-                                <div class="row mt-2">
+                            @if (!empty($setting->tds_apply) && $setting->tds_apply == 1)
+                            <div class="row mt-2">
                                     <div class="col-lg-6 col-6">
                                         <div class="select-group w-100">
                                             <label for="tds_percentage">TDS Percentage (%)</label>
@@ -1773,6 +1773,9 @@
                                         </div>
                                     </div>
                                 </div>
+                            @else
+                                <input type="hidden" name="tds_percentage" id="tds_percentage" value="0">
+                                <input type="hidden" name="tds_amount" id="tds_amount" value="0.00">
                             @endif
                         </div>
                         <div class="col-lg-12 ">
@@ -3341,7 +3344,9 @@
                 const tdsPercentage = Math.max(0, Math.min(100, tdsPercentageInput));
 
                 const preTdsTotal = priceAfterGlobalDiscount + totalProductGst + shipping + labourTotal;
-                const tdsAmount = isTdsEnabled ? (preTdsTotal * tdsPercentage) / 100 : 0;
+                // TDS is calculated on product subtotal only (not shipping or labour)
+                const tdsBasis = priceAfterGlobalDiscount + totalProductGst;
+                const tdsAmount = isTdsEnabled ? (tdsBasis * tdsPercentage) / 100 : 0;
 
                 let finalTotal = preTdsTotal - tdsAmount;
                 let roundedTotal = Math.round(finalTotal);
@@ -3372,6 +3377,7 @@
                     $(".tds-amount-summary").html(
                         `- ${formatCurrency(tdsAmount.toFixed(2), currencySymbol, currencyPosition)}`
                     );
+                    // Always show TDS row (even at 0.00 so user can see it)
                     $(".tds-summary-row").show();
                 } else {
                     $(".tds-summary-row").hide();
@@ -3988,10 +3994,6 @@
                 calculateTotals();
             });
             $("#tds_percentage").on("blur", function() {
-                if (!isTdsEnabled) {
-                    return;
-                }
-
                 const rawValue = ($(this).val() || "").trim();
                 if (rawValue === "") {
                     $("#tds_amount").val("0.00");

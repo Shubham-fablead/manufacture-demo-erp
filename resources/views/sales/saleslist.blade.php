@@ -1398,11 +1398,13 @@
 
                         <div class="border p-2 rounded bg-light">
                             <strong>Total Amount:</strong> ₹<span id="emiTotal"></span><br>
+                            <div id="tdsSummarySection" class="d-none">
+                                <strong>TDS (<span id="modalTdsPercentage">0.00</span>%):</strong> ₹<span id="modalTdsAmount">0.00</span><br>
+                            </div>
                             <div id="returnAmountSection" class="d-none">
                                 <strong>Return Amount:</strong> ₹<span id="returnAmountDisplay">0.00</span><br>
                             </div>
                             <strong>Remaining Amount:</strong> ₹<span id="remainingAmountDisplay">0.00</span>
-
                         </div>
 
                         <!-- ✅ View Payment History Button -->
@@ -1541,6 +1543,12 @@
                         </div>
 
                         <div class="mb-3">
+                            <label for="paymentDate" class="form-label">Payment Date</label>
+                            <input type="text" class="form-control datetimepicker" id="paymentDate" name="payment_date" autocomplete="off" placeholder="DD-MM-YYYY">
+                            <div class="text-danger" id="paymentDateError"></div>
+                        </div>
+
+                        <div class="mb-3">
                             <label for="paymentRemarks" class="form-label">Remark</label>
                             <input type="text" class="form-control" id="paymentRemarks" name="remarks"
                                 placeholder="Enter remark">
@@ -1563,6 +1571,7 @@
                         <input type="hidden" id="paymentJobCardId" name="order_id">
                         <input type="hidden" id="remainingAmountHidden" name="remaining_amount">
                         <input type="hidden" id="paymentMethodHidden" name="payment_type">
+                        <input type="hidden" id="paymentDateHidden" name="payment_date_value">
 
 
 
@@ -2427,6 +2436,8 @@
                 let remainingAmount = $(this).data('remaining-amount');
                 let returnAmount = parseFloat($(this).data('return-amount')) || 0;
                 let method = $(this).data('method') || '';
+                let tdsPct = parseFloat($(this).data('tds-percentage') || 0);
+                let tdsAmt = parseFloat($(this).data('tds-amount') || 0);
 
                 // ✅ Fill modal hidden inputs + text spans
                 $('#paymentJobCardId').val(jobCardId);
@@ -2449,8 +2460,62 @@
                     $('#returnAmountSection').addClass('d-none');
                 }
 
+                // ✅ Show TDS if available
+                if (tdsPct > 0 || tdsAmt > 0) {
+                    $('#modalTdsPercentage').text(tdsPct.toFixed(2));
+                    $('#modalTdsAmount').text(tdsAmt.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+                    $('#tdsSummarySection').removeClass('d-none');
+                } else {
+                    // Try fetching TDS from order details via AJAX
+                    $.ajax({
+                        url: '/api/sales/order-tds/' + jobCardId,
+                        method: 'GET',
+                        headers: { "Authorization": "Bearer " + authToken },
+                        success: function(res) {
+                            if (res.status && (parseFloat(res.tds_percentage) > 0 || parseFloat(res.tds_amount) > 0)) {
+                                $('#modalTdsPercentage').text(parseFloat(res.tds_percentage).toFixed(2));
+                                $('#modalTdsAmount').text(parseFloat(res.tds_amount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+                                $('#tdsSummarySection').removeClass('d-none');
+                            } else {
+                                $('#tdsSummarySection').addClass('d-none');
+                            }
+                        },
+                        error: function() {
+                            $('#tdsSummarySection').addClass('d-none');
+                        }
+                    });
+                }
+
                 $('#remainingAmountHidden').val(remainingAmount);
                 $('#paymentMethodHidden').val(method);
+
+                // ✅ Set today's date in payment date field
+                const today = moment().format('DD-MM-YYYY');
+                $('#paymentDate').val(today);
+                $('#paymentDateHidden').val(moment().format('YYYY-MM-DD'));
+
+                // Init datetimepicker on paymentDate if not already done
+                if (!$('#paymentDate').data('DateTimePicker')) {
+                    $('#paymentDate').datetimepicker({
+                        format: 'DD-MM-YYYY',
+                        useCurrent: true,
+                        showTodayButton: true,
+                        icons: {
+                            date: 'fa fa-calendar',
+                            previous: 'fa fa-chevron-left',
+                            next: 'fa fa-chevron-right',
+                            today: 'fa fa-crosshairs',
+                            clear: 'fa fa-trash',
+                            close: 'fa fa-times'
+                        }
+                    });
+                    $('#paymentDate').on('dp.change', function(e) {
+                        const val = e.date ? e.date.format('YYYY-MM-DD') : '';
+                        $('#paymentDateHidden').val(val);
+                    });
+                } else {
+                    $('#paymentDate').data('DateTimePicker').date(moment());
+                }
 
                 // ✅ Reset payment method dropdown to default
                 $('#paymentMethodSelect').val('');
@@ -2828,6 +2893,14 @@ $('#paymentHistoryList').html(historyHtml);
                     console.log("Payment method selected:", paymentMethod);
                 }
 
+                // Payment Date validation
+                const paymentDateVal = $('#paymentDate').val().trim();
+                if (!paymentDateVal) {
+                    isValid = false;
+                    $('#paymentDateError').text("Please select a payment date.");
+                    return false;
+                }
+
 
                 // Cash Payment Validation
                 if (paymentMethod === 'cash') {
@@ -3057,6 +3130,21 @@ $('#paymentHistoryList').html(historyHtml);
                 let formElement = $(this)[0];
                 let formData = new FormData(formElement);
 
+                // Append formatted payment date (YYYY-MM-DD) for backend
+                const pdHidden = $('#paymentDateHidden').val();
+                if (pdHidden) {
+                    formData.set('payment_date', pdHidden);
+                } else {
+                    // fallback: parse from display field
+                    const pdDisplay = $('#paymentDate').val().trim();
+                    if (pdDisplay) {
+                        const parts = pdDisplay.split('-');
+                        if (parts.length === 3) {
+                            formData.set('payment_date', `${parts[2]}-${parts[1]}-${parts[0]}`);
+                        }
+                    }
+                }
+
                 let submitButton = $(this).find('button[type="submit"]');
                 submitButton.prop('disabled', true).text('Processing...');
                 if (paymentMethodSelect === 'emi') {
@@ -3135,6 +3223,14 @@ $('#paymentHistoryList').html(historyHtml);
                 $('#paymentJobCardId').val('');
                 $('#remainingAmountHidden').val('');
                 $('#paymentMethodHidden').val('');
+
+                // Reset TDS and date fields
+                $('#tdsSummarySection').addClass('d-none');
+                $('#modalTdsPercentage').text('0.00');
+                $('#modalTdsAmount').text('0.00');
+                $('#paymentDate').val('');
+                $('#paymentDateHidden').val('');
+                $('#paymentDateError').text('');
             });
 
             function loadOrders(page = 1) {
@@ -3224,7 +3320,10 @@ $('#paymentHistoryList').html(historyHtml);
                                         data-emi-months="${order.remaining_emi_months}" data-emi-duration="${order.emi_duration || 0}"
                                         data-total-amount="${order.total_amount || 0}" data-remaining-amount="${order.remaining_amount}"
                                         data-return-amount="${order.total_return || 0}"
-                                        data-remaining-emi-months="${order.remaining_emi_months}" title="Make Payment">
+                                        data-remaining-emi-months="${order.remaining_emi_months}"
+                                        data-tds-percentage="${order.tds_percentage || 0}"
+                                        data-tds-amount="${order.tds_amount || 0}"
+                                        title="Make Payment">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="#092C4C" viewBox="0 0 24 24">
                                             <path d="M21 7H3V5h18v2zm0 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9h18zm-2 4H5v6h14v-6zM8 12h2v2H8v-2zm6 0h2v2h-2v-2z"/>
                                         </svg>

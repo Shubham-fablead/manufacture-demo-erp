@@ -850,8 +850,7 @@ $gstDataForAttribute = '[]';
                         </div>
                     </div>
 
-                    @if ((bool) ($setting->tds_apply ?? false))
-                        <div class="col-lg-3 col-sm-6 col-6">
+                    <div class="col-lg-3 col-sm-6 col-6">
                             <div class="form-group">
                                 <label>TDS Percentage (%)</label>
                                 <input type="number" class="form-control" name="tds_percentage"
@@ -869,7 +868,6 @@ $gstDataForAttribute = '[]';
                                     min="0" step="0.01" readonly>
                             </div>
                         </div>
-                    @endif
 
                     <div class="col-lg-3 col-sm-6 col-6" id="payment_method_col">
                         <div class="form-group">
@@ -1011,8 +1009,8 @@ $gstDataForAttribute = '[]';
                                 $shippingCost = $sales->shipping ?? 0;
 
                                 // 5.1 Calculate TDS
-                                $isTdsEnabled = (bool) ($setting->tds_apply ?? false);
-                                $tdsPercentage = $isTdsEnabled ? (float) ($sales->tds_percentage ?? 0) : 0;
+                                $isTdsEnabled = true;
+                                $tdsPercentage = (float) ($sales->tds_percentage ?? 0);
                                 $storedTdsAmount = (float) ($sales->tds_amount ?? 0);
 
                                 // 6. Calculate Taxes on (Products After Discount) only
@@ -1033,11 +1031,9 @@ $gstDataForAttribute = '[]';
                                 // 7. Grand Total
                                 $preTdsTotal =
                                     $productsAfterDiscount + $labourSubtotal + $shippingCost + $totalTaxAmount;
-                                $tdsAmount = $isTdsEnabled
-                                    ? ($storedTdsAmount > 0
-                                        ? $storedTdsAmount
-                                        : ($preTdsTotal * $tdsPercentage) / 100)
-                                    : 0;
+                                $tdsAmount = $storedTdsAmount > 0
+                                    ? $storedTdsAmount
+                                    : ($preTdsTotal * $tdsPercentage) / 100;
                                 $grandTotal = $preTdsTotal - $tdsAmount;
                                 $roundedGrandTotal = round($grandTotal);
                                 $roundOffAmount = $roundedGrandTotal - $grandTotal;
@@ -1255,8 +1251,7 @@ $gstDataForAttribute = '[]';
                                         </h5>
                                     </li>
 
-                                    <li class="tds-summary"
-                                        @if (!$isTdsEnabled) style="display:none;" @endif>
+                                    <li class="tds-summary">
                                         <h4>TDS (<span
                                                 id="tds-percentage-display">{{ number_format($tdsPercentage, 2) }}</span>%)
                                         </h4>
@@ -1441,7 +1436,7 @@ $gstDataForAttribute = '[]';
                     $(document).ready(function() {
                         const currencySymbol = '{{ $setting->currency_symbol ?? '₹' }}';
                         const currencyPosition = '{{ $setting->currency_position ?? 'left' }}';
-                        const isTdsEnabled = @json((bool) ($setting->tds_apply ?? false));
+                        const isTdsEnabled = true;
                         const selectedSubAdminId = localStorage.getItem("selectedSubAdminId");
                         const addBankModalElement = document.getElementById('addBankModal');
                         const addBankModal = addBankModalElement && typeof bootstrap !== 'undefined' ?
@@ -1993,6 +1988,7 @@ $(document).on('blur', '#tds-percentage-input', function() {
                         }
 
                         // Calculate all totals including product-wise GST
+                        let _isInitialLoad = true;
                         function calculateAllTotals() {
                             let grossSubtotal = 0;
                             let totalPerItemDiscount = 0;
@@ -2135,15 +2131,25 @@ $(document).on('blur', '#tds-percentage-input', function() {
                             // }
 
                             const preTdsGrandTotal = afterDiscount + labourSubtotal + shippingCost;
-                            const tdsAmount = isTdsEnabled ? (preTdsGrandTotal * tdsPercentage) / 100 : 0;
+
+                            // On initial load, use the saved tds_amount from the input (pre-filled by PHP).
+                            // After the user interacts, recalculate from the percentage.
+                            let tdsAmount;
+                            if (_isInitialLoad) {
+                                tdsAmount = parseFloat($('#tds-amount-input').val()) || 0;
+                            } else {
+                                tdsAmount = isTdsEnabled ? (preTdsGrandTotal * tdsPercentage) / 100 : 0;
+                            }
 
                             if (isTdsEnabled) {
                                 $('#tds-percentage-display').text(formatNumber(tdsPercentage));
                                 $('#tds-amount-display').text(`-${formatNumber(tdsAmount)}`);
-                                $('#tds-amount-input').val(tdsAmount.toFixed(2));
+                                // Only overwrite tds-amount-input after initial load
+                                if (!_isInitialLoad) {
+                                    $('#tds-amount-input').val(tdsAmount.toFixed(2));
+                                }
+                                // Always show TDS row
                                 $('.tds-summary').show();
-                            } else {
-                                $('.tds-summary').hide();
                             }
 
                             // Show/hide GST total
@@ -2183,11 +2189,8 @@ $(document).on('blur', '#tds-percentage-input', calculateAllTotals);
 $(document).on('input', '#tds-percentage-input', function() {
     const rawVal = parseFloat($(this).val()) || 0;
     const tdsPercentage = Math.max(0, Math.min(100, rawVal));
-    const grandTotalBeforeTds = parseFloat($('#grand-total').text().replace(/,/g, '')) || 0;
-    const tdsAmount = (grandTotalBeforeTds * tdsPercentage) / 100;
-    $('#tds-percentage-display').text(tdsPercentage.toFixed(2));
-    $('#tds-amount-display').text(`-${tdsAmount.toFixed(2)}`);
-    $('#tds-amount-input').val(tdsAmount.toFixed(2));
+    // Re-run full recalculation so TDS is computed against the correct pre-TDS total
+    calculateAllTotals();
 });
 
 $(document).on('input', '.discount-input', function() {
@@ -2915,6 +2918,7 @@ addProductToTable(
 
                         // Initial calculation
                         calculateAllTotals();
+                        _isInitialLoad = false; // From now on, TDS amount is recalculated from percentage
 
                         // Initialize customer phone on page load
                         const selectedCustomer = $('#customer_id').find(':selected');
