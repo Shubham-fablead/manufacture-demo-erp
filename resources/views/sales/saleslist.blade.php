@@ -1127,6 +1127,18 @@
             display: inline-block;
         }
 
+        /* Allow dropdown to escape table overflow */
+        .table-responsive {
+            overflow: visible !important;
+        }
+
+        .datanew,
+        .datanew tbody,
+        .datanew tr,
+        .datanew td:last-child {
+            overflow: visible !important;
+        }
+
         .action-dots-btn {
             width: 38px;
             height: 38px;
@@ -4108,81 +4120,7 @@ $('#paymentHistoryList').html(historyHtml);
                 const formattedDate = `${day}-${month}-${year} ${hours}:${minutes} ${ampm}`;
 
                 // 🔹 Build action buttons properly
-                let actionBtns = ``;
-
-                // if (status === 'sales') {
-                if (parseFloat(order.remaining_amount || 0) > 0 && status === 'sales') {
-                    actionBtns += `<a href="javascript:void(0);" class="me-3 make-payment-btn" data-bs-toggle="modal" data-bs-target="#makePaymentModal"
-                                        data-id="${order.id}" data-amount="${order.remaining_amount}" data-method="${order.payment_method || ''}"
-                                        data-emi-months="${order.remaining_emi_months}" data-emi-duration="${order.emi_duration || 0}"
-                                        data-total-amount="${order.total_amount || 0}" data-remaining-amount="${order.remaining_amount}"
-                                        data-return-amount="${order.total_return || 0}"
-                                        data-remaining-emi-months="${order.remaining_emi_months}" title="Make Payment">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="#092C4C" viewBox="0 0 24 24">
-                                            <path d="M21 7H3V5h18v2zm0 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9h18zm-2 4H5v6h14v-6zM8 12h2v2H8v-2zm6 0h2v2h-2v-2z"/>
-                                        </svg>
-                                    </a>`;
-
-                }
-                actionBtns += `<button class="btn open-history" data-id="${order.id}" title="Payment History">
-                                                <i class="fas fa-history" style="font-size: 16px;"></i>
-                                            </button>`;
-                if ((order.quotation_status || '').toLowerCase() === 'quotation') {
-                    actionBtns += `<a class="btn btn-sm btn-success me-2 convert-to-sales" href="javascript:void(0);" data-id="${order.id}" title="Convert to Sales">
-                        Convert to Sales
-                    </a>`;
-                }
-
-                @if (app('hasPermission')(2, 'view'))
-                    actionBtns += `<a class="me-3" href="/sales-details/${order.id}">
-                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M12 9C11.206 9.00524 10.4459 9.32299 9.88447 9.88447C9.32299 10.4459 9.00524 11.206 9 12C9 13.642 10.358 15 12 15C13.641 15 15 13.642 15 12C15 10.359 13.641 9 12 9Z" fill="#092C4C"/>
-            <path d="M12 5C4.36704 5 2.07304 11.617 2.05204 11.684L1.94604 12L2.05105 12.316C2.07305 12.383 4.36704 19 12 19C19.633 19 21.927 12.383 21.948 12.316L22.054 12L21.949 11.684C21.927 11.617 19.633 5 12 5ZM12 17C6.64904 17 4.57604 13.154 4.07404 12C4.57804 10.842 6.65204 7 12 7C17.351 7 19.424 10.846 19.926 12C19.422 13.158 17.348 17 12 17Z" fill="#092C4C"/>
-            </svg>
-
-
-                                        </a>`;
-                @endif
-                // if (!order.has_payment || order.has_payment === 0) {
-                @if (app('hasPermission')(2, 'edit'))
-                    if (parseFloat(order.total_return || 0) === 0) {
-                        actionBtns += `
-                                            <a class="me-3" href="/edit-sales/${order.id}">
-                                                <svg width="16" height="20" viewBox="0 0 16 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M15.045 5.401C15.423 5.023 15.631 4.521 15.631 3.987C15.631 3.453 15.423 2.951 15.045 2.573L13.459 0.987001C13.081 0.609001 12.579 0.401001 12.045 0.401001C11.511 0.401001 11.009 0.609001 10.632 0.986001L0 11.585V16H4.413L15.045 5.401ZM12.045 2.401L13.632 3.986L12.042 5.57L10.456 3.985L12.045 2.401ZM2 14V12.415L9.04 5.397L10.626 6.983L3.587 14H2ZM0 18H16V20H0V18Z" fill="#092C4C"/>
-                </svg>
-
-                                            </a>`;
-                    }
-                @endif
-                // }
-                actionBtns += `
-                @if (app('hasPermission')(2, 'view'))
-                                        <a class="me-3" href="/sales-invoice/${order.id}">
-
-
-            <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="#092C4C" viewBox="0 0 24 24">
-                <path d="M14 2H7a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7zm0 2.5L16.5 7H14zM8 11h8v1.5H8zm0 3h8v1.5H8zm0 3h5v1.5H8z"/>
-            </svg>
-                                        </a>
-                                        <a class="me-3" href="javascript:void(0);" onclick="window.open('/sales/invoice/pdf/' + ${order.id});"  title="Print Invoice">
-            <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="#092C4C" viewBox="0 0 24 24">
-                <path d="M19 7V4a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v3H3a1 1 0 0 0-1 1v9a2 2 0 0 0 2 2h2v3h12v-3h2a2 2 0 0 0 2-2V8a1 1 0 0 0-1-1h-2zM7 4h10v3H7V4zm10 16H7v-4h10v4zm3-6a1 1 0 0 1-1 1h-2v-2H7v2H5a1 1 0 0 1-1-1V9h16v5z"/>
-            </svg>
-        </a>
-                        @endif
-
-                                         ${!['sales-manager', 'purchase-manager', 'inventory-manager'].includes(userRole) ? `
-                                                                                                                                 @if (app('hasPermission')(2, 'delete'))
-                                                                                        <a class="me-3 delete-order" href="javascript:void(0);" data-id="${order.id}">
-                                                                                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                                                                <path d="M5 20C5 20.5304 5.21071 21.0391 5.58579 21.4142C5.96086 21.7893 6.46957 22 7 22H17C17.5304 22 18.0391 21.7893 18.4142 21.4142C18.7893 21.0391 19 20.5304 19 20V8H21V6H17V4C17 3.46957 16.7893 2.96086 16.4142 2.58579C16.0391 2.21071 15.5304 2 15 2H9C8.46957 2 7.96086 2.21071 7.58579 2.58579C7.21071 2.96086 7 3.46957 7 4V6H3V8H5V20ZM9 4H15V6H9V4ZM8 8H17V20H7V8H8Z" fill="#092C4C"/>
-                                                                                                <path d="M9 10H11V18H9V10ZM13 10H15V18H13V10Z" fill="#092C4C"/>
-                                                                                            </svg>
-                                                                                        </a>
-                                                                                        @endif
-                                                                                    ` : ''}
-    `
+                const actionBtns = buildActionDropdown(order, displayAmount, currencySymbol, currencyPosition);
 
                 const orderData = {
                     ...order,

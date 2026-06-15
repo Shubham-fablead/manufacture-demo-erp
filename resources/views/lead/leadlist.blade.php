@@ -359,6 +359,18 @@
             display: inline-block;
         }
 
+        /* Allow dropdown to escape table overflow */
+        .table-responsive {
+            overflow: visible !important;
+        }
+
+        .lead-table,
+        .lead-table tbody,
+        .lead-table tr,
+        .lead-table td:last-child {
+            overflow: visible !important;
+        }
+
         .lead-dots-btn {
             width: 38px;
             height: 38px;
