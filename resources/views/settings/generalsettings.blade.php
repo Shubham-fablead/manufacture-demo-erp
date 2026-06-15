@@ -340,6 +340,29 @@
                                                 templates (e.g. meeting_reminder_3_hours_before).</small>
                                         </div>
                                     </div>
+                                     <div class="col-lg-3 col-sm-6 col-6">
+                                        <div class="form-group">
+                                            <label>Invoice Size</label>
+                                            <select id="invoice_size" name="invoice_size" class="form-select">
+                                                <option value="small"
+                                                    {{ old('invoice_size', $setting->invoice_size ?? 'big') == 'small' ? 'selected' : '' }}>
+                                                    Small Size Invoice</option>
+                                                <option value="big"
+                                                    {{ old('invoice_size', $setting->invoice_size ?? 'big') == 'big' ? 'selected' : '' }}>
+                                                    Big Size Invoice</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                     <div class="col-lg-3 col-sm-6 col-6">
+                                        <div class="form-group">
+                                            <label>Send Mail</label>
+                                            <select id="send_mail" name="send_mail" class="form-select">
+                                                <option value="1">On</option>
+                                                <option value="0">Off</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
                                 </div>
 
                                 {{-- Wizard nav for step 2 --}}
@@ -400,29 +423,8 @@
                                         </div>
                                     </div>
 
-                                    <div class="col-lg-3 col-sm-6 col-6">
-                                        <div class="form-group">
-                                            <label>Invoice Size</label>
-                                            <select id="invoice_size" name="invoice_size" class="form-select">
-                                                <option value="small"
-                                                    {{ old('invoice_size', $setting->invoice_size ?? 'big') == 'small' ? 'selected' : '' }}>
-                                                    Small Size Invoice</option>
-                                                <option value="big"
-                                                    {{ old('invoice_size', $setting->invoice_size ?? 'big') == 'big' ? 'selected' : '' }}>
-                                                    Big Size Invoice</option>
-                                            </select>
-                                        </div>
-                                    </div>
-
-                                    <div class="col-lg-3 col-sm-6 col-6">
-                                        <div class="form-group">
-                                            <label>Send Mail</label>
-                                            <select id="send_mail" name="send_mail" class="form-select">
-                                                <option value="1">On</option>
-                                                <option value="0">Off</option>
-                                            </select>
-                                        </div>
-                                    </div>
+                                   
+                                   
 
                                     <div class="col-lg-3 col-sm-6 col-6">
                                         <div class="form-group">

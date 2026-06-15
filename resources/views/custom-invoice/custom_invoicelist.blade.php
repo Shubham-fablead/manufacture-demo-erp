@@ -603,6 +603,69 @@
             font-size: 16px;
         }
 
+        .invoice-action-wrap {
+            position: relative;
+            display: inline-block;
+        }
+
+        .invoice-action-toggle {
+            width: 34px;
+            height: 34px;
+            border: 1px solid #d9e2ec;
+            border-radius: 8px;
+            background: #f8fbff;
+            color: #092C4C;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            padding: 0;
+            line-height: 1;
+        }
+
+        .invoice-action-toggle i {
+            font-size: 14px;
+        }
+
+        .invoice-action-menu {
+            min-width: 170px;
+            padding: 8px 0;
+            border: 1px solid #edf0f4;
+            border-radius: 6px;
+            box-shadow: 0 10px 28px rgba(15, 23, 42, 0.14);
+        }
+
+        .invoice-action-menu .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 9px 14px;
+            color: #1b2850;
+            font-size: 14px;
+            line-height: 1.2;
+            text-decoration: none;
+            background: transparent;
+            border: 0;
+            width: 100%;
+            text-align: left;
+        }
+
+        .invoice-action-menu .dropdown-item i {
+            width: 16px;
+            color: #5f6b7a;
+            text-align: center;
+        }
+
+        .invoice-action-menu .dropdown-item:hover {
+            background: #f6f8fb;
+            color: #1b2850;
+        }
+
+        .invoice-action-menu .dropdown-item.text-danger,
+        .invoice-action-menu .dropdown-item.text-danger i {
+            color: #ff3b3b !important;
+        }
+
         /* Toggle button styles */
         .invoice-toggle-btn-table {
             background: #ff9f43;
@@ -1296,7 +1359,7 @@
             if (parseFloat(o.remaining_amount) > 0) {
                 buttons += `
                     <button type="button"
-                        class="btn btn-sm btn-primary me-3 make-payment-btn"
+                        class="dropdown-item make-payment-btn"
                         data-bs-toggle="modal"
                         data-bs-target="#makePaymentModal"
                         data-id="${o.id}"
@@ -1304,56 +1367,60 @@
                         data-method="${o.payment_mode || ''}"
                         data-total-amount="${o.grand_total || 0}"
                         data-remaining-amount="${o.remaining_amount}">
-                        Make Payment
+                        <i class="fas fa-money-bill-wave"></i>
+                        <span>Pay</span>
                     </button>
                 `;
             }
 
             buttons += `
-                <button class="btn open-history" data-id="${o.id}" title="Payment History">
-                    <i class="fas fa-history" style="font-size: 16px;"></i>
+                <button type="button" class="dropdown-item open-history" data-id="${o.id}" title="Payment History">
+                    <i class="fas fa-history"></i>
+                    <span>History</span>
                 </button>
             `;
 
             @if (app('hasPermission')(4, 'view'))
-                buttons += `<a class="me-3" href="/invoice-view/${o.id}">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M12 9C11.206 9.00524 10.4459 9.32299 9.88447 9.88447C9.32299 10.4459 9.00524 11.206 9 12C9 13.642 10.358 15 12 15C13.641 15 15 13.642 15 12C15 10.359 13.641 9 12 9Z" fill="#092C4C"></path>
-                        <path d="M12 5C4.36704 5 2.07304 11.617 2.05204 11.684L1.94604 12L2.05105 12.316C2.07305 12.383 4.36704 19 12 19C19.633 19 21.927 12.383 21.948 12.316L22.054 12L21.949 11.684C21.927 11.617 19.633 5 12 5ZM12 17C6.64904 17 4.57604 13.154 4.07404 12C4.57804 10.842 6.65204 7 12 7C17.351 7 19.424 10.846 19.926 12C19.422 13.158 17.348 17 12 17Z" fill="#092C4C"></path>
-                    </svg>
+                buttons += `<a class="dropdown-item" href="/invoice-view/${o.id}">
+                    <i class="fas fa-eye"></i>
+                    <span>View</span>
                 </a>`;
             @endif
 
             if (!o.has_payment || o.has_payment === 0) {
                 @if (app('hasPermission')(4, 'edit'))
-                    buttons += `<a class="me-3" href="/edit-custom-invoice/${o.id}">
-                        <svg width="16" height="20" viewBox="0 0 16 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M15.045 5.401C15.423 5.023 15.631 4.521 15.631 3.987C15.631 3.453 15.423 2.951 15.045 2.573L13.459 0.987001C13.081 0.609001 12.579 0.401001 12.045 0.401001C11.511 0.401001 11.009 0.609001 10.632 0.986001L0 11.585V16H4.413L15.045 5.401ZM12.045 2.401L13.632 3.986L12.042 5.57L10.456 3.985L12.045 2.401ZM2 14V12.415L9.04 5.397L10.626 6.983L3.587 14H2ZM0 18H16V20H0V18Z" fill="#092C4C"></path>
-                        </svg>
+                    buttons += `<a class="dropdown-item" href="/edit-custom-invoice/${o.id}">
+                        <i class="fas fa-edit"></i>
+                        <span>Edit</span>
                     </a>`;
                 @endif
             }
 
             @if (app('hasPermission')(4, 'view'))
-                buttons += `<a class="me-3" href="javascript:void(0);" onclick="window.open('/custom-invoice/pdf/' + ${o.id});" title="Print Invoice">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="#092C4C" viewBox="0 0 24 24">
-                        <path d="M19 7V4a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v3H3a1 1 0 0 0-1 1v9a2 2 0 0 0 2 2h2v3h12v-3h2a2 2 0 0 0 2-2V8a1 1 0 0 0-1-1h-2zM7 4h10v3H7V4zm10 16H7v-4h10v4zm3-6a1 1 0 0 1-1 1h-2v-2H7v2H5a1 1 0 0 1-1-1V9h16v5z"/>
-                    </svg>
+                buttons += `<a class="dropdown-item" href="javascript:void(0);" onclick="window.open('/custom-invoice/pdf/' + ${o.id});" title="Print Invoice">
+                    <i class="fas fa-print"></i>
+                    <span>Print Invoice</span>
                 </a>`;
             @endif
 
             if (userRole !== 'sales-manager' && userRole !== 'purchase-manager' && userRole !== 'inventory-manager') {
                 @if (app('hasPermission')(4, 'delete'))
-                    buttons += `<a class="me-3 confirm-text delete-order" data-id="${o.id}" href="javascript:void(0);">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M5 20C5 20.5304 5.21071 21.0391 5.58579 21.4142C5.96086 21.7893 6.46957 22 7 22H17C17.5304 22 18.0391 21.7893 18.4142 21.4142C18.7893 21.0391 19 20.5304 19 20V8H21V6H17V4C17 3.46957 16.7893 2.96086 16.4142 2.58579C16.0391 2.21071 15.5304 2 15 2H9C8.46957 2 7.96086 2.21071 7.58579 2.58579C7.21071 2.96086 7 3.46957 7 4V6H3V8H5V20ZM9 4H15V6H9V4ZM8 8H17V20H7V8H8Z" fill="#092C4C"></path>
-                            <path d="M9 10H11V18H9V10ZM13 10H15V18H13V10Z" fill="#092C4C"></path>
-                        </svg>
+                    buttons += `<a class="dropdown-item text-danger confirm-text delete-order" data-id="${o.id}" href="javascript:void(0);">
+                        <i class="fas fa-trash"></i>
+                        <span>Delete</span>
                     </a>`;
                 @endif
             }
 
-            return buttons;
+            return `
+                <div class="dropdown invoice-action-wrap">
+                    <button type="button" class="invoice-action-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Actions">
+                        <i class="fas fa-ellipsis-h"></i>
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-end invoice-action-menu">
+                        ${buttons}
+                    </div>
+                </div>`;
         }
 
         function renderInvoicePagination(pagination) {

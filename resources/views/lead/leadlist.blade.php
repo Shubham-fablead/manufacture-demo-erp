@@ -353,6 +353,97 @@
             margin-bottom: 6px;
         }
 
+        /* ===== LEAD ACTION DROPDOWN ===== */
+        .lead-action-wrap {
+            position: relative;
+            display: inline-block;
+        }
+
+        .lead-dots-btn {
+            width: 38px;
+            height: 38px;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            background: #fff;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 18px;
+            color: #1b2850;
+            letter-spacing: 2px;
+            line-height: 1;
+            transition: background 0.15s;
+            padding: 0;
+        }
+
+        .lead-dots-btn:hover {
+            background: #f1f3f5;
+        }
+
+        .lead-dropdown-menu {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: calc(100% + 4px);
+            z-index: 1055;
+            min-width: 170px;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.14);
+            padding: 6px 0;
+            border: 1px solid #f0f0f0;
+        }
+
+        .lead-dropdown-menu.show {
+            display: block;
+        }
+
+        .lead-dropdown-menu a,
+        .lead-dropdown-menu button {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            padding: 9px 16px;
+            font-size: 14px;
+            color: #333;
+            background: none;
+            border: none;
+            text-decoration: none;
+            cursor: pointer;
+            transition: background 0.12s;
+            box-sizing: border-box;
+            white-space: nowrap;
+        }
+
+        .lead-dropdown-menu a:hover,
+        .lead-dropdown-menu button:hover {
+            background: #f8f9fa;
+            color: #1b2850;
+        }
+
+        .lead-dropdown-menu a i,
+        .lead-dropdown-menu button i {
+            width: 18px;
+            text-align: center;
+            font-size: 15px;
+            color: #555;
+            flex-shrink: 0;
+        }
+
+        .lead-dropdown-menu .lead-action-delete {
+            color: #dc3545;
+        }
+
+        .lead-dropdown-menu .lead-action-delete i {
+            color: #dc3545;
+        }
+
+        .lead-dropdown-menu .lead-action-delete:hover {
+            background: #fff5f5;
+        }
+
         @media (min-width: 768px) {
             .table.datanew thead th,
             .table.datanew tbody td {
@@ -629,11 +720,14 @@
             `;
 
             const actionButtons = `
-                <div class="action-buttons">
-                    ${!item.converted_customer_id ? `<a class="icon-btn convert-lead" data-id="${item.id}" href="javascript:void(0);" title="Convert to Customer"><i class="fa fa-user-plus text-success"></i></a>` : ''}
-                    ${canViewLead ? `<a class="icon-btn" href="/lead-view/${item.id}" title="View"><i class="fa fa-eye"></i></a>` : ''}
-                    ${canEditLead ? `<a class="icon-btn" href="/edit-lead/${item.id}" title="Edit"><i class="fa fa-pen"></i></a>` : ''}
-                    ${canDeleteLead ? `<a class="confirm-text delete-lead icon-btn" data-id="${item.id}" href="javascript:void(0);" title="Delete"><i class="fa fa-trash text-danger"></i></a>` : ''}
+                <div class="lead-action-wrap">
+                    <button class="lead-dots-btn" title="Actions">•••</button>
+                    <div class="lead-dropdown-menu">
+                        ${!item.converted_customer_id ? `<a class="convert-lead" data-id="${item.id}" href="javascript:void(0);"><i class="fa fa-user-plus"></i> Convert</a>` : ''}
+                        ${canViewLead ? `<a href="/lead-view/${item.id}"><i class="fa fa-eye"></i> View</a>` : ''}
+                        ${canEditLead ? `<a href="/edit-lead/${item.id}"><i class="fa fa-pen"></i> Edit</a>` : ''}
+                        ${canDeleteLead ? `<a class="lead-action-delete confirm-text delete-lead" data-id="${item.id}" href="javascript:void(0);"><i class="fa fa-trash"></i> Delete</a>` : ''}
+                    </div>
                 </div>
             `;
 
@@ -974,6 +1068,23 @@
                 icon.text('-');
             }
         };
+
+        // Lead action dropdown toggle
+        $(document).on('click', '.lead-dots-btn', function(e) {
+            e.stopPropagation();
+            const $menu = $(this).next('.lead-dropdown-menu');
+            const isOpen = $menu.hasClass('show');
+            $('.lead-dropdown-menu.show').removeClass('show');
+            if (!isOpen) {
+                $menu.addClass('show');
+            }
+        });
+
+        $(document).on('click', function(e) {
+            if (!$(e.target).closest('.lead-action-wrap').length) {
+                $('.lead-dropdown-menu.show').removeClass('show');
+            }
+        });
     });
 </script>
 @endpush
