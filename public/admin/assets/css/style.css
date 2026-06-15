@@ -4570,7 +4570,9 @@ span.select2-container.select2-container--default.select2-container--open {
     color: #212b36;
     position: relative;
     display: block;
-    padding: 6px 8px 6px 36px
+  
+    padding: 6px 15px 6px 36px
+    
 }
 
 .sidebar .sidebar-menu>ul>li.submenu ul li a.active {
@@ -4589,7 +4591,7 @@ span.select2-container.select2-container--default.select2-container--open {
     height: 10px;
     border-radius: 50px;
     position: absolute;
-    top: 11px;
+    top: 18px;
     left: 16px
 }
 

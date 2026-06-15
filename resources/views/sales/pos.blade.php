@@ -3335,6 +3335,12 @@
                 });
                 // ================= GLOBAL DISCOUNT (REMOVED) =================
                 let globalDiscountAmount = 0;
+                // TDS basis = base price after discount, excluding GST.
+                // subtotalAfterDiscount = sum of (gstIncludedAmount - discountAmount) per item
+                //   = (baseSubtotal + totalProductGst) - totalProductDiscount
+                // So: base-after-discount (excluding GST) = subtotalAfterDiscount - totalProductGst
+                //   = baseSubtotal - totalProductDiscount  ... but discount was on gst+base amount
+                // Correct: priceAfterGlobalDiscount = subtotalAfterDiscount - totalProductGst
                 let priceAfterGlobalDiscount = subtotalAfterDiscount - totalProductGst;
 
                 // ================= FINAL TOTAL =================
@@ -3344,8 +3350,8 @@
                 const tdsPercentage = Math.max(0, Math.min(100, tdsPercentageInput));
 
                 const preTdsTotal = priceAfterGlobalDiscount + totalProductGst + shipping + labourTotal;
-                // TDS is calculated on product subtotal only (not GST, shipping or labour)
-                const tdsBasis = priceAfterGlobalDiscount;
+                // TDS is calculated on original product base price (before discount, before GST)
+                const tdsBasis = baseSubtotal;
                 const tdsAmount = isTdsEnabled ? (tdsBasis * tdsPercentage) / 100 : 0;
 
                 let finalTotal = preTdsTotal - tdsAmount;

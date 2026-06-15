@@ -556,6 +556,69 @@
             color: #dc3545;
         }
 
+        .purchase-action-wrap {
+            position: relative;
+            display: inline-block;
+        }
+
+        .purchase-action-toggle {
+            width: 34px;
+            height: 28px;
+            border: 1px solid #c9d3e0;
+            border-radius: 4px;
+            background: #f8fbff;
+            color: #092C4C;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            padding: 0;
+            line-height: 1;
+        }
+
+        .purchase-action-toggle i {
+            font-size: 14px;
+        }
+
+        .purchase-action-menu {
+            min-width: 160px;
+            padding: 8px 0;
+            border: 1px solid #edf0f4;
+            border-radius: 6px;
+            box-shadow: 0 6px 18px rgba(15, 23, 42, 0.12);
+        }
+
+        .purchase-action-menu .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 14px;
+            color: #1b2850;
+            font-size: 13px;
+            line-height: 1.2;
+            text-decoration: none;
+            background: transparent;
+            border: 0;
+            width: 100%;
+            text-align: left;
+        }
+
+        .purchase-action-menu .dropdown-item i {
+            width: 16px;
+            color: #6b778c;
+            text-align: center;
+        }
+
+        .purchase-action-menu .dropdown-item:hover {
+            background: #f6f8fb;
+            color: #1b2850;
+        }
+
+        .purchase-action-menu .dropdown-item.text-danger,
+        .purchase-action-menu .dropdown-item.text-danger i {
+            color: #ff3b3b !important;
+        }
+
         .mobile-badge {
             padding: 4px 8px;
             border-radius: 4px;
@@ -2672,65 +2735,77 @@
                     if (parseFloat(o.remaining_amount) > 0) {
 
                         buttons += `
-                                                                                <button type="button"
-                                                                                    class="btn btn-sm btn-primary me-3 make-payment-btn"
-                                                                                    data-bs-toggle="modal"
-                                                                                    data-bs-target="#makePaymentModal"
-                                                                                    data-id="${o.id}"
-                                                                                    data-amount="${o.remaining_amount}"
-                                                                                    data-method="${o.payment_mode || ''}"
-                                                                                    data-total-amount="${o.grand_total || 0}"
-                                                                                    data-remaining-amount="${o.remaining_amount}"
-                                                                                    data-return-amount="${o.total_return || 0}">
-                                                                                    Make Payment
-                                                                                </button>
+                            <button type="button"
+                                class="dropdown-item make-payment-btn"
+                                data-bs-toggle="modal"
+                                data-bs-target="#makePaymentModal"
+                                data-id="${o.id}"
+                                data-amount="${o.remaining_amount}"
+                                data-method="${o.payment_mode || ''}"
+                                data-total-amount="${o.grand_total || 0}"
+                                data-remaining-amount="${o.remaining_amount}"
+                                data-return-amount="${o.total_return || 0}">
+                                <i class="fas fa-money-bill-wave"></i>
+                                <span>Pay</span>
+                            </button>
                                                                             `;
                     }
                     // console.log(o);
 
                     // Other actions (always visible)
                     buttons += `
-                                    <button class="btn open-history" data-id="${o.id}" title="Payment History">
-                                                <i class="fas fa-history" style="font-size: 16px;"></i>
-                                            </button>
-                                                                            <a class="me-3" href="/print-purchase/${o.id}">
-                                                                                <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 32 32"><path d="M28 24v-4a1 1 0 0 0-2 0v4a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1v-4a1 1 0 0 0-2 0v4a3 3 0 0 0 3 3h18a3 3 0 0 0 3-3zm-6.38-5.22-5 4a1 1 0 0 1-1.24 0l-5-4a1 1 0 0 1 1.24-1.56l3.38 2.7V6a1 1 0 0 1 2 0v13.92l3.38-2.7a1 1 0 1 1 1.24 1.56z" fill="#092C4C"></path></svg>
-                                                                            </a>`;
+                        <button type="button" class="dropdown-item open-history" data-id="${o.id}" title="Payment History">
+                            <i class="fas fa-history"></i>
+                            <span>History</span>
+                        </button>
+                        @if (app('hasPermission')(3, 'view'))
+                            <a class="dropdown-item" href="/purchase-view/${o.id}">
+                                <i class="fas fa-eye"></i>
+                                <span>View</span>
+                            </a>
+                            <a class="dropdown-item" href="/print-purchase/${o.id}">
+                                <i class="fas fa-file-invoice"></i>
+                                <span>Invoice</span>
+                            </a>
+                        @endif
+                    `;
 
                     @if (app('hasPermission')(3, 'edit'))
                         if (parseFloat(o.total_return || 0) === 0) {
                             buttons += `
-                        <a class="me-3" href="/edit-purchase/${o.id}">
-                                <svg width="16" height="20" viewBox="0 0 16 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M15.045 5.401C15.423 5.023 15.631 4.521 15.631 3.987C15.631 3.453 15.423 2.951 15.045 2.573L13.459 0.987001C13.081 0.609001 12.579 0.401001 12.045 0.401001C11.511 0.401001 11.009 0.609001 10.632 0.986001L0 11.585V16H4.413L15.045 5.401ZM12.045 2.401L13.632 3.986L12.042 5.57L10.456 3.985L12.045 2.401ZM2 14V12.415L9.04 5.397L10.626 6.983L3.587 14H2ZM0 18H16V20H0V18Z" fill="#092C4C"></path>
-                                    </svg>
-                            </a>`;
+                                <a class="dropdown-item" href="/edit-purchase/${o.id}">
+                                    <i class="fas fa-edit"></i>
+                                    <span>Edit</span>
+                                </a>`;
                         }
                     @endif
 
 
                     buttons += `
-                                                                            @if (app('hasPermission')(3, 'view'))
+                        @if (app('hasPermission')(3, 'view'))
+                            <a class="dropdown-item" href="javascript:void(0);" onclick="window.open('/purchase/invoice/pdf/' + ${o.id});">
+                                <i class="fas fa-print"></i>
+                                <span>Print Invoice</span>
+                            </a>
+                        @endif
 
-                                                                            <a class="me-3" href="javascript:void(0);" onclick="window.open('/purchase/invoice/pdf/' + ${o.id});">
-                                                                                <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="#092C4C" viewBox="0 0 24 24">
-                                                                                    <path d="M19 7V4a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v3H3a1 1 0 0 0-1 1v9a2 2 0 0 0 2 2h2v3h12v-3h2a2 2 0 0 0 2-2V8a1 1 0 0 0-1-1h-2zM7 4h10v3H7V4zm10 16H7v-4h10v4zm3-6a1 1 0 0 1-1 1h-2v-2H7v2H5a1 1 0 0 1-1-1V9h16v5z"/>
-                                                                                </svg>
-                                                                            </a>
-                                                                            @endif
+                        @if (app('hasPermission')(3, 'delete'))
+                            <a class="dropdown-item text-danger confirm-text delete-order" data-id="${o.id}" href="javascript:void(0);">
+                                <i class="fas fa-trash"></i>
+                                <span>Delete</span>
+                            </a>
+                        @endif
+                    `;
 
-                                                                            @if (app('hasPermission')(3, 'delete'))
-
-                                                                            <a class="me-3 confirm-text delete-order" data-id="${o.id}" href="javascript:void(0);">
-                                                                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                                                    <path d="M5 20C5 20.5304 5.21071 21.0391 5.58579 21.4142C5.96086 21.7893 6.46957 22 7 22H17C17.5304 22 18.0391 21.7893 18.4142 21.4142C18.7893 21.0391 19 20.5304 19 20V8H21V6H17V4C17 3.46957 16.7893 2.96086 16.4142 2.58579C16.0391 2.21071 15.5304 2 15 2H9C8.46957 2 7.96086 2.21071 7.58579 2.58579C7.21071 2.96086 7 3.46957 7 4V6H3V8H5V20ZM9 4H15V6H9V4ZM8 8H17V20H7V8H8Z" fill="#092C4C"/>
-                                                                                    <path d="M9 10H11V18H9V10ZM13 10H15V18H13V10Z" fill="#092C4C"/>
-                                                                                </svg>
-                                                                            </a>
-                                                                            @endif
-                                                                        `;
-
-                    return buttons;
+                    return `
+                        <div class="dropdown purchase-action-wrap">
+                            <button type="button" class="purchase-action-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Actions">
+                                <i class="fas fa-ellipsis-h"></i>
+                            </button>
+                            <div class="dropdown-menu dropdown-menu-end purchase-action-menu">
+                                ${buttons}
+                            </div>
+                        </div>`;
                 }
 
                 // function loadPurchases() {
