@@ -58,6 +58,7 @@ use App\Http\Controllers\api\TransactionController;
 use App\Http\Controllers\api\ConnectedDevicesController;
 use App\Http\Controllers\api\FollowUpController;
 use App\Http\Controllers\api\LeadController;
+use App\Http\Controllers\api\PlanController;
 use App\Http\Controllers\api\MeetingController;
 use App\Http\Controllers\api\NotificationController;
 use App\Http\Controllers\api\RowMaterialController;
@@ -177,6 +178,15 @@ Route::middleware(['auth.api'])->group(function () {
     Route::post('return-purchase', [PurchaseReturnController::class, 'returnPurchase']);
     Route::get('/purchase-return-list', [PurchaseReturnController::class, 'purchaseReturnList'])->name('purchaseReturnList');
 
+
+
+     // Plans CRUD
+    Route::get('/getAllPlans',[PlanController::class, 'getAllPlans'])->name('plans.getAll');
+    Route::get('/getPlanById/{id}',[PlanController::class, 'getPlanById'])->name('plans.getById');
+    Route::post('/createPlan',[PlanController::class, 'createPlan'])->name('plans.create');
+    Route::post('/updatePlan',[PlanController::class, 'updatePlan'])->name('plans.update');
+    Route::post('/deletePlan/{id}',[PlanController::class, 'deletePlan'])->name('plans.delete');
+    Route::post('/togglePlanStatus/{id}',[PlanController::class, 'togglePlanStatus'])->name('plans.toggleStatus');
 
     Route::get('getProfile', [ProfileController::class, 'getProfile'])->name('getProfile');
     Route::post('updateProfile', [ProfileController::class, 'updateProfile'])->name('updateProfile');

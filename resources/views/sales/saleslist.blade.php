@@ -1121,6 +1121,95 @@
             color: #ff9f43;
         }
 
+        /* ── Mobile filter layout (≤ 767px) ── */
+        @media (max-width: 767.98px) {
+            /* Search — full width */
+            .sales-filter-toolbar .filter-search {
+                width: 100% !important;
+                flex: 0 0 100% !important;
+                max-width: 100% !important;
+            }
+
+            /* Month + Year — 2 equal columns */
+            .sales-filter-toolbar .filter-month-col,
+            .sales-filter-toolbar .filter-year-col {
+                width: 50% !important;
+                flex: 0 0 50% !important;
+                max-width: 50% !important;
+            }
+
+            /* Date + Financial year — 2 equal columns */
+            .sales-filter-toolbar .filter-date-col,
+            .sales-filter-toolbar .filter-fy-col {
+                width: 50% !important;
+                flex: 0 0 50% !important;
+                max-width: 50% !important;
+            }
+
+            /* Excel + PDF — 2 equal full-width buttons */
+            .mobile-export-row {
+                display: flex !important;
+                gap: 8px;
+                margin-top: 4px;
+            }
+            .mobile-export-row .btn {
+                flex: 1;
+                height: 42px;
+                font-size: 14px;
+                font-weight: 700;
+                border-radius: 6px;
+            }
+
+            /* Hide the desktop export group on mobile */
+            .desktop-export-group {
+                display: none !important;
+            }
+
+            /* Summary boxes — full width, tall rows */
+            .mobile-summary-box {
+                display: flex !important;
+                align-items: center;
+                justify-content: space-between;
+                width: 100%;
+                padding: 12px 16px;
+                border-radius: 8px;
+                border: 1px solid;
+                font-size: 15px;
+                font-weight: 700;
+                margin-top: 6px;
+            }
+            .mobile-summary-box.total-box {
+                color: #ff9f43;
+                border-color: #ffe0bc;
+                background: #fff8f0;
+            }
+            .mobile-summary-box.pending-box {
+                color: #ea5455;
+                border-color: #f5c2c7;
+                background: #fff5f5;
+            }
+            .mobile-summary-box.paid-box {
+                color: #28c76f;
+                border-color: #b7ebcd;
+                background: #effcf4;
+            }
+
+            /* Hide desktop inline summary boxes on mobile */
+            .desktop-summary-row {
+                display: none !important;
+            }
+        }
+
+        /* On desktop — hide mobile-only elements */
+        @media (min-width: 768px) {
+            .mobile-export-row {
+                display: none !important;
+            }
+            .mobile-summary-box {
+                display: none !important;
+            }
+        }
+
         /* ===== ACTION DROPDOWN MENU ===== */
         .action-dropdown-wrap {
             position: relative;
@@ -1291,7 +1380,7 @@
                         </div>
 
                         <!-- Month Filter -->
-                        <div class="col-md-2 col-6 filter-field">
+                        <div class="col-md-2 col-6 filter-field filter-month-col">
                             <div class="mb-1 custom-select2">
                                 <select id="filter-month" data-placeholder="All Months"
                                     class="form-control form-control-sm filter-select2">
@@ -1306,7 +1395,7 @@
                         </div>
 
                         <!-- Year Filter -->
-                        <div class="col-md-2 col-6 filter-field">
+                        <div class="col-md-2 col-6 filter-field filter-year-col">
                             <div class="mb-1 custom-select2">
                                 <select id="filter-year" data-placeholder="All Years"
                                     class="form-control form-control-sm filter-select2">
@@ -1318,7 +1407,7 @@
                             </div>
                         </div>
 
-                        <div class="col-md-2 col-6 filter-field {{ ($financialYearEnabled ?? true) ? '' : 'd-none' }}"
+                        <div class="col-md-2 col-6 filter-field filter-fy-col {{ ($financialYearEnabled ?? true) ? '' : 'd-none' }}"
                             id="sales-financial-year-filter">
                             <div class="mb-1">
                                 <select id="filter-financial-year" class="form-control form-control-sm">
@@ -1328,13 +1417,43 @@
                         </div>
 
                         <!-- Date -->
-                        <div class="col-md-2 col-6 filter-field">
+                        <div class="col-md-2 col-6 filter-field filter-date-col">
                             <input type="text" id="filter-date" placeholder="Choose Date"
                                 class="datetimepicker form-control form-control-sm filter-date-input">
                         </div>
 
-                        <!-- Summary + Export row -->
-                        <div class="col-12 filter-field mt-2">
+                        <!-- Mobile-only: Excel + PDF buttons (full width, 2 columns) -->
+                        <div class="col-12 px-2 mobile-export-row">
+                            <button id="exportAllChallan-mobile" class="btn btn-sm btn-success"
+                                onclick="$('#exportAllChallan').trigger('click');">
+                                <i class="fas fa-file-excel"></i> Excel
+                            </button>
+                            <button id="exportPdf-mobile" class="btn btn-sm btn-danger"
+                                onclick="$('#exportPdf').trigger('click');">
+                                <i class="fas fa-file-pdf"></i> PDF
+                            </button>
+                        </div>
+
+                        <!-- Mobile-only: Summary boxes (full width stacked) -->
+                        @if (in_array(auth()->user()->role, ['admin', 'sub-admin']))
+                        <div class="col-12 px-2 d-block d-md-none mt-1">
+                            <div class="mobile-summary-box total-box">
+                                <span>Total:</span>
+                                <span id="filtered-total-mobile">₹0.00</span>
+                            </div>
+                            <div class="mobile-summary-box pending-box">
+                                <span>Total Pending:</span>
+                                <span id="filtered-pending-total-mobile">₹0.00</span>
+                            </div>
+                            <div class="mobile-summary-box paid-box">
+                                <span>Total Paid:</span>
+                                <span id="filtered-paid-total-mobile">₹0.00</span>
+                            </div>
+                        </div>
+                        @endif
+
+                        <!-- Desktop: Summary + Export row -->
+                        <div class="col-12 filter-field mt-2 desktop-summary-row">
                             <div class="d-flex flex-wrap align-items-center gap-2">
                                 @if (in_array(auth()->user()->role, ['admin', 'sub-admin']))
                                     <div class="summary-inline-box pending-box">
@@ -1350,10 +1469,10 @@
                                         <span id="filtered-total">₹0.00</span>
                                     </div>
                                 @endif
-                                <button id="exportAllChallan" class="btn btn-sm btn-success ms-auto">
+                                <button id="exportAllChallan" class="btn btn-sm btn-success ms-auto desktop-export-group">
                                     <i class="fas fa-file-excel"></i> Excel
                                 </button>
-                                <button id="exportPdf" class="btn btn-sm btn-danger">
+                                <button id="exportPdf" class="btn btn-sm btn-danger desktop-export-group">
                                     <i class="fas fa-file-pdf"></i> PDF
                                 </button>
                             </div>
@@ -2365,6 +2484,10 @@
                 currencyPosition));
             $('#filtered-paid-total').text(formatSummaryAmount(totalPaidAmount, currencySymbol,
                 currencyPosition));
+            // Sync mobile summary boxes
+            $('#filtered-total-mobile').text(formatSummaryAmount(totalAmount, currencySymbol, currencyPosition));
+            $('#filtered-pending-total-mobile').text(formatSummaryAmount(totalPendingAmount, currencySymbol, currencyPosition));
+            $('#filtered-paid-total-mobile').text(formatSummaryAmount(totalPaidAmount, currencySymbol, currencyPosition));
         }
 
         const salesCalendarYears = @json($years ?? []);

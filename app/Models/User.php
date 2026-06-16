@@ -25,6 +25,7 @@ class User extends Authenticatable
         'email',
         'phone',
         'role',
+        'plan_id',
         'state_code',
         'state_name',
         'gst_number',
@@ -62,6 +63,11 @@ class User extends Authenticatable
     public function details()
     {
         return $this->hasOne(UserDetail::class, 'user_id', 'id');
+    }
+
+    public function plan()
+    {
+        return $this->belongsTo(Plan::class, 'plan_id');
     }
     public function userDetail()
     {
