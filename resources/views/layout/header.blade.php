@@ -111,6 +111,11 @@
             object-fit: cover;
             border-radius: 50%;
         }
+
+        /* Show notification icons on iPad Mini/Air even though tab-view is hidden */
+        .header-search-container.tab-view .notification-wrapper {
+            display: inline-flex !important;
+        }
     }
 
     /* iPad Pro specific (1024px) */

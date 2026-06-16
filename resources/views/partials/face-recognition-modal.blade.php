@@ -16,6 +16,39 @@
     #faceRecognitionModal .modal-header {
         padding: 22px 24px 10px;
         background: transparent;
+        position: relative;
+    }
+
+    .face-modal-close-btn {
+        position: absolute;
+        top: 16px;
+        right: 16px;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        border: 2px solid #e2e8f0;
+        background: #f1f5f9;
+        color: #475569;
+        font-size: 16px;
+        font-weight: 700;
+        line-height: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: background .2s, color .2s, border-color .2s, transform .15s;
+        padding: 0;
+        flex-shrink: 0;
+        z-index: 10;
+    }
+
+    .face-modal-close-btn:hover,
+    .face-modal-close-btn:focus {
+        background: #fee2e2;
+        border-color: #fca5a5;
+        color: #dc2626;
+        transform: scale(1.08);
+        outline: none;
     }
 
     #faceRecognitionModal .modal-body {
@@ -287,7 +320,7 @@
                         </p>
                     </div>
                 </div>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="face-modal-close-btn" data-bs-dismiss="modal" aria-label="Close">&#x2715;</button>
             </div>
             <div class="modal-body">
                 <div class="face-modal-tips">

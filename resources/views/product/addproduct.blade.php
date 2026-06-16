@@ -80,8 +80,7 @@
                 <h4>Add Product</h4>
             </div>
              <div class="back-button">
-                <a href="{{ route('product.list') }}" class="btn back-button"> <i class="fa-solid fa-arrow-left"></i> Back</a></br>
-                            <span class="success_submit text-danger"></span>
+                <a href="{{ route('product.list') }}" class="btn back-button"> <i class="fa-solid fa-arrow-left"></i> Back</a>
             </div>
         </div>
 
@@ -125,7 +124,7 @@
 
                         <div class="col-lg-3 col-sm-6 col-6">
                             <div class="form-group">
-                                <label class="form-label-icon"><i class="fa-solid fa-barcode"></i> SKU <span class="required">*</span></label>
+                                <label class="form-label-icon"><i class="fa-solid fa-barcode"></i> SKU <span class="required"></span></label>
                                 <input type="number" class="form-control" name="SKU" id="SKU">
                                 <span class="error_SKU text-danger"></span>
                             </div>

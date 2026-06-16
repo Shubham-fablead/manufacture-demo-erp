@@ -134,7 +134,7 @@
 
                         <div class="col-lg-3 col-sm-6 col-6">
                             <div class="form-group">
-                                <label class="form-label-icon"><i class="fa-solid fa-barcode"></i> SKU <span class="required">*</span></label>
+                                <label class="form-label-icon"><i class="fa-solid fa-barcode"></i> SKU <span class="required"></span></label>
                                 <input type="number" name="SKU" id="SKU" class="form-control" step="1"
                                     min="0">
                                 <span class="error_SKU text-danger"></span>

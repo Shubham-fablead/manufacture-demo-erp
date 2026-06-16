@@ -40,6 +40,7 @@ use App\Http\Controllers\admin\RowMaterialController;
 use App\Http\Controllers\admin\RowMaterialInventoryController;
 use App\Http\Controllers\admin\SalaryController;
 use App\Http\Controllers\admin\SalesController;
+use App\Http\Controllers\admin\PlanController;
 use App\Http\Controllers\admin\SalesReturnController;
 use App\Http\Controllers\admin\SettingController;
 use App\Http\Controllers\admin\StaffController;
@@ -245,6 +246,16 @@ Route::middleware(['auth:web', 'auto.permission'])->group(function () {
     Route::get('/vendor-report', [VendorController::class, 'vendor_report'])->name('vendor.report');
     Route::get('/vendor-view/{id}', [VendorController::class, 'vendor_view'])->name('vendor.view');
 
+
+
+
+     //plans
+    Route::get('/plans', [PlanController::class,'index'])->name('plans.planlist');
+    Route::get('/add-plan', [PlanController::class,'create'])->name('plans.addplan');
+    Route::post('/add-plan', [PlanController::class,'store'])->name('plans.store');
+    Route::get('/edit-plan/{plan}', [PlanController::class,'edit'])->name('plans.edit');
+    Route::put('/edit-plan/{plan}', [PlanController::class,'update'])->name('plans.update');
+    Route::delete('/delete-plan/{plan}', [PlanController::class,'destroy'])->name('plans.destroy');
 
     // Follow Up
     Route::get('/follow-ups', [FollowUpController::class, 'follow_up_list'])->name('followup.list');

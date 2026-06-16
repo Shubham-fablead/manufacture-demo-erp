@@ -969,19 +969,34 @@ class SalesController extends Controller
                 }
             }
 
-            $productTotalBeforeTds = 0;
-            foreach ($request->items as $item) {
-                $baseAmount = ((float) ($item['price'] ?? 0)) * ((float) ($item['quantity'] ?? 0));
-                $itemGstAmount = (float) ($item['product_gst_total'] ?? 0);
-                $itemDiscountAmount = (float) ($item['discount_amount'] ?? 0);
-                $productTotalBeforeTds += ($baseAmount + $itemGstAmount - $itemDiscountAmount);
-            }
+           $productOriginalTotal = 0;
+$productAfterDiscountTotal = 0;
 
-            $preTdsTotal = $productTotalBeforeTds + $shippingAmount + $labourSubtotal;
-            // TDS applies on product subtotal only (not shipping or labour)
-            $tdsPercentage = max(0, min(100, (float) ($request->tds_percentage ?? 0)));
-            $tdsAmount = round(($productTotalBeforeTds * $tdsPercentage) / 100, 2);
-            $roundedTotal = max(0, round($preTdsTotal - $tdsAmount));
+foreach ($request->items as $item) {
+
+    $baseAmount = ((float) ($item['price'] ?? 0)) * ((float) ($item['quantity'] ?? 0));
+
+    $itemGstAmount = (float) ($item['product_gst_total'] ?? 0);
+
+    $itemDiscountAmount = (float) ($item['discount_amount'] ?? 0);
+
+    // Original Amount (Before Discount)
+  $productOriginalTotal += $baseAmount;
+    
+
+    // Amount After Discount
+    $productAfterDiscountTotal += ($baseAmount + $itemGstAmount - $itemDiscountAmount);
+}
+
+$preTdsTotal = $productAfterDiscountTotal + $shippingAmount + $labourSubtotal;
+
+$tdsPercentage = max(0, min(100, (float) ($request->tds_percentage ?? 0)));
+
+// TDS ON ORIGINAL PRODUCT VALUE
+$tdsAmount = round(($productOriginalTotal * $tdsPercentage) / 100, 2);
+
+// Final Total
+$roundedTotal = max(0, round($preTdsTotal - $tdsAmount, 2));
 
             /*
         |--------------------------------------------------------------------------

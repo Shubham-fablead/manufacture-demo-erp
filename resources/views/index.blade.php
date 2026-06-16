@@ -632,7 +632,13 @@
         text-align: right;
     }
 
-    /* Style for chart select2 dropdowns */
+    /* Latest Sales & Latest Purchases — product name word wrap */
+    .dataview table tbody td.productimgname a span {
+        white-space: normal !important;
+        overflow: visible !important;
+        text-overflow: unset !important;
+        word-break: break-word !important;
+    }
     .chart-select-container .select2-container--default .select2-selection--single {
         height: 31px !important;
         border: 1px solid #ced4da !important;
@@ -1224,7 +1230,7 @@
                                                             <div class="mobile-details-row">
                                                                 <span class="mobile-details-label">Sale Date:</span>
                                                                 <span class="mobile-details-value">
-                                                                    {{ Carbon::parse($item->order_date)->format('d F Y h:i A') }}
+                                                                    {{ Carbon::parse($item->order_date)->format('d F Y') }}
                                                                 </span>
                                                             </div>
 
@@ -1263,7 +1269,7 @@
                                                 </td>
 
                                                 <td class="d-none d-md-table-cell">
-                                                    {{ Carbon::parse($item->order_date)->format('d F Y h:i A') }}
+                                                    {{ Carbon::parse($item->order_date)->format('d F Y') }}
                                                 </td>
                                             </tr>
                                         @empty
@@ -1349,7 +1355,7 @@
                                                             <div class="mobile-details-row">
                                                                 <span class="mobile-details-label">Purchase Date:</span>
                                                                 <span class="mobile-details-value">
-                                                                    {{ \Carbon\Carbon::parse($item->purchase_date)->format('d F Y h:i A') }}
+                                                                    {{ \Carbon\Carbon::parse($item->purchase_date)->format('d F Y') }}
                                                                 </span>
                                                             </div>
 
@@ -1387,7 +1393,7 @@
                                                 </td>
 
                                                 <td class="d-none d-md-table-cell">
-                                                    {{ \Carbon\Carbon::parse($item->purchase_date)->format('d F Y h:i A') }}
+                                                    {{ \Carbon\Carbon::parse($item->purchase_date)->format('d F Y') }}
                                                 </td>
                                             </tr>
                                         @empty
@@ -1412,7 +1418,7 @@
                 <div class="overview-title">
                     <div>
                         <h4>CRM Pipeline Overview</h4>
-                        /* <p>Lead movement, customer conversion, and pending relationship work.</p> */
+                      
                     </div>
                     <a href="{{ route('lead.list') }}" class="btn btn-sm btn-primary">View Leads</a>
                 </div>
@@ -1697,7 +1703,7 @@
                 <div class="overview-title">
                     <div>
                         <h4>HR Workforce Overview</h4>
-                        /* <p>Staff strength, attendance performance, payroll progress, and advance exposure.</p> */
+                        
                     </div>
                     <a href="{{ route('staff.list') }}" class="btn btn-sm btn-primary">View Staff</a>
                 </div>

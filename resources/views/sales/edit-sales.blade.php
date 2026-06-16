@@ -2132,22 +2132,20 @@ $(document).on('blur', '#tds-percentage-input', function() {
 
                             const preTdsGrandTotal = afterDiscount + labourSubtotal + shippingCost;
 
-                            // On initial load, use the saved tds_amount from the input (pre-filled by PHP).
-                            // After the user interacts, recalculate from the percentage.
+                            // TDS basis: original base product price only (no GST, no discount adjustment)
+                            const tdsBasis = grossSubtotal;
+
+                            // On initial load, recalculate TDS from grossSubtotal (base price only).
+                            // Do NOT use the stored tds_amount from DB — it may have been calculated
+                            // on GST-inclusive totals before the fix was applied.
                             let tdsAmount;
-                            if (_isInitialLoad) {
-                                tdsAmount = parseFloat($('#tds-amount-input').val()) || 0;
-                            } else {
-                                tdsAmount = isTdsEnabled ? (preTdsGrandTotal * tdsPercentage) / 100 : 0;
-                            }
+                            tdsAmount = isTdsEnabled ? (tdsBasis * tdsPercentage) / 100 : 0;
 
                             if (isTdsEnabled) {
                                 $('#tds-percentage-display').text(formatNumber(tdsPercentage));
                                 $('#tds-amount-display').text(`-${formatNumber(tdsAmount)}`);
-                                // Only overwrite tds-amount-input after initial load
-                                if (!_isInitialLoad) {
-                                    $('#tds-amount-input').val(tdsAmount.toFixed(2));
-                                }
+                                // Always keep tds-amount-input in sync (used by form submission)
+                                $('#tds-amount-input').val(tdsAmount.toFixed(2));
                                 // Always show TDS row
                                 $('.tds-summary').show();
                             }
