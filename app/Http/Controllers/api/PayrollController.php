@@ -25,6 +25,20 @@ use Illuminate\View\View;
 
 class PayrollController extends Controller
 {
+
+    private function resolveBranchId(Request $request)
+    {
+        $user = $this->currentUser();
+        $role = strtolower((string) ($user->role ?? ''));
+        $selectedSubAdminId = $request->input('selectedSubAdminId') ?? session('selectedSubAdminId');
+
+        return match ($role) {
+            'sub-admin' => (int) ($user->branch_id ?? $user->id ?? 0),
+            'staff'     => (int) ($user->branch_id ?? $user->id ?? 0),
+            'admin'     => (int) (! empty($selectedSubAdminId) ? $selectedSubAdminId : ($user->id ?? 0)),
+            default     => (int) ($user->branch_id ?? $user->id ?? 0),
+        };
+    }
     public function page(?int $id = null): View
     {
         return view('payroll.payroll', [
@@ -53,6 +67,7 @@ class PayrollController extends Controller
     public function getAll(Request $request): JsonResponse
     {
         $month = $request->query('month');
+        $branchId = $this->resolveBranchId($request);
         $query = PayrollModel::query()
             ->from('payroll')
             ->leftJoin('users', 'users.id', '=', 'payroll.user_id')
@@ -70,10 +85,16 @@ class PayrollController extends Controller
             $query->where('payroll.month_year', $month);
         }
 
-        if (($user = $this->currentUser()) && $user->role === 'staff') {
-            $query->where('payroll.user_id', $user->id);
+        if (($user = $this->currentUser())) {
+            if ($user->role === 'staff') {
+                $query->where('payroll.user_id', $user->id);
+            } else {
+                $query->where(function ($q) use ($branchId) {
+                    $q->where('payroll.branch_id', $branchId)
+                      ->orWhere('users.branch_id', $branchId);
+                });
+            }
         }
-        // dd($this->currentUser());
 
         return response()->json([
             'status' => 'success',
@@ -101,6 +122,7 @@ class PayrollController extends Controller
     public function create(Request $request): JsonResponse
     {
         $data = $this->validatePayroll($request);
+        $data['branch_id'] = $this->resolveBranchId($request);
 
         $existing = PayrollModel::query()
             ->where('user_id', $data['user_id'])
@@ -462,6 +484,7 @@ class PayrollController extends Controller
 
     public function save(Request $request): JsonResponse
     {
+        $branchId = $this->resolveBranchId($request);
         $record = $this->upsertMonthlyPayrollFromSummary([
             'user_id' => (int) $request->input('employee_id'),
             'month_year' => (string) $request->input('month'),
@@ -474,6 +497,7 @@ class PayrollController extends Controller
             'overtime_pay' => (float) $request->input('overtime_pay', 0),
             'total_overtime_hours' => (float) $request->input('total_overtime_hours', 0),
             'bonuses' => (float) $request->input('advance_payment', 0),
+            'branch_id' => $branchId,
         ]);
 
         return response()->json([
@@ -567,6 +591,7 @@ class PayrollController extends Controller
 
     public function saveAll(Request $request)
     {
+        $branchId = $this->resolveBranchId($request);
         $employeeIds = (array) $request->input('employee_id', []);
         $salaries = (array) $request->input('salary', []);
         $leaves = (array) $request->input('leaves', []);
@@ -591,6 +616,7 @@ class PayrollController extends Controller
                 'overtime_pay' => (float) ($overtimePays[$index] ?? 0),
                 'total_overtime_hours' => (float) ($totalOvertimeHours[$index] ?? 0),
                 'bonuses' => (float) ($request->input('advance_payment')[$index] ?? 0),
+                'branch_id' => $branchId,
             ]);
         }
 
@@ -671,9 +697,11 @@ class PayrollController extends Controller
     private function buildPayrollPayload(Request $request, array $validated, ?PayrollModel $record = null): array
     {
         $currentUser = $this->currentUser();
+        $branchId = $validated['branch_id'] ?? $record?->branch_id ?? $this->resolveBranchId($request);
 
         return [
             'user_id' => (int) $validated['user_id'],
+            'branch_id' => (int) $branchId,
             'leave_type' => $request->input('leave_type'),
             'remaining_paid_leaves' => (float) $request->input('remaining_paid_leaves', 0),
             'month_year' => $validated['month_year'],
@@ -722,6 +750,7 @@ class PayrollController extends Controller
         $oldAdvance = (float) $record->bonuses;
         $record->fill([
             'user_id' => $data['user_id'],
+            'branch_id' => $data['branch_id'] ?? $record->branch_id ?? $this->resolveEmployeeBranchId($data['user_id']),
             'month_year' => $data['month_year'],
             'salary_amount' => $data['salary_amount'],
             'total_leaves' => $data['total_leaves'],
@@ -1086,12 +1115,25 @@ $netSalary = round($earnedSalary + $overtimePay - $taxDeduction, 2);
             ->where('users.isDeleted', 0)
             ->whereIn('users.role', ['staff', 'hr']);
 
-        $currentUser = Auth::user();
-        if ($currentUser && $currentUser->role === 'staff') {
-            $query->where('users.id', $currentUser->id);
+        $currentUser = $this->currentUser();
+        if ($currentUser) {
+            if ($currentUser->role === 'staff') {
+                $query->where('users.id', $currentUser->id);
+            } else {
+                $branchId = $this->resolveBranchId(request());
+                $query->where(function ($q) use ($branchId) {
+                    $q->where('users.branch_id', $branchId)
+                      ->orWhere('users.id', $branchId);
+                });
+            }
         }
 
         return $query->orderBy('users.name')->get();
+    }
+
+    private function resolveEmployeeBranchId(int $userId): int
+    {
+        return (int) (User::query()->where('id', $userId)->value('branch_id') ?? 0);
     }
 
     private function approvedLeaveDates(int $userId, Carbon $start, Carbon $end): array

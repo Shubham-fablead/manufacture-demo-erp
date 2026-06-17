@@ -7,6 +7,7 @@ use App\Models\DepartmentModel;
 use App\Models\DesignationModel;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
@@ -14,9 +15,44 @@ use Illuminate\Validation\ValidationException;
 
 class DesignationController extends Controller
 {
+    /* -------------------------------------------------
+     | 🔹 Helper: Resolve Branch ID  (same as BrandController)
+     -------------------------------------------------*/
+    private function resolveBranchId(Request $request): int|null
+    {
+        $user = Auth::guard('api')->user();
+        if (!$user) {
+            return null;
+        }
+
+        $role = strtolower((string) ($user->role ?? ''));
+
+        return match ($role) {
+            'sub-admin' => $user->id,
+            'staff'     => $user->branch_id,
+            'admin'     => $request->input('selectedSubAdminId')
+                           ?? $request->input('sub_admin_id')
+                           ?? $user->id,
+            default     => $user->id,
+        };
+    }
+
+    /* -------------------------------------------------
+     | Pages
+     -------------------------------------------------*/
     public function createPage(Request $request)
     {
+        // Resolve branch ID from session for web (non-API) context
+        $user = auth()->user();
+        $role = strtolower((string) ($user->role ?? ''));
+        $branchId = match ($role) {
+            'sub-admin' => $user->id,
+            'staff'     => $user->branch_id,
+            default     => session('selectedSubAdminId') ?? $user->id,
+        };
+
         $departments = DepartmentModel::query()
+            ->where('branch_id', $branchId)
             ->orderBy('department_name')
             ->get();
 
@@ -41,20 +77,25 @@ class DesignationController extends Controller
         return view('designation.view');
     }
 
+    /* -------------------------------------------------
+     | 🔹 List (paginated / all)
+     -------------------------------------------------*/
     public function index(Request $request): JsonResponse
     {
         if ($error = $this->ensureManagementAccess()) {
             return $error;
         }
 
-        $perPage = max(1, (int) $request->input('per_page', 10));
-        $page = max(1, (int) $request->input('page', 1));
-        $search = trim((string) $request->input('search', ''));
+        $branchId   = $this->resolveBranchId($request);
+        $perPage    = max(1, (int) $request->input('per_page', 10));
+        $page       = max(1, (int) $request->input('page', 1));
+        $search     = trim((string) $request->input('search', ''));
         $shouldPaginate = $request->has('page') || $request->has('per_page') || $request->filled('search');
 
         $query = DesignationModel::query()
             ->leftJoin('department', 'department.id', '=', 'designation.department_id')
             ->select('designation.*', 'department.department_name')
+            ->where('designation.branch_id', $branchId)
             ->when($search !== '', static function ($q) use ($search) {
                 $q->where(function ($subQuery) use ($search) {
                     $subQuery->where('designation.designation_name', 'like', "%{$search}%")
@@ -68,11 +109,11 @@ class DesignationController extends Controller
         if ($shouldPaginate) {
             $paginatedDesignations = $query->paginate($perPage, ['*'], 'page', $page);
             $designations = $paginatedDesignations->items();
-            $pagination = [
-                'current_page' => $paginatedDesignations->currentPage(),
-                'last_page' => $paginatedDesignations->lastPage(),
-                'per_page' => $paginatedDesignations->perPage(),
-                'total' => $paginatedDesignations->total(),
+            $pagination   = [
+                'current_page'  => $paginatedDesignations->currentPage(),
+                'last_page'     => $paginatedDesignations->lastPage(),
+                'per_page'      => $paginatedDesignations->perPage(),
+                'total'         => $paginatedDesignations->total(),
                 'next_page_url' => $paginatedDesignations->nextPageUrl(),
                 'prev_page_url' => $paginatedDesignations->previousPageUrl(),
             ];
@@ -81,12 +122,15 @@ class DesignationController extends Controller
         }
 
         return response()->json([
-            'status' => 'success',
+            'status'       => 'success',
             'designations' => $designations,
-            'pagination' => $pagination,
+            'pagination'   => $pagination,
         ]);
     }
 
+    /* -------------------------------------------------
+     | 🔹 Show single
+     -------------------------------------------------*/
     public function show(int $id): JsonResponse
     {
         if ($error = $this->ensureManagementAccess()) {
@@ -95,49 +139,52 @@ class DesignationController extends Controller
 
         $designation = DesignationModel::find($id);
         if (!$designation) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Designation not found.',
-            ], 404);
+            return response()->json(['status' => 'error', 'message' => 'Designation not found.'], 404);
         }
 
-        return response()->json([
-            'status' => 'success',
-            'data' => $designation,
-        ]);
+        return response()->json(['status' => 'success', 'data' => $designation]);
     }
 
+    /* -------------------------------------------------
+     | 🔹 Create
+     -------------------------------------------------*/
     public function store(Request $request): JsonResponse
     {
         if ($error = $this->ensureManagementAccess()) {
             return $error;
         }
 
+        $branchId = $this->resolveBranchId($request);
+
         $validated = $request->validate([
             'designation_name' => ['required', 'string', 'min:2', 'max:255'],
-            'department_id' => ['required', 'integer', 'exists:department,id'],
+            'department_id'    => ['required', 'integer', 'exists:department,id'],
         ]);
 
         $normalizedName = $this->normalizeName($validated['designation_name']);
-        if ($this->designationExists($normalizedName, (int) $validated['department_id'])) {
+        if ($this->designationExists($normalizedName, (int) $validated['department_id'], null, $branchId)) {
             return response()->json([
-                'status' => 'error',
+                'status'  => 'error',
                 'message' => 'Designation already exists for the selected department.',
             ], 409);
         }
 
         $designation = DesignationModel::create([
+            'branch_id'        => $branchId,
             'designation_name' => $normalizedName,
-            'department_id' => (int) $validated['department_id'],
+            'department_id'    => (int) $validated['department_id'],
         ]);
 
         return response()->json([
-            'status' => 'success',
+            'status'  => 'success',
             'message' => 'Designation created successfully!',
-            'data' => $designation,
+            'data'    => $designation,
         ], 201);
     }
 
+    /* -------------------------------------------------
+     | 🔹 Update
+     -------------------------------------------------*/
     public function update(Request $request, int $id): JsonResponse
     {
         if ($error = $this->ensureManagementAccess()) {
@@ -146,38 +193,41 @@ class DesignationController extends Controller
 
         $designation = DesignationModel::find($id);
         if (!$designation) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Designation not found.',
-            ], 404);
+            return response()->json(['status' => 'error', 'message' => 'Designation not found.'], 404);
         }
+
+        $branchId = $designation->branch_id ?? $this->resolveBranchId($request);
 
         $validated = $request->validate([
             'designation_name' => ['required', 'string', 'min:2', 'max:255'],
-            'department_id' => ['required', 'integer', 'exists:department,id'],
+            'department_id'    => ['required', 'integer', 'exists:department,id'],
         ]);
 
         $normalizedName = $this->normalizeName($validated['designation_name']);
-        $departmentId = (int) $validated['department_id'];
-        if ($this->designationExists($normalizedName, $departmentId, $id)) {
+        $departmentId   = (int) $validated['department_id'];
+
+        if ($this->designationExists($normalizedName, $departmentId, $id, $branchId)) {
             return response()->json([
-                'status' => 'error',
+                'status'  => 'error',
                 'message' => 'Designation already exists for the selected department.',
             ], 409);
         }
 
         $designation->update([
             'designation_name' => $normalizedName,
-            'department_id' => $departmentId,
+            'department_id'    => $departmentId,
         ]);
 
         return response()->json([
-            'status' => 'success',
+            'status'  => 'success',
             'message' => 'Designation updated successfully!',
-            'data' => $designation->fresh(),
+            'data'    => $designation->fresh(),
         ]);
     }
 
+    /* -------------------------------------------------
+     | 🔹 Delete
+     -------------------------------------------------*/
     public function destroy(int $id): JsonResponse
     {
         if ($error = $this->ensureManagementAccess()) {
@@ -186,14 +236,10 @@ class DesignationController extends Controller
 
         $designation = DesignationModel::find($id);
         if (!$designation) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Designation not found.',
-            ], 404);
+            return response()->json(['status' => 'error', 'message' => 'Designation not found.'], 404);
         }
 
         $hasDependency = false;
-
         if (Schema::hasTable('user_info')) {
             $hasDependency = $hasDependency || DB::table('user_info')->where('designation_id', $id)->exists();
         }
@@ -203,36 +249,41 @@ class DesignationController extends Controller
 
         if ($hasDependency) {
             return response()->json([
-                'status' => 'error',
+                'status'  => 'error',
                 'message' => 'This designation is associated with employees or performance records and cannot be deleted.',
             ], 400);
         }
 
         $designation->delete();
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Designation deleted successfully!',
-        ]);
+        return response()->json(['status' => 'success', 'message' => 'Designation deleted successfully!']);
     }
 
-    public function all(): JsonResponse
+    /* -------------------------------------------------
+     | 🔹 All (dropdown / no pagination)
+     -------------------------------------------------*/
+    public function all(Request $request): JsonResponse
     {
         if ($error = $this->ensureManagementAccess()) {
             return $error;
         }
 
+        $branchId     = $this->resolveBranchId($request);
         $designations = DesignationModel::query()
+            ->where('branch_id', $branchId)
             ->orderBy('designation_name')
             ->get();
 
         return response()->json([
-            'status' => 'success',
-            'data' => $designations,
+            'status'       => 'success',
+            'data'         => $designations,
             'designations' => $designations,
         ]);
     }
 
+    /* -------------------------------------------------
+     | 🔹 Quick Store (inline add from other forms)
+     -------------------------------------------------*/
     public function quickStore(Request $request): JsonResponse
     {
         if ($error = $this->ensureManagementAccess()) {
@@ -242,43 +293,41 @@ class DesignationController extends Controller
         try {
             $validated = $request->validate([
                 'designation_name' => ['required', 'string', 'min:2', 'max:255'],
-                'department_id' => ['required', 'integer', 'exists:department,id'],
+                'department_id'    => ['required', 'integer', 'exists:department,id'],
             ]);
         } catch (ValidationException $e) {
-            return response()->json([
-                'success' => false,
-                'errors' => $e->errors(),
-            ], 422);
+            return response()->json(['success' => false, 'errors' => $e->errors()], 422);
         }
 
+        $branchId       = $this->resolveBranchId($request);
         $normalizedName = $this->normalizeName($validated['designation_name']);
-        $departmentId = (int) $validated['department_id'];
-        if ($this->designationExists($normalizedName, $departmentId)) {
+        $departmentId   = (int) $validated['department_id'];
+
+        if ($this->designationExists($normalizedName, $departmentId, null, $branchId)) {
             return response()->json([
                 'success' => false,
-                'errors' => [
-                    'designation_name' => ['This designation already exists for the selected department.'],
-                ],
+                'errors'  => ['designation_name' => ['This designation already exists for the selected department.']],
             ], 409);
         }
 
         $designation = DesignationModel::create([
-            'department_id' => $departmentId,
+            'branch_id'        => $branchId,
+            'department_id'    => $departmentId,
             'designation_name' => $normalizedName,
         ]);
 
-        return response()->json([
-            'success' => true,
-            'designation' => $designation,
-        ]);
+        return response()->json(['success' => true, 'designation' => $designation]);
     }
 
+    /* -------------------------------------------------
+     | 🔹 Private helpers
+     -------------------------------------------------*/
     private function ensureManagementAccess(): ?JsonResponse
     {
         $user = auth('api')->user();
         if (!$user) {
             return response()->json([
-                'status' => 'error',
+                'status'  => 'error',
                 'message' => 'Unauthorized: Token missing or invalid.',
             ], 401);
         }
@@ -286,7 +335,7 @@ class DesignationController extends Controller
         $role = strtolower((string) ($user->role ?? ''));
         if (!in_array($role, ['admin', 'hr', 'sub-admin'], true)) {
             return response()->json([
-                'status' => 'error',
+                'status'  => 'error',
                 'message' => 'Forbidden: You do not have access to this resource.',
             ], 403);
         }
@@ -299,11 +348,12 @@ class DesignationController extends Controller
         return Str::title(Str::lower(trim($name)));
     }
 
-    private function designationExists(string $name, int $departmentId, ?int $ignoreId = null): bool
+    private function designationExists(string $name, int $departmentId, ?int $ignoreId = null, int|null $branchId = null): bool
     {
         return DesignationModel::query()
             ->where('department_id', $departmentId)
             ->when($ignoreId, static fn ($q) => $q->where('id', '!=', $ignoreId))
+            ->when($branchId, static fn ($q) => $q->where('branch_id', $branchId))
             ->whereRaw('LOWER(designation_name) = ?', [Str::lower($name)])
             ->exists();
     }

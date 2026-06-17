@@ -76,6 +76,10 @@
                     number_of_leaves: $('#number_of_leaves').val(),
                     allow_half_day: $('#allow_half_day').val()
                 };
+                const selectedSubAdminId = localStorage.getItem('selectedSubAdminId');
+                if (selectedSubAdminId && selectedSubAdminId !== 'null' && selectedSubAdminId !== 'undefined') {
+                    payload.selectedSubAdminId = selectedSubAdminId;
+                }
 
                 if (!payload.leave_type || payload.number_of_leaves === '') {
                     Swal.fire('Validation Error', 'Leave type and number of leaves are required.', 'error');

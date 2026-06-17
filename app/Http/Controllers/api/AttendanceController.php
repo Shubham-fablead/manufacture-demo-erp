@@ -14,6 +14,19 @@ use Carbon\Carbon;
 
 class AttendanceController extends Controller
 {
+
+    private function resolveBranchId(Request $request)
+    {
+        $user = Auth::guard('api')->user();
+        $role = strtolower((string) ($user->role ?? ''));
+
+        return match ($role) {
+            'sub-admin' => (int) ($user->id ?? 0),
+            'staff'     => (int) ($user->branch_id ?? $user->id ?? 0),
+            'admin'     => (int) ($request->input('selectedSubAdminId') ?: ($user->id ?? 0)),
+            default     => (int) ($user->id ?? 0),
+        };
+    }
     protected function canManageAttendance($user): bool
     {
         return in_array($user->role, ['admin', 'sub-admin', 'hr'], true);
@@ -50,18 +63,12 @@ class AttendanceController extends Controller
             'extraday.required' => 'Extraday field is required.',
         ]);
 
-
-        $user = Auth::guard('api')->user();
-        $userId = $user->id;
-
-        if ($request->filled('selectedSubAdminId') && is_numeric($request->input('selectedSubAdminId'))) {
-            $userId = (int) $request->input('selectedSubAdminId');
-        }
+        $branchId = $this->resolveBranchId($request);
 
         Attendance::updateOrCreate(
             ['user_id' => $request->user_id, 'date' => $request->date],
             [
-                'branch_id' => $userId,
+                'branch_id' => $branchId,
                 'status' => $request->status,
                 'check_in_time' => $request->check_in_time,
                 'check_out_time' => $request->check_out_time,
@@ -92,12 +99,7 @@ class AttendanceController extends Controller
         ]);
 
         $user = Auth::guard('api')->user();
-        $branchId = $user->id;
-        $subAdminId = $request->input('selectedSubAdminId');
-
-        if (!empty($subAdminId) && is_numeric($subAdminId)) {
-            $branchId = (int) $subAdminId;
-        }
+        $branchId = $this->resolveBranchId($request);
 
         // Get staff IDs
         if ($request->filled('user_id')) {

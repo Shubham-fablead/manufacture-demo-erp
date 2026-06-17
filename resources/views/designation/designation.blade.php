@@ -46,7 +46,9 @@
 @push('js')
     <script>
         $(function() {
-            const token = localStorage.getItem('token');
+            const token = (typeof window.getAuthToken === 'function'
+                ? window.getAuthToken()
+                : (localStorage.getItem('authToken') || localStorage.getItem('token') || ''));
             const routeDesignationId = @json($designationId ?? null);
             const params = new URLSearchParams(window.location.search);
             const designationId = routeDesignationId || params.get('id');
@@ -68,7 +70,8 @@
 
                 const payload = {
                     designation_name: $('#designation_name').val().trim(),
-                    department_id: $('#department_id').val()
+                    department_id: $('#department_id').val(),
+                    selectedSubAdminId: localStorage.getItem('selectedSubAdminId') || null,
                 };
 
                 if (!payload.department_id) {

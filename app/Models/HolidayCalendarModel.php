@@ -16,6 +16,7 @@ class HolidayCalendarModel extends Model
         'title',
         'holiday_date',
         'description',
+        'branch_id',
         'created_at',
         'updated_at',
     ];

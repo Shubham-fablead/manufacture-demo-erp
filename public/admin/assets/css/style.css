@@ -4444,7 +4444,7 @@ span.select2-container.select2-container--default.select2-container--open {
 }
 
 .sidebar .sidebar-menu>ul>li {
-    margin-bottom: 2px
+    margin-bottom: 10px
 }
 
 .sidebar .sidebar-menu>ul>li.active a {
@@ -4452,7 +4452,7 @@ span.select2-container.select2-container--default.select2-container--open {
 }
 
 .sidebar .sidebar-menu>ul>li>a {
-    padding: 4px 12px;
+    padding: 8px 12px;
     position: relative;
     color: #212b36
 }
@@ -4561,6 +4561,7 @@ span.select2-container.select2-container--default.select2-container--open {
     background: #fafbfe;
     border-radius: 5px;
     padding: 4px 0;
+    margin-top: 6px;
     display: none
 }
 

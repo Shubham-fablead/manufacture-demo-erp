@@ -9,10 +9,28 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 
 class LeaveTypeController extends Controller
 {
+    /* -------------------------------------------------
+     | 🔹 Helper: Resolve Branch ID  (same as BrandController)
+     -------------------------------------------------*/
+    private function resolveBranchId(Request $request)
+    {
+        $user = Auth::user() ?? Auth::guard('api')->user();
+        $role = strtolower((string) ($user->role ?? ''));
+        $selectedSubAdminId = $request->input('selectedSubAdminId') ?? session('selectedSubAdminId');
+
+        return match ($role) {
+            'sub-admin' => (int) ($user->branch_id ?? $user->id ?? 0),
+            'staff'     => (int) ($user->branch_id ?? $user->id ?? 0),
+            'admin'     => (int) (! empty($selectedSubAdminId) ? $selectedSubAdminId : ($user->branch_id ?? $user->id ?? 0)),
+            default     => (int) ($user->branch_id ?? $user->id ?? 0),
+        };
+    }
+
     public function createPage(Request $request)
     {
         $leaveTypeId = $request->integer('id') ?: $request->session()->pull('leave_type_edit_id');
@@ -48,8 +66,10 @@ class LeaveTypeController extends Controller
         $page = max(1, (int) $request->input('page', 1));
         $search = trim((string) $request->input('search', ''));
         $shouldPaginate = $request->has('page') || $request->has('per_page') || $request->filled('search');
+        $branchId = $this->resolveBranchId($request);
 
         $query = LeaveTypeModel::query()
+            ->where('branch_id', $branchId)
             ->when($search !== '', static function ($q) use ($search) {
                 $normalizedSearch = Str::lower($search);
                 $q->where(function ($subQuery) use ($search, $normalizedSearch) {
@@ -134,6 +154,7 @@ class LeaveTypeController extends Controller
         $record = LeaveTypeModel::create([
             'leave_type' => $leaveTypeName,
             'number_of_leaves' => (int) $validated['number_of_leaves'],
+            'branch_id' => $this->resolveBranchId($request),
             'allow_half_day' => (int) $validated['allow_half_day'],
         ]);
 
@@ -175,6 +196,7 @@ class LeaveTypeController extends Controller
         $record->update([
             'leave_type' => $leaveTypeName,
             'number_of_leaves' => (int) $validated['number_of_leaves'],
+            'branch_id' => $record->branch_id ?: $this->resolveBranchId($request),
             'allow_half_day' => (int) $validated['allow_half_day'],
         ]);
 
@@ -248,6 +270,7 @@ class LeaveTypeController extends Controller
         $record = LeaveTypeModel::create([
             'leave_type' => $leaveTypeName,
             'number_of_leaves' => (int) $validated['number_of_leaves'],
+            'branch_id' => $this->resolveBranchId($request),
             'allow_half_day' => (int) $request->input('allow_half_day', 0),
         ]);
 
@@ -286,8 +309,11 @@ class LeaveTypeController extends Controller
 
     private function leaveTypeExists(string $name, ?int $ignoreId = null): bool
     {
+        $branchId = $this->resolveBranchId(request());
+
         return LeaveTypeModel::query()
             ->when($ignoreId, static fn ($q) => $q->where('id', '!=', $ignoreId))
+            ->where('branch_id', $branchId)
             ->whereRaw('LOWER(leave_type) = ?', [Str::lower($name)])
             ->exists();
     }

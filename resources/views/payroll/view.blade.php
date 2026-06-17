@@ -735,8 +735,15 @@
         function fetchPayroll() {
             // Build URL with month filter
             let apiUrl = '<?= url("/api/payroll/getAll") ?>';
+            const selectedSubAdminId = localStorage.getItem('selectedSubAdminId');
+
             if (selectedMonth) {
                 apiUrl += '?month=' + selectedMonth;
+            }
+
+            if (selectedSubAdminId) {
+                apiUrl += apiUrl.includes('?') ? '&' : '?';
+                apiUrl += 'selectedSubAdminId=' + encodeURIComponent(selectedSubAdminId);
             }
 
             $.ajax({

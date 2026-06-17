@@ -287,6 +287,7 @@
             const token = (typeof window.getAuthToken === 'function'
                 ? window.getAuthToken()
                 : (localStorage.getItem('authToken') || localStorage.getItem('token') || ''));
+            const selectedSubAdminId = localStorage.getItem('selectedSubAdminId');
             const year = new Date().getFullYear();
             $('#calendarYear').text(year);
 
@@ -295,8 +296,13 @@
                 return;
             }
 
+            const params = new URLSearchParams();
+            if (selectedSubAdminId && selectedSubAdminId !== 'null' && selectedSubAdminId !== 'undefined') {
+                params.set('selectedSubAdminId', selectedSubAdminId);
+            }
+
             $.ajax({
-                url: '/api/get_holidays',
+                url: `/api/get_holidays${params.toString() ? `?${params.toString()}` : ''}`,
                 method: 'GET',
                 headers: {
                     Authorization: `Bearer ${token}`

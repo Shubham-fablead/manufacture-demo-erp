@@ -4,9 +4,11 @@ namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\HolidayCalendarModel;
+use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Auth;
 
 class HolidaysController extends Controller
 {
@@ -40,8 +42,10 @@ class HolidaysController extends Controller
         $page = max(1, (int) $request->input('page', 1));
         $search = trim((string) $request->input('search', ''));
         $shouldPaginate = $request->has('page') || $request->has('per_page') || $request->filled('search');
+        $branchId = $this->resolveBranchId($request);
 
         $query = HolidayCalendarModel::query()
+            ->where('branch_id', $branchId)
             ->when($search !== '', static function ($q) use ($search) {
                 $q->where(function ($subQuery) use ($search) {
                     $subQuery->where('title', 'like', "%{$search}%")
@@ -96,7 +100,11 @@ class HolidaysController extends Controller
         }
 
         $date = date('Y-m-d', strtotime((string) $request->input('holiday_date')));
-        $exists = HolidayCalendarModel::whereDate('holiday_date', $date)->exists();
+        $branchId = $this->resolveBranchId($request);
+        $exists = HolidayCalendarModel::query()
+            ->whereDate('holiday_date', $date)
+            ->where('branch_id', $branchId)
+            ->exists();
         if ($exists) {
             return response()->json([
                 'status' => 'error',
@@ -108,6 +116,7 @@ class HolidaysController extends Controller
             'title' => trim((string) $request->input('title')),
             'holiday_date' => $date,
             'description' => $request->input('description'),
+            'branch_id' => $this->resolveBranchId($request),
         ]);
 
         return response()->json([
@@ -178,6 +187,7 @@ class HolidaysController extends Controller
         $duplicate = HolidayCalendarModel::query()
             ->whereDate('holiday_date', $date)
             ->where('id', '!=', $holidayId)
+            ->where('branch_id', $holiday->branch_id ?: $this->resolveBranchId($request))
             ->exists();
 
         if ($duplicate) {
@@ -191,6 +201,7 @@ class HolidaysController extends Controller
             'title' => trim((string) $request->input('title')),
             'holiday_date' => $date,
             'description' => $request->input('description'),
+            'branch_id' => $holiday->branch_id ?: $this->resolveBranchId($request),
         ]);
 
         return response()->json([
@@ -255,5 +266,26 @@ class HolidaysController extends Controller
         }
 
         return null;
+    }
+
+    private function resolveBranchId(Request $request): int
+    {
+        $user = Auth::user() ?? auth('api')->user();
+        $selectedSubAdminId = $request->input('selectedSubAdminId') ?? session('selectedSubAdminId');
+
+        if (! $user) {
+            return 0;
+        }
+
+        $role = strtolower((string) ($user->role ?? ''));
+        if ($role === 'staff' && ! empty($user->branch_id)) {
+            return (int) $user->branch_id;
+        }
+
+        if ($role === 'admin' && ! empty($selectedSubAdminId)) {
+            return (int) $selectedSubAdminId;
+        }
+
+        return (int) ($user->branch_id ?? $user->id ?? 0);
     }
 }

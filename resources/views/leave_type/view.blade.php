@@ -93,6 +93,13 @@
             };
             let searchDebounceTimer = null;
 
+            function getSelectedBranchId() {
+                return localStorage.getItem('selectedSubAdminId')
+                    || localStorage.getItem('selectedBranchId')
+                    || '{{ session('selectedSubAdminId') }}'
+                    || '';
+            }
+
             if (!token) {
                 Swal.fire('Unauthorized', 'Please login again to continue.', 'warning');
                 return;
@@ -141,6 +148,7 @@
                         page: state.page,
                         per_page: state.perPage,
                         search: state.search,
+                        selectedSubAdminId: getSelectedBranchId(),
                     },
                     headers: {
                         Authorization: `Bearer ${token}`

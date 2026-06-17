@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+
 class LeaveTypeModel extends Model
 {
     use HasFactory;
@@ -15,6 +16,7 @@ class LeaveTypeModel extends Model
     protected $fillable = [
         'leave_type',
         'number_of_leaves',
+        'branch_id',
         'allow_half_day',
     ];
 
