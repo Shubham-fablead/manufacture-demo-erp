@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Module;
 use App\Models\Notification;
 use App\Models\Order;
+use App\Models\Plan;
 use App\Models\Setting;
 use App\Models\User;
 use App\Models\UserDetail;
@@ -298,6 +299,34 @@ class StaffController extends Controller
     $userBranchId = ! empty($request->sub_admin_id)
         ? $request->sub_admin_id
         : ($user->id ?? null);
+
+    // ── Plan user_limit check ────────────────────────────────────────────
+    // Find the admin/sub-admin who owns this branch and check their plan
+    $branchOwner = User::where(function ($q) use ($userBranchId) {
+            $q->where('id', $userBranchId)
+              ->orWhere('branch_id', $userBranchId);
+        })
+        ->whereIn('role', ['admin', 'sub-admin'])
+        ->whereNotNull('plan_id')
+        ->first();
+
+    if ($branchOwner && $branchOwner->plan_id) {
+        $plan = Plan::find($branchOwner->plan_id);
+        if ($plan && $plan->user_limit > 0) {
+            $currentStaffCount = User::where('branch_id', $userBranchId)
+                ->whereIn('role', ['staff', 'hr'])
+                ->where('isDeleted', '!=', 1)
+                ->count();
+
+            if ($currentStaffCount >= $plan->user_limit) {
+                return response()->json([
+                    'status'  => false,
+                    'message' => 'User limit reached. Your current plan "' . $plan->name . '" allows a maximum of ' . $plan->user_limit . ' staff member(s). Please upgrade your plan to add more staff.',
+                ], 403);
+            }
+        }
+    }
+    // ────────────────────────────────────────────────────────────────────
 
     $rules =  [
         'customer_name' => 'required|string|max:80',
