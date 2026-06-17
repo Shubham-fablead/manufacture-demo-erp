@@ -13,6 +13,7 @@ class DepartmentModel extends Model
     protected $primaryKey = 'id';
 
     protected $fillable = [
+        'branch_id',
         'department_name',
         'enable_overtime',
         'overtime_rate_type',

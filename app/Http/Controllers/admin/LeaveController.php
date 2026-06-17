@@ -10,6 +10,7 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -17,6 +18,22 @@ use Illuminate\Support\Facades\Validator;
 
 class LeaveController extends Controller
 {
+    /* -------------------------------------------------
+     | 🔹 Helper: Resolve Branch ID  (same as BrandController)
+     -------------------------------------------------*/
+    private function resolveBranchId(Request $request)
+    {
+        $user = $this->resolveAuthUser();
+        $role = strtolower((string) ($user->role ?? ''));
+        $selectedSubAdminId = $request->input('selectedSubAdminId') ?? session('selectedSubAdminId');
+
+        return match ($role) {
+            'sub-admin' => (int) ($user->branch_id ?? $user->id ?? 0),
+            'staff'     => (int) ($user->branch_id ?? $user->id ?? 0),
+            'admin'     => (int) (! empty($selectedSubAdminId) ? $selectedSubAdminId : ($user->branch_id ?? $user->id ?? 0)),
+            default     => (int) ($user->branch_id ?? $user->id ?? 0),
+        };
+    }
     public function indexPage()
     {
         return view('leave.leaveview');
@@ -31,12 +48,15 @@ class LeaveController extends Controller
     {
         $authUser = auth()->user();
         $role = $this->normalizeRole((string) ($authUser->role ?? 'staff'));
+        $branchId = $this->resolveBranchId(request());
 
         $query = LeaveModel::with(['user', 'leaveType'])
             ->orderBy('start_date', 'desc');
 
         if (!$this->isManagementRole($role)) {
             $query->where('user_id', $authUser->id);
+        } else {
+            $query->where('branch_id', $branchId);
         }
 
         $leaves = $query->get();
@@ -44,13 +64,14 @@ class LeaveController extends Controller
         return view('leave.leave-request', compact('leaves'));
     }
 
-    public function createPage()
+    public function createPage(Request $request)
     {
         $authUser = auth()->user();
         $role = $this->normalizeRole((string) ($authUser->role ?? 'staff'));
         $nameColumn = $this->userDisplayColumn();
 
         $leaveTypes = LeaveTypeModel::query()
+            ->where('branch_id', $this->resolveBranchId(request()))
             ->orderBy('leave_type')
             ->get(['id', 'leave_type', 'allow_half_day']);
 
@@ -63,6 +84,7 @@ class LeaveController extends Controller
         }
 
         $this->applyNotDeletedFilter($usersQuery);
+        $usersQuery->where('branch_id', $this->resolveBranchId($request));
 
         if ($this->isManagementRole($role)) {
             $usersQuery->whereRaw('LOWER(role) in (?, ?, ?)', ['hr', 'staff', 'employee']);
@@ -125,6 +147,7 @@ class LeaveController extends Controller
         $role = $this->normalizeRole((string) $authUser->role);
         $requestedUserId = $request->filled('user_id') ? (int) $request->input('user_id') : null;
         $nameColumn = $this->userDisplayColumn();
+        $branchId = $this->resolveBranchId($request);
 
         $usersQuery = User::query()->select(['id', 'profile_image', 'role']);
         if ($nameColumn === 'username') {
@@ -134,6 +157,7 @@ class LeaveController extends Controller
         }
 
         $this->applyNotDeletedFilter($usersQuery);
+        $usersQuery->where('branch_id', $branchId);
 
         if ($this->isManagementRole($role)) {
             $usersQuery->whereRaw('LOWER(role) in (?, ?, ?)', ['hr', 'staff', 'employee']);
@@ -176,6 +200,7 @@ class LeaveController extends Controller
                 'leaves.status',
                 'leave_type.leave_type',
             ])
+            ->where('leaves.branch_id', $branchId)
             ->whereIn('leaves.user_id', $userIds)
             ->orderByDesc('leaves.start_date')
             ->orderByDesc('leaves.id');
@@ -298,6 +323,7 @@ class LeaveController extends Controller
             'start_date'    => $startDate->toDateString(),
             'end_date'      => $endDate->toDateString(),
             'no_of_day'     => $noOfDays, // for backwards compatibility
+            'branch_id'     => $this->resolveBranchId($request),
             'status'        => $status,
             'half_day'      => (int) ($validated['half_day'] ?? 0),
             'half_day_type' => $validated['half_day_type'] ?? null,

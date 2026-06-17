@@ -26,6 +26,7 @@ class LeaveModel extends Model
         'no_of_day',
         'no_of_days',
         'reason',
+          'branch_id',
         'leave_id',
         'leave_type_id',
         'created_by',

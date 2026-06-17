@@ -133,6 +133,7 @@
             });
 
             function loadDesignations() {
+                const selectedSubAdminId = localStorage.getItem('selectedSubAdminId');
                 $.ajax({
                     url: '/api/designation',
                     method: 'GET',
@@ -140,6 +141,7 @@
                         page: state.page,
                         per_page: state.perPage,
                         search: state.search,
+                        selectedSubAdminId: selectedSubAdminId || '',
                     },
                     headers: {
                         Authorization: `Bearer ${token}`
@@ -197,6 +199,9 @@
                     $.ajax({
                         url: `/api/designation/${id}`,
                         method: 'DELETE',
+                        data: {
+                            selectedSubAdminId: localStorage.getItem('selectedSubAdminId') || '',
+                        },
                         headers: {
                             Authorization: `Bearer ${token}`
                         }

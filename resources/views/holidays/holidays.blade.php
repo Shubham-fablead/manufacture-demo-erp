@@ -138,6 +138,7 @@
             });
 
             function loadHolidays() {
+                const selectedSubAdminId = localStorage.getItem('selectedSubAdminId') || sessionStorage.getItem('selectedSubAdminId') || '';
                 $.ajax({
                     url: '/api/get_holidays',
                     method: 'GET',
@@ -145,6 +146,7 @@
                         page: state.page,
                         per_page: state.perPage,
                         search: state.search,
+                        selectedSubAdminId: selectedSubAdminId,
                     },
                     headers: {
                         Authorization: `Bearer ${token}`

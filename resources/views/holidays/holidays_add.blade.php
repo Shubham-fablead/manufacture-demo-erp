@@ -46,7 +46,9 @@
 @push('js')
     <script>
         $(function() {
-            const token = localStorage.getItem('token');
+            const token = (typeof window.getAuthToken === 'function')
+                ? window.getAuthToken()
+                : (localStorage.getItem('authToken') || localStorage.getItem('token') || '');
             if (!token) {
                 Swal.fire('Unauthorized', 'Please login again to continue.', 'warning');
                 return;
@@ -60,6 +62,10 @@
                     holiday_date: $('#holiday_date').val(),
                     description: $('#description').val().trim()
                 };
+                const selectedSubAdminId = localStorage.getItem('selectedSubAdminId');
+                if (selectedSubAdminId && selectedSubAdminId !== 'null' && selectedSubAdminId !== 'undefined') {
+                    payload.selectedSubAdminId = selectedSubAdminId;
+                }
 
                 if (!payload.title || !payload.holiday_date) {
                     Swal.fire('Validation Error', 'Title and holiday date are required.', 'error');
@@ -86,4 +92,3 @@
         });
     </script>
 @endpush
-

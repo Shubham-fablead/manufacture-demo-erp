@@ -1783,10 +1783,12 @@
 
         function fetchEmployees() {
             const token = (typeof window.getAuthToken === 'function') ? window.getAuthToken() : (localStorage.getItem('authToken') || localStorage.getItem('token') || '');
+            const selectedSubAdminId = localStorage.getItem('selectedSubAdminId') || sessionStorage.getItem('selectedSubAdminId') || '';
 
             return $.ajax({
                 url: '/api/leave',
                 method: 'GET',
+                data: selectedSubAdminId ? { selectedSubAdminId: selectedSubAdminId } : {},
                 headers: {
                     'Authorization': `Bearer ${token}`
                 },

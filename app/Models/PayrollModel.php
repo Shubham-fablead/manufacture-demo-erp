@@ -29,6 +29,7 @@ class PayrollModel extends Model
         'tax_deduction',
         'salary_deduction',
         'bonuses',
+           'branch_id',
         'net_salary',
         'payment_date',
         'payment_status',

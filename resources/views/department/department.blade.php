@@ -117,6 +117,7 @@
                     overtime_rate_type: $('#overtime_rate_type').val() || 'multiplier',
                     overtime_multiplier: $('#overtime_multiplier').val() || 1,
                     min_overtime_count_in_minutes: $('#min_overtime_count_in_minutes').val() || 0,
+                    selectedSubAdminId: localStorage.getItem('selectedSubAdminId') || null,
                 };
 
                 const url = isEditMode ? `/api/department/${departmentId}` : '/api/department';

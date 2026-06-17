@@ -16,6 +16,7 @@ class DesignationModel extends Model
     protected $fillable = [
         'designation_name',
         'department_id',
+         'branch_id',
     ];
 
     public $timestamps = true;
