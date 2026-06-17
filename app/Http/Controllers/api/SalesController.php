@@ -2355,10 +2355,9 @@ public function update_sale(Request $request)
             }
         }
         $preTdsGrandTotal = ($totalProductsWithGstAndDiscount - $discountAmount) + ($request->shipping ?? 0) + $labourSubtotal;
-        // TDS applies on product subtotal only (not shipping or labour)
-        $productOnlyBase = $totalProductsWithGstAndDiscount - $discountAmount;
+        // TDS applies on gross product base price only (no GST, no discounts)
         $tdsPercentage = max(0, min(100, (float) ($request->tds_percentage ?? 0)));
-        $tdsAmount = round(($productOnlyBase * $tdsPercentage) / 100, 2);
+        $tdsAmount = round(($subtotal * $tdsPercentage) / 100, 2);
         $grandTotal = max(0, round($preTdsGrandTotal - $tdsAmount));
 
         $isQuotationOrder = $updatedQuotationStatus === 'quotation';
