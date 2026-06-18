@@ -467,11 +467,17 @@
             const yearSelector = document.getElementById('year-selector');
             const monthSelectorMobile = document.getElementById('month-selector-mobile');
             const yearSelectorMobile = document.getElementById('year-selector-mobile');
+            const selectedSubAdminId = localStorage.getItem('selectedSubAdminId');
             
             const month = (monthSelector && monthSelector.value) || (monthSelectorMobile && monthSelectorMobile.value);
             const year = (yearSelector && yearSelector.value) || (yearSelectorMobile && yearSelectorMobile.value);
 
-            fetch(`/api/attendance/getAttendance/${month}/${year}`, { headers })
+            let url = `/api/attendance/getAttendance/${month}/${year}`;
+            if (selectedSubAdminId) {
+                url += `?selectedSubAdminId=${encodeURIComponent(selectedSubAdminId)}`;
+            }
+
+            fetch(url, { headers })
                 .then(response => response.json())
                 .then(data => {
                     if (data.status === 'success') {
@@ -720,8 +726,13 @@
 
         const loadEmployeeHistory = (userId, month, year) => {
             const historyContainer = document.getElementById(`history-data-${userId}`);
+            const selectedSubAdminId = localStorage.getItem('selectedSubAdminId');
+            let url = `/api/attendance/getAttendance/${month}/${year}`;
+            if (selectedSubAdminId) {
+                url += `?selectedSubAdminId=${encodeURIComponent(selectedSubAdminId)}`;
+            }
 
-            fetch(`/api/attendance/getAttendance/${month}/${year}`, { headers })
+            fetch(url, { headers })
                 .then(response => response.json())
                 .then(data => {
                     if (data.status === 'success') {

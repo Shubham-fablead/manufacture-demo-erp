@@ -615,6 +615,8 @@ Route::middleware(['auth:web', 'auto.permission'])->group(function () {
         Route::post('/checkout', [AttendanceeController::class, 'checkOut'])->name('checkout.web');
     });
 
+    Route::get('/payrollview', [ApiPayrollController::class, 'display'])->name('payroll.list');
+
     // omsai-ERP style staff check-in / check-out (web session, GPS capture)
     Route::get('/staff/check-status',  [AttendanceeController::class, 'staffCheckStatus'])->name('staff.checkstatus');
     Route::post('/staff/check-in',     [AttendanceeController::class, 'staffCheckIn'])->name('staff.checkin');
@@ -635,5 +637,5 @@ Route::middleware(['auth:web', 'auto.permission'])->group(function () {
         Route::get('/details/{id}', [ApiPayrollController::class, 'getProfile'])->whereNumber('id')->name('details');
         Route::get('/download-slip/{id}', [ApiPayrollController::class, 'downloadSlip'])->whereNumber('id')->name('download-slip');
     });
-    Route::get('/payrollview', [ApiPayrollController::class, 'display'])->name('payroll.list');
+    
 });

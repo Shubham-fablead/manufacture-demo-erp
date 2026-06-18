@@ -21,10 +21,10 @@ class AttendanceController extends Controller
         $role = strtolower((string) ($user->role ?? ''));
 
         return match ($role) {
-            'sub-admin' => (int) ($user->id ?? 0),
+            'sub-admin' => (int) ($user->branch_id ?? $user->id ?? 0),
             'staff'     => (int) ($user->branch_id ?? $user->id ?? 0),
             'admin'     => (int) ($request->input('selectedSubAdminId') ?: ($user->id ?? 0)),
-            default     => (int) ($user->id ?? 0),
+            default     => (int) ($user->branch_id ?? $user->id ?? 0),
         };
     }
     protected function canManageAttendance($user): bool
