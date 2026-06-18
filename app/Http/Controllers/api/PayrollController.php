@@ -89,10 +89,7 @@ class PayrollController extends Controller
             if ($user->role === 'staff') {
                 $query->where('payroll.user_id', $user->id);
             } else {
-                $query->where(function ($q) use ($branchId) {
-                    $q->where('payroll.branch_id', $branchId)
-                      ->orWhere('users.branch_id', $branchId);
-                });
+                $query->where('users.branch_id', $branchId);
             }
         }
 

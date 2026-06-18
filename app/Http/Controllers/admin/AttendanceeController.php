@@ -916,7 +916,7 @@ class AttendanceeController extends Controller
 
     protected function branchIdFor(User $user): ?int
     {
-        $selectedSubAdminId = session('selectedSubAdminId');
+        $selectedSubAdminId = request()->input('selectedSubAdminId') ?? session('selectedSubAdminId');
         if (in_array($user->role, ['admin', 'sub-admin'], true) && !empty($selectedSubAdminId)) {
             return (int) $selectedSubAdminId;
         }

@@ -16,7 +16,7 @@ class AttendanceController extends Controller
     {
         $user         = Auth::user();
         $role         = $user->role;
-        $userBranchId = $user->id;
+        $userBranchId = $user->branch_id ?? $user->id;
         $subAdminId   = session('selectedSubAdminId');
 
         $monthInput  = $request->input('month', now()->format('Y-m'));
@@ -72,7 +72,7 @@ class AttendanceController extends Controller
     {
         $user         = Auth::user();
         $role         = $user->role;
-        $userBranchId = $user->id;
+        $userBranchId = $user->branch_id ?? $user->id;
         $subAdminId   = session('selectedSubAdminId');
         if (! empty($subAdminId)) {
             $query      = User::where('role', 'staff')->where('isDeleted', 0)->where('branch_id', $subAdminId)->orderBy('id', 'desc');
@@ -96,7 +96,7 @@ class AttendanceController extends Controller
     {
         $user     = Auth::user();
         $role     = $user->role;
-        $branchId = $user->id;
+        $branchId = $user->branch_id ?? $user->id;
         $subAdminId = session('selectedSubAdminId');
 
         if ($role === 'admin' && !empty($subAdminId)) {
