@@ -8,6 +8,11 @@
             max-width: 280px;
         }
 
+        .designation-pagination-controls {
+            border-top: 1px solid #eef0f3;
+            padding-top: 14px;
+        }
+
         .table-pagination-btn:not(:disabled) {
             background-color: #FF9F43;
             border-color: #FF9F43;
@@ -55,20 +60,24 @@
                         <tbody></tbody>
                     </table>
                 </div>
-                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mt-3" id="designationPaginationWrapper">
-                    <div class="d-flex align-items-center gap-2">
-                        <label for="designationPerPage" class="mb-0">Rows:</label>
-                        <select id="designationPerPage" class="form-select form-select-sm" style="width: auto;">
+                <div class="pagination-controls designation-pagination-controls d-flex flex-column flex-md-row justify-content-between align-items-center mt-3" id="designationPaginationWrapper" style="display:none;">
+                    <div class="d-flex align-items-center mb-3 mb-md-0 flex-wrap gap-2">
+                        <span class="me-2" style="font-size: 14px; color: #555;">Show per page :</span>
+                        <select id="designationPerPage" class="form-select form-select-sm" style="width: auto; border: 1px solid #ddd;">
                             <option value="10" selected>10</option>
                             <option value="25">25</option>
                             <option value="50">50</option>
+                            <option value="100">100</option>
                         </select>
+                        <span class="ms-3" style="font-size: 14px; color: #555;">
+                            <span id="designationPaginationFrom">0</span> - <span id="designationPaginationTo">0</span> of <span id="designationPaginationTotal">0</span> items
+                        </span>
                     </div>
-                    <div class="d-flex align-items-center gap-2">
-                        <button type="button" class="btn btn-sm btn-outline-secondary table-pagination-btn" id="designationPrevPage">Previous</button>
-                        <span id="designationPageInfo">Page 1 of 1</span>
-                        <button type="button" class="btn btn-sm btn-outline-secondary table-pagination-btn" id="designationNextPage">Next</button>
-                    </div>
+                    <nav aria-label="Designation pagination">
+                        <ul class="pagination pagination-sm mb-0" id="designationPaginationNumbers">
+                            <!-- page numbers will be populated by JS -->
+                        </ul>
+                    </nav>
                 </div>
             </div>
         </div>
@@ -91,6 +100,7 @@
                 search: '',
             };
             let searchDebounceTimer = null;
+            const visiblePageCount = 5;
 
             if (!token) {
                 Swal.fire('Unauthorized', 'Please login again to continue.', 'warning');
@@ -103,19 +113,13 @@
                 loadDesignations();
             });
 
-            $('#designationPrevPage').on('click', function() {
-                if (state.page <= 1) {
+            $(document).on('click', '.designation-page-link', function(e) {
+                e.preventDefault();
+                const page = Number($(this).data('page'));
+                if (!page || page === state.page || page < 1 || page > state.lastPage) {
                     return;
                 }
-                state.page -= 1;
-                loadDesignations();
-            });
-
-            $('#designationNextPage').on('click', function() {
-                if (state.page >= state.lastPage) {
-                    return;
-                }
-                state.page += 1;
+                state.page = page;
                 loadDesignations();
             });
 
@@ -236,9 +240,47 @@
             });
 
             function updatePaginationUI() {
-                $('#designationPageInfo').text(`Page ${state.page} of ${state.lastPage} (${state.total} total)`);
-                $('#designationPrevPage').prop('disabled', state.page <= 1);
-                $('#designationNextPage').prop('disabled', state.page >= state.lastPage);
+                let from = state.total === 0 ? 0 : ((state.page - 1) * state.perPage) + 1;
+                let to = state.page * state.perPage;
+                if (to > state.total) {
+                    to = state.total;
+                }
+
+                $('#designationPaginationFrom').text(from);
+                $('#designationPaginationTo').text(to);
+                $('#designationPaginationTotal').text(state.total);
+
+                let paginationHtml = '';
+
+                paginationHtml += `
+                    <li class="page-item ${state.page <= 1 ? 'disabled' : ''}">
+                        <a class="page-link designation-page-link" href="javascript:void(0);" data-page="${state.page - 1}">Previous</a>
+                    </li>
+                `;
+
+                let startPage = Math.max(1, state.page - 2);
+                let endPage = Math.min(state.lastPage, startPage + visiblePageCount - 1);
+
+                if (endPage - startPage + 1 < visiblePageCount) {
+                    startPage = Math.max(1, endPage - visiblePageCount + 1);
+                }
+
+                for (let i = startPage; i <= endPage; i++) {
+                    paginationHtml += `
+                        <li class="page-item ${i === state.page ? 'active' : ''}">
+                            <a class="page-link designation-page-link" href="javascript:void(0);" data-page="${i}">${i}</a>
+                        </li>
+                    `;
+                }
+
+                paginationHtml += `
+                    <li class="page-item ${state.page >= state.lastPage ? 'disabled' : ''}">
+                        <a class="page-link designation-page-link" href="javascript:void(0);" data-page="${state.page + 1}">Next</a>
+                    </li>
+                `;
+
+                $('#designationPaginationNumbers').html(paginationHtml);
+                $('#designationPaginationWrapper').toggle(state.total > 0);
             }
 
             function handleError(xhr) {
