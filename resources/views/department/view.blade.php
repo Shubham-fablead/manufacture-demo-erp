@@ -8,18 +8,27 @@
             max-width: 280px;
         }
 
-        .table-pagination-btn:not(:disabled) {
+        .pagination-controls {
+            gap: 12px;
+        }
+
+        .pagination-controls .page-link {
+            color: #6c757d;
+            border: 1px solid #ced4da;
+            border-radius: 6px;
+            margin: 0 2px;
+        }
+
+        .pagination-controls .page-item.active .page-link {
             background-color: #FF9F43;
             border-color: #FF9F43;
             color: #fff;
         }
 
-        .table-pagination-btn:not(:disabled):hover,
-        .table-pagination-btn:not(:disabled):focus {
-            background-color: #f58f2f;
-            border-color: #f58f2f;
-            color: #fff;
-            box-shadow: none;
+        .pagination-controls .page-item.disabled .page-link {
+            color: #adb5bd;
+            pointer-events: none;
+            background-color: #fff;
         }
     </style>
     <div class="content">
@@ -54,20 +63,25 @@
                         <tbody></tbody>
                     </table>
                 </div>
-                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mt-3" id="departmentPaginationWrapper">
-                    <div class="d-flex align-items-center gap-2">
-                        <label for="departmentPerPage" class="mb-0">Rows:</label>
-                        <select id="departmentPerPage" class="form-select form-select-sm" style="width: auto;">
+                <div class="pagination-controls d-flex flex-column flex-md-row justify-content-between align-items-center mt-3">
+                    <div class="d-flex align-items-center mb-3 mb-md-0">
+                        <span class="me-2" style="font-size: 14px; color: #555;">Show per page :</span>
+                        <select id="departmentPerPage" class="form-select form-select-sm"
+                            style="width: auto; border: 1px solid #ddd;">
                             <option value="10" selected>10</option>
                             <option value="25">25</option>
                             <option value="50">50</option>
+                            <option value="100">100</option>
                         </select>
+                        <span class="ms-3" style="font-size: 14px; color: #555;">
+                            <span id="departmentPaginationFrom">0</span> - <span id="departmentPaginationTo">0</span> of
+                            <span id="departmentPaginationTotal">0</span> items
+                        </span>
                     </div>
-                    <div class="d-flex align-items-center gap-2">
-                        <button type="button" class="btn btn-sm btn-outline-secondary table-pagination-btn" id="departmentPrevPage">Previous</button>
-                        <span id="departmentPageInfo">Page 1 of 1</span>
-                        <button type="button" class="btn btn-sm btn-outline-secondary table-pagination-btn" id="departmentNextPage">Next</button>
-                    </div>
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination pagination-sm mb-0" id="departmentPaginationNumbers">
+                        </ul>
+                    </nav>
                 </div>
             </div>
         </div>
@@ -97,22 +111,6 @@
             $('#departmentPerPage').on('change', function() {
                 state.perPage = Number($(this).val()) || 10;
                 state.page = 1;
-                loadDepartments();
-            });
-
-            $('#departmentPrevPage').on('click', function() {
-                if (state.page <= 1) {
-                    return;
-                }
-                state.page -= 1;
-                loadDepartments();
-            });
-
-            $('#departmentNextPage').on('click', function() {
-                if (state.page >= state.lastPage) {
-                    return;
-                }
-                state.page += 1;
                 loadDepartments();
             });
 
@@ -175,7 +173,7 @@
                     `).join('');
 
                     $('#departmentTable tbody').html(rows || '<tr><td colspan="3" class="text-center">No records found</td></tr>');
-                    updatePaginationUI();
+                    updatePaginationUI(pagination);
                 }).fail(handleError);
             }
 
@@ -208,11 +206,93 @@
                 });
             });
 
-            function updatePaginationUI() {
-                $('#departmentPageInfo').text(`Page ${state.page} of ${state.lastPage} (${state.total} total)`);
-                $('#departmentPrevPage').prop('disabled', state.page <= 1);
-                $('#departmentNextPage').prop('disabled', state.page >= state.lastPage);
+            function updatePaginationUI(pagination) {
+                let from = (pagination.current_page - 1) * pagination.per_page + 1;
+                let to = pagination.current_page * pagination.per_page;
+                if (to > pagination.total) to = pagination.total;
+                if (pagination.total === 0) from = 0;
+
+                $('#departmentPaginationFrom').text(from);
+                $('#departmentPaginationTo').text(to);
+                $('#departmentPaginationTotal').text(pagination.total);
+
+                let paginationHtml = '';
+                const totalPages = pagination.last_page || 1;
+                const currentPage = pagination.current_page || 1;
+                const visiblePageCount = 2;
+                let startPage = Math.floor((currentPage - 1) / visiblePageCount) * visiblePageCount + 1;
+                let endPage = Math.min(totalPages, startPage + visiblePageCount - 1);
+
+                paginationHtml += `
+                    <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+                        <a class="page-link department-page-link" href="javascript:void(0);" data-page="${currentPage - 1}">Previous</a>
+                    </li>
+                `;
+
+                if (startPage > 1) {
+                    paginationHtml += `
+                        <li class="page-item">
+                            <a class="page-link department-page-link" href="javascript:void(0);" data-page="${startPage - 1}" data-action="prev-group">..</a>
+                        </li>
+                    `;
+                }
+
+                for (let i = startPage; i <= endPage; i++) {
+                    paginationHtml += `
+                        <li class="page-item ${i === currentPage ? 'active' : ''}">
+                            <a class="page-link department-page-link" href="javascript:void(0);" data-page="${i}">${i}</a>
+                        </li>
+                    `;
+                }
+
+                if (endPage < totalPages) {
+                    paginationHtml += `
+                        <li class="page-item">
+                            <a class="page-link department-page-link" href="javascript:void(0);" data-page="${endPage + 1}" data-action="next-group">..</a>
+                        </li>
+                    `;
+                }
+
+                paginationHtml += `
+                    <li class="page-item ${currentPage === totalPages || totalPages === 0 ? 'disabled' : ''}">
+                        <a class="page-link department-page-link" href="javascript:void(0);" data-page="${currentPage + 1}">Next</a>
+                    </li>
+                `;
+
+                $('#departmentPaginationNumbers').html(paginationHtml);
+                $('.pagination-controls').toggle(pagination.total > 0);
             }
+
+            $(document).on('click', '.department-page-link', function(e) {
+                e.preventDefault();
+
+                const page = Number($(this).data('page'));
+                const action = $(this).data('action');
+
+                if (action === 'next-group') {
+                    if (page && page <= state.lastPage) {
+                        state.page = page;
+                        loadDepartments();
+                    }
+                    return;
+                }
+
+                if (action === 'prev-group') {
+                    const prevStartPage = Math.max(1, page - 2);
+                    if (prevStartPage >= 1 && prevStartPage <= state.lastPage) {
+                        state.page = prevStartPage;
+                        loadDepartments();
+                    }
+                    return;
+                }
+
+                if (!page || page < 1 || page > state.lastPage || page === state.page) {
+                    return;
+                }
+
+                state.page = page;
+                loadDepartments();
+            });
 
             function handleError(xhr) {
                 const message = xhr.responseJSON?.message || xhr.responseJSON?.error || 'Something went wrong. Please try again.';
