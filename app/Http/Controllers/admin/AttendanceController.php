@@ -11,6 +11,20 @@ use Illuminate\Support\Facades\Auth;
 
 class AttendanceController extends Controller
 {
+    private function resolveBranchId(Request $request, $user): int
+    {
+        $selectedSubAdminId = $request->input('selectedSubAdminId') ?? session('selectedSubAdminId');
+
+        if ($user->role === 'staff' && ! empty($user->branch_id)) {
+            return (int) $user->branch_id;
+        }
+
+        if (in_array($user->role, ['admin', 'sub-admin'], true) && ! empty($selectedSubAdminId)) {
+            return (int) $selectedSubAdminId;
+        }
+
+        return (int) ($user->branch_id ?? $user->id ?? 0);
+    }
 
     public function index(Request $request)
     {
@@ -95,13 +109,7 @@ class AttendanceController extends Controller
     public function manageSummary(Request $request)
     {
         $user     = Auth::user();
-        $role     = $user->role;
-        $branchId = $user->branch_id ?? $user->id;
-        $subAdminId = session('selectedSubAdminId');
-
-        if ($role === 'admin' && !empty($subAdminId)) {
-            $branchId = (int) $subAdminId;
-        }
+        $branchId = $this->resolveBranchId($request, $user);
 
         $month = (int) $request->query('month', date('n'));
         $year  = (int) $request->query('year',  date('Y'));
@@ -165,6 +173,8 @@ class AttendanceController extends Controller
 
     public function manageHistory(Request $request, $employee_id)
     {
+        $user = Auth::user();
+        $branchId = $this->resolveBranchId($request, $user);
         $month = (int) $request->query('month', date('n'));
         $year  = (int) $request->query('year',  date('Y'));
 
@@ -172,7 +182,7 @@ class AttendanceController extends Controller
         $endDate   = Carbon::createFromDate($year, $month, 1)->endOfMonth();
 
         $employee = User::find($employee_id);
-        if (!$employee) {
+        if (!$employee || ((int) $employee->branch_id !== (int) $branchId && $user->role !== 'admin')) {
             return response()->json(['status' => false, 'message' => 'Employee not found.'], 404);
         }
 
