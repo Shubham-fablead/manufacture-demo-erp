@@ -328,6 +328,7 @@
 $(document).ready(function() {
 
     var fallbackAvatar = '{{ $fallbackAvatar }}';
+    var selectedSubAdminId = localStorage.getItem('selectedSubAdminId');
 
     // Pre-select current month / year
     var now = new Date();
@@ -354,7 +355,11 @@ $(document).ready(function() {
         $.ajax({
             url: '{{ route("attendance.manage.summary") }}',
             method: 'GET',
-            data: { month: month, year: year },
+            data: {
+                month: month,
+                year: year,
+                selectedSubAdminId: selectedSubAdminId
+            },
             success: function(res) {
                 if (!res.status || !res.summary || res.summary.length === 0) {
                     $('#ma-summary-tbody').html(
@@ -456,7 +461,11 @@ $(document).ready(function() {
         $.ajax({
             url: '{{ url("/attendance/manage/history") }}/' + empId,
             method: 'GET',
-            data: { month: month, year: year },
+            data: {
+                month: month,
+                year: year,
+                selectedSubAdminId: selectedSubAdminId
+            },
             dataType: 'json',
             success: function(res) {
                 if (!res) {

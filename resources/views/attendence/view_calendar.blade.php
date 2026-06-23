@@ -1345,7 +1345,12 @@
             try {
                 currentMonth = parseInt(month);
                 currentYear = parseInt(year);
-                const response = await fetch(`/api/attendance/getAttendance/${month}/${year}`, { headers });
+                const selectedSubAdminId = localStorage.getItem('selectedSubAdminId') || '';
+                let url = `/api/attendance/getAttendance/${month}/${year}`;
+                if (selectedSubAdminId) {
+                    url += `?selectedSubAdminId=${encodeURIComponent(selectedSubAdminId)}`;
+                }
+                const response = await fetch(url, { headers });
                 const data = await response.json();
 
                 if (data.status === 'success') {
