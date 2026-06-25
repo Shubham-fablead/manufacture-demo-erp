@@ -141,6 +141,7 @@ class SalesController extends Controller
     public function getHistory($order_id)
     {
         $history = PaymentStore::where('order_id', $order_id)
+            ->where('isDeleted', 0)
             ->orderBy('created_at', 'desc')
             ->get();
 
