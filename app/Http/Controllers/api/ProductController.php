@@ -936,7 +936,10 @@ class ProductController extends Controller
                 ->first();
 
             if ($product) {
-                $product->quantity += $quantity;
+                $previousQuantity = (int) $product->quantity;
+                $newQuantity = $previousQuantity + $quantity;
+
+                $product->quantity = $newQuantity;
                 $product->price = (float) $price;
                 $product->status = $status;
                 $product->{$productAvailabilityColumn} = $availability;
@@ -947,6 +950,17 @@ class ProductController extends Controller
                 }
 
                 $product->save();
+
+                ProductInventory::create([
+                    'product_id'    => $product->id,
+                    'initial_stock' => $previousQuantity,
+                    'current_stock' => $newQuantity,
+                    'branch_id'     => $branchId,
+                    'create_by'     => $user->id,
+                    'type'          => 'Stock Added',
+                    'date'          => now(),
+                ]);
+
                 $updatedSKUs[] = $sku;
                 continue;
             }
@@ -977,7 +991,17 @@ class ProductController extends Controller
                 $productData['unit_id'] = $unit?->id;
             }
 
-            Product::create($productData);
+            $product = Product::create($productData);
+
+            ProductInventory::create([
+                'product_id'    => $product->id,
+                'initial_stock' => $quantity,
+                'current_stock' => $quantity,
+                'branch_id'     => $branchId,
+                'create_by'     => $user->id,
+                'type'          => 'Create',
+                'date'          => now(),
+            ]);
 
             $insertedCount++;
         }
@@ -1164,4 +1188,3 @@ class ProductController extends Controller
         ]);
     }
 }
-

@@ -45,7 +45,10 @@
                         <!-- Submit & Cancel -->
                         <div class="col-lg-12 text-end">
                             <div class="form-group mb-3">
-                                <a href="javascript:void(0);" class="btn btn-submit submit me-2">Submit</a>
+                                <a href="javascript:void(0);" class="btn btn-submit submit me-2" id="importSubmitBtn">
+                                    <span class="spinner-border spinner-border-sm me-2 d-none" id="importSubmitSpinner" role="status" aria-hidden="true"></span>
+                                    <span id="importSubmitText">Submit</span>
+                                </a>
                                 <a href="{{ route('product.list') }}" class="btn btn-cancel">Cancel</a>
                             </div>
                         </div>
@@ -117,8 +120,22 @@
 @push('js')
 <script>
     $(document).ready(function() {
+        const $submitBtn = $('#importSubmitBtn');
+        const $submitSpinner = $('#importSubmitSpinner');
+        const $submitText = $('#importSubmitText');
+
+        function setLoading(isLoading) {
+            $submitBtn.prop('disabled', isLoading).toggleClass('disabled', isLoading);
+            $submitSpinner.toggleClass('d-none', !isLoading);
+            $submitText.text(isLoading ? 'Uploading...' : 'Submit');
+        }
+
         $(document).on('click', '.submit', function(e) {
             e.preventDefault();
+
+            if ($submitBtn.prop('disabled')) {
+                return;
+            }
 
             var authToken = localStorage.getItem("authToken");
             var selectedSubAdminId = localStorage.getItem("selectedSubAdminId");
@@ -138,6 +155,8 @@
                 return;
             }
 
+            setLoading(true);
+
             var formData = new FormData();
             formData.append("csv_file", csv_file);
 
@@ -155,6 +174,7 @@
                     "Authorization": "Bearer " + authToken,
                 },
                 success: function(response) {
+                    setLoading(false);
                     if (response.status) {
                         let messageParts = [];
 
@@ -197,6 +217,7 @@
                     }
                 },
                 error: function(xhr) {
+                    setLoading(false);
                     if (xhr.status === 422) {
                         let errors = xhr.responseJSON.errors;
                         let errorList = "";
@@ -227,6 +248,9 @@
                             confirmButtonText: 'OK'
                         });
                     }
+                },
+                complete: function() {
+                    setLoading(false);
                 }
             });
         });
