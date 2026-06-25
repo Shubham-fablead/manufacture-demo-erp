@@ -91,6 +91,186 @@
             text-align: center;
         }
 
+        .payment-history-items {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .payment-history-card {
+            border: 1px solid #e6e6e6;
+            border-radius: 4px;
+            background: #fff;
+            padding: 12px 14px;
+        }
+
+        .payment-history-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .payment-history-meta {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .payment-history-date {
+            font-size: 14px;
+            font-weight: 500;
+            color: #2b2b2b;
+            line-height: 1.3;
+        }
+
+        .payment-history-subtext {
+            margin-top: 4px;
+            font-size: 13px;
+            color: #6c757d;
+            line-height: 1.4;
+            word-break: break-word;
+        }
+
+        .payment-history-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-shrink: 0;
+        }
+
+        .payment-history-amount {
+            font-size: 15px;
+            font-weight: 700;
+            color: #212529;
+            white-space: nowrap;
+        }
+
+        .payment-history-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .payment-action-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 4px;
+            border: 1px solid;
+            background: #fff;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .payment-action-btn i {
+            font-size: 13px;
+        }
+
+        .payment-action-btn.edit-payment-history {
+            border-color: #ff9f43;
+            color: #ff9f43;
+        }
+
+        .payment-action-btn.edit-payment-history:hover {
+            background: #fff5eb;
+        }
+
+        .payment-action-btn.delete-payment-history {
+            border-color: #ea5455;
+            color: #ea5455;
+        }
+
+        .payment-action-btn.delete-payment-history:hover {
+            background: #fff1f1;
+        }
+
+        .payment-history-summary {
+            margin-top: 16px;
+            border: 1px solid #e6e6e6;
+            border-radius: 4px;
+            overflow: hidden;
+            background: #fff;
+        }
+
+        .payment-history-summary-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            font-size: 14px;
+            border-bottom: 1px solid #ececec;
+        }
+
+        .payment-history-summary-row:last-child {
+            border-bottom: 0;
+        }
+
+        .payment-history-summary-row strong {
+            color: #2b2b2b;
+        }
+
+        .payment-history-summary-row .summary-danger {
+            color: #ea5455;
+            font-weight: 700;
+        }
+
+        .payment-edit-group {
+            margin-bottom: 16px;
+        }
+
+        .payment-edit-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: #2b2b2b;
+            font-weight: 500;
+        }
+
+        .payment-edit-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-start;
+            margin-top: 8px;
+        }
+
+        .payment-edit-actions .btn {
+            min-width: 132px;
+        }
+
+        #editPaymentHistoryModal .modal-dialog {
+            max-width: 520px;
+            margin: 0.75rem auto;
+        }
+
+        #editPaymentHistoryModal .modal-content {
+            max-height: calc(100vh - 24px);
+            display: flex;
+            flex-direction: column;
+        }
+
+        #editPaymentHistoryModal .modal-body {
+            overflow-y: auto;
+            flex: 1 1 auto;
+            padding-bottom: 120px;
+        }
+
+        #editPaymentHistoryModal #edit_payment_remarks {
+            min-height: 88px;
+        }
+
+        #editPaymentHistoryModal .modal-footer {
+            position: sticky;
+            bottom: 0;
+            background: #fff;
+            z-index: 2;
+            border-top: 1px solid #e9ecef;
+            margin-top: 0;
+            padding-top: 12px;
+            padding-bottom: 12px;
+        }
+
         .table-scroll-top {
             display: none;
         }
@@ -1859,11 +2039,122 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">x</button>
                 </div>
                 <div class="modal-body">
-                    <ul id="globalPaymentHistoryList" class="list-group"></ul>
+                    <div id="globalPaymentHistoryList"></div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-cancel" data-bs-dismiss="modal">Close</button>
                 </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="editPaymentHistoryModal" tabindex="-1" aria-labelledby="editPaymentHistoryLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editPaymentHistoryLabel">Edit Payment</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">x</button>
+                </div>
+                <form id="editPaymentHistoryForm">
+                    <div class="modal-body">
+                        <input type="hidden" id="edit_payment_id" name="payment_id">
+                        <input type="hidden" id="edit_order_id" name="order_id">
+                        <input type="hidden" id="edit_current_payment_amount" name="current_payment_amount">
+
+                        <div class="payment-edit-group">
+                            <label for="edit_payment_method">Select Payment Method</label>
+                            <select class="form-select" id="edit_payment_method" name="payment_method">
+                                <option value="cash">Cash</option>
+                                <option value="online">Online</option>
+                                <option value="cash_online">Cash + Online</option>
+                            </select>
+                        </div>
+
+                        <div class="payment-edit-group" id="edit_paid_type_group">
+                            <label for="edit_paid_type">Paid Type</label>
+                            <select class="form-select" id="edit_paid_type" name="paid_type">
+                                <option value="cash_fully">Cash Fully</option>
+                                <option value="cash_partially">Cash Partially</option>
+                            </select>
+                        </div>
+
+                        <div class="payment-edit-group d-none" id="edit_online_type_group">
+                            <label for="edit_online_type">Select Online Type</label>
+                            <select class="form-select" id="edit_online_type" name="online_type">
+                                <option value="online_fully">Online Fully</option>
+                                <option value="online_partially">Online Partially</option>
+                            </select>
+                        </div>
+
+                        <div class="payment-edit-group d-none" id="edit_cash_online_type_group">
+                            <label for="edit_cash_online_type">Paid Type</label>
+                            <select class="form-select" id="edit_cash_online_type" name="cash_online_type">
+                                <option value="cash_online_fully">Cash + Online Fully</option>
+                                <option value="cash_online_partially">Cash + Online Partially</option>
+                            </select>
+                        </div>
+
+                        <div class="payment-edit-group d-none" id="edit_partial_amount_group">
+                            <label for="edit_partial_amount">Enter Amount</label>
+                            <input type="number" class="form-control" id="edit_partial_amount" name="payment_amount"
+                                min="0" step="0.01">
+                        </div>
+
+                        <div class="payment-edit-group d-none" id="edit_pending_amount_group">
+                            <label for="edit_pending_amount">Pending Amount</label>
+                            <input type="number" class="form-control" id="edit_pending_amount" readonly>
+                        </div>
+
+                        <div class="payment-edit-group" id="edit_cash_amount_group">
+                            <label for="edit_cash_amount">Cash Amount</label>
+                            <input type="number" class="form-control" id="edit_cash_amount" name="cash_amount"
+                                min="0" step="0.01">
+                        </div>
+
+                        <div class="payment-edit-group d-none" id="edit_online_amount_group">
+                            <label for="edit_online_amount">Online Amount</label>
+                            <input type="number" class="form-control" id="edit_online_amount" name="upi_amount"
+                                min="0" step="0.01">
+                        </div>
+
+                        <div class="payment-edit-group d-none" id="edit_bank_group">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <label for="edit_bank_id" class="mb-0">Select Bank</label>
+                                <button type="button" class="btn btn-sm btn-outline-warning" id="editOpenAddBankModal">
+                                    Add Bank
+                                </button>
+                            </div>
+                            <select class="form-select" id="edit_bank_id" name="bank_id">
+                                <option value="">Select Bank</option>
+                                @foreach ($banks as $bank)
+                                    <option value="{{ $bank->id }}">{{ $bank->bank_name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div class="payment-edit-group d-none" id="edit_reference_group">
+                            <label for="edit_reference_number">Reference Number</label>
+                            <input type="text" class="form-control" id="edit_reference_number" name="reference_number"
+                                placeholder="Enter reference number">
+                        </div>
+
+                        <div class="payment-edit-group">
+                            <label for="edit_payment_remarks">Remarks</label>
+                            <textarea class="form-control" id="edit_payment_remarks" name="remarks" rows="4"
+                                placeholder="Enter remarks"></textarea>
+                        </div>
+
+                        <div class="payment-edit-group">
+                            <label for="edit_payment_date">Payment Date</label>
+                            <input type="date" class="form-control" id="edit_payment_date" name="payment_date">
+                        </div>
+                    </div>
+                    <div class="modal-footer payment-edit-actions">
+                        <button type="button" class="btn btn-cancel" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-submit text-white" style="background-color: #ff9f43;">Save
+                            Changes</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -1906,6 +2197,223 @@
             }
 
             return value;
+        }
+
+        function escapePaymentHistoryText(value) {
+            return String(value ?? 'N/A')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        function formatPaymentHistoryAmount(value) {
+            return parseFloat(value || 0).toLocaleString(undefined, {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+        }
+
+        function getPaymentHistoryReference(payment) {
+            return payment.reference_number || payment.transaction_id || payment.receipt_number || payment.ref_no || 'N/A';
+        }
+
+        let editPaymentModalInstance = null;
+        let paymentHistoryModalInstance = null;
+        let currentPaymentHistorySummary = {};
+
+        function toPaymentInputDate(value) {
+            if (!value) return '';
+            const datePart = String(value).split(' ')[0];
+
+            if (/^\d{4}-\d{2}-\d{2}$/.test(datePart)) {
+                return datePart;
+            }
+
+            if (/^\d{2}-\d{2}-\d{4}$/.test(datePart)) {
+                const [day, month, year] = datePart.split('-');
+                return `${year}-${month}-${day}`;
+            }
+
+            const parsedDate = new Date(value);
+            if (!isNaN(parsedDate.getTime())) {
+                const day = String(parsedDate.getDate()).padStart(2, '0');
+                const month = String(parsedDate.getMonth() + 1).padStart(2, '0');
+                const year = parsedDate.getFullYear();
+                return `${year}-${month}-${day}`;
+            }
+
+            return '';
+        }
+
+        function showEditPaymentSections() {
+            const method = $('#edit_payment_method').val();
+            const paidType = $('#edit_paid_type').val();
+            const onlineType = $('#edit_online_type').val();
+            const cashOnlineType = $('#edit_cash_online_type').val();
+
+            $('#edit_paid_type_group, #edit_online_type_group, #edit_cash_online_type_group, #edit_partial_amount_group, #edit_pending_amount_group, #edit_cash_amount_group, #edit_online_amount_group, #edit_bank_group, #edit_reference_group')
+                .addClass('d-none');
+
+            if (method === 'cash') {
+                $('#edit_paid_type_group, #edit_cash_amount_group').removeClass('d-none');
+                if (paidType === 'cash_partially') {
+                    $('#edit_partial_amount_group, #edit_pending_amount_group').removeClass('d-none');
+                    $('#edit_cash_amount_group').addClass('d-none');
+                }
+            } else if (method === 'online') {
+                $('#edit_online_type_group, #edit_bank_group, #edit_reference_group').removeClass('d-none');
+                if (onlineType === 'online_partially') {
+                    $('#edit_partial_amount_group, #edit_pending_amount_group').removeClass('d-none');
+                }
+            } else if (method === 'cash_online') {
+                $('#edit_cash_online_type_group, #edit_cash_amount_group, #edit_online_amount_group').removeClass('d-none');
+                if (cashOnlineType === 'cash_online_partially') {
+                    $('#edit_pending_amount_group').removeClass('d-none');
+                }
+            }
+        }
+
+        function recalculateEditPendingAmount() {
+            const orderTotal = parseFloat(currentPaymentHistorySummary.order_total || 0);
+            const returnAmount = parseFloat(currentPaymentHistorySummary.return_amount || 0);
+            const currentPaymentAmount = parseFloat($('#edit_current_payment_amount').val() || 0);
+            const enteredAmount = parseFloat($('#edit_partial_amount').val() || 0);
+            const totalPaid = parseFloat(currentPaymentHistorySummary.total_paid || 0) - currentPaymentAmount + enteredAmount;
+            const pendingAmount = Math.max(0, (orderTotal - returnAmount) - totalPaid);
+            $('#edit_pending_amount').val(pendingAmount.toFixed(2));
+        }
+
+        function populateEditPaymentModal(payment) {
+            const method = payment.payment_method || 'cash';
+            const type = payment.payment_type || 'fully';
+            const amount = parseFloat(payment.payment_amount || 0);
+            const cashAmount = parseFloat(payment.cash_amount || 0);
+            const upiAmount = parseFloat(payment.upi_amount || 0);
+
+            $('#edit_payment_id').val(payment.id || '');
+            $('#edit_order_id').val(payment.order_id || '');
+            $('#edit_payment_method').val(method);
+            $('#edit_payment_remarks').val(payment.remarks || '');
+            $('#edit_payment_date').val(toPaymentInputDate(payment.payment_date || payment.created_at));
+            $('#edit_partial_amount').val(amount.toFixed(2));
+            $('#edit_cash_amount').val((cashAmount > 0 ? cashAmount : amount).toFixed(2));
+            $('#edit_online_amount').val((upiAmount > 0 ? upiAmount : amount).toFixed(2));
+            $('#edit_bank_id').val(payment.bank_id || '');
+            $('#edit_reference_number').val(payment.reference_number || '');
+
+            if (method === 'cash') {
+                $('#edit_paid_type').val(type === 'partially' ? 'cash_partially' : 'cash_fully');
+            } else if (method === 'online') {
+                $('#edit_online_type').val(type === 'partially' ? 'online_partially' : 'online_fully');
+            } else {
+                $('#edit_cash_online_type').val(type === 'partially' ? 'cash_online_partially' : 'cash_online_fully');
+            }
+
+            $('#edit_current_payment_amount').val(amount.toFixed(2));
+            showEditPaymentSections();
+            recalculateEditPendingAmount();
+        }
+
+        function buildEditPaymentPayload() {
+            const method = $('#edit_payment_method').val();
+            const paymentDate = $('#edit_payment_date').val();
+            const remarks = $('#edit_payment_remarks').val();
+            const payload = {
+                payment_date: paymentDate,
+                remarks: remarks,
+                payment_method: method
+            };
+
+            if (method === 'cash') {
+                const paidType = $('#edit_paid_type').val();
+                payload.payment_type = paidType === 'cash_partially' ? 'partially' : 'fully';
+                payload.payment_amount = paidType === 'cash_partially' ? $('#edit_partial_amount').val() : $('#edit_cash_amount').val();
+                payload.cash_amount = payload.payment_amount;
+                payload.upi_amount = 0;
+            } else if (method === 'online') {
+                const onlineType = $('#edit_online_type').val();
+                payload.payment_type = onlineType === 'online_partially' ? 'partially' : 'fully';
+                payload.payment_amount = onlineType === 'online_partially' ? $('#edit_partial_amount').val() : $('#edit_current_payment_amount').val();
+                payload.cash_amount = 0;
+                payload.upi_amount = payload.payment_amount;
+                payload.bank_id = $('#edit_bank_id').val();
+                payload.reference_number = $('#edit_reference_number').val();
+            } else {
+                const cashOnlineType = $('#edit_cash_online_type').val();
+                const cashAmount = parseFloat($('#edit_cash_amount').val() || 0);
+                const onlineAmount = parseFloat($('#edit_online_amount').val() || 0);
+                payload.payment_type = cashOnlineType === 'cash_online_partially' ? 'partially' : 'fully';
+                payload.payment_amount = (cashAmount + onlineAmount).toFixed(2);
+                payload.cash_amount = cashAmount.toFixed(2);
+                payload.upi_amount = onlineAmount.toFixed(2);
+            }
+
+            return payload;
+        }
+
+        function renderPaymentHistoryCards(history, summary) {
+            if (!history.length) {
+                return '<div class="payment-history-card">No payment history found.</div>';
+            }
+
+            const itemsHtml = history.map(payment => {
+                const method = payment.payment_method ? payment.payment_method.replace(/_/g, ' ') : 'N/A';
+                const reference = getPaymentHistoryReference(payment);
+
+                return `
+                    <div class="payment-history-card">
+                        <div class="payment-history-row">
+                            <div class="payment-history-meta">
+                                <div class="payment-history-date">${escapePaymentHistoryText(formatPaymentHistoryDate(payment.payment_date || payment.created_at))}</div>
+                                <div class="payment-history-subtext">
+                                    Method: ${escapePaymentHistoryText(method)} | Ref: ${escapePaymentHistoryText(reference)}
+                                </div>
+                            </div>
+                            <div class="payment-history-right">
+                                <div class="payment-history-amount">Rs.${formatPaymentHistoryAmount(payment.payment_amount)}</div>
+                                <div class="payment-history-actions">
+                                    <button type="button" class="payment-action-btn edit-payment-history" data-payment-id="${payment.id}" title="Edit payment">
+                                        <i class="fas fa-pen"></i>
+                                    </button>
+                                    <button type="button" class="payment-action-btn delete-payment-history" data-payment-id="${payment.id}" data-order-id="${payment.order_id || ''}" title="Delete payment">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            const extraPaid = parseFloat(summary.extra_paid || 0);
+            const remainingValue = extraPaid > 0 ? extraPaid : parseFloat(summary.remaining || 0);
+            const remainingLabel = extraPaid > 0 ? 'Extra Paid' : 'Remaining';
+            const remainingClass = remainingValue > 0 ? 'summary-danger' : '';
+
+            const summaryHtml = `
+                <div class="payment-history-summary">
+                    <div class="payment-history-summary-row">
+                        <strong>Order Total</strong>
+                        <span>Rs.${formatPaymentHistoryAmount(summary.order_total)}</span>
+                    </div>
+                    <div class="payment-history-summary-row">
+                        <strong>Total Paid</strong>
+                        <span>Rs.${formatPaymentHistoryAmount(summary.total_paid)}</span>
+                    </div>
+                    <div class="payment-history-summary-row">
+                        <strong>Return Amount</strong>
+                        <span>Rs.${formatPaymentHistoryAmount(summary.return_amount || 0)}</span>
+                    </div>
+                    <div class="payment-history-summary-row">
+                        <strong>${remainingLabel}</strong>
+                        <span class="${remainingClass}">Rs.${formatPaymentHistoryAmount(remainingValue)}</span>
+                    </div>
+                </div>
+            `;
+
+            return `<div class="payment-history-items">${itemsHtml}</div>${summaryHtml}`;
         }
 
         function getStatusBadge(status, type = 'payment', extraPaid = 0) {
@@ -4403,6 +4911,209 @@ $('#paymentHistoryList').html(historyHtml);
                 }
             });
         });
+        $(document).off('click', '.open-history').on('click', '.open-history', function() {
+            const authToken = localStorage.getItem("authToken");
+            const jobCardId = $(this).data('id');
+
+            $('#globalPaymentHistoryList')
+                .data('order-id', jobCardId)
+                .html('<div class="payment-history-card">Loading...</div>');
+
+            $.ajax({
+                url: '/api/order/payment-history/' + jobCardId,
+                method: 'GET',
+                headers: {
+                    "Authorization": "Bearer " + authToken
+                },
+                success: function(response) {
+                    currentPaymentHistorySummary = response.summary || {};
+                    $('#globalPaymentHistoryList').html(
+                        renderPaymentHistoryCards(response.data || [], currentPaymentHistorySummary)
+                    );
+
+                    if (!paymentHistoryModalInstance) {
+                        paymentHistoryModalInstance = new bootstrap.Modal(document.getElementById('paymentHistoryModal'));
+                    }
+                    paymentHistoryModalInstance.show();
+                },
+                error: function() {
+                    $('#globalPaymentHistoryList').html(
+                        '<div class="payment-history-card text-danger">Failed to load payment history.</div>'
+                    );
+
+                    if (!paymentHistoryModalInstance) {
+                        paymentHistoryModalInstance = new bootstrap.Modal(document.getElementById('paymentHistoryModal'));
+                    }
+                    paymentHistoryModalInstance.show();
+                }
+            });
+        });
+
+        $(document).off('click', '.edit-payment-history').on('click', '.edit-payment-history', function() {
+            const paymentId = $(this).data('payment-id');
+            const authToken = localStorage.getItem("authToken");
+
+            $.ajax({
+                url: '/api/payment-store/' + paymentId,
+                method: 'GET',
+                headers: {
+                    "Authorization": "Bearer " + authToken
+                },
+                success: function(response) {
+                    if (!response.status || !response.data) {
+                        Swal.fire({
+                            title: 'Error',
+                            text: 'Unable to load payment details.',
+                            icon: 'error',
+                            confirmButtonColor: '#ff9f43'
+                        });
+                        return;
+                    }
+
+                    populateEditPaymentModal(response.data);
+
+                    if (paymentHistoryModalInstance) {
+                        paymentHistoryModalInstance.hide();
+                    }
+
+                    if (!editPaymentModalInstance) {
+                        editPaymentModalInstance = new bootstrap.Modal(document.getElementById('editPaymentHistoryModal'));
+                    }
+                    editPaymentModalInstance.show();
+                },
+                error: function() {
+                    Swal.fire({
+                        title: 'Error',
+                        text: 'Unable to load payment details.',
+                        icon: 'error',
+                        confirmButtonColor: '#ff9f43'
+                    });
+                }
+            });
+        });
+
+        $(document).off('click', '.delete-payment-history').on('click', '.delete-payment-history', function() {
+            const paymentId = $(this).data('payment-id');
+            const orderId = $('#globalPaymentHistoryList').data('order-id');
+            const authToken = localStorage.getItem("authToken");
+
+            Swal.fire({
+                title: 'Delete payment?',
+                text: 'This will remove the selected payment history row.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ea5455',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Delete'
+            }).then((result) => {
+                if (!result.isConfirmed) {
+                    return;
+                }
+
+                $.ajax({
+                    url: '/sales-receipt-payment/transaction/' + paymentId,
+                    method: 'POST',
+                    data: {
+                        _method: 'DELETE',
+                        _token: "{{ csrf_token() }}"
+                    },
+                    headers: {
+                        "Authorization": "Bearer " + authToken
+                    },
+                    success: function(response) {
+                        Swal.fire({
+                            title: 'Deleted',
+                            text: response.message || 'Payment deleted successfully.',
+                            icon: 'success',
+                            confirmButtonColor: '#ff9f43'
+                        });
+
+                        if (orderId) {
+                            $('.open-history[data-id="' + orderId + '"]').first().trigger('click');
+                        }
+                    },
+                    error: function(xhr) {
+                        const message = xhr.responseJSON && xhr.responseJSON.message ?
+                            xhr.responseJSON.message :
+                            'Failed to delete payment history.';
+
+                        Swal.fire({
+                            title: 'Error',
+                            text: message,
+                            icon: 'error',
+                            confirmButtonColor: '#ff9f43'
+                        });
+                    }
+                });
+            });
+        });
+
+        $('#edit_payment_method, #edit_paid_type, #edit_online_type, #edit_cash_online_type').on('change', function() {
+            showEditPaymentSections();
+            recalculateEditPendingAmount();
+        });
+
+        $('#editOpenAddBankModal').on('click', function() {
+            resetAddBankForm();
+            if (editPaymentModalInstance) {
+                editPaymentModalInstance.hide();
+            }
+            if (addBankModal) {
+                addBankModal.show();
+            }
+        });
+
+        $('#edit_partial_amount, #edit_cash_amount, #edit_online_amount').on('input', function() {
+            recalculateEditPendingAmount();
+        });
+
+        $('#editPaymentHistoryForm').on('submit', function(e) {
+            e.preventDefault();
+
+            const paymentId = $('#edit_payment_id').val();
+            const orderId = $('#edit_order_id').val();
+            const authToken = localStorage.getItem("authToken");
+            const payload = buildEditPaymentPayload();
+
+            $.ajax({
+                url: '/api/payment-store/' + paymentId + '/update',
+                method: 'POST',
+                data: payload,
+                headers: {
+                    'X-CSRF-TOKEN': "{{ csrf_token() }}",
+                    "Authorization": "Bearer " + authToken
+                },
+                success: function(response) {
+                    if (editPaymentModalInstance) {
+                        editPaymentModalInstance.hide();
+                    }
+
+                    Swal.fire({
+                        title: 'Success',
+                        text: response.message || 'Payment updated successfully.',
+                        icon: 'success',
+                        confirmButtonColor: '#ff9f43'
+                    }).then(() => {
+                        if (orderId) {
+                            $('.open-history[data-id="' + orderId + '"]').first().trigger('click');
+                        }
+                    });
+                },
+                error: function(xhr) {
+                    const message = xhr.responseJSON && xhr.responseJSON.message ?
+                        xhr.responseJSON.message :
+                        'Failed to update payment.';
+
+                    Swal.fire({
+                        title: 'Error',
+                        text: message,
+                        icon: 'error',
+                        confirmButtonColor: '#ff9f43'
+                    });
+                }
+            });
+        });
+
         $(document).on('click', '.delete-order', function() {
             var orderId = $(this).data('id'); // ✅ Correct usage
             var authToken = localStorage.getItem("authToken");

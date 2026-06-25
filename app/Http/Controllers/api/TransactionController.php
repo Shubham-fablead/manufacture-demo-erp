@@ -565,6 +565,24 @@ class TransactionController extends Controller
         $payment->payment_amount = $request->payment_amount;
         $payment->payment_date   = $request->payment_date;
         $payment->remarks        = $request->remarks;
+        if ($request->filled('payment_method')) {
+            $payment->payment_method = $request->payment_method;
+        }
+        if ($request->filled('payment_type')) {
+            $payment->payment_type = $request->payment_type;
+        }
+        if ($request->has('cash_amount')) {
+            $payment->cash_amount = $request->cash_amount;
+        }
+        if ($request->has('upi_amount')) {
+            $payment->upi_amount = $request->upi_amount;
+        }
+        if ($request->has('bank_id')) {
+            $payment->bank_id = $request->bank_id;
+        }
+        if ($request->has('reference_number')) {
+            $payment->reference_number = $request->reference_number;
+        }
         $payment->save();
         return response()->json(['status' => true, 'message' => 'Payment updated successfully.']);
     }
