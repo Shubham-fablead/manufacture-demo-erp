@@ -1,5 +1,10 @@
 @php
     $user = auth()->user();
+    $settings = App\Models\Setting::first();
+    $showSmtpSettings = is_null($settings?->send_mail) ? true : (bool) $settings->send_mail;
+    $showWhatsappConfiguration = is_null($settings?->customer_whatsapp_message)
+        ? true
+        : ((bool) $settings->customer_whatsapp_message || (bool) $settings->admin_whatsapp_message);
 @endphp
 
 <div class="sidebar" id="sidebar">
@@ -517,10 +522,10 @@
                             @if (app('hasPermission')(14, 'view'))
                                 <li><a href="{{ route('setting.generalsettings') }}">Shop Settings</a></li>
                             @endif
-                            @if (app('hasPermission')(14, 'view'))
+                            @if (app('hasPermission')(14, 'view') && $showSmtpSettings)
                                 <li><a href="{{ route('setting.smtpsettings') }}">Smtp Settings</a></li>
                             @endif
-                            @if (app('hasPermission')(14, 'view'))
+                            @if (app('hasPermission')(14, 'view') && $showWhatsappConfiguration)
                                 <li><a href="{{ route('setting.facebookappconfiguration') }}">WhatsApp
                                         Configuration</a></li>
                             @endif

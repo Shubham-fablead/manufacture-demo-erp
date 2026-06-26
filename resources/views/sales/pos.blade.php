@@ -1343,6 +1343,50 @@
         white-space: normal !important;
         word-wrap: break-word !important;
     }
+
+    .pos-customer-row {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+        align-items: start;
+    }
+
+    .pos-customer-row > .pos-customer-field,
+    .pos-customer-row > .pos-customer-field--date {
+        width: 100%;
+        max-width: none;
+        padding: 0;
+        flex: none;
+    }
+
+    .pos-customer-row .form-group {
+        margin-bottom: 0;
+    }
+
+    .pos-customer-row label {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 14px;
+        margin-bottom: 6px;
+        font-weight: 500;
+        color: #1f2937;
+    }
+
+        .pos-customer-row .form-control,
+        .pos-customer-row .select2-container .select2-selection--single {
+            min-height: 42px;
+            border-radius: 8px;
+        }
+
+        .customer-modal-dialog {
+            max-width: 1080px;
+            width: calc(100% - 48px);
+        }
+
+        .customer-modal-dialog .modal-content {
+            border-radius: 10px;
+        }
 }
 
 /* For tablet devices */
@@ -1641,16 +1685,37 @@
                                                 <div id="scan-message" class="text-center mt-2 small text-muted">
                                                     Initializing camera...</div>
                                             </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-secondary"
+                                <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary"
                                                     data-bs-dismiss="modal">Close</button>
-                                            </div>
-                                        </div>
                                     </div>
                                 </div>
-                                <div class="row w-105 pos-customer-row">
-                                    <!-- Customer Name -->
-                                    <div class="col-md-4 col-6 pos-customer-field">
+                            </div>
+                        </div>
+
+                        <div class="d-flex align-items-center justify-content-between mb-2 mt-3">
+                            <div class="d-flex align-items-center gap-2">
+                                <i class="fas fa-user-friends text-success"></i>
+                                <h5 class="mb-0" style="font-size: 18px; font-weight: 700;">Customer details</h5>
+                            </div>
+                            <div class="d-flex align-items-center gap-2">
+                                <button type="button" id="openAddCustomerModal"
+                                    class="btn btn-sm btn-outline-success d-inline-flex align-items-center justify-content-center"
+                                    style="width: 40px; height: 40px; border-radius: 10px;" title="Add Customer">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                                <button type="button" id="openEditCustomerModal"
+                                    class="btn btn-sm btn-outline-warning d-inline-flex align-items-center justify-content-center"
+                                    style="width: 40px; height: 40px; border-radius: 10px; display:none;"
+                                    title="Edit Customer">
+                                    <i class="fas fa-pen"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="row w-105 pos-customer-row">
+                            <!-- Customer Name -->
+                            <div class="col-md-4 col-6 pos-customer-field">
                                         <div class="select-split select-group w-100">
                                             <div class="select-group w-100">
                                                 <label>Customer Name</label>
@@ -1680,22 +1745,331 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="col-md-4 col-12 pos-customer-field pos-customer-field--date">
-                                        <div class="select-split pos-order-date-group">
+                                    <div class="col-md-4 col-6 pos-customer-field">
+                                        <div class="select-split">
                                             <div class="select-group w-100">
-                                                <label>Order Date</label>
-                                                <input type="hidden" id="order_date" name="order_date"
-                                                    value="{{ now()->format('Y-m-d') }}">
-                                                <div class="input-groupicon">
-                                                    <input type="text" id="order_date_display" class="form-control"
-                                                        value="{{ now()->format('d/m/Y') }}" autocomplete="off">
-                                                    <a class="addonset">
-                                                        <img src="{{ env('ImagePath') . 'admin/assets/img/icons/calendars.svg' }}"
-                                                            alt="Calendar">
-                                                    </a>
-                                                </div>
+                                                <label>Customer GST no</label>
+                                                <input type="text" id="customer_gst_number" class="form-control"
+                                                    placeholder="Enter GST to auto-fill" name="customer_gst_number">
+                                                <span class="error_customergst text-danger"></span>
                                             </div>
                                         </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        @php
+                            $staffUsers = \App\Models\User::where('role', 'staff')
+                                ->where('isDeleted', 0)
+                                ->when(!empty($subAdminId) && $subAdminId !== 'null', function ($query) use ($subAdminId) {
+                                    $query->where('branch_id', $subAdminId);
+                                })
+                                ->get();
+                        @endphp
+
+                        <div class="row mt-3">
+                            <div class="col-md-4 col-6">
+                                <div class="form-group">
+                                    <label>Order Date</label>
+                                    <input type="hidden" id="order_date" name="order_date"
+                                        value="{{ now()->format('Y-m-d') }}">
+                                    <div class="input-groupicon">
+                                        <input type="text" id="order_date_display" class="form-control"
+                                            value="{{ now()->format('d/m/Y') }}" autocomplete="off">
+                                        <a class="addonset">
+                                            <img src="{{ env('ImagePath') . 'admin/assets/img/icons/calendars.svg' }}"
+                                                alt="Calendar">
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-6">
+                                <div class="form-group">
+                                    <label>Assign Staff</label>
+                                    <select id="assigned_staff" name="assigned_staff" class="form-control select2">
+                                        <option value="">Select Staff (Optional)</option>
+                                        @foreach ($staffUsers as $staff)
+                                            <option value="{{ $staff->id }}">{{ $staff->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-6">
+                                <div class="form-group">
+                                    <label>Order Type</label>
+                                    <select id="order_type" name="order_type" class="form-control">
+                                        <option value="Self Pickup" selected>Self Pickup</option>
+                                        <option value="Delivery">Delivery</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="modal fade" id="editCustomerModal" tabindex="-1"
+                            aria-labelledby="editCustomerModalLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-lg modal-dialog-centered customer-modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="editCustomerModalLabel">Edit Customer</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                            aria-label="Close">x</button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <form id="posEditCustomerForm" enctype="multipart/form-data">
+                                            @csrf
+                                            <input type="hidden" id="pos_edit_customer_id">
+                                            <div class="row">
+                                                <div class="col-lg-3 col-sm-6 col-12">
+                                                    <div class="form-group mb-3">
+                                                        <label>Customer Name <span class="text-danger">*</span></label>
+                                                        <input type="text" name="customer_name" id="pos_edit_customer_name"
+                                                            class="form-control" placeholder="Customer Name">
+                                                        <small class="text-danger error-customer_name"></small>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-3 col-sm-6 col-12">
+                                                    <div class="form-group mb-3">
+                                                        <label>Company Name</label>
+                                                        <input type="text" name="company_name" id="pos_edit_company_name"
+                                                            class="form-control" placeholder="Company Name">
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-3 col-sm-6 col-12">
+                                                    <div class="form-group mb-3">
+                                                        <label>Phone <span class="text-danger">*</span></label>
+                                                        <input type="text" maxlength="10" name="phone" id="pos_edit_phone"
+                                                            class="form-control" placeholder="10-digit phone">
+                                                        <small class="text-danger error-phone"></small>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-3 col-sm-6 col-12">
+                                                    <div class="form-group mb-3">
+                                                        <label>Alternate Phone</label>
+                                                        <input type="text" maxlength="10" name="alternate_phone"
+                                                            id="pos_edit_alternate_phone" class="form-control"
+                                                            placeholder="10-digit phone (optional)">
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-3 col-sm-6 col-12">
+                                                    <div class="form-group mb-3">
+                                                        <label>Email</label>
+                                                        <input type="email" name="email" id="pos_edit_email"
+                                                            class="form-control" placeholder="Email">
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-3 col-sm-6 col-12">
+                                                    <div class="form-group mb-3">
+                                                        <label>GST Number</label>
+                                                        <input type="text" name="gst_number" maxlength="15"
+                                                            id="pos_edit_gst_number" class="form-control"
+                                                            placeholder="GST Number">
+                                                        <small class="text-danger error-gst_number"></small>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-3 col-sm-6 col-12">
+                                                    <div class="form-group mb-3">
+                                                        <label>PAN Number</label>
+                                                        <input type="text" name="pan_number" maxlength="10"
+                                                            id="pos_edit_pan_number" class="form-control"
+                                                            placeholder="PAN Number">
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-3 col-sm-6 col-12">
+                                                    <div class="form-group mb-3">
+                                                        <label>State Code</label>
+                                                        <input type="text" name="state_code" id="pos_edit_state_code"
+                                                            class="form-control" placeholder="e.g. 27">
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-3 col-sm-6 col-12">
+                                                    <div class="form-group mb-3">
+                                                        <label>State Name</label>
+                                                        <input type="text" name="state_name" id="pos_edit_state_name"
+                                                            class="form-control" placeholder="Auto-filled from state"
+                                                            readonly>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-3 col-sm-6 col-12">
+                                                    <div class="form-group mb-3">
+                                                        <label>Country</label>
+                                                        <input type="text" name="country" id="pos_edit_country"
+                                                            class="form-control" placeholder="Country">
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-3 col-sm-6 col-12">
+                                                    <div class="form-group mb-3">
+                                                        <label>City</label>
+                                                        <input type="text" name="city" id="pos_edit_city"
+                                                            class="form-control" placeholder="City">
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-6 col-12">
+                                                    <div class="form-group mb-3">
+                                                        <div class="d-flex align-items-center justify-content-between mb-1">
+                                                            <label class="mb-0">Address</label>
+                                                        </div>
+                                                        <textarea name="address" id="pos_edit_address" class="form-control" rows="3" placeholder="Address"></textarea>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-6 col-12">
+                                                    <div class="form-group mb-3">
+                                                        <div class="d-flex align-items-center justify-content-between mb-1">
+                                                            <label class="mb-0">Delivery Address</label>
+                                                            <div class="form-check m-0">
+                                                                <input class="form-check-input" type="checkbox"
+                                                                    id="pos_edit_use_address" checked>
+                                                                <label class="form-check-label" for="pos_edit_use_address">
+                                                                    Use Address
+                                                                </label>
+                                                            </div>
+                                                        </div>
+                                                        <textarea name="delivery_address" id="pos_edit_delivery_address" class="form-control" rows="3"
+                                                            placeholder="Delivery Address"></textarea>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary"
+                                            data-bs-dismiss="modal">Cancel</button>
+                                        <button type="button" id="updatePosCustomerBtn"
+                                            class="btn btn-warning">Update Customer</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="modal fade" id="addCustomerModal" tabindex="-1"
+                            aria-labelledby="addCustomerModalLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-lg modal-dialog-centered customer-modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="addCustomerModalLabel">Add New Customer</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                            aria-label="Close">x</button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <form id="posCustomerForm" enctype="multipart/form-data">
+                                            @csrf
+                                            <div class="row">
+                                                <div class="col-lg-3 col-sm-6 col-12">
+                                                    <div class="form-group mb-3">
+                                                        <label>Customer Name <span class="text-danger">*</span></label>
+                                                        <input type="text" name="customer_name" id="pos_customer_name"
+                                                            class="form-control" placeholder="Customer Name">
+                                                        <small class="text-danger error-customer_name"></small>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-3 col-sm-6 col-12">
+                                                    <div class="form-group mb-3">
+                                                        <label>Company Name</label>
+                                                        <input type="text" name="company_name" id="pos_company_name"
+                                                            class="form-control" placeholder="Company Name">
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-3 col-sm-6 col-12">
+                                                    <div class="form-group mb-3">
+                                                        <label>Phone <span class="text-danger">*</span></label>
+                                                        <input type="text" maxlength="10" name="phone" id="pos_phone"
+                                                            class="form-control" placeholder="10-digit phone">
+                                                        <small class="text-danger error-phone"></small>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-3 col-sm-6 col-12">
+                                                    <div class="form-group mb-3">
+                                                        <label>Alternate Phone</label>
+                                                        <input type="text" maxlength="10" name="alternate_phone"
+                                                            id="pos_alternate_phone" class="form-control"
+                                                            placeholder="10-digit phone (optional)">
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-3 col-sm-6 col-12">
+                                                    <div class="form-group mb-3">
+                                                        <label>Email</label>
+                                                        <input type="email" name="email" id="pos_email"
+                                                            class="form-control" placeholder="Email">
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-3 col-sm-6 col-12">
+                                                    <div class="form-group mb-3">
+                                                        <label>GST Number</label>
+                                                        <input type="text" name="gst_number" maxlength="15"
+                                                            id="pos_gst_number" class="form-control"
+                                                            placeholder="GST Number">
+                                                        <small class="text-danger error-gst_number"></small>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-3 col-sm-6 col-12">
+                                                    <div class="form-group mb-3">
+                                                        <label>PAN Number</label>
+                                                        <input type="text" name="pan_number" maxlength="10"
+                                                            id="pos_pan_number" class="form-control"
+                                                            placeholder="PAN Number">
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-3 col-sm-6 col-12">
+                                                    <div class="form-group mb-3">
+                                                        <label>State Code</label>
+                                                        <input type="text" name="state_code" id="pos_state_code"
+                                                            class="form-control" placeholder="e.g. 27">
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-3 col-sm-6 col-12">
+                                                    <div class="form-group mb-3">
+                                                        <label>State Name</label>
+                                                        <input type="text" name="state_name" id="pos_state_name"
+                                                            class="form-control" placeholder="Auto-filled from state"
+                                                            readonly>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-3 col-sm-6 col-12">
+                                                    <div class="form-group mb-3">
+                                                        <label>Country</label>
+                                                        <input type="text" name="country" id="pos_country"
+                                                            class="form-control" placeholder="Country">
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-3 col-sm-6 col-12">
+                                                    <div class="form-group mb-3">
+                                                        <label>City</label>
+                                                        <input type="text" name="city" id="pos_city"
+                                                            class="form-control" placeholder="City">
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-6 col-12">
+                                                    <div class="form-group mb-3">
+                                                        <div class="d-flex align-items-center justify-content-between mb-1">
+                                                            <label class="mb-0">Address</label>
+                                                        </div>
+                                                        <textarea name="address" id="pos_address" class="form-control" rows="3" placeholder="Address"></textarea>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-6 col-12">
+                                                    <div class="form-group mb-3">
+                                                        <div class="d-flex align-items-center justify-content-between mb-1">
+                                                            <label class="mb-0">Delivery Address</label>
+                                                            <div class="form-check m-0">
+                                                                <input class="form-check-input" type="checkbox"
+                                                                    id="pos_use_address" checked>
+                                                                <label class="form-check-label" for="pos_use_address">
+                                                                    Use Address
+                                                                </label>
+                                                            </div>
+                                                        </div>
+                                                        <textarea name="delivery_address" id="pos_delivery_address" class="form-control" rows="3"
+                                                            placeholder="Delivery Address"></textarea>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary"
+                                            data-bs-dismiss="modal">Cancel</button>
+                                        <button type="button" id="savePosCustomerBtn"
+                                            class="btn btn-primary">Save Customer</button>
                                     </div>
                                 </div>
                             </div>
@@ -4281,6 +4655,8 @@
                     selectedSubAdminId: selectedSubAdminId,
                     customer_id: name,
                     customer_phone: phone,
+                    assigned_staff: $("#assigned_staff").val() || '',
+                    order_type: $("#order_type").val() || 'Self Pickup',
                     order_date: orderDate,
                     subtotal: subtotal,
                     discount: 0,
@@ -4637,11 +5013,329 @@
         $(".select2").select2({
             tags: true,
         });
-        // $(document).ready(function() {
-        $('#customer_name').on('change', function() {
-            var phone = $(this).find(':selected').data('phone');
-            $('#customer_phone').val(phone || '');
+        const posStateCodeToName = {
+            "01": "Jammu and Kashmir",
+            "02": "Himachal Pradesh",
+            "03": "Punjab",
+            "04": "Chandigarh",
+            "05": "Uttarakhand",
+            "06": "Haryana",
+            "07": "Delhi",
+            "08": "Rajasthan",
+            "09": "Uttar Pradesh",
+            "10": "Bihar",
+            "11": "Sikkim",
+            "12": "Arunachal Pradesh",
+            "13": "Nagaland",
+            "14": "Manipur",
+            "15": "Mizoram",
+            "16": "Tripura",
+            "17": "Meghalaya",
+            "18": "Assam",
+            "19": "West Bengal",
+            "20": "Jharkhand",
+            "21": "Odisha",
+            "22": "Chhattisgarh",
+            "23": "Madhya Pradesh",
+            "24": "Gujarat",
+            "25": "Daman and Diu",
+            "26": "Dadra and Nagar Haveli",
+            "27": "Maharashtra",
+            "28": "Andhra Pradesh",
+            "29": "Karnataka",
+            "30": "Goa",
+            "31": "Lakshadweep",
+            "32": "Kerala",
+            "33": "Tamil Nadu",
+            "34": "Puducherry",
+            "35": "Andaman and Nicobar Islands",
+            "36": "Telangana",
+            "37": "Andhra Pradesh (New)"
+        };
+
+        const $addCustomerModalEl = document.getElementById('addCustomerModal');
+        const addCustomerModal = $addCustomerModalEl ? new bootstrap.Modal($addCustomerModalEl, {
+            backdrop: 'static',
+            keyboard: false
+        }) : null;
+        const $editCustomerModalEl = document.getElementById('editCustomerModal');
+        const editCustomerModal = $editCustomerModalEl ? new bootstrap.Modal($editCustomerModalEl, {
+            backdrop: 'static',
+            keyboard: false
+        }) : null;
+        const initialCustomerId = $('#customer_name').val();
+
+        function syncAddressFields(addressSelector, deliverySelector, useCheckboxSelector) {
+            const $address = $(addressSelector);
+            const $delivery = $(deliverySelector);
+            const $useAddress = $(useCheckboxSelector);
+
+            $delivery.prop('readonly', $useAddress.is(':checked'));
+            if ($useAddress.is(':checked')) {
+                $delivery.val($address.val());
+            }
+        }
+
+        $('#openAddCustomerModal').on('click', function() {
+            $('#posCustomerForm')[0].reset();
+            $('#posCustomerForm .text-danger').text('');
+            $('#pos_use_address').prop('checked', true).trigger('change');
+            if (addCustomerModal) {
+                addCustomerModal.show();
+            }
         });
+
+        $('#customer_name').on('change', function() {
+            const $selectedOption = $(this).find(':selected');
+            const customerId = $(this).val();
+            const phone = $selectedOption.data('phone');
+            const isRealCustomer = !!customerId && customerId !== initialCustomerId && typeof phone !== 'undefined';
+
+            $('#customer_phone').val(phone || '');
+            $('#openEditCustomerModal').toggle(isRealCustomer);
+        });
+
+        $('#openEditCustomerModal').hide();
+
+        $('#openEditCustomerModal').on('click', function() {
+            const customerId = $('#customer_name').val();
+            if (!customerId) {
+                return;
+            }
+
+            $('#posEditCustomerForm .text-danger').text('');
+
+            $.ajax({
+                url: `/api/getCustomer/${customerId}`,
+                method: 'GET',
+                headers: {
+                    'X-CSRF-TOKEN': "{{ csrf_token() }}",
+                    'Authorization': 'Bearer ' + authToken
+                },
+                success: function(response) {
+                    const customer = response?.customer || {};
+                    const details = customer?.details || {};
+
+                    $('#pos_edit_customer_id').val(customer.id || '');
+                    $('#pos_edit_customer_name').val(customer.name || '');
+                    $('#pos_edit_company_name').val(customer.company_name || '');
+                    $('#pos_edit_phone').val(customer.phone || '');
+                    $('#pos_edit_alternate_phone').val(customer.alternate_phone || '');
+                    $('#pos_edit_email').val(customer.email || '');
+                    $('#pos_edit_gst_number').val(customer.gst_number || '');
+                    $('#pos_edit_pan_number').val(customer.pan_number || '');
+                    $('#pos_edit_state_code').val(customer.state_code || '');
+                    $('#pos_edit_state_name').val(customer.state_name || '');
+                    $('#pos_edit_country').val(details.country || '');
+                    $('#pos_edit_city').val(details.city || '');
+                    $('#pos_edit_address').val(details.address || '');
+                    $('#pos_edit_delivery_address').val(details.delivery_address || details.address || '');
+                    $('#pos_edit_use_address').prop('checked', true);
+                    syncAddressFields('#pos_edit_address', '#pos_edit_delivery_address', '#pos_edit_use_address');
+
+                    if (editCustomerModal) {
+                        editCustomerModal.show();
+                    }
+                },
+                error: function(xhr) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: xhr.responseJSON?.error || 'Failed to fetch customer.'
+                    });
+                }
+            });
+        });
+
+        $('#pos_state_code').on('input', function() {
+            let code = $(this).val().replace(/\D/g, '').slice(0, 2);
+            $(this).val(code);
+            $('#pos_state_name').val(posStateCodeToName[code.padStart(2, '0')] || '');
+        });
+
+        $('#pos_phone, #pos_alternate_phone').on('input', function() {
+            let value = $(this).val().replace(/\D/g, '').slice(0, 10);
+            $(this).val(value);
+        });
+
+        $('#pos_gst_number').on('input', function() {
+            $(this).val($(this).val().toUpperCase().slice(0, 15));
+        });
+
+        $('#pos_address').on('input', function() {
+            if ($('#pos_use_address').is(':checked')) {
+                $('#pos_delivery_address').val($(this).val());
+            }
+        });
+
+        $('#pos_use_address').on('change', function() {
+            if ($(this).is(':checked')) {
+                $('#pos_delivery_address').val($('#pos_address').val());
+                $('#pos_delivery_address').prop('readonly', true);
+            } else {
+                $('#pos_delivery_address').prop('readonly', false);
+            }
+        });
+
+        $('#pos_delivery_address').prop('readonly', true);
+
+        $('#pos_edit_address').on('input', function() {
+            if ($('#pos_edit_use_address').is(':checked')) {
+                $('#pos_edit_delivery_address').val($(this).val());
+            }
+        });
+
+        $('#pos_edit_use_address').on('change', function() {
+            if ($(this).is(':checked')) {
+                $('#pos_edit_delivery_address').val($('#pos_edit_address').val());
+                $('#pos_edit_delivery_address').prop('readonly', true);
+            } else {
+                $('#pos_edit_delivery_address').prop('readonly', false);
+            }
+        });
+
+        $('#pos_edit_delivery_address').prop('readonly', true);
+
+        $('#savePosCustomerBtn').on('click', function() {
+            const $btn = $(this);
+            const originalText = $btn.text();
+            const formData = new FormData(document.getElementById('posCustomerForm'));
+            if (selectedSubAdminId && selectedSubAdminId !== "null" && selectedSubAdminId !== "undefined") {
+                formData.append('selectedSubAdminId', selectedSubAdminId);
+            }
+
+            $('#posCustomerForm .text-danger').text('');
+            $btn.prop('disabled', true).text('Saving...');
+
+            $.ajax({
+                url: '/api/createCustomer',
+                method: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                headers: {
+                    'X-CSRF-TOKEN': "{{ csrf_token() }}",
+                    'Authorization': 'Bearer ' + authToken
+                },
+                success: function(response) {
+                    const customerName = $('#pos_customer_name').val().trim();
+                    const customerPhone = $('#pos_phone').val().trim();
+                    const createdCustomer = response?.customer || null;
+                    const newId = createdCustomer?.id;
+
+                    if (newId && $('#customer_name option[value="' + newId + '"]').length === 0) {
+                        $('#customer_name').append(
+                            $('<option>', {
+                                value: newId,
+                                text: customerName,
+                                'data-phone': customerPhone
+                            })
+                        );
+                    }
+
+                    if (newId) {
+                        $('#customer_name').val(String(newId)).trigger('change');
+                    }
+                    $('#customer_phone').val(customerPhone);
+
+                    if (addCustomerModal) {
+                        addCustomerModal.hide();
+                    }
+
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success',
+                        text: response.message || 'Customer created successfully.'
+                    });
+                },
+                error: function(xhr) {
+                    const errors = xhr.responseJSON?.errors || {};
+                    $('#posCustomerForm .error-customer_name').text(errors.customer_name ? errors.customer_name[0] : '');
+                    $('#posCustomerForm .error-phone').text(errors.phone ? errors.phone[0] : '');
+                    $('#posCustomerForm .error-gst_number').text(errors.gst_number ? errors.gst_number[0] : '');
+
+                    if (!Object.keys(errors).length) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: xhr.responseJSON?.message || 'Failed to create customer.'
+                        });
+                    }
+                },
+                complete: function() {
+                    $btn.prop('disabled', false).text(originalText);
+                }
+            });
+        });
+
+        $('#updatePosCustomerBtn').on('click', function() {
+            const customerId = $('#pos_edit_customer_id').val();
+            if (!customerId) {
+                return;
+            }
+
+            const $btn = $(this);
+            const originalText = $btn.text();
+            const formData = new FormData(document.getElementById('posEditCustomerForm'));
+            if (selectedSubAdminId && selectedSubAdminId !== "null" && selectedSubAdminId !== "undefined") {
+                formData.append('selectedSubAdminId', selectedSubAdminId);
+            }
+
+            $('#posEditCustomerForm .text-danger').text('');
+            $btn.prop('disabled', true).text('Updating...');
+
+            $.ajax({
+                url: `/api/updateCustomer/${customerId}`,
+                method: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                headers: {
+                    'X-CSRF-TOKEN': "{{ csrf_token() }}",
+                    'Authorization': 'Bearer ' + authToken
+                },
+                success: function(response) {
+                    const customerName = $('#pos_edit_customer_name').val().trim();
+                    const customerPhone = $('#pos_edit_phone').val().trim();
+
+                    $('#customer_name option[value="' + customerId + '"]')
+                        .text(customerName)
+                        .attr('data-phone', customerPhone);
+
+                    $('#customer_name').val(String(customerId)).trigger('change');
+                    $('#customer_phone').val(customerPhone);
+
+                    if (editCustomerModal) {
+                        editCustomerModal.hide();
+                    }
+
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success',
+                        text: response.message || 'Customer updated successfully.'
+                    });
+                },
+                error: function(xhr) {
+                    const errors = xhr.responseJSON?.errors || {};
+                    $('#posEditCustomerForm .error-customer_name').text(errors.customer_name ? errors.customer_name[0] : '');
+                    $('#posEditCustomerForm .error-phone').text(errors.phone ? errors.phone[0] : '');
+                    $('#posEditCustomerForm .error-gst_number').text(errors.gst_number ? errors.gst_number[0] : '');
+
+                    if (!Object.keys(errors).length) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: xhr.responseJSON?.message || 'Failed to update customer.'
+                        });
+                    }
+                },
+                complete: function() {
+                    $btn.prop('disabled', false).text(originalText);
+                }
+            });
+        });
+
+        // $(document).ready(function() {
         // });
         $(document).ready(function() {
             const $searchInput = $('#customerSearch1');

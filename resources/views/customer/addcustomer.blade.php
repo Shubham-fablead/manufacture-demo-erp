@@ -153,6 +153,21 @@
                             </div>
                         </div>
 
+                        <!-- Delivery Address -->
+                        <div class="col-lg-4 col-sm-6 col-12">
+                            <div class="form-group">
+                                <div class="d-flex align-items-center justify-content-between mb-1">
+                                    <label class="mb-0">Delivery Address</label>
+                                    <div class="form-check m-0">
+                                        <input class="form-check-input" type="checkbox" id="use_address">
+                                        <label class="form-check-label" for="use_address">Use Address</label>
+                                    </div>
+                                </div>
+                                <textarea name="delivery_address" id="delivery_address" class="form-control"></textarea>
+                                <div class="text-danger error-delivery_address"></div>
+                            </div>
+                        </div>
+
                         <!-- Avatar Upload -->
                         <div class="col-lg-4 col-sm-6 col-12">
                             <div class="form-group">
@@ -255,6 +270,22 @@
 
                 $(this).val(value);
             });
+
+            $("#address").on("input", function() {
+                if ($("#use_address").is(":checked")) {
+                    $("#delivery_address").val($(this).val());
+                }
+            });
+
+            $("#use_address").on("change", function() {
+                if ($(this).is(":checked")) {
+                    $("#delivery_address").val($("#address").val()).prop("readonly", true);
+                } else {
+                    $("#delivery_address").prop("readonly", false);
+                }
+            });
+
+            $("#delivery_address").prop("readonly", true);
 
             var authToken = localStorage.getItem("authToken");
             let $gstLoader = $('#gst-loader');

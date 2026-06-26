@@ -926,6 +926,7 @@ class SalesController extends Controller
             'discount'       => 'nullable|numeric|min:0|max:100',
             'remarks'        => 'nullable|string|max:500',
             'payment_remarks' => 'nullable|string|max:500',
+            'assigned_staff' => 'nullable|integer|exists:users,id',
             'tax'            => 'nullable|array',
             'items'          => 'required|array|min:1',
             'labour_items'   => 'nullable|array',
@@ -1146,6 +1147,8 @@ $roundedTotal = max(0, round($preTdsTotal - $tdsAmount, 2));
                 'order_number' => $orderNumber,
                 'user_id' => $customer_id,
                 'payment_method' => $paymentMethod,
+                'assigned_staff' => $request->assigned_staff ?: null,
+                'order_type' => $request->order_type ?: 'Self Pickup',
                 'discount' => $request->discount ?? 0,
                 'tax_id' => !empty($request->tax) ? json_encode($request->tax) : null,
                 'gst_option' => $request->gst_option === 'with'
@@ -1472,6 +1475,7 @@ $roundedTotal = max(0, round($preTdsTotal - $tdsAmount, 2));
                 'user:id,name,phone',
                 'orderItems:id,order_id',
                 'creator:id,name,role',
+                'assignedStaff:id,name',
             ])
             ->where('isDeleted', 0)
 
@@ -2458,6 +2462,8 @@ public function update_sale(Request $request)
             'user_id' => $request->customer_id,
             'user_phone' => $request->customer_phone,
             'payment_method' => $storedPaymentMethod,
+            'assigned_staff' => $request->assigned_staff ?: $order->assigned_staff,
+            'order_type' => $request->order_type ?: $order->order_type,
             'discount' => $request->discount,
             'discount_amount' => $totalItemDiscounts + $discountAmount,
             'gst_option' => $request->gst_option === 'with_gst' ? 'with_gst' : 'without_gst',
@@ -3124,7 +3130,10 @@ public function update_sale(Request $request)
         $currencyPosition = $settings->currency_position ?? 'left';
 
         try {
-            $query = Order::with(['user:id,name,phone'])
+            $query = Order::with([
+                'user:id,name,phone',
+                'assignedStaff:id,name',
+            ])
                 ->where('isDeleted', 0);
             // ->where('type', 'Sales');
 
@@ -3458,7 +3467,10 @@ if ($setting && $setting->invoice_size === 'small') {
         $setting = Setting::where('branch_id', $branchIdToUse)->first();
 
         try {
-            $query = Order::with(['user:id,name,phone'])
+            $query = Order::with([
+                'user:id,name,phone',
+                'assignedStaff:id,name',
+            ])
                 ->where('isDeleted', 0);
 
             // 🔹 Apply filters
@@ -4054,7 +4066,10 @@ if ($setting && $setting->invoice_size === 'small') {
         $selectedSubAdminId = $request->input('selectedSubAdminId');
         $branchIdForNonStaff = $this->resolveBranchIdForTdsReport($user, $selectedSubAdminId);
 
-        $query = Order::with(['user:id,name,phone'])
+        $query = Order::with([
+            'user:id,name,phone',
+            'assignedStaff:id,name',
+        ])
             ->where('isDeleted', 0)
             ->where(function ($q) {
                 $q->where('tds_amount', '>', 0)
@@ -4120,7 +4135,7 @@ if ($setting && $setting->invoice_size === 'small') {
         return $query;
     }
 
-     private function getTdsOrderReportSummary($query): array
+    private function getTdsOrderReportSummary($query): array
     {
         $summary = (clone $query)
             ->selectRaw('COUNT(*) as total_orders')
@@ -4135,5 +4150,40 @@ if ($setting && $setting->invoice_size === 'small') {
             'total_tds_amount' => round((float) ($summary->total_tds_amount ?? 0), 2),
             'average_tds_percentage' => round((float) ($summary->average_tds_percentage ?? 0), 2),
         ];
+    }
+
+    public function updateOrderInline(Request $request)
+    {
+        $request->validate([
+            'order_id' => 'required|integer|exists:orders,id',
+            'assigned_staff' => 'nullable',
+            'order_type' => 'nullable|in:Self Pickup,Delivery',
+        ]);
+
+        $order = Order::findOrFail($request->order_id);
+        $updateData = [];
+
+        if ($request->has('assigned_staff')) {
+            $updateData['assigned_staff'] = $request->assigned_staff !== '' ? $request->assigned_staff : null;
+        }
+
+        if ($request->has('order_type')) {
+            $updateData['order_type'] = $request->order_type ?: 'Self Pickup';
+        }
+
+        if (empty($updateData)) {
+            return response()->json([
+                'status' => false,
+                'message' => 'No changes to update.',
+            ], 422);
+        }
+
+        $order->update($updateData);
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Order updated successfully.',
+            'data' => $order->fresh(['assignedStaff:id,name']),
+        ]);
     }
 }

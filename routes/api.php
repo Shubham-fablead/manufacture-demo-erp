@@ -341,6 +341,7 @@ Route::middleware(['auth.api'])->group(function () {
     Route::get('getsalseById/{id}', [SalesController::class, 'getsalseById'])->name('getsalseById');
     Route::post('delete/{id}', [SalesController::class, 'delete'])->name('delete');
     Route::post('update_sale', [SalesController::class, 'update_sale'])->name('update_sale');
+    Route::post('update-order-inline', [SalesController::class, 'updateOrderInline'])->name('update_order_inline');
     Route::post('convert-quotation-to-sale/{id}', [SalesController::class, 'convertQuotationToSale'])->name('convert_quotation_to_sale');
     Route::get('/orders/filter', [SalesController::class, 'getFilteredOrders']);
     Route::get('/order/payment-history/{id}', [SalesController::class, 'getHistory1'])->name('order.payment_history');

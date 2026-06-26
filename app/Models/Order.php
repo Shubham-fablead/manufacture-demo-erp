@@ -13,10 +13,13 @@ class Order extends Model
     protected $table = 'orders';
     protected $fillable = [
         'order_number',
+        'order_date',
         'shipping',
         'tds_percentage',
         'tds_amount',
         'user_id',
+        'assigned_staff',
+        'order_type',
         'discount',
         'tax_id',
         'gst_option',
@@ -57,6 +60,10 @@ class Order extends Model
     public function creator()
     {
         return $this->belongsTo(User::class, 'created_by');
+    }
+    public function assignedStaff()
+    {
+        return $this->belongsTo(User::class, 'assigned_staff');
     }
     public function items()
     {

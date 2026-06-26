@@ -82,6 +82,11 @@
                                             </div>
                                             <hr>
                                             <div class="row">
+                                                <div class="col-lg-3 col-md-4 label">Delivery Address</div>
+                                                <div class="col-lg-9 col-md-8"><span class="profile-delivery_address"></span></div>
+                                            </div>
+                                            <hr>
+                                            <div class="row">
                                                 <div class="col-lg-3 col-md-4 label">Coutry</div>
                                                 <div class="col-lg-9 col-md-8"><span class="profile-country"></span></div>
                                             </div>
@@ -184,6 +189,8 @@
                         $('.profile-role').text(res.role ?? 'N/A');
                         $('.profile-address').text(res.address && res.address.trim() !== '' ? res.address :
                             'N/A');
+                        $('.profile-delivery_address').text(res.delivery_address && res.delivery_address.trim() !== '' ? res
+                            .delivery_address : 'N/A');
                         $('.profile-country').text(res.country && res.country.trim() !== '' ? res.country :
                             'N/A');
                         $('.profile-city').text(res.city && res.city.trim() !== '' ? res.city : 'N/A');
