@@ -3,6 +3,17 @@
 @section('title', 'Sales List')
 
 @section('content')
+    @php
+        $currentBranchId = session('selectedSubAdminId') ?? auth()->user()->branch_id ?? auth()->user()->id;
+        $salesStaffUsers = \App\Models\User::where('role', 'staff')
+            ->where('isDeleted', 0)
+            ->when(!empty($currentBranchId), function ($query) use ($currentBranchId) {
+                $query->where('branch_id', $currentBranchId);
+            })
+            ->select('id', 'name')
+            ->orderBy('name')
+            ->get();
+    @endphp
     <style>
         /* Status Badge Styles */
         .status-badge {
@@ -1036,6 +1047,17 @@
             font-weight: 600;
         }
 
+        .sales-inline-select {
+            min-width: 120px;
+            max-width: 150px;
+            height: 30px;
+            padding: 3px 8px;
+            font-size: 12px;
+            border: 1px solid #cfd7e6;
+            border-radius: 4px;
+            background: #fff;
+        }
+
 
         .sales-filter-toolbar .filter-field,
         .sales-filter-toolbar .filter-field .custom-select2,
@@ -1711,6 +1733,8 @@
                                 <th>Payment Status</th>
                                 {{-- <th>Return Status</th> --}}
                                 <th>Total</th>
+                                <th>Assigned Staff</th>
+                                <th>Order Type</th>
                                 <th>Biller</th>
                                 <th class="text-center">Action</th>
                             </tr>
@@ -2685,6 +2709,14 @@
                                 <span class="mobile-detail-value" style="font-weight: bold; color: #ff9f43;">${displayAmount}</span>
                             </div>
                             <div class="mobile-detail-row">
+                                <span class="mobile-detail-label">Assigned Staff:</span>
+                                <span class="mobile-detail-value">${order.assignedStaff?.name || 'N/A'}</span>
+                            </div>
+                            <div class="mobile-detail-row">
+                                <span class="mobile-detail-label">Order Type:</span>
+                                <span class="mobile-detail-value">${order.order_type || 'N/A'}</span>
+                            </div>
+                            <div class="mobile-detail-row">
                                 <span class="mobile-detail-label">Biller:</span>
                                 <span class="mobile-detail-value">${order.biller || 'Admin'}</span>
                             </div>
@@ -2851,6 +2883,14 @@
                 <div class="order-detail-row-simple">
                     <span class="order-detail-label-simple">Total:</span>
                     <span class="order-detail-value-simple" style="font-weight: bold; color: #ff9f43;">${displayAmount}</span>
+                </div>
+                <div class="order-detail-row-simple">
+                    <span class="order-detail-label-simple">Assigned Staff:</span>
+                    <span class="order-detail-value-simple">${order.assignedStaff?.name || 'N/A'}</span>
+                </div>
+                <div class="order-detail-row-simple">
+                    <span class="order-detail-label-simple">Order Type:</span>
+                    <span class="order-detail-value-simple">${order.order_type || 'N/A'}</span>
                 </div>
                 <div class="order-detail-row-simple">
                     <span class="order-detail-label-simple">Biller:</span>
@@ -4027,6 +4067,92 @@ $('#paymentHistoryList').html(historyHtml);
                 </div>`;
             }
 
+            function buildAssignedStaffSelect(order) {
+                const assignedStaffId = order.assigned_staff ?? order.assignedStaff?.id ?? order.assigned_staff_id ?? '';
+                const currentId = String(assignedStaffId || '');
+                let options = '<option value="">-- Unassigned --</option>';
+                @foreach ($salesStaffUsers as $staff)
+                    options += `<option value="{{ $staff->id }}" ${currentId === '{{ $staff->id }}' ? 'selected' : ''}>{{ $staff->name }}</option>`;
+                @endforeach
+                return `<select class="sales-inline-select assigned-staff-select" data-order-id="${order.id}" title="Assigned Staff">
+                    ${options}
+                </select>`;
+            }
+
+            function getAssignedStaffName(order) {
+                return order.assignedStaff?.name || order.assigned_staff_name || order.assigned_staff?.name || 'Unassigned';
+            }
+
+            function buildOrderTypeSelect(order) {
+                const currentType = String(order.order_type || 'Self Pickup');
+                const options = ['Self Pickup', 'Delivery']
+                    .map(type => `<option value="${type}" ${currentType === type ? 'selected' : ''}>${type}</option>`)
+                    .join('');
+                return `<select class="sales-inline-select order-type-select" data-order-id="${order.id}">
+                    ${options}
+                </select>`;
+            }
+
+            function updateInlineOrderField(orderId, payload, $select, previousValue) {
+                $.ajax({
+                    url: '/api/update-order-inline',
+                    method: 'POST',
+                    data: {
+                        order_id: orderId,
+                        ...payload,
+                        selectedSubAdminId: selectedSubAdminId || ''
+                    },
+                    headers: {
+                        'X-CSRF-TOKEN': "{{ csrf_token() }}",
+                        'Authorization': 'Bearer ' + authToken,
+                    },
+                    success: function(response) {
+                        if (response.status) {
+                            if (window.orderDataMap && window.orderDataMap[orderId]) {
+                                window.orderDataMap[orderId] = {
+                                    ...window.orderDataMap[orderId],
+                                    ...response.data
+                                };
+                            }
+                        } else {
+                            $select.val(previousValue);
+                            Swal.fire('Error', response.message || 'Update failed.', 'error');
+                        }
+                    },
+                    error: function(xhr) {
+                        $select.val(previousValue);
+                        const message = xhr.responseJSON?.message || 'Update failed.';
+                        Swal.fire('Error', message, 'error');
+                    }
+                });
+            }
+
+            $(document).on('change', '.assigned-staff-select', function() {
+                const $select = $(this);
+                const orderId = $select.data('order-id');
+                const previousValue = $select.data('previous-value') ?? '';
+                const assignedStaff = $select.val();
+
+                updateInlineOrderField(orderId, {
+                    assigned_staff: assignedStaff
+                }, $select, previousValue);
+            });
+
+            $(document).on('change', '.order-type-select', function() {
+                const $select = $(this);
+                const orderId = $select.data('order-id');
+                const previousValue = $select.data('previous-value') ?? '';
+                const orderType = $select.val();
+
+                updateInlineOrderField(orderId, {
+                    order_type: orderType
+                }, $select, previousValue);
+            });
+
+            $(document).on('focusin', '.assigned-staff-select, .order-type-select', function() {
+                $(this).data('previous-value', $(this).val());
+            });
+
             function loadOrders(page = 1) {
                 currentPage = page;
                 const selectedMonth = normalizeFilterValue($('#filter-month').val() || '');
@@ -4131,6 +4257,8 @@ $('#paymentHistoryList').html(historyHtml);
                                         order
                                         .extra_paid || 0),
                                     displayAmount || '0.00',
+                                    buildAssignedStaffSelect(order),
+                                    buildOrderTypeSelect(order),
                                     `<span class="biller-wrap">${order.biller || 'Admin'}</span>`,
                                     actionBtns
                                 ]);
@@ -4208,7 +4336,7 @@ $('#paymentHistoryList').html(historyHtml);
                             }, 100);
                         } else {
                             table.clear().draw();
-                            $(".datanew tbody").html('<tr><td colspan="9">No order found</td></tr>');
+                            $(".datanew tbody").html('<tr><td colspan="11">No order found</td></tr>');
                             updateSalesSummaryTotals(0, 0, 0, '₹', 'left');
                             window.salesSummaryTotals = {
                                 total_amount: 0,

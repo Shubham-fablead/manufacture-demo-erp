@@ -114,6 +114,19 @@
                     </div>
                     <div class="col-lg-4 col-sm-6 col-12">
                         <div class="form-group">
+                            <div class="d-flex align-items-center justify-content-between mb-1">
+                                <label class="mb-0">Delivery Address</label>
+                                <div class="form-check m-0">
+                                    <input class="form-check-input" type="checkbox" id="use_address">
+                                    <label class="form-check-label" for="use_address">Use Address</label>
+                                </div>
+                            </div>
+                            <textarea id="delivery_address" name="delivery_address" class="form-control"></textarea>
+                            <div class="text-danger error-delivery_address"></div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-sm-6 col-12">
+                        <div class="form-group">
                             <label>Photo</label>
                             <div class="image-upload">
                                 <input type="file" id="avatar-input" name="avatar" accept="image/*">
@@ -226,6 +239,10 @@
                         $("#state_name").val(resolveStateName(customer.state_code || ""));
                         $("#address").val(customer.details.address ||
                         ""); // Use empty string if address is null
+                        $("#delivery_address").val(customer.details.delivery_address ||
+                        customer.details.address || "");
+                        $("#use_address").prop("checked", true);
+                        $("#delivery_address").prop("readonly", true);
 
                         // Show profile image if exists
                         if (customer.profile_image) {
@@ -318,6 +335,20 @@
                 $(this).val(value);
             });
 
+            $("#address").on("input", function() {
+                if ($("#use_address").is(":checked")) {
+                    $("#delivery_address").val($(this).val());
+                }
+            });
+
+            $("#use_address").on("change", function() {
+                if ($(this).is(":checked")) {
+                    $("#delivery_address").val($("#address").val()).prop("readonly", true);
+                } else {
+                    $("#delivery_address").prop("readonly", false);
+                }
+            });
+
             $("#updateCustomer").on("click", function(e) {
                 e.preventDefault();
                 const $btn = $(this);
@@ -341,6 +372,7 @@
                 formData.append("state_code", $("#state_code").val());
                 formData.append("state_name", $("#state_name").val());
                 formData.append("address", $("#address").val());
+                formData.append("delivery_address", $("#delivery_address").val());
 
                 let avatar = $("#avatar-input")[0].files[0];
                 // console.log(avatar);

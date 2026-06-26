@@ -267,7 +267,9 @@ class CustomerController extends Controller
             return response()->json(['status' => false, 'errors' => $validator->errors()], 422);
         }
 
-        DB::transaction(function () use ($request, $authUser, $branchId) {
+        $createdCustomer = null;
+
+        DB::transaction(function () use ($request, $authUser, $branchId, &$createdCustomer) {
 
             $customer = new User();
             $customer->fill([
@@ -304,10 +306,11 @@ class CustomerController extends Controller
             $customer->save();
 
             UserDetail::create([
-                'user_id' => $customer->id,
-                'country' => $request->country,
-                'city'    => $request->city,
-                'address' => $request->address,
+                'user_id'           => $customer->id,
+                'country'           => $request->country,
+                'city'              => $request->city,
+                'address'           => $request->address,
+                'delivery_address'  => $request->delivery_address,
             ]);
             // 🔔 CREATE NOTIFICATION
             Notification::create([
@@ -320,9 +323,15 @@ class CustomerController extends Controller
                 'is_sound'  => 0,
                 'branch_id' => $branchId,
             ]);
+
+            $createdCustomer = $customer->load('details');
         });
 
-        return response()->json(['status' => true, 'message' => 'Customer created successfully!']);
+        return response()->json([
+            'status'   => true,
+            'message'  => 'Customer created successfully!',
+            'customer' => $createdCustomer,
+        ]);
     }
 
     public function getCustomer($id)
@@ -470,9 +479,10 @@ class CustomerController extends Controller
         UserDetail::updateOrCreate(
             ['user_id' => $id],
             [
-                'country' => $request->country,
-                'city'    => $request->city,
-                'address' => $request->address,
+                'country'          => $request->country,
+                'city'             => $request->city,
+                'address'          => $request->address,
+                'delivery_address' => $request->delivery_address,
             ]
         );
 
@@ -501,6 +511,7 @@ class CustomerController extends Controller
             'state_code'    => $user->state_code,
             'state_name'    => $user->state_name,
             'address'       => optional($user->userDetail)->address ?? 'N/A',
+            'delivery_address' => optional($user->userDetail)->delivery_address ?? 'N/A',
             'city'          => optional($user->userDetail)->city ?? 'N/A',
             'country'       => optional($user->userDetail)->country ?? 'N/A',
         ]);
