@@ -4068,7 +4068,7 @@ $('#paymentHistoryList').html(historyHtml);
             }
 
             function buildAssignedStaffSelect(order) {
-                const assignedStaffId = order.assigned_staff ?? order.assignedStaff?.id ?? order.assigned_staff_id ?? '';
+                const assignedStaffId = order.assigned_staff?.id ?? order.assigned_staff ?? order.assignedStaff?.id ?? order.assigned_staff_id ?? '';
                 const currentId = String(assignedStaffId || '');
                 let options = '<option value="">-- Unassigned --</option>';
                 @foreach ($salesStaffUsers as $staff)
@@ -4080,7 +4080,7 @@ $('#paymentHistoryList').html(historyHtml);
             }
 
             function getAssignedStaffName(order) {
-                return order.assignedStaff?.name || order.assigned_staff_name || order.assigned_staff?.name || 'Unassigned';
+                return order.assigned_staff?.name || order.assignedStaff?.name || order.assigned_staff_name || 'Unassigned';
             }
 
             function buildOrderTypeSelect(order) {
