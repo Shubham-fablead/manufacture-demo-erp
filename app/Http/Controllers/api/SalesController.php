@@ -4156,7 +4156,7 @@ if ($setting && $setting->invoice_size === 'small') {
     {
         $request->validate([
             'order_id' => 'required|integer|exists:orders,id',
-            'assigned_staff' => 'nullable',
+            'assigned_staff' => 'nullable|integer|exists:users,id',
             'order_type' => 'nullable|in:Self Pickup,Delivery',
         ]);
 
@@ -4164,7 +4164,7 @@ if ($setting && $setting->invoice_size === 'small') {
         $updateData = [];
 
         if ($request->has('assigned_staff')) {
-            $updateData['assigned_staff'] = $request->assigned_staff !== '' ? $request->assigned_staff : null;
+            $updateData['assigned_staff'] = $request->assigned_staff !== '' ? (int) $request->assigned_staff : null;
         }
 
         if ($request->has('order_type')) {
