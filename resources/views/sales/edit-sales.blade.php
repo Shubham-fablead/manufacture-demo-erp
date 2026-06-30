@@ -91,6 +91,47 @@
             color: #fff;
         }
 
+        .customer-label-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .customer-action-group {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .customer-action-btn {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            border: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            color: #fff;
+            font-size: 12px;
+            line-height: 1;
+        }
+
+        .customer-add-btn {
+            background: #ff9f43;
+        }
+
+        .customer-edit-btn {
+            background: #1f3c88;
+        }
+
+        .customer-edit-btn:disabled {
+            opacity: 0.55;
+            cursor: not-allowed;
+        }
+
         .page-header {
             display: flex;
             align-items: center;
@@ -471,7 +512,13 @@
                             default => $prefillPaymentMethod,
                         };
 
-                        if ($prefillCashAmount > 0 && $prefillOnlineAmount > 0) {
+                        if (strtolower((string) ($sales->payment_method ?? '')) === 'emi') {
+                            $prefillPaymentMethod = 'emi';
+                        }
+
+                        if ($prefillPaymentMethod === 'emi') {
+                            // Keep EMI as saved on the order, even if payment rows contain bank/online amounts.
+                        } elseif ($prefillCashAmount > 0 && $prefillOnlineAmount > 0) {
                             $prefillPaymentMethod = 'cash+online';
                         } elseif ($prefillOnlineAmount > 0 || !empty($prefillBankId)) {
                             $prefillPaymentMethod = 'online';
@@ -511,7 +558,19 @@
                     <div class="col-lg-3 col-sm-6 col-6">
                         <input type="hidden" name="update_selse_id" id="update_selse_id" value="{{ $update_id }}">
                         <div class="form-group">
-                            <label>Customer</label>
+                            <div class="customer-label-row">
+                                <label class="mb-0">Customer</label>
+                                <div class="customer-action-group">
+                                    <button type="button" id="openAddCustomerModal"
+                                        class="customer-action-btn customer-add-btn" title="Add Customer">
+                                        <i class="fa-solid fa-plus"></i>
+                                    </button>
+                                    <button type="button" id="openEditCustomerModal"
+                                        class="customer-action-btn customer-edit-btn" title="Edit Customer">
+                                        <i class="fa-solid fa-pen"></i>
+                                    </button>
+                                </div>
+                            </div>
                             <select name="customer_id" id="customer_id" class="form-control select2">
                                 <option value="">Select Customer</option>
                                 @foreach ($usernames as $user)
@@ -883,6 +942,9 @@ $gstDataForAttribute = '[]';
                                 <option value="cash+online" {{ $prefillPaymentMethod === 'cash+online' ? 'selected' : '' }}>
                                     Cash+Online
                                 </option>
+                                <option value="emi" {{ $prefillPaymentMethod === 'emi' ? 'selected' : '' }}>
+                                    EMI
+                                </option>
                             </select>
                         </div>
                     </div>
@@ -963,6 +1025,108 @@ $gstDataForAttribute = '[]';
                                         data-paid-total="{{ number_format($prefillTotalPaid, 2, '.', '') }}"
                                         value="{{ number_format($prefillPendingAmount, 2, '.', '') }}" readonly>
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="emiBox" style="display:none; margin-top:10px;">
+                    <div class="row g-2">
+                        <div class="col-md-6 col-6">
+                            <div class="form-group">
+                                <label for="emiDownPayment">Down Payment (Optional)</label>
+                                <input type="number" class="form-control" id="emiDownPayment"
+                                    placeholder="₹ Amount" min="0" step="0.01">
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-6">
+                            <div class="form-group">
+                                <label for="emiLoanAmount">Loan Amount</label>
+                                <input type="number" class="form-control" id="emiLoanAmount"
+                                    placeholder="0.00" min="0" step="0.01" readonly>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-6">
+                            <div class="form-group">
+                                <label for="emiTenure">EMI Tenure</label>
+                                <select id="emiTenure" class="form-control" required>
+                                    <option value="">Select Tenure</option>
+                                    <option value="3">3 Months</option>
+                                    <option value="6">6 Months</option>
+                                    <option value="9">9 Months</option>
+                                    <option value="12">12 Months</option>
+                                    <option value="18">18 Months</option>
+                                    <option value="24">24 Months</option>
+                                    <option value="custom">Custom</option>
+                                </select>
+                                <span class="error_emi_tenure text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-6" id="emiCustomTenureWrap" style="display:none;">
+                            <div class="form-group">
+                                <label for="emiCustomTenure">Custom Tenure (Months)</label>
+                                <input type="number" class="form-control" id="emiCustomTenure"
+                                    placeholder="Enter months" min="1" step="1">
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-6">
+                            <div class="form-group">
+                                <label for="emiInterestRate">Interest Rate (%) Optional</label>
+                                <input type="number" class="form-control" id="emiInterestRate"
+                                    placeholder="0" min="0" step="0.01">
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-6">
+                            <div class="form-group">
+                                <label for="emiMonthlyValue">Monthly EMI</label>
+                                <input type="number" class="form-control" id="emiMonthlyValue"
+                                    placeholder="0.00" min="0" step="0.01" readonly>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-6">
+                            <div class="form-group">
+                                <label for="emiAadharNumber">Aadhar Number</label>
+                                <input type="text" class="form-control" id="emiAadharNumber"
+                                    placeholder="Enter Aadhar number">
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-6">
+                            <div class="form-group">
+                                <label for="emiDoId">DO ID</label>
+                                <input type="text" class="form-control" id="emiDoId"
+                                    placeholder="DO ID">
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-6">
+                            <div class="form-group">
+                                <label for="emiPanNumber">PAN Number Optional</label>
+                                <input type="text" class="form-control" id="emiPanNumber"
+                                    placeholder="PAN Number">
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-6">
+                            <div class="form-group">
+                                <label for="emiGuarantorName">Guarantor Name Optional</label>
+                                <input type="text" class="form-control" id="emiGuarantorName"
+                                    placeholder="Guarantor Name">
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-6">
+                            <div class="form-group">
+                                <div class="bank-label-row">
+                                    <label>Select Bank Optional</label>
+                                    <button type="button" id="openAddBankModal"
+                                        class="bank-add-btn">Add Bank</button>
+                                </div>
+                                <select name="emi_bank_id" id="emi_bank_id" class="form-control">
+                                    <option value="">Select Bank</option>
+                                    @foreach ($banks as $bank)
+                                        <option value="{{ $bank->id }}" {{ (int) $prefillBankId === (int) $bank->id ? 'selected' : '' }}>
+                                            {{ $bank->bank_name }}{{ $bank->account_number ? ' (' . $bank->account_number . ')' : '' }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                <span class="error_bank text-danger"></span>
                             </div>
                         </div>
                     </div>
@@ -1372,6 +1536,261 @@ $gstDataForAttribute = '[]';
                         </div>
                     </div>
                 </div>
+                <div class="modal fade" id="addCustomerModal" tabindex="-1" aria-labelledby="addCustomerModalLabel"
+                    aria-hidden="true">
+                    <div class="modal-dialog modal-lg modal-dialog-centered customer-modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="addCustomerModalLabel">Add New Customer</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">x</button>
+                            </div>
+                            <div class="modal-body">
+                                <form id="salesCustomerForm" enctype="multipart/form-data">
+                                    @csrf
+                                    <div class="row">
+                                        <div class="col-lg-3 col-sm-6 col-12">
+                                            <div class="form-group mb-3">
+                                                <label>Customer Name <span class="text-danger">*</span></label>
+                                                <input type="text" name="customer_name" id="sales_customer_name"
+                                                    class="form-control" placeholder="Customer Name">
+                                                <small class="text-danger error-customer_name"></small>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-3 col-sm-6 col-12">
+                                            <div class="form-group mb-3">
+                                                <label>Company Name</label>
+                                                <input type="text" name="company_name" id="sales_company_name"
+                                                    class="form-control" placeholder="Company Name">
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-3 col-sm-6 col-12">
+                                            <div class="form-group mb-3">
+                                                <label>Phone <span class="text-danger">*</span></label>
+                                                <input type="text" maxlength="10" name="phone" id="sales_phone"
+                                                    class="form-control" placeholder="10-digit phone">
+                                                <small class="text-danger error-phone"></small>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-3 col-sm-6 col-12">
+                                            <div class="form-group mb-3">
+                                                <label>Alternate Phone</label>
+                                                <input type="text" maxlength="10" name="alternate_phone"
+                                                    id="sales_alternate_phone" class="form-control"
+                                                    placeholder="10-digit phone (optional)">
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-3 col-sm-6 col-12">
+                                            <div class="form-group mb-3">
+                                                <label>Email</label>
+                                                <input type="email" name="email" id="sales_email" class="form-control"
+                                                    placeholder="Email">
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-3 col-sm-6 col-12">
+                                            <div class="form-group mb-3">
+                                                <label>GST Number</label>
+                                                <input type="text" name="gst_number" maxlength="15" id="sales_gst_number"
+                                                    class="form-control" placeholder="GST Number">
+                                                <small class="text-danger error-gst_number"></small>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-3 col-sm-6 col-12">
+                                            <div class="form-group mb-3">
+                                                <label>PAN Number</label>
+                                                <input type="text" name="pan_number" maxlength="10" id="sales_pan_number"
+                                                    class="form-control" placeholder="PAN Number">
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-3 col-sm-6 col-12">
+                                            <div class="form-group mb-3">
+                                                <label>State Code</label>
+                                                <input type="text" name="state_code" id="sales_state_code"
+                                                    class="form-control" placeholder="e.g. 27">
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-3 col-sm-6 col-12">
+                                            <div class="form-group mb-3">
+                                                <label>State Name</label>
+                                                <input type="text" name="state_name" id="sales_state_name"
+                                                    class="form-control" placeholder="Auto-filled from state" readonly>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-3 col-sm-6 col-12">
+                                            <div class="form-group mb-3">
+                                                <label>Country</label>
+                                                <input type="text" name="country" id="sales_country"
+                                                    class="form-control" placeholder="Country">
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-3 col-sm-6 col-12">
+                                            <div class="form-group mb-3">
+                                                <label>City</label>
+                                                <input type="text" name="city" id="sales_city" class="form-control"
+                                                    placeholder="City">
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-6 col-12">
+                                            <div class="form-group mb-3">
+                                                <div class="d-flex align-items-center justify-content-between mb-1">
+                                                    <label class="mb-0">Address</label>
+                                                </div>
+                                                <textarea name="address" id="sales_address" class="form-control" rows="3" placeholder="Address"></textarea>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-6 col-12">
+                                            <div class="form-group mb-3">
+                                                <div class="d-flex align-items-center justify-content-between mb-1">
+                                                    <label class="mb-0">Delivery Address</label>
+                                                    <div class="form-check m-0">
+                                                        <input class="form-check-input" type="checkbox" id="sales_use_address"
+                                                            checked>
+                                                        <label class="form-check-label" for="sales_use_address">
+                                                            Use Address
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                                <textarea name="delivery_address" id="sales_delivery_address" class="form-control" rows="3"
+                                                    placeholder="Delivery Address"></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button type="button" id="saveSalesCustomerBtn" class="btn btn-warning">Save Customer</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal fade" id="editCustomerModal" tabindex="-1" aria-labelledby="editCustomerModalLabel"
+                    aria-hidden="true">
+                    <div class="modal-dialog modal-lg modal-dialog-centered customer-modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="editCustomerModalLabel">Edit Customer</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">x</button>
+                            </div>
+                            <div class="modal-body">
+                                <form id="salesEditCustomerForm" enctype="multipart/form-data">
+                                    @csrf
+                                    <input type="hidden" id="sales_edit_customer_id">
+                                    <div class="row">
+                                        <div class="col-lg-3 col-sm-6 col-12">
+                                            <div class="form-group mb-3">
+                                                <label>Customer Name <span class="text-danger">*</span></label>
+                                                <input type="text" name="customer_name" id="sales_edit_customer_name"
+                                                    class="form-control" placeholder="Customer Name">
+                                                <small class="text-danger error-customer_name"></small>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-3 col-sm-6 col-12">
+                                            <div class="form-group mb-3">
+                                                <label>Company Name</label>
+                                                <input type="text" name="company_name" id="sales_edit_company_name"
+                                                    class="form-control" placeholder="Company Name">
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-3 col-sm-6 col-12">
+                                            <div class="form-group mb-3">
+                                                <label>Phone <span class="text-danger">*</span></label>
+                                                <input type="text" maxlength="10" name="phone" id="sales_edit_phone"
+                                                    class="form-control" placeholder="10-digit phone">
+                                                <small class="text-danger error-phone"></small>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-3 col-sm-6 col-12">
+                                            <div class="form-group mb-3">
+                                                <label>Alternate Phone</label>
+                                                <input type="text" maxlength="10" name="alternate_phone"
+                                                    id="sales_edit_alternate_phone" class="form-control"
+                                                    placeholder="10-digit phone (optional)">
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-3 col-sm-6 col-12">
+                                            <div class="form-group mb-3">
+                                                <label>Email</label>
+                                                <input type="email" name="email" id="sales_edit_email"
+                                                    class="form-control" placeholder="Email">
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-3 col-sm-6 col-12">
+                                            <div class="form-group mb-3">
+                                                <label>GST Number</label>
+                                                <input type="text" name="gst_number" maxlength="15"
+                                                    id="sales_edit_gst_number" class="form-control" placeholder="GST Number">
+                                                <small class="text-danger error-gst_number"></small>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-3 col-sm-6 col-12">
+                                            <div class="form-group mb-3">
+                                                <label>PAN Number</label>
+                                                <input type="text" name="pan_number" maxlength="10"
+                                                    id="sales_edit_pan_number" class="form-control" placeholder="PAN Number">
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-3 col-sm-6 col-12">
+                                            <div class="form-group mb-3">
+                                                <label>State Code</label>
+                                                <input type="text" name="state_code" id="sales_edit_state_code"
+                                                    class="form-control" placeholder="e.g. 27">
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-3 col-sm-6 col-12">
+                                            <div class="form-group mb-3">
+                                                <label>State Name</label>
+                                                <input type="text" name="state_name" id="sales_edit_state_name"
+                                                    class="form-control" placeholder="Auto-filled from state" readonly>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-3 col-sm-6 col-12">
+                                            <div class="form-group mb-3">
+                                                <label>Country</label>
+                                                <input type="text" name="country" id="sales_edit_country"
+                                                    class="form-control" placeholder="Country">
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-3 col-sm-6 col-12">
+                                            <div class="form-group mb-3">
+                                                <label>City</label>
+                                                <input type="text" name="city" id="sales_edit_city"
+                                                    class="form-control" placeholder="City">
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-6 col-12">
+                                            <div class="form-group mb-3">
+                                                <div class="d-flex align-items-center justify-content-between mb-1">
+                                                    <label class="mb-0">Address</label>
+                                                </div>
+                                                <textarea name="address" id="sales_edit_address" class="form-control" rows="3" placeholder="Address"></textarea>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-6 col-12">
+                                            <div class="form-group mb-3">
+                                                <div class="d-flex align-items-center justify-content-between mb-1">
+                                                    <label class="mb-0">Delivery Address</label>
+                                                    <div class="form-check m-0">
+                                                        <input class="form-check-input" type="checkbox"
+                                                            id="sales_edit_use_address" checked>
+                                                        <label class="form-check-label" for="sales_edit_use_address">
+                                                            Use Address
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                                <textarea name="delivery_address" id="sales_edit_delivery_address" class="form-control" rows="3"
+                                                    placeholder="Delivery Address"></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button type="button" id="updateSalesCustomerBtn" class="btn btn-warning">Update Customer</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <div class="modal fade" id="addBankModal" tabindex="-1" aria-labelledby="addBankModalLabel"
                     aria-hidden="true">
                     <div class="modal-dialog">
@@ -1585,6 +2004,7 @@ $(document).on('blur', '#tds-percentage-input', function() {
                             $('#cash_amount_col').toggle(shouldShowPaymentRow && (method === 'cash' || method === 'cash+online'));
                             $('#online_amount_col').toggle(shouldShowPaymentRow && (method === 'online' || method === 'cash+online'));
                             $('#pending_amount_col').toggle(shouldShowPaymentRow);
+                            $('#emiBox').toggle(shouldShowPaymentRow && method === 'emi');
 
                             $('#cash_amount_label').text(method === 'cash' ? 'Payment Amount' : 'Cash Amount');
                             $('#online_amount_label').text(method === 'online' ? 'Payment Amount' : 'Bank Amount');
@@ -1594,6 +2014,8 @@ $(document).on('blur', '#tds-percentage-input', function() {
                             $('#online_amount').prop('disabled', isQuotation || !(method === 'online' || method === 'cash+online'));
                             $('#pending_amount').prop('disabled', true);
                             $('#paid_type').prop('disabled', !shouldShowPaymentRow);
+                            $('#emiDownPayment, #emiLoanAmount, #emiTenure, #emiCustomTenure, #emiInterestRate, #emiMonthlyValue, #emiAadharNumber, #emiDoId, #emiPanNumber, #emiGuarantorName, #emi_bank_id')
+                                .prop('disabled', !(shouldShowPaymentRow && method === 'emi'));
 
                             $paymentColumns.removeClass('col-lg-3 col-lg-4 col-lg-6 col-lg-12 d-none');
 
@@ -1846,6 +2268,38 @@ $(document).on('blur', '#tds-percentage-input', function() {
                             allowClear: true
                         });
 
+                        const $addCustomerModalEl = document.getElementById('addCustomerModal');
+                        const addCustomerModal = $addCustomerModalEl ? new bootstrap.Modal($addCustomerModalEl, {
+                            backdrop: 'static',
+                            keyboard: false
+                        }) : null;
+                        const $editCustomerModalEl = document.getElementById('editCustomerModal');
+                        const editCustomerModal = $editCustomerModalEl ? new bootstrap.Modal($editCustomerModalEl, {
+                            backdrop: 'static',
+                            keyboard: false
+                        }) : null;
+                        const initialCustomerId = $('#customer_id').val();
+
+                        function syncCustomerAddressFields(addressSelector, deliverySelector, useCheckboxSelector) {
+                            const $address = $(addressSelector);
+                            const $delivery = $(deliverySelector);
+                            const $useAddress = $(useCheckboxSelector);
+
+                            $delivery.prop('readonly', $useAddress.is(':checked'));
+                            if ($useAddress.is(':checked')) {
+                                $delivery.val($address.val());
+                            }
+                        }
+
+                        $('#openAddCustomerModal').on('click', function() {
+                            $('#salesCustomerForm')[0].reset();
+                            $('#salesCustomerForm .text-danger').text('');
+                            $('#sales_use_address').prop('checked', true).trigger('change');
+                            if (addCustomerModal) {
+                                addCustomerModal.show();
+                            }
+                        });
+
                         if ($.fn.select2) {
                             $('#payment_method, #payment_status, #paid_type, #bank_id').select2({
                                 width: '100%'
@@ -1856,6 +2310,268 @@ $(document).on('blur', '#tds-percentage-input', function() {
                         $('#customer_id').on('change', function() {
                             var phone = $(this).find(':selected').data('phone');
                             $('#customer_phone').val(phone || '');
+                            const customerId = $(this).val();
+                            const isRealCustomer = !!customerId;
+                            $('#openEditCustomerModal').prop('disabled', !isRealCustomer);
+                        });
+
+                        $('#openEditCustomerModal').prop('disabled', true);
+
+                        $('#openEditCustomerModal').on('click', function() {
+                            const customerId = $('#customer_id').val();
+                            if (!customerId) {
+                                return;
+                            }
+
+                            $('#salesEditCustomerForm .text-danger').text('');
+
+                            $.ajax({
+                                url: `/api/getCustomer/${customerId}`,
+                                method: 'GET',
+                                headers: {
+                                    'X-CSRF-TOKEN': "{{ csrf_token() }}",
+                                    'Authorization': 'Bearer ' + localStorage.getItem("authToken")
+                                },
+                                success: function(response) {
+                                    const customer = response?.customer || {};
+                                    const details = customer?.details || {};
+
+                                    $('#sales_edit_customer_id').val(customer.id || '');
+                                    $('#sales_edit_customer_name').val(customer.name || '');
+                                    $('#sales_edit_company_name').val(customer.company_name || '');
+                                    $('#sales_edit_phone').val(customer.phone || '');
+                                    $('#sales_edit_alternate_phone').val(customer.alternate_phone || '');
+                                    $('#sales_edit_email').val(customer.email || '');
+                                    $('#sales_edit_gst_number').val(customer.gst_number || '');
+                                    $('#sales_edit_pan_number').val(customer.pan_number || '');
+                                    $('#sales_edit_state_code').val(customer.state_code || '');
+                                    $('#sales_edit_state_name').val(customer.state_name || '');
+                                    $('#sales_edit_country').val(details.country || '');
+                                    $('#sales_edit_city').val(details.city || '');
+                                    $('#sales_edit_address').val(details.address || '');
+                                    $('#sales_edit_delivery_address').val(details.delivery_address || details.address || '');
+                                    $('#sales_edit_use_address').prop('checked', true);
+                                    syncCustomerAddressFields('#sales_edit_address', '#sales_edit_delivery_address', '#sales_edit_use_address');
+
+                                    if (editCustomerModal) {
+                                        editCustomerModal.show();
+                                    }
+                                },
+                                error: function(xhr) {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Error',
+                                        text: xhr.responseJSON?.error || 'Failed to fetch customer.'
+                                    });
+                                }
+                            });
+                        });
+
+                        $('#sales_use_address').on('change', function() {
+                            if ($(this).is(':checked')) {
+                                $('#sales_delivery_address').val($('#sales_address').val());
+                                $('#sales_delivery_address').prop('readonly', true);
+                            } else {
+                                $('#sales_delivery_address').prop('readonly', false);
+                            }
+                        });
+
+                        $('#sales_address').on('input', function() {
+                            if ($('#sales_use_address').is(':checked')) {
+                                $('#sales_delivery_address').val($(this).val());
+                            }
+                        });
+
+                        $('#sales_delivery_address').prop('readonly', true);
+
+                        $('#sales_edit_use_address').on('change', function() {
+                            if ($(this).is(':checked')) {
+                                $('#sales_edit_delivery_address').val($('#sales_edit_address').val());
+                                $('#sales_edit_delivery_address').prop('readonly', true);
+                            } else {
+                                $('#sales_edit_delivery_address').prop('readonly', false);
+                            }
+                        });
+
+                        $('#sales_edit_address').on('input', function() {
+                            if ($('#sales_edit_use_address').is(':checked')) {
+                                $('#sales_edit_delivery_address').val($(this).val());
+                            }
+                        });
+
+                        $('#sales_edit_delivery_address').prop('readonly', true);
+
+                        $('#sales_phone, #sales_alternate_phone, #sales_edit_phone, #sales_edit_alternate_phone').on('input', function() {
+                            let value = $(this).val().replace(/\D/g, '').slice(0, 10);
+                            $(this).val(value);
+                        });
+
+                        $('#sales_gst_number, #sales_edit_gst_number').on('input', function() {
+                            $(this).val($(this).val().toUpperCase().slice(0, 15));
+                        });
+
+                        $('#sales_state_code, #sales_edit_state_code').on('input', function() {
+                            let code = $(this).val().replace(/\D/g, '').slice(0, 2);
+                            $(this).val(code);
+                            const mapped = {
+                                "01": "Jammu and Kashmir",
+                                "02": "Himachal Pradesh",
+                                "03": "Punjab",
+                                "04": "Chandigarh",
+                                "05": "Uttarakhand",
+                                "06": "Haryana",
+                                "07": "Delhi",
+                                "08": "Rajasthan",
+                                "09": "Uttar Pradesh",
+                                "10": "Bihar",
+                                "11": "Sikkim",
+                                "12": "Arunachal Pradesh",
+                                "13": "Nagaland",
+                                "14": "Manipur",
+                                "15": "Mizoram",
+                                "16": "Tripura",
+                                "17": "Meghalaya",
+                                "18": "Assam",
+                                "19": "West Bengal",
+                                "20": "Jharkhand",
+                                "21": "Odisha",
+                                "22": "Chhattisgarh",
+                                "23": "Madhya Pradesh",
+                                "24": "Gujarat",
+                                "25": "Daman and Diu",
+                                "26": "Dadra and Nagar Haveli",
+                                "27": "Maharashtra",
+                                "28": "Andhra Pradesh",
+                                "29": "Karnataka",
+                                "30": "Goa",
+                                "31": "Lakshadweep",
+                                "32": "Kerala",
+                                "33": "Tamil Nadu",
+                                "34": "Puducherry",
+                                "35": "Andaman and Nicobar Islands",
+                                "36": "Telangana",
+                                "37": "Andhra Pradesh (New)"
+                            };
+                            const stateName = mapped[code.padStart(2, '0')] || '';
+                            if (this.id === 'sales_state_code') {
+                                $('#sales_state_name').val(stateName);
+                            } else {
+                                $('#sales_edit_state_name').val(stateName);
+                            }
+                        });
+
+                        $('#saveSalesCustomerBtn').on('click', function() {
+                            const $btn = $(this);
+                            const formData = new FormData(document.getElementById('salesCustomerForm'));
+                            $('#salesCustomerForm .text-danger').text('');
+                            $btn.prop('disabled', true).text('Saving...');
+
+                            $.ajax({
+                                url: '/api/createCustomer',
+                                method: 'POST',
+                                data: formData,
+                                processData: false,
+                                contentType: false,
+                                headers: {
+                                    'X-CSRF-TOKEN': "{{ csrf_token() }}",
+                                    'Authorization': 'Bearer ' + localStorage.getItem("authToken")
+                                },
+                                success: function(response) {
+                                    const customerName = $('#sales_customer_name').val().trim();
+                                    const customerPhone = $('#sales_phone').val().trim();
+                                    const createdCustomer = response?.customer || null;
+                                    const newId = createdCustomer?.id;
+
+                                    if (newId && $('#customer_id option[value="' + newId + '"]').length === 0) {
+                                        $('#customer_id').append(
+                                            $('<option>', {
+                                                value: newId,
+                                                text: customerName,
+                                                'data-phone': customerPhone
+                                            })
+                                        );
+                                    }
+
+                                    if (newId) {
+                                        $('#customer_id').val(String(newId)).trigger('change');
+                                    }
+                                    $('#customer_phone').val(customerPhone);
+
+                                    if (addCustomerModal) {
+                                        addCustomerModal.hide();
+                                    }
+
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: 'Success',
+                                        text: response.message || 'Customer created successfully.'
+                                    });
+                                },
+                                error: function(xhr) {
+                                    const errors = xhr.responseJSON?.errors || {};
+                                    $('#salesCustomerForm .error-customer_name').text(errors.customer_name ? errors.customer_name[0] : '');
+                                    $('#salesCustomerForm .error-phone').text(errors.phone ? errors.phone[0] : '');
+                                    $('#salesCustomerForm .error-gst_number').text(errors.gst_number ? errors.gst_number[0] : '');
+                                },
+                                complete: function() {
+                                    $btn.prop('disabled', false).text('Save Customer');
+                                }
+                            });
+                        });
+
+                        $('#updateSalesCustomerBtn').on('click', function() {
+                            const $btn = $(this);
+                            const customerId = $('#sales_edit_customer_id').val();
+                            const formData = new FormData(document.getElementById('salesEditCustomerForm'));
+                            $('#salesEditCustomerForm .text-danger').text('');
+                            $btn.prop('disabled', true).text('Updating...');
+
+                            $.ajax({
+                                url: `/api/updateCustomer/${customerId}`,
+                                method: 'POST',
+                                data: formData,
+                                processData: false,
+                                contentType: false,
+                                headers: {
+                                    'X-CSRF-TOKEN': "{{ csrf_token() }}",
+                                    'Authorization': 'Bearer ' + localStorage.getItem("authToken")
+                                },
+                                success: function(response) {
+                                    const updatedName = $('#sales_edit_customer_name').val().trim();
+                                    const updatedPhone = $('#sales_edit_phone').val().trim();
+
+                                    if (customerId) {
+                                        let $option = $('#customer_id option[value="' + customerId + '"]');
+                                        if ($option.length === 0) {
+                                            $('#customer_id').append($('<option>', { value: customerId }));
+                                            $option = $('#customer_id option[value="' + customerId + '"]');
+                                        }
+                                        $option.text(updatedName).attr('data-phone', updatedPhone);
+                                        $('#customer_id').trigger('change');
+                                    }
+
+                                    $('#customer_phone').val(updatedPhone);
+
+                                    if (editCustomerModal) {
+                                        editCustomerModal.hide();
+                                    }
+
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: 'Success',
+                                        text: response.message || 'Customer updated successfully.'
+                                    });
+                                },
+                                error: function(xhr) {
+                                    const errors = xhr.responseJSON?.errors || {};
+                                    $('#salesEditCustomerForm .error-customer_name').text(errors.customer_name ? errors.customer_name[0] : '');
+                                    $('#salesEditCustomerForm .error-phone').text(errors.phone ? errors.phone[0] : '');
+                                    $('#salesEditCustomerForm .error-gst_number').text(errors.gst_number ? errors.gst_number[0] : '');
+                                },
+                                complete: function() {
+                                    $btn.prop('disabled', false).text('Update Customer');
+                                }
+                            });
                         });
 
 
@@ -2291,6 +3007,10 @@ $(document).on('input', '.quantity-input', function() {
                             $('#cash_amount').val('');
                             $('#online_amount').val('');
                             $('#pending_amount').val(parseMoney($('#pending_amount').data('prefill')).toFixed(2));
+                            calculatePaymentBreakdown();
+                        });
+
+                        $('#payment_method').on('select2:select', function() {
                             calculatePaymentBreakdown();
                         });
 
@@ -2922,6 +3642,7 @@ addProductToTable(
                         const selectedCustomer = $('#customer_id').find(':selected');
                         if (selectedCustomer.length) {
                             $('#customer_phone').val(selectedCustomer.data('phone') || '');
+                            $('#openEditCustomerModal').prop('disabled', !$('#customer_id').val());
                         }
 
                         $('#order_number').on('input', function() {

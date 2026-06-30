@@ -300,6 +300,44 @@
                                             <h5 id="pendingAmountText" style="color:#C62828;font-weight:600;">₹0.00</h5>
                                         </li>
 
+                                        @php
+                                            $emiTenureValue = $sales->emi_tenure ?? $sales->emi_month ?? null;
+                                            $emiTenureLabel = $emiTenureValue ? (str_contains((string) $emiTenureValue, 'Month') ? $emiTenureValue : $emiTenureValue . ' months') : null;
+                                            $emiMonthly = isset($sales->emi_monthly_amount) && $sales->emi_monthly_amount !== null ? (float) $sales->emi_monthly_amount : null;
+                                            $emiLoanAmount = isset($sales->emi_loan_amount) && $sales->emi_loan_amount !== null ? (float) $sales->emi_loan_amount : null;
+                                            $emiTenureNumber = is_numeric($emiTenureValue) ? (float) $emiTenureValue : (float) preg_replace('/[^0-9.]/', '', (string) $emiTenureValue);
+                                        @endphp
+
+                                        @if (($sales->payment_method ?? '') === 'emi' && ($emiTenureLabel || $emiMonthly || $emiLoanAmount))
+                                            <li style="border-top:1px solid #eef0f4; padding-top:12px;">
+                                                <div style="display:grid; grid-template-columns: 1fr auto; gap:18px; align-items:start; width:100%;">
+                                                    <div>
+                                                        <h4 style="color:#556; margin-bottom:4px;">EMI Plan</h4>
+                                                    </div>
+                                                    <div style="text-align:right;">
+                                                        <div style="font-weight:600; color:#1f2a44; white-space:nowrap;">
+                                                            @if($emiMonthly !== null && $emiTenureLabel && $emiTenureNumber > 0)
+                                                                {{ formatCurrency($emiMonthly, $setting->currency_symbol ?? 'â‚¹', $setting->currency_position ?? 'left') }} x {{ $emiTenureLabel }} = {{ formatCurrency($emiMonthly * $emiTenureNumber, $setting->currency_symbol ?? 'â‚¹', $setting->currency_position ?? 'left') }}
+                                                            @elseif($emiMonthly !== null && $emiTenureLabel)
+                                                                {{ formatCurrency($emiMonthly, $setting->currency_symbol ?? 'â‚¹', $setting->currency_position ?? 'left') }} x {{ $emiTenureLabel }}
+                                                            @else
+                                                                EMI selected
+                                                            @endif
+                                                        </div>
+                                                        <div style="font-size:12px; color:#6c757d; margin-top:4px; white-space:nowrap;">
+                                                            Loan amount: {{ $emiLoanAmount !== null ? formatCurrency($emiLoanAmount, $setting->currency_symbol ?? 'â‚¹', $setting->currency_position ?? 'left') : 'â‚¹0.00' }}
+                                                            @if($emiTenureLabel)
+                                                                | Tenure: {{ $emiTenureLabel }}
+                                                            @endif
+                                                        </div>
+                                                        <div style="font-size:11px; color:#8b92a2; margin-top:3px; white-space:nowrap;">
+                                                            Installment total shown separately from down payment.
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                        @endif
+
                                         <li id="extraPaidRow" style="display: none;">
                                             <h4 style="color:#dc3545;">Extra Paid</h4>
                                             <h5 id="extraPaidText" style="color:#dc3545;font-weight:600;">₹0.00</h5>

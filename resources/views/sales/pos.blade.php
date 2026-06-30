@@ -1122,14 +1122,16 @@
         /* ===== POS PAYMENT PANEL FIELDS FIX ===== */
 #posPaidTypeBox,
 #cashOnlineBox,
-#bankSelectionBox {
+#bankSelectionBox,
+#emiBox {
     width: 100%;
     box-sizing: border-box;
 }
 
 #posPaidTypeBox .form-group,
 #cashOnlineBox .form-group,
-#bankSelectionBox .form-group {
+#bankSelectionBox .form-group,
+#emiBox .form-group {
     display: flex;
     flex-direction: column;
     width: 100%;
@@ -1138,7 +1140,8 @@
 
 #posPaidTypeBox .form-group label,
 #cashOnlineBox .form-group label,
-#bankSelectionBox .form-group label {
+#bankSelectionBox .form-group label,
+#emiBox .form-group label {
     font-size: 12px;
     font-weight: 600;
     margin-bottom: 4px;
@@ -1149,7 +1152,9 @@
 #posPaidTypeBox .form-group select,
 #posPaidTypeBox .form-group input,
 #cashOnlineBox .form-group input,
-#bankSelectionBox .form-group select {
+#bankSelectionBox .form-group select,
+#emiBox .form-group select,
+#emiBox .form-group input {
     width: 100% !important;
     box-sizing: border-box;
     height: 36px;
@@ -1255,7 +1260,8 @@
 /* Apply grid to form groups inside payment boxes */
 .payment_panel #posPaidTypeBox .form-group,
 .payment_panel #cashOnlineBox .form-group,
-.payment_panel #bankSelectionBox .form-group {
+.payment_panel #bankSelectionBox .form-group,
+.payment_panel #emiBox .form-group {
     display: block;
     width: 100%;
     margin-bottom: 12px;
@@ -1296,6 +1302,46 @@
 /* For Bank Selection box - keep full width (but can be full width) */
 #bankSelectionBox .form-group {
     width: 100%;
+}
+
+#emiBox {
+    border: 1px solid #eef1f7;
+    border-radius: 12px;
+    background: #fff;
+    padding: 12px 12px 10px;
+    max-height: 240px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+}
+
+#emiBox::-webkit-scrollbar {
+    width: 4px;
+}
+
+#emiBox::-webkit-scrollbar-thumb {
+    background: #d1d5db;
+    border-radius: 999px;
+}
+
+        .emi-action-row {
+            display: flex;
+            justify-content: flex-end;
+            margin: 8px 0 8px;
+        }
+
+.emi-cancel-btn {
+    border: 1px solid #ff4d4f;
+    background: #fff;
+    color: #ff4d4f;
+    border-radius: 6px;
+    padding: 4px 12px;
+    font-size: 12px;
+    line-height: 1.2;
+}
+
+.emi-cancel-btn:hover {
+    background: #fff1f0;
+    color: #ff4d4f;
 }
 
 /* Make all inputs inside payment panel have consistent styling */
@@ -1701,12 +1747,12 @@
                             <div class="d-flex align-items-center gap-2">
                                 <button type="button" id="openAddCustomerModal"
                                     class="btn btn-sm btn-outline-success d-inline-flex align-items-center justify-content-center"
-                                    style="width: 40px; height: 40px; border-radius: 10px;" title="Add Customer">
+                                    style="width: 28px; height: 29px; border-radius: 10px;" title="Add Customer">
                                     <i class="fas fa-plus"></i>
                                 </button>
                                 <button type="button" id="openEditCustomerModal"
                                     class="btn btn-sm btn-outline-warning d-inline-flex align-items-center justify-content-center"
-                                    style="width: 40px; height: 40px; border-radius: 10px; display:none;"
+                                    style="width: 28px; height: 29px; border-radius: 10px; display:none;"
                                     title="Edit Customer">
                                     <i class="fas fa-pen"></i>
                                 </button>
@@ -2331,7 +2377,18 @@
                                         </a>
                                     </li>
 
+                                    <li>
+                                        <a href="javascript:void(0);" class="paymentmethod">
+                                            <input type="radio" name="payment_method" value="emi" hidden>
+                                            <i class="fas fa-calendar-alt" style="font-size: 16px; display: block; margin-bottom: 4px;"></i>
+                                            EMI
+                                        </a>
+                                    </li>
+
                                 </ul>
+                                <div class="emi-action-row">
+                                    <button type="button" class="emi-cancel-btn" id="emiCancelBtn">Cancel</button>
+                                </div>
                                 <div id="posPaidTypeBox" style="display:none; margin-top:10px;">
                                     <div class="form-group mb-2">
                                         <label for="posPaidType">Paid Type</label>
@@ -2409,6 +2466,107 @@
                                         </div>
                                     </div>
                                 </div>
+                                <div id="emiBox" style="display:none; margin-top:10px;">
+                                    <div class="row g-2">
+                                        <div class="col-md-6 col-6">
+                                            <div class="form-group">
+                                                <label for="emiDownPayment">Down Payment (Optional)</label>
+                                                <input type="number" class="form-control" id="emiDownPayment"
+                                                    placeholder="₹ Amount" min="0" step="0.01">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 col-6">
+                                            <div class="form-group">
+                                                <label for="emiLoanAmount">Loan Amount</label>
+                                                <input type="number" class="form-control" id="emiLoanAmount"
+                                                    placeholder="0.00" min="0" step="0.01" readonly>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 col-6">
+                                            <div class="form-group">
+                                                <label for="emiTenure">EMI Tenure</label>
+                                                <select id="emiTenure" class="form-control" required>
+                                                    <option value="">Select Tenure</option>
+                                                    <option value="3">3 Months</option>
+                                                    <option value="6">6 Months</option>
+                                                    <option value="9">9 Months</option>
+                                                    <option value="12">12 Months</option>
+                                                    <option value="18">18 Months</option>
+                                                    <option value="24">24 Months</option>
+                                                    <option value="custom">Custom</option>
+                                                </select>
+                                                <span class="error_emi_tenure text-danger"></span>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 col-6" id="emiCustomTenureWrap" style="display:none;">
+                                            <div class="form-group">
+                                                <label for="emiCustomTenure">Custom Tenure (Months)</label>
+                                                <input type="number" class="form-control" id="emiCustomTenure"
+                                                    placeholder="Enter months" min="1" step="1">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 col-6">
+                                            <div class="form-group">
+                                                <label for="emiInterestRate">Interest Rate (%) Optional</label>
+                                                <input type="number" class="form-control" id="emiInterestRate"
+                                                    placeholder="0" min="0" step="0.01">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 col-6">
+                                            <div class="form-group">
+                                                <label for="emiMonthlyValue">Monthly EMI</label>
+                                                <input type="number" class="form-control" id="emiMonthlyValue"
+                                                    placeholder="0.00" min="0" step="0.01" readonly>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 col-6">
+                                            <div class="form-group">
+                                                <label for="emiAadharNumber">Aadhar Number</label>
+                                                <input type="text" class="form-control" id="emiAadharNumber"
+                                                    placeholder="Enter Aadhar number">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 col-6">
+                                            <div class="form-group">
+                                                <label for="emiDoId">DO ID</label>
+                                                <input type="text" class="form-control" id="emiDoId"
+                                                    placeholder="DO ID">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 col-6">
+                                            <div class="form-group">
+                                                <label for="emiPanNumber">PAN Number Optional</label>
+                                                <input type="text" class="form-control" id="emiPanNumber"
+                                                    placeholder="PAN Number">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 col-6">
+                                            <div class="form-group">
+                                                <label for="emiGuarantorName">Guarantor Name Optional</label>
+                                                <input type="text" class="form-control" id="emiGuarantorName"
+                                                    placeholder="Guarantor Name">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 col-6">
+                                            <div class="form-group">
+                                                <div class="bank-label-row">
+                                                    <label>Select Bank Optional</label>
+                                                    <button type="button" id="openAddBankModal"
+                                                        class="bank-add-btn">Add Bank</button>
+                                                </div>
+                                                <select name="emi_bank_id" id="emi_bank_id" class="form-control">
+                                                    <option value="">Select Bank</option>
+                                                    @foreach ($banks as $bank)
+                                                        <option value="{{ $bank->id }}">{{ $bank->bank_name }}
+                                                            ({{ $bank->account_number }})
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                                <span class="error_bank text-danger"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                                 <span class="error_peymentmethod"></span>
                             </div>
 
@@ -2442,6 +2600,8 @@
         }
     </script>
     <script>
+        let isOrderSubmitting = false;
+
         // ==================== BARCODE SCANNER ====================
         // let html5QrCode = null;
         // ✅ MUST be defined BEFORE initScanner calls it
@@ -3058,6 +3218,10 @@
             $('#qr-reader').html('').css('min-height', '300px');
             $('#scan-message').text('Initializing camera...').show().css('color', '');
         });
+
+        $('#openBarcodeScannerFromPayment').on('click', function() {
+            $('#barcodeScannerModal').modal('show');
+        });
     </script>
     <script>
         let labourItemsList = [];
@@ -3356,22 +3520,36 @@
                 const total = getCurrentSaleTotal();
                 const $paidType = $("#posPaidType");
 
-                $(".error_bank, .error_paidtype, .error_paidamount").text("");
+                $(".error_bank, .error_paidtype, .error_paidamount, .error_emi_tenure").text("");
 
                 if (!selectedPayment || selectedPayment === "pending") {
-                    $("#posPaidTypeBox, #posPaidAmountFields, #cashOnlineBox, #bankSelectionBox").slideUp();
+                    $("#posPaidTypeBox, #posPaidAmountFields, #cashOnlineBox, #bankSelectionBox, #emiBox")
+                        .slideUp();
+                    $("#emiCancelBtn").hide();
                     $("#posPaidAmount, #posPendingAmount, #posCashOnlineCashAmount, #posCashOnlineOnlineAmount")
+                        .val("");
+                    $("#emiDownPayment, #emiLoanAmount, #emiTenure, #emiCustomTenure, #emiInterestRate, #emiMonthlyValue, #emiAadharNumber, #emiDoId, #emiPanNumber, #emiGuarantorName, #emi_bank_id")
                         .val("");
                     $("#posPaidType").val("");
                     return;
                 }
 
+                if (selectedPayment === "emi") {
+                    $("#posPaidTypeBox, #posPaidAmountFields, #cashOnlineBox, #bankSelectionBox").hide();
+                    $("#emiCancelBtn").show();
+                    $("#emiBox").slideDown();
+                    return;
+                }
+
                 $("#posPaidTypeBox").slideDown();
+                $("#emiCancelBtn").show();
                 const paidType = $paidType.val();
 
                 if (!paidType) {
-                    $("#posPaidAmountFields, #cashOnlineBox, #bankSelectionBox").slideUp();
+                    $("#posPaidAmountFields, #cashOnlineBox, #bankSelectionBox, #emiBox").slideUp();
                     $("#posPaidAmount, #posPendingAmount, #posCashOnlineCashAmount, #posCashOnlineOnlineAmount")
+                        .val("");
+                    $("#emiDownPayment, #emiLoanAmount, #emiTenure, #emiCustomTenure, #emiInterestRate, #emiMonthlyValue, #emiAadharNumber, #emiDoId, #emiPanNumber, #emiGuarantorName, #emi_bank_id")
                         .val("");
                     return;
                 }
@@ -3379,9 +3557,14 @@
                 if (selectedPayment === "debit card" || selectedPayment === "scan" || selectedPayment ===
                     "cash+online") {
                     $("#bankSelectionBox").slideDown();
+                    $("#emiBox").slideUp();
+                } else if (selectedPayment === "emi") {
+                    $("#bankSelectionBox").slideUp();
+                    $("#emiBox").slideDown();
                 } else {
                     $("#bankSelectionBox").slideUp();
                     $("#bank_id").val("");
+                    $("#emiBox").slideUp();
                 }
 
                 $("#posPaidAmountFields").slideDown();
@@ -3430,6 +3613,7 @@
                 } else {
                     $("#cashOnlineBox").slideUp();
                     $("#posCashOnlineCashAmount, #posCashOnlineOnlineAmount").val("");
+                    $("#emiLoanAmount").val("");
 
                     if (paidType === "fully") {
                         paidAmount = total;
@@ -3478,7 +3662,10 @@
                 $("#posPaidAmount, #posPendingAmount, #posCashOnlineCashAmount, #posCashOnlineOnlineAmount, #posPaymentRemark")
                     .val("");
                 $("#bank_id").val("");
-                $("#posPaidTypeBox, #posPaidAmountFields, #cashOnlineBox, #bankSelectionBox").hide();
+                $("#emiDownPayment, #emiLoanAmount, #emiTenure, #emiCustomTenure, #emiInterestRate, #emiMonthlyValue, #emiAadharNumber, #emiDoId, #emiPanNumber, #emiGuarantorName, #emi_bank_id")
+                    .val("");
+                $("#emiCancelBtn").hide();
+                $("#posPaidTypeBox, #posPaidAmountFields, #cashOnlineBox, #bankSelectionBox, #emiBox").hide();
             }
 
             window.refreshPosPaymentUi = refreshPosPaymentUi;
@@ -3520,6 +3707,53 @@
 
             $("#posPaidAmount, #posCashOnlineCashAmount, #posCashOnlineOnlineAmount").on("input", function() {
                 refreshPosPaymentUi(false);
+            });
+
+            $("#emiTenure").on("change", function() {
+                const selectedTenure = $(this).val();
+                if (selectedTenure === "custom") {
+                    $("#emiCustomTenureWrap").show();
+                } else {
+                    $("#emiCustomTenureWrap").hide();
+                    $("#emiCustomTenure").val("");
+                }
+                refreshPosPaymentUi(false);
+            });
+
+            $("#emiDownPayment, #emiCustomTenure, #emiInterestRate").on("input change", function() {
+                const total = getCurrentSaleTotal();
+                const downPayment = toAmount($("#emiDownPayment").val());
+                const loanAmount = Math.max(total - downPayment, 0);
+                const selectedTenure = $("#emiTenure").val();
+                const tenure = selectedTenure === "custom"
+                    ? parseFloat($("#emiCustomTenure").val()) || 0
+                    : parseFloat(selectedTenure) || 0;
+                const interestRate = toAmount($("#emiInterestRate").val());
+                let monthlyEmi = 0;
+
+                $("#emiLoanAmount").val(loanAmount ? loanAmount.toFixed(2) : "");
+
+                if (loanAmount > 0 && tenure > 0) {
+                    const monthlyRate = interestRate > 0 ? (interestRate / 100) / 12 : 0;
+                    if (monthlyRate > 0) {
+                        const factor = Math.pow(1 + monthlyRate, tenure);
+                        monthlyEmi = (loanAmount * monthlyRate * factor) / (factor - 1);
+                    } else {
+                        monthlyEmi = loanAmount / tenure;
+                    }
+                }
+
+                $("#emiMonthlyValue").val(monthlyEmi ? monthlyEmi.toFixed(2) : "");
+            });
+
+            $("#emiCancelBtn").on("click", function() {
+                $("#emiBox").hide();
+                $("input[name='payment_method'][value='emi']").prop("checked", false);
+                $(".paymentmethod").removeClass("active");
+                $("#emiCancelBtn").hide();
+                $("#posPaidTypeBox, #posPaidAmountFields, #cashOnlineBox, #bankSelectionBox").hide();
+                $("#emiDownPayment, #emiLoanAmount, #emiTenure, #emiInterestRate, #emiMonthlyValue, #emiAadharNumber, #emiDoId, #emiPanNumber, #emiGuarantorName, #emi_bank_id")
+                    .val("");
             });
 
             refreshPosPaymentUi(true);
@@ -4420,6 +4654,10 @@
                 calculateTotals();
             });
             $(".btn-totallabel").click(function(event) {
+                if (isOrderSubmitting) {
+                    return;
+                }
+
                 // ================= LABOUR ITEMS =================
                 let labourItems = [];
 
@@ -4446,6 +4684,7 @@
                 const selectedSubAdminId = localStorage.getItem("selectedSubAdminId");
 
                 // Show loading text and disable the button
+                isOrderSubmitting = true;
                 $btn.html(
                     '<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> Placing Order...'
                 ).prop('disabled', true);
@@ -4502,7 +4741,27 @@
                     }
                 }
 
-                if (quotationStatus !== 'quotation' && selectedPayment && selectedPayment !== "pending") {
+                if (quotationStatus !== 'quotation' && selectedPayment === "emi") {
+                    const emiBankId = $("#emi_bank_id").val();
+                    const emiTenure = $("#emiTenure").val();
+                    const emiCustomTenure = $("#emiCustomTenure").val();
+
+                    if (!emiTenure) {
+                        $(".error_emi_tenure").text("EMI tenure is required.").css("color", "red");
+                        isValid = false;
+                    } else if (emiTenure === "custom" && !emiCustomTenure) {
+                        $(".error_emi_tenure").text("Custom EMI tenure is required.").css("color", "red");
+                        isValid = false;
+                    }
+
+                    if (!emiBankId) {
+                        $(".error_bank").text("Bank selection is required.").css("color", "red");
+                        isValid = false;
+                    }
+                }
+
+                if (quotationStatus !== 'quotation' && selectedPayment && selectedPayment !== "pending" &&
+                    selectedPayment !== "emi") {
                     if (!posPaymentMeta || !posPaymentMeta.paidType) {
                         $(".error_paidtype").text("Please select paid type.");
                         isValid = false;
@@ -4676,7 +4935,7 @@
                 // add payment fields only when this is a sale
                 if (quotationStatus === 'sales') {
                     orderData.payment_method = selectedPayment;
-                    orderData.bank_id = bank_id;
+                    orderData.bank_id = selectedPayment === "emi" ? ($("#emi_bank_id").val() || "") : bank_id;
                     orderData.payment_amount = posPaymentMeta ? posPaymentMeta.paidAmount : 0;
                     orderData.pending_amount = posPaymentMeta ? posPaymentMeta.pendingAmount : total;
                     orderData.payment_remarks = paymentRemarks;
@@ -4694,6 +4953,23 @@
                             "partially") ? "cash_online_partially" : "cash_online_fully";
                         orderData.cash_amount = posPaymentMeta ? posPaymentMeta.cashAmount : 0;
                         orderData.online_amount = posPaymentMeta ? posPaymentMeta.onlineAmount : 0;
+                    } else if (selectedPayment === "emi") {
+                        orderData.online_type = (posPaymentMeta && posPaymentMeta.paidType === "partially") ?
+                            "emi_partially" : "emi_fully";
+                        orderData.amount = posPaymentMeta ? posPaymentMeta.paidAmount : 0;
+                        orderData.down_payment = $("#emiDownPayment").val() || 0;
+                        orderData.loan_amount = $("#emiLoanAmount").val() || 0;
+                        orderData.emi_tenure = $("#emiTenure").val() === "custom"
+                            ? ($("#emiCustomTenure").val() || "")
+                            : ($("#emiTenure").val() || "");
+                        orderData.emi_month = orderData.emi_tenure;
+                        orderData.interest_rate = $("#emiInterestRate").val() || "";
+                        orderData.monthly_emi = $("#emiMonthlyValue").val() || "";
+                        orderData.aadhar_number = $("#emiAadharNumber").val().trim();
+                        orderData.emi_do_id = $("#emiDoId").val().trim();
+                        orderData.emi_pan_number = $("#emiPanNumber").val().trim();
+                        orderData.emi_guarnator_name = $("#emiGuarantorName").val().trim();
+                        orderData.emi_bank_id = $("#emi_bank_id").val() || "";
                     }
                 }
 
@@ -4717,6 +4993,7 @@
                     data: JSON.stringify(orderData),
                     success: function(response) {
                         // Re-enable and reset the button
+                        isOrderSubmitting = false;
                         $btn.html(originalText).prop('disabled', false);
                         if (response.status) {
                             orderId = response.order_id;
@@ -4757,6 +5034,7 @@
                     //     alert("Error placing order. Please try again.");
                     // }
                     error: function(xhr, status, error) {
+                        isOrderSubmitting = false;
                         $btn.html(originalText).prop('disabled', false);
 
                         // Try to extract error message from response
@@ -5089,12 +5367,14 @@
             const $selectedOption = $(this).find(':selected');
             const customerId = $(this).val();
             const phone = $selectedOption.data('phone');
-            const isRealCustomer = !!customerId && customerId !== initialCustomerId && typeof phone !== 'undefined';
+            const isRealCustomer = !!customerId;
 
             $('#customer_phone').val(phone || '');
+            $('#openAddCustomerModal').toggle(!isRealCustomer);
             $('#openEditCustomerModal').toggle(isRealCustomer);
         });
 
+        $('#openAddCustomerModal').show();
         $('#openEditCustomerModal').hide();
 
         $('#openEditCustomerModal').on('click', function() {
