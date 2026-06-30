@@ -200,6 +200,10 @@ Route::middleware(['auth:web', 'auto.permission'])->group(function () {
     Route::get('/customer', [CustomerController::class, 'customer_list'])->name('customer.list');
     Route::get('/add-customer', [CustomerController::class, 'add_customer'])->name('customer.add');
     Route::get('/edit-customer/{num}', [CustomerController::class, 'edit_customer'])->name('customer.edit');
+    Route::get('/import-customer', [CustomerController::class, 'customer_import'])->name('customer.import');
+    Route::get('/import-customer-sample', [CustomerController::class, 'customer_import_sample'])->name('customer.import.sample');
+    Route::get('/export-customer', [CustomerController::class, 'customer_export'])->name('customer.export');
+    Route::post('/import-customer', [CustomerController::class, 'customer_import_store'])->name('customer.import.store');
     Route::get('/customer-report', [CustomerController::class, 'customer_report'])->name('customer.report');
     Route::get('/customer-view/{id}', [CustomerController::class, 'customer_view'])->name('customer.view');
 
@@ -243,6 +247,10 @@ Route::middleware(['auth:web', 'auto.permission'])->group(function () {
     Route::get('/vendors', [VendorController::class, 'vendor_list'])->name('vendor.list');
     Route::get('/add-vendor', [VendorController::class, 'add_vendor'])->name('vendor.add');
     Route::get('/edit-vendor/{num}', [VendorController::class, 'edit_vendor'])->name('vendor.edit');
+    Route::get('/import-vendor', [VendorController::class, 'vendor_import'])->name('vendor.import');
+    Route::get('/import-vendor-sample', [VendorController::class, 'vendor_import_sample'])->name('vendor.import.sample');
+    Route::get('/export-vendor', [VendorController::class, 'vendor_export'])->name('vendor.export');
+    Route::post('/import-vendor', [VendorController::class, 'vendor_import_store'])->name('vendor.import.store');
     Route::get('/vendor-report', [VendorController::class, 'vendor_report'])->name('vendor.report');
     Route::get('/vendor-view/{id}', [VendorController::class, 'vendor_view'])->name('vendor.view');
 
@@ -525,6 +533,10 @@ Route::middleware(['auth:web', 'auto.permission'])->group(function () {
     Route::get('/staff', [StaffController::class, 'staff_list'])->name('staff.list');
     Route::get('/add-staff', [StaffController::class, 'add_staff'])->name('staff.add');
     Route::get('/edit-staff/{num}', [StaffController::class, 'edit_staff'])->name('staff.edit');
+    Route::get('/import-staff', [StaffController::class, 'staff_import'])->name('staff.import');
+    Route::get('/import-staff-sample', [StaffController::class, 'staff_import_sample'])->name('staff.import.sample');
+    Route::get('/export-staff', [StaffController::class, 'staff_export'])->name('staff.export');
+    Route::post('/import-staff', [StaffController::class, 'staff_import_store'])->name('staff.import.store');
     Route::get('/staff-report', [StaffController::class, 'staff_report'])->name('staff.report');
     Route::get('/staff-view/{id}', [StaffController::class, 'staff_view'])->name('staff.view');
 
