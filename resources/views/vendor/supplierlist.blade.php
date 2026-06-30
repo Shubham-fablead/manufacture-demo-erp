@@ -365,6 +365,25 @@
             border-radius: 5px;
         }
 
+        .vendor-page-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: nowrap;
+        }
+
+        .vendor-action-btn {
+            background: #1b2850;
+            color: #fff;
+            border: 1px solid #1b2850;
+            white-space: nowrap;
+        }
+
+        .vendor-action-btn:hover {
+            background: #14203d;
+            color: #fff;
+        }
+
         .btn-searchset {
             position: absolute;
             left: 10px;
@@ -427,12 +446,22 @@
                 <h4>All Vendors</h4>
             </div>
             <div class="page-btn">
-                @if (app('hasPermission')(10, 'add'))
-                    <a href="{{ route('vendor.add') }}" class="btn btn-added btn-sm">
-                        <img src="{{ env('ImagePath') . 'admin/assets/img/icons/plus.svg' }}" class="me-1" alt="img">Add
-                        Vendor
-                    </a>
-                @endif
+                <div class="vendor-page-actions">
+                    @if (app('hasPermission')(10, 'view'))
+                        <a href="{{ route('vendor.import') }}" class="btn btn-sm vendor-action-btn">
+                            <i class="fas fa-file-import me-1"></i>Import
+                        </a>
+                        <a href="{{ route('vendor.export') }}" class="btn btn-sm vendor-action-btn">
+                            <i class="fas fa-file-export me-1"></i>Export
+                        </a>
+                    @endif
+                    @if (app('hasPermission')(10, 'add'))
+                        <a href="{{ route('vendor.add') }}" class="btn btn-added btn-sm">
+                            <img src="{{ env('ImagePath') . 'admin/assets/img/icons/plus.svg' }}" class="me-1" alt="img">Add
+                            Vendor
+                        </a>
+                    @endif
+                </div>
             </div>
         </div>
 

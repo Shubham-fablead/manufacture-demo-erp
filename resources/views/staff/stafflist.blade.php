@@ -80,6 +80,25 @@
             border-radius: 5px;
         }
 
+        .staff-page-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: nowrap;
+        }
+
+        .staff-action-btn {
+            background: #1b2850;
+            color: #fff;
+            border: 1px solid #1b2850;
+            white-space: nowrap;
+        }
+
+        .staff-action-btn:hover {
+            background: #14203d;
+            color: #fff;
+        }
+
         .btn-searchset {            position: absolute;
             left: 10px;
             z-index: 10;
@@ -425,12 +444,22 @@
                 <h4>All Staffs</h4>
             </div>
             <div class="page-btn">
-                @if (app('hasPermission')(8, 'add'))
-                <a href="{{ route('staff.add') }}" class="btn btn-added btn-sm">
-                    <img src="{{ env('ImagePath') . 'admin/assets/img/icons/plus.svg' }}" class="me-1" alt="img">New
-                    Staff
-                </a>
-                @endif
+                <div class="staff-page-actions">
+                    @if (app('hasPermission')(8, 'view'))
+                        <a href="{{ route('staff.import') }}" class="btn btn-sm staff-action-btn">
+                            <i class="fas fa-file-import me-1"></i>Import
+                        </a>
+                        <a href="{{ route('staff.export') }}" class="btn btn-sm staff-action-btn">
+                            <i class="fas fa-file-export me-1"></i>Export
+                        </a>
+                    @endif
+                    @if (app('hasPermission')(8, 'add'))
+                        <a href="{{ route('staff.add') }}" class="btn btn-added btn-sm">
+                            <img src="{{ env('ImagePath') . 'admin/assets/img/icons/plus.svg' }}" class="me-1" alt="img">New
+                            Staff
+                        </a>
+                    @endif
+                </div>
             </div>
         </div>
 

@@ -553,9 +553,8 @@
                     <div class="col-lg-1 col-sm-12 col-6">
                         <div class="form-group">
                             <label>Disc%</label>
-                            <input type="number" name="product_discount[]" class="form-control product-discount-input"
-                                placeholder="0.00" value="0" min="0" max="100"
-                                oninput="this.value = this.value < 0 ? 0 : (this.value > 100 ? 100 : this.value)">
+                            <input type="text" inputmode="decimal" name="product_discount[]"
+                                class="form-control product-discount-input" placeholder="0.00" value="0">
                             <span class="error text-danger"></span>
                         </div>
                     </div>
@@ -1248,7 +1247,7 @@
                                                 <div class="col-lg-1 col-sm-12 col-6">
                                                     <div class="form-group">
                                                         <label>Disc %</label>
-                                                        <input type="number" name="product_discount[]" class="form-control product-discount-input" placeholder="0.00" value="0" min="0" max="100" oninput="this.value = this.value < 0 ? 0 : (this.value > 100 ? 100 : this.value)">
+                                                        <input type="text" inputmode="decimal" name="product_discount[]" class="form-control product-discount-input" placeholder="0.00" value="0">
                                                         <span class="error text-danger"></span>
                                                     </div>
                                                 </div>
@@ -1545,6 +1544,32 @@
                     if (!isNaN(val)) {
                         this.value = val.toFixed(2);
                     }
+                });
+
+                $(document).on("input", ".product-discount-input", function() {
+                    let val = this.value.toString().replace(/[^0-9.]/g, '');
+                    let dotIndex = val.indexOf('.');
+
+                    if (dotIndex !== -1) {
+                        val = val.slice(0, dotIndex + 1) + val.slice(dotIndex + 1).replace(/\./g, '');
+                        let decimals = val.slice(dotIndex + 1);
+                        if (decimals.length > 2) {
+                            val = val.slice(0, dotIndex + 3);
+                        }
+                    }
+
+                    this.value = val;
+                });
+
+                $(document).on("blur", ".product-discount-input", function() {
+                    let val = parseFloat(this.value);
+                    if (isNaN(val)) {
+                        this.value = '0.00';
+                        return;
+                    }
+
+                    val = Math.max(0, Math.min(100, val));
+                    this.value = val.toFixed(2);
                 });
 
                 $(document).on("input", ".price-input, .quantity-input, .product-discount-input",

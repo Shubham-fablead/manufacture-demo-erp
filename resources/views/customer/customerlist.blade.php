@@ -242,9 +242,14 @@
                 font-size: 18px;
             }
 
-            .page-btn .btn-added {
+        .page-btn .btn-added {
                 padding: 6px 12px;
                 font-size: 12px;
+            }
+
+            .customer-page-actions {
+                gap: 8px;
+                flex-wrap: wrap;
             }
 
             .card-body {
@@ -439,6 +444,25 @@
             background-color: #e68a35 !important;
         }
 
+        .customer-page-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: nowrap;
+        }
+
+        .customer-action-btn {
+            background: #1b2850;
+            color: #fff;
+            border: 1px solid #1b2850;
+            white-space: nowrap;
+        }
+
+        .customer-action-btn:hover {
+            background: #14203d;
+            color: #fff;
+        }
+
         .pagination .page-item.disabled .page-link {
             background-color: #fff !important;
             color: #dee2e6 !important;
@@ -455,12 +479,22 @@
                 <h4>All Customers</h4>
             </div>
             <div class="page-btn">
-                @if (app('hasPermission')(9, 'add'))
-                    <a href="{{ route('customer.add') }}" class="btn btn-added btn-sm">
-                        <img src="{{ env('ImagePath') . 'admin/assets/img/icons/plus.svg' }}" class="me-1" alt="img">New
-                        Customer
-                    </a>
-                @endif
+                <div class="customer-page-actions">
+                    @if (app('hasPermission')(9, 'view'))
+                        <a href="{{ route('customer.export') }}" class="btn btn-sm customer-action-btn">
+                            <i class="fas fa-file-export me-1"></i>Export
+                        </a>
+                    @endif
+                    @if (app('hasPermission')(9, 'add'))
+                        <a href="{{ route('customer.import') }}" class="btn btn-sm customer-action-btn">
+                            <i class="fas fa-file-import me-1"></i>Import
+                        </a>
+                        <a href="{{ route('customer.add') }}" class="btn btn-added btn-sm">
+                            <img src="{{ env('ImagePath') . 'admin/assets/img/icons/plus.svg' }}" class="me-1" alt="img">New
+                            Customer
+                        </a>
+                    @endif
+                </div>
             </div>
         </div>
 
