@@ -279,13 +279,9 @@
 
             $("#use_address").on("change", function() {
                 if ($(this).is(":checked")) {
-                    $("#delivery_address").val($("#address").val()).prop("readonly", true);
-                } else {
-                    $("#delivery_address").prop("readonly", false);
+                    $("#delivery_address").val($("#address").val());
                 }
             });
-
-            $("#delivery_address").prop("readonly", true);
 
             var authToken = localStorage.getItem("authToken");
             let $gstLoader = $('#gst-loader');
