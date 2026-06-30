@@ -60,7 +60,9 @@
             #paid-payments-table thead th:nth-child(6),
             #paid-payments-table tbody td:nth-child(6),
             #paid-payments-table thead th:nth-child(7),
-            #paid-payments-table tbody td:nth-child(7) {
+            #paid-payments-table tbody td:nth-child(7),
+            #paid-payments-table thead th:nth-child(8),
+            #paid-payments-table tbody td:nth-child(8) {
                 display: none;  
             }
 
@@ -70,7 +72,9 @@
             #pending-payments-table thead th:nth-child(4),
             #pending-payments-table tbody td:nth-child(4),
             #pending-payments-table thead th:nth-child(5),
-            #pending-payments-table tbody td:nth-child(5) {
+            #pending-payments-table tbody td:nth-child(5),
+            #pending-payments-table thead th:nth-child(6),
+            #pending-payments-table tbody td:nth-child(6) {
                 display: none;
             }
 
@@ -125,7 +129,9 @@
             #paid-payments-table thead th:nth-child(6),
             #paid-payments-table tbody td:nth-child(6),
             #paid-payments-table thead th:nth-child(7),
-            #paid-payments-table tbody td:nth-child(7) {
+            #paid-payments-table tbody td:nth-child(7),
+            #paid-payments-table thead th:nth-child(8),
+            #paid-payments-table tbody td:nth-child(8) {
                 display: none;
             }
 
@@ -133,7 +139,9 @@
             #pending-payments-table thead th:nth-child(4),
             #pending-payments-table tbody td:nth-child(4),
             #pending-payments-table thead th:nth-child(5),
-            #pending-payments-table tbody td:nth-child(5) {
+            #pending-payments-table tbody td:nth-child(5),
+            #pending-payments-table thead th:nth-child(6),
+            #pending-payments-table tbody td:nth-child(6) {
                 display: none;
             }
 
@@ -275,6 +283,27 @@
         .ledger-toggle-btn-table.minus:hover {
             background: #c82333;
         }
+
+        .ledger-view-products-btn {
+            background: #fff;
+            border: 1px solid #ff9f43;
+            color: #1b2850;
+            border-radius: 4px;
+            padding: 4px 14px;
+            font-size: 14px;
+            font-weight: 700;
+            line-height: 1.4;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            white-space: nowrap;
+        }
+
+        .ledger-view-products-btn:hover {
+            background: #fff4e8;
+            color: #1b2850;
+            border-color: #ff9f43;
+        }
     </style>
     <div class="content">
         <div class="page-header">
@@ -399,12 +428,102 @@
             </div>
         </div>
     </div>
+
+    <div class="modal fade" id="ledgerProductsModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header" style="position: relative; padding-right: 3.25rem;">
+                    <h5 class="modal-title" id="ledgerProductsModalTitle">Products</h5>
+                    <button type="button" data-bs-dismiss="modal" aria-label="Close"
+                        style="position:absolute; right:16px; top:50%; transform:translateY(-50%); border:0; background:transparent; color:#dc3545; font-size:30px; line-height:1; font-weight:700; padding:0; cursor:pointer;">&times;</button>
+                </div>
+                <div class="modal-body" id="ledgerProductsModalBody"></div>
+            </div>
+        </div>
+    </div>
 @endsection
 
 @push('js')
     <script>
         // Global variables
         var ledgerDataMap = {};
+
+        function formatDisplayDate(dateValue) {
+            if (!dateValue) return '-';
+            const date = new Date(dateValue);
+            if (isNaN(date.getTime())) return dateValue;
+            return date.toLocaleDateString('en-GB');
+        }
+
+        function openLedgerProductsModal(title, order) {
+            let products = [];
+
+            if (order.items && order.items.length > 0) {
+                products = order.items.map((item, index) => ({
+                    no: index + 1,
+                    name: item.product?.name || '-',
+                    qty: item.quantity || 0,
+                    price: item.price || 0,
+                    total: item.total || 0
+                }));
+            } else if (order.products_with_names && order.products_with_names.length > 0) {
+                products = order.products_with_names.map((item, index) => ({
+                    no: index + 1,
+                    name: item.product_name || '-',
+                    qty: item.quantity || 0,
+                    price: item.price || 0,
+                    total: item.total || 0
+                }));
+            }
+
+            let html = '';
+            if (products.length > 0) {
+                html += `
+                    <div class="table-responsive">
+                        <table class="table table-bordered mb-0">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Product</th>
+                                    <th>Qty</th>
+                                    <th>Price</th>
+                                    <th>Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                `;
+
+                products.forEach((product) => {
+                    html += `
+                        <tr>
+                            <td>${product.no}</td>
+                            <td>${product.name}</td>
+                            <td>${product.qty}</td>
+                            <td>${product.price}</td>
+                            <td>${product.total}</td>
+                        </tr>
+                    `;
+                });
+
+                html += `
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            } else {
+                html = '<div class="text-muted">No products found.</div>';
+            }
+
+            $('#ledgerProductsModalTitle').text(title);
+            $('#ledgerProductsModalBody').html(html);
+
+            const modalEl = document.getElementById('ledgerProductsModal');
+            if (window.bootstrap && bootstrap.Modal) {
+                bootstrap.Modal.getOrCreateInstance(modalEl).show();
+            } else if ($(modalEl).modal) {
+                $(modalEl).modal('show');
+            }
+        }
 
         // Helper function to build expandable row content for Paid Payments
         function buildPaidPaymentExpandableRowContent(payment, order, productNames, paymentMethod, currency,
@@ -413,7 +532,7 @@
             `${amount}${currency}`;
 
             return `
-                <td colspan="7" class="ledger-details-content">
+                <td colspan="8" class="ledger-details-content">
                     <div class="ledger-details-list">
                         <div class="ledger-detail-row-simple">
                             <span class="ledger-detail-label-simple">Product(s):</span>
@@ -446,7 +565,7 @@
             `${amount}${currency}`;
 
             return `
-                <td colspan="5" class="ledger-details-content">
+                <td colspan="6" class="ledger-details-content">
                     <div class="ledger-details-list">
                         <div class="ledger-detail-row-simple">
                             <span class="ledger-detail-label-simple">Product(s):</span>
@@ -724,6 +843,7 @@
                         <tr>
                             <th>Bill No.</th>
                             <th class="text-center">Details</th>
+                            <th>Date</th>
                             <th>Product(s)</th>
                             <th>Total Amount</th>
                             <th>Paid Amount</th>
@@ -756,12 +876,20 @@
                                 <span class="toggle-icon">+</span>
                             </button>
                         `;
+                        const viewProductsBtn = `
+                            <button type="button"
+                                class="ledger-view-products-btn"
+                                onclick="openLedgerProductsModal('Products - ${order.bill_no || order.order_number || order.invoice_number || '-'}', ledgerDataMap.paidPayments['${index}'].order)">
+                                View Products (${productNames !== '-' ? productNames.split(',').length : 0})
+                            </button>
+                        `;
 
                         html += `
             <tr>
                 <td>${order.bill_no || order.order_number || order.invoice_number || '-'}</td>
                 <td>${detailsToggle}</td>
-                <td>${productNames}</td>
+                <td>${formatDisplayDate(order.created_at || order.createdAt || ledger.created_at)}</td>
+                <td>${viewProductsBtn}</td>
                 <td>${formatCurrency(order.total_amount || order.grand_total || 0)}</td>
                 <td>${formatCurrency(payment.total_amount || order.amount_total || 0)}</td>
                 <td>${(payment.payment_date || order.created_at)}</td>
@@ -770,7 +898,7 @@
                         totalPaid += parseFloat(payment.total_amount || order.amount_total || 0);
                     });
                 } else {
-                    html += `<tr><td colspan="7" class="text-center text-muted">No record available</td></tr>`;
+                    html += `<tr><td colspan="8" class="text-center text-muted">No record available</td></tr>`;
                 }
                 html += `
     </tbody>
@@ -801,6 +929,7 @@
                         <tr>
                             <th>Bill No.</th>
                             <th class="text-center">Details</th>
+                            <th>Date</th>
                             <th>Product(s)</th>
                             <th>Total Amount</th>
                             <th>Remaining Amount</th>
@@ -828,19 +957,27 @@
                                 <span class="toggle-icon">+</span>
                             </button>
                         `;
+                        const viewProductsBtn = `
+                            <button type="button"
+                                class="ledger-view-products-btn"
+                                onclick="openLedgerProductsModal('Products - ${order.bill_no || order.order_number || order.invoice_number || payment.invoice_id || '-'}', ledgerDataMap.pendingPayments['${index}'].order)">
+                                View Products (${productNames !== '-' ? productNames.split(',').length : 0})
+                            </button>
+                        `;
 
                         html += `
             <tr>
                 <td>${order.bill_no || order.order_number || order.invoice_number || payment.invoice_id || '-'}</td>
                 <td>${detailsToggle}</td>
-                <td>${productNames}</td>
+                <td>${formatDisplayDate(order.created_at || order.createdAt || ledger.created_at)}</td>
+                <td>${viewProductsBtn}</td>
                 <td>${formatCurrency(order.total_amount || order.grand_total || 0)}</td>
                 <td>${formatCurrency(payment.amount_total || order.total_amount || 0)}</td>
             </tr>`;
                         totalPending += parseFloat(payment.amount_total || order.amount_total || 0);
                     });
                 } else {
-                    html += `<tr><td colspan="5" class="text-center text-muted">No record available</td></tr>`;
+                    html += `<tr><td colspan="6" class="text-center text-muted">No record available</td></tr>`;
                 }
                 html += `
     </tbody>

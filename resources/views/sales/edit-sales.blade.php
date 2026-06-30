@@ -199,6 +199,32 @@
             line-height: 1;
         }
 
+        #emiBox {
+            margin-top: 10px;
+            padding-top: 10px;
+        }
+
+        #emiBox .form-group {
+            margin-bottom: 18px;
+        }
+
+        #emiBox label {
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        @media (min-width: 992px) {
+            #emiBox .row.g-2 > .col-md-6 {
+                flex: 0 0 25%;
+                max-width: 25%;
+            }
+
+            #emiBox .row.g-2 > .col-md-6.w-100-lg {
+                flex: 0 0 100%;
+                max-width: 100%;
+            }
+        }
+
         @media (max-width: 767.98px) {
             .page-header {
                 flex-wrap: wrap;
@@ -1030,98 +1056,115 @@ $gstDataForAttribute = '[]';
                     </div>
                 </div>
 
-                <div id="emiBox" style="display:none; margin-top:10px;">
+                @php
+                    $emiTenureValue = old('emi_tenure', $sales->emi_tenure ?? '');
+                    $emiCustomTenureValue = old('emi_custom_tenure', $sales->emi_custom_tenure ?? '');
+                    $emiLoanAmountValue = old('emi_loan_amount', $sales->emi_loan_amount ?? '');
+                    $emiDownPaymentValue = old('emi_down_payment', $sales->emi_down_payment ?? '');
+                    $emiInterestRateValue = old('emi_interest_rate', $sales->emi_interest_rate ?? '');
+                    $emiMonthlyAmountValue = old('emi_monthly_amount', $sales->emi_monthly_amount ?? '');
+                    $emiAadharNumberValue = old('emi_aadhar_number', $sales->emi_aadhar_number ?? '');
+                    $emiDoIdValue = old('emi_do_id', $sales->emi_do_id ?? '');
+                    $emiPanNumberValue = old('emi_pan_number', $sales->emi_pan_number ?? '');
+                    $emiGuarantorNameValue = old('emi_guarnator_name', $sales->emi_guarnator_name ?? '');
+                    $emiBankIdValue = old('emi_bank_id', $sales->emi_bank_id ?? '');
+                @endphp
+                <div id="emiBox" style="display:{{ $prefillPaymentMethod === 'emi' ? 'block' : 'none' }}; margin-top:10px;">
                     <div class="row g-2">
-                        <div class="col-md-6 col-6">
+                        <div class="col-md-6 col-12">
                             <div class="form-group">
                                 <label for="emiDownPayment">Down Payment (Optional)</label>
                                 <input type="number" class="form-control" id="emiDownPayment"
-                                    placeholder="₹ Amount" min="0" step="0.01">
+                                    placeholder="₹ Amount" min="0" step="0.01"
+                                    value="{{ $emiDownPaymentValue }}">
                             </div>
                         </div>
-                        <div class="col-md-6 col-6">
+                        <div class="col-md-6 col-12">
                             <div class="form-group">
                                 <label for="emiLoanAmount">Loan Amount</label>
                                 <input type="number" class="form-control" id="emiLoanAmount"
-                                    placeholder="0.00" min="0" step="0.01" readonly>
+                                    placeholder="0.00" min="0" step="0.01" readonly
+                                    value="{{ $emiLoanAmountValue }}">
                             </div>
                         </div>
-                        <div class="col-md-6 col-6">
+                        <div class="col-md-6 col-12">
                             <div class="form-group">
                                 <label for="emiTenure">EMI Tenure</label>
                                 <select id="emiTenure" class="form-control" required>
                                     <option value="">Select Tenure</option>
-                                    <option value="3">3 Months</option>
-                                    <option value="6">6 Months</option>
-                                    <option value="9">9 Months</option>
-                                    <option value="12">12 Months</option>
-                                    <option value="18">18 Months</option>
-                                    <option value="24">24 Months</option>
-                                    <option value="custom">Custom</option>
+                                    <option value="3" {{ (string) $emiTenureValue === '3' ? 'selected' : '' }}>3 Months</option>
+                                    <option value="6" {{ (string) $emiTenureValue === '6' ? 'selected' : '' }}>6 Months</option>
+                                    <option value="9" {{ (string) $emiTenureValue === '9' ? 'selected' : '' }}>9 Months</option>
+                                    <option value="12" {{ (string) $emiTenureValue === '12' ? 'selected' : '' }}>12 Months</option>
+                                    <option value="18" {{ (string) $emiTenureValue === '18' ? 'selected' : '' }}>18 Months</option>
+                                    <option value="24" {{ (string) $emiTenureValue === '24' ? 'selected' : '' }}>24 Months</option>
+                                    <option value="custom" {{ $emiTenureValue === 'custom' ? 'selected' : '' }}>Custom</option>
                                 </select>
                                 <span class="error_emi_tenure text-danger"></span>
                             </div>
                         </div>
-                        <div class="col-md-6 col-6" id="emiCustomTenureWrap" style="display:none;">
+                        <div class="col-md-6 col-12" id="emiCustomTenureWrap" style="display:{{ $emiTenureValue === 'custom' ? 'block' : 'none' }};">
                             <div class="form-group">
                                 <label for="emiCustomTenure">Custom Tenure (Months)</label>
                                 <input type="number" class="form-control" id="emiCustomTenure"
-                                    placeholder="Enter months" min="1" step="1">
+                                    placeholder="Enter months" min="1" step="1"
+                                    value="{{ $emiCustomTenureValue }}">
                             </div>
                         </div>
-                        <div class="col-md-6 col-6">
+                        <div class="col-md-6 col-12">
                             <div class="form-group">
                                 <label for="emiInterestRate">Interest Rate (%) Optional</label>
                                 <input type="number" class="form-control" id="emiInterestRate"
-                                    placeholder="0" min="0" step="0.01">
+                                    placeholder="0" min="0" step="0.01"
+                                    value="{{ $emiInterestRateValue }}">
                             </div>
                         </div>
-                        <div class="col-md-6 col-6">
+                        <div class="col-md-6 col-12">
                             <div class="form-group">
                                 <label for="emiMonthlyValue">Monthly EMI</label>
                                 <input type="number" class="form-control" id="emiMonthlyValue"
-                                    placeholder="0.00" min="0" step="0.01" readonly>
+                                    placeholder="0.00" min="0" step="0.01" readonly
+                                    value="{{ $emiMonthlyAmountValue }}">
                             </div>
                         </div>
-                        <div class="col-md-6 col-6">
+                        <div class="col-md-6 col-12">
                             <div class="form-group">
                                 <label for="emiAadharNumber">Aadhar Number</label>
                                 <input type="text" class="form-control" id="emiAadharNumber"
-                                    placeholder="Enter Aadhar number">
+                                    placeholder="Enter Aadhar number" value="{{ $emiAadharNumberValue }}">
                             </div>
                         </div>
-                        <div class="col-md-6 col-6">
+                        <div class="col-md-6 col-12">
                             <div class="form-group">
                                 <label for="emiDoId">DO ID</label>
-                                <input type="text" class="form-control" id="emiDoId"
-                                    placeholder="DO ID">
+                                <input type="text" class="form-control" id="emiDoId" placeholder="DO ID"
+                                    value="{{ $emiDoIdValue }}">
                             </div>
                         </div>
-                        <div class="col-md-6 col-6">
+                        <div class="col-md-6 col-12">
                             <div class="form-group">
                                 <label for="emiPanNumber">PAN Number Optional</label>
                                 <input type="text" class="form-control" id="emiPanNumber"
-                                    placeholder="PAN Number">
+                                    placeholder="PAN Number" value="{{ $emiPanNumberValue }}">
                             </div>
                         </div>
-                        <div class="col-md-6 col-6">
+                        <div class="col-md-6 col-12">
                             <div class="form-group">
                                 <label for="emiGuarantorName">Guarantor Name Optional</label>
                                 <input type="text" class="form-control" id="emiGuarantorName"
-                                    placeholder="Guarantor Name">
+                                    placeholder="Guarantor Name" value="{{ $emiGuarantorNameValue }}">
                             </div>
                         </div>
-                        <div class="col-md-6 col-6">
+                        <div class="col-md-6 col-12">
                             <div class="form-group">
                                 <div class="bank-label-row">
                                     <label>Select Bank Optional</label>
-                                    <button type="button" id="openAddBankModal"
-                                        class="bank-add-btn">Add Bank</button>
+                                    <button type="button" id="openAddBankModal" class="bank-add-btn">Add Bank</button>
                                 </div>
                                 <select name="emi_bank_id" id="emi_bank_id" class="form-control">
                                     <option value="">Select Bank</option>
                                     @foreach ($banks as $bank)
-                                        <option value="{{ $bank->id }}" {{ (int) $prefillBankId === (int) $bank->id ? 'selected' : '' }}>
+                                        <option value="{{ $bank->id }}" {{ (int) $emiBankIdValue === (int) $bank->id ? 'selected' : '' }}>
                                             {{ $bank->bank_name }}{{ $bank->account_number ? ' (' . $bank->account_number . ')' : '' }}
                                         </option>
                                     @endforeach
@@ -2016,6 +2059,10 @@ $(document).on('blur', '#tds-percentage-input', function() {
                             $('#paid_type').prop('disabled', !shouldShowPaymentRow);
                             $('#emiDownPayment, #emiLoanAmount, #emiTenure, #emiCustomTenure, #emiInterestRate, #emiMonthlyValue, #emiAadharNumber, #emiDoId, #emiPanNumber, #emiGuarantorName, #emi_bank_id')
                                 .prop('disabled', !(shouldShowPaymentRow && method === 'emi'));
+                            $('#emiBox .row.g-2 > .col-md-6').removeClass('w-100-lg');
+                            if (shouldShowPaymentRow && method === 'emi') {
+                                $('#emiBox .row.g-2 > .col-md-6:last').addClass('w-100-lg');
+                            }
 
                             $paymentColumns.removeClass('col-lg-3 col-lg-4 col-lg-6 col-lg-12 d-none');
 
@@ -2285,7 +2332,6 @@ $(document).on('blur', '#tds-percentage-input', function() {
                             const $delivery = $(deliverySelector);
                             const $useAddress = $(useCheckboxSelector);
 
-                            $delivery.prop('readonly', $useAddress.is(':checked'));
                             if ($useAddress.is(':checked')) {
                                 $delivery.val($address.val());
                             }
@@ -2370,9 +2416,6 @@ $(document).on('blur', '#tds-percentage-input', function() {
                         $('#sales_use_address').on('change', function() {
                             if ($(this).is(':checked')) {
                                 $('#sales_delivery_address').val($('#sales_address').val());
-                                $('#sales_delivery_address').prop('readonly', true);
-                            } else {
-                                $('#sales_delivery_address').prop('readonly', false);
                             }
                         });
 
@@ -2382,14 +2425,9 @@ $(document).on('blur', '#tds-percentage-input', function() {
                             }
                         });
 
-                        $('#sales_delivery_address').prop('readonly', true);
-
                         $('#sales_edit_use_address').on('change', function() {
                             if ($(this).is(':checked')) {
                                 $('#sales_edit_delivery_address').val($('#sales_edit_address').val());
-                                $('#sales_edit_delivery_address').prop('readonly', true);
-                            } else {
-                                $('#sales_edit_delivery_address').prop('readonly', false);
                             }
                         });
 
@@ -2398,8 +2436,6 @@ $(document).on('blur', '#tds-percentage-input', function() {
                                 $('#sales_edit_delivery_address').val($(this).val());
                             }
                         });
-
-                        $('#sales_edit_delivery_address').prop('readonly', true);
 
                         $('#sales_phone, #sales_alternate_phone, #sales_edit_phone, #sales_edit_alternate_phone').on('input', function() {
                             let value = $(this).val().replace(/\D/g, '').slice(0, 10);
@@ -2999,7 +3035,43 @@ $(document).on('input', '.quantity-input', function() {
                             calculatePaymentBreakdown();
                         }
 
+                        function prefillEmiFields() {
+                            const emiValues = {
+                                downPayment: @json($emiDownPaymentValue),
+                                loanAmount: @json($emiLoanAmountValue),
+                                tenure: @json((string) $emiTenureValue),
+                                customTenure: @json($emiCustomTenureValue),
+                                interestRate: @json($emiInterestRateValue),
+                                monthlyAmount: @json($emiMonthlyAmountValue),
+                                aadharNumber: @json($emiAadharNumberValue),
+                                doId: @json($emiDoIdValue),
+                                panNumber: @json($emiPanNumberValue),
+                                guarantorName: @json($emiGuarantorNameValue),
+                                bankId: @json((string) $emiBankIdValue),
+                            };
+
+                            $('#emiDownPayment').val(emiValues.downPayment);
+                            $('#emiLoanAmount').val(emiValues.loanAmount);
+                            $('#emiTenure').val(emiValues.tenure);
+                            $('#emiCustomTenure').val(emiValues.customTenure);
+                            $('#emiInterestRate').val(emiValues.interestRate);
+                            $('#emiMonthlyValue').val(emiValues.monthlyAmount);
+                            $('#emiAadharNumber').val(emiValues.aadharNumber);
+                            $('#emiDoId').val(emiValues.doId);
+                            $('#emiPanNumber').val(emiValues.panNumber);
+                            $('#emiGuarantorName').val(emiValues.guarantorName);
+
+                            if (emiValues.bankId) {
+                                $('#emi_bank_id').val(emiValues.bankId).trigger('change.select2');
+                            }
+
+                            if (emiValues.tenure === 'custom') {
+                                $('#emiCustomTenureWrap').show();
+                            }
+                        }
+
                         $('#quotationToggle').on('change', togglePaymentFields);
+                        prefillEmiFields();
                         togglePaymentFields(); // Initial call
 
                         $('#payment_method').on('change', function() {

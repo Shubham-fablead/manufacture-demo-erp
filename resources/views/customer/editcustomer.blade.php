@@ -242,7 +242,6 @@
                         $("#delivery_address").val(customer.details.delivery_address ||
                         customer.details.address || "");
                         $("#use_address").prop("checked", true);
-                        $("#delivery_address").prop("readonly", true);
 
                         // Show profile image if exists
                         if (customer.profile_image) {
@@ -343,9 +342,7 @@
 
             $("#use_address").on("change", function() {
                 if ($(this).is(":checked")) {
-                    $("#delivery_address").val($("#address").val()).prop("readonly", true);
-                } else {
-                    $("#delivery_address").prop("readonly", false);
+                    $("#delivery_address").val($("#address").val());
                 }
             });
 
