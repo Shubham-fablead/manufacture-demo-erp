@@ -5342,6 +5342,46 @@
             keyboard: false
         }) : null;
         const initialCustomerId = $('#customer_name').val();
+        let isOpeningCustomerModalFromSelect = false;
+
+        if ($('#customer_name').length) {
+            if ($('#customer_name').hasClass('select2-hidden-accessible')) {
+                $('#customer_name').select2('destroy');
+            }
+
+            $('#customer_name').select2({
+                tags: true,
+                placeholder: 'Select Customer',
+                allowClear: true,
+                width: '100%',
+                createTag: function(params) {
+                    const term = $.trim(params.term);
+                    if (!term) {
+                        return null;
+                    }
+
+                    return {
+                        id: term,
+                        text: term,
+                        newTag: true
+                    };
+                },
+                templateResult: function(data) {
+                    if (data.loading) {
+                        return data.text;
+                    }
+
+                    if (data.newTag) {
+                        return $('<span>Create Customer "' + data.text + '"</span>');
+                    }
+
+                    return data.text;
+                },
+                templateSelection: function(data) {
+                    return data.text || data.id;
+                }
+            });
+        }
 
         function syncAddressFields(addressSelector, deliverySelector, useCheckboxSelector) {
             const $address = $(addressSelector);
@@ -5368,6 +5408,28 @@
             const customerId = $(this).val();
             const phone = $selectedOption.data('phone');
             const isRealCustomer = !!customerId;
+
+            if (isOpeningCustomerModalFromSelect) {
+                return;
+            }
+
+            if (customerId && isNaN(customerId)) {
+                const typedCustomerName = String(customerId).trim();
+
+                isOpeningCustomerModalFromSelect = true;
+                $(this).val('').trigger('change.select2');
+                isOpeningCustomerModalFromSelect = false;
+
+                $('#posCustomerForm')[0].reset();
+                $('#posCustomerForm .text-danger').text('');
+                $('#pos_customer_name').val(typedCustomerName);
+                $('#pos_use_address').prop('checked', true).trigger('change');
+
+                if (addCustomerModal) {
+                    addCustomerModal.show();
+                }
+                return;
+            }
 
             $('#customer_phone').val(phone || '');
             $('#openAddCustomerModal').toggle(!isRealCustomer);
