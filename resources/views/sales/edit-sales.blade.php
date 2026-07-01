@@ -640,6 +640,29 @@
                             </div>
                         </div>
                     </div>
+                    <div class="col-lg-3 col-sm-6 col-6">
+                        <div class="form-group">
+                            <label>Assign Staff</label>
+                            <select name="assigned_staff" id="assigned_staff" class="form-control select2">
+                                <option value="">Select Staff</option>
+                                @foreach ($staffUsers as $staff)
+                                    <option value="{{ $staff->id }}"
+                                        {{ (string) ($sales->assigned_staff ?? '') === (string) $staff->id ? 'selected' : '' }}>
+                                        {{ $staff->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-sm-6 col-6">
+                        <div class="form-group">
+                            <label>Order Type</label>
+                            <select name="order_type" id="order_type" class="form-control">
+                                <option value="Self Pickup" {{ ($sales->order_type ?? 'Self Pickup') === 'Self Pickup' ? 'selected' : '' }}>Self Pickup</option>
+                                <option value="Delivery" {{ ($sales->order_type ?? 'Self Pickup') === 'Delivery' ? 'selected' : '' }}>Delivery</option>
+                            </select>
+                        </div>
+                    </div>
                     <div class="col-lg-12 col-sm-12 col-12">
                         <div class="form-group">
                             <label>Product Name</label>
@@ -3579,6 +3602,8 @@ addProductToTable(
                                 selectedSubAdminId: selectedSubAdminId || null,
                                 remarks: $('#remarks').val(),
                                 payment_method: $('#payment_method').val(),
+                                assigned_staff: $('#assigned_staff').val(),
+                                order_type: $('#order_type').val(),
                                 status: $('#payment_status').val(),
                                 paid_type: $('#paid_type').val(),
                                 bank_id: $('#bank_id').val(),

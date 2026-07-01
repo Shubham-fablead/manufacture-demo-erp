@@ -147,6 +147,23 @@ class SalesController extends Controller
 
         $order = Order::findOrFail($order_id);
 
+        $history = $history->map(function ($payment) use ($order) {
+            $amount = (float) ($payment->payment_amount ?? 0);
+
+            if ($amount <= 0 && strtolower((string) ($payment->payment_type ?? $payment->payment_method ?? '')) === 'emi') {
+                $amount = (float) (
+                    $payment->emi_monthly_amount
+                    ?? $order->emi_monthly_amount
+                    ?? $order->remaining_amount
+                    ?? 0
+                );
+            }
+
+            $payment->payment_amount = round(max(0, $amount), 2);
+
+            return $payment;
+        });
+
         $totalPaid = $history->sum('payment_amount');
 
         // Calculate Return Amount
@@ -191,6 +208,15 @@ class SalesController extends Controller
         if ($request->filled('order_id')) {
             // Determine payment amount
             $paymentAmount = $request->emi_total_new ?? $request->emi_total ?? $request->amount ?? $request->upi_online_amount ?? 0;
+
+            if (strtolower((string) ($request->payment_method ?? $request->payment_type ?? '')) === 'emi') {
+                $paymentAmount = $request->emi_paid_value
+                    ?? $request->emi_monthly_amount
+                    ?? $request->monthly_emi
+                    ?? $request->emi_monthly
+                    ?? $request->amount
+                    ?? 0;
+            }
 
             if ($request->filled('cash_amount') && $request->filled('online_amount')) {
                 $paymentAmount = (float) $request->cash_amount + (float) $request->online_amount;
@@ -317,7 +343,9 @@ class SalesController extends Controller
                     'remaining_amount' => $newRemaining,
                     'payment_method' => $request->payment_method ?? $request->payment_type ?? '',
                     'payment_date' => \Carbon\Carbon::now(),
-                    'payment_type' => $type,
+                    'payment_type' => strtolower((string) ($request->payment_method ?? $request->payment_type ?? '')) === 'emi'
+                        ? 'emi'
+                        : $type,
                     'cash_amount' => $request->cash_amount,
                     'upi_amount' => $request->online_amount,
                     'emi_month' => $request->emi_month ?? 1,

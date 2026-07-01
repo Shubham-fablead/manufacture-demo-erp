@@ -126,6 +126,11 @@ class SalesController extends Controller
             ->where('branch_id', $branchIdToUse)
             ->get();
 
+        $staffUsers = User::where('role', 'staff')
+            ->where('branch_id', $branchIdToUse)
+            ->where('isDeleted', 0)
+            ->get();
+
         $setting = $this->fallbackSetting($branchIdToUse);
         $labourItems = LabourItem::where('created_by', $branchIdToUse)
             ->where('isDeleted', false)
@@ -135,7 +140,7 @@ class SalesController extends Controller
             ->where('isDeleted', 0)
             ->get();
 
-        return view('sales/edit-sales', compact('sales', 'TaxRate', 'category', 'usernames', 'products', 'update_id', 'setting', 'labourItems', 'banks'));
+        return view('sales/edit-sales', compact('sales', 'TaxRate', 'category', 'usernames', 'products', 'staffUsers', 'update_id', 'setting', 'labourItems', 'banks'));
     }
 
     public function sales_details($id)

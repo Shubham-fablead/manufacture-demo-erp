@@ -4183,6 +4183,7 @@ $('#paymentHistoryList').html(historyHtml);
                     let emiTotal = $('#emiMonthlyAmount').val();
                     let emiMonth = $('#emiMonthSelect').val();
                     formData.append('emi_paid_value', emiTotal.replace(/[,]/g, ''));
+                    formData.append('emi_monthly_amount', emiTotal.replace(/[,]/g, ''));
                     formData.append('emi_month', emiMonth);
                     formData.append('amount', emiTotal.replace(/[,]/g, ''));
                 }
