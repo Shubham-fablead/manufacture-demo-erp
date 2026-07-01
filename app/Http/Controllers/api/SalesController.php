@@ -2500,6 +2500,16 @@ public function update_sale(Request $request)
             'tds_amount'       => $tdsAmount,
             'remarks'          => $request->remarks ?? $order->remarks,
             'created_at'       => $orderCreatedAt,
+            'emi_down_payment' => $request->emi_down_payment ?? null,
+            'emi_loan_amount'  => $request->emi_loan_amount ?? null,
+            'emi_interest_rate'=> $request->emi_interest_rate ?? null,
+            'emi_tenure'       => $request->emi_tenure ?? null,
+            'emi_monthly_amount' => $request->emi_monthly_amount ?? null,
+            'emi_aadhar_number' => $request->emi_aadhar_number ?? null,
+            'emi_pan_number'   => $request->emi_pan_number ?? null,
+            'emi_guarnator_name' => $request->emi_guarnator_name ?? null,
+            'emi_do_id'        => $request->emi_do_id ?? null,
+            'emi_bank_id'      => $request->emi_bank_id ?? null,
         ]);
 
         if (!$isQuotationOrder && $paymentMethodForOrder !== 'pending' && $additionalPaidAmount > 0) {

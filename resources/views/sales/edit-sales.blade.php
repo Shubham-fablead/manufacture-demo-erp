@@ -3594,7 +3594,17 @@ addProductToTable(
                                 quotation_status: $('#quotationToggle').is(':checked') ? 'quotation' : 'sales',
                                 labour_item_ids: [],
                                 labour_qtys: [],
-                                labour_prices: []
+                                labour_prices: [],
+                                emi_down_payment: $('#emiDownPayment').val() || null,
+                                emi_loan_amount: $('#emiLoanAmount').val() || null,
+                                emi_tenure: $('#emiTenure').val() === 'custom' ? $('#emiCustomTenure').val() : $('#emiTenure').val() || null,
+                                emi_interest_rate: $('#emiInterestRate').val() || null,
+                                emi_monthly_amount: $('#emiMonthlyValue').val() || null,
+                                emi_aadhar_number: $('#emiAadharNumber').val() || null,
+                                emi_do_id: $('#emiDoId').val() || null,
+                                emi_pan_number: $('#emiPanNumber').val() || null,
+                                emi_guarnator_name: $('#emiGuarantorName').val() || null,
+                                emi_bank_id: $('#emi_bank_id').val() || null
                             };
 
                             // Collect labour items
