@@ -1639,10 +1639,10 @@
                         <!-- Sort Filter -->
                         <div class="col-md-2 col-6 filter-field filter-sort-col">
                             <div class="mb-1 custom-select2">
-                                <select id="filter-sort" data-placeholder="Oldest First"
+                                <select id="filter-sort" data-placeholder="Latest First"
                                     class="form-control form-control-sm filter-select2">
-                                    <option value="oldest">Oldest First</option>
                                     <option value="latest">Latest First</option>
+                                    <option value="oldest">Oldest First</option>
                                     <option value="order_no_asc">Order No. 1 to Last</option>
                                     <option value="order_no_desc">Order No. Last to 1</option>
                                 </select>
@@ -1855,6 +1855,7 @@
                                 <option value="cash">Cash</option>
                                 <option value="online">Online</option>
                                 <option value="cash_online">Cash + Online</option>
+                                <option value="emi">EMI</option>
 
                             </select>
                             <div class="text-danger" id="paymentMethodError"></div>
@@ -1966,6 +1967,19 @@
                                 @endforeach
                             </select>
                             <div class="text-danger" id="bankError"></div>
+                        </div>
+
+                        <div class="mb-3 d-none" id="emi_container">
+                            <label for="emiMonthSelect" class="form-label">EMI Month</label>
+                            <select class="form-select" id="emiMonthSelect" name="emi_month">
+                                <option value="" selected disabled>Select EMI Month</option>
+                            </select>
+                            <div class="text-danger" id="emiMonthError"></div>
+
+                            <label for="emiMonthlyAmount" class="form-label mt-3">Monthly EMI</label>
+                            <input type="text" class="form-control" id="emiMonthlyAmount" readonly>
+                            <input type="hidden" id="emiMonthCountHidden" value="0">
+                            <input type="hidden" id="emiNextMonthHidden" value="1">
                         </div>
 
                         <!-- Fully Paid Fields -->
@@ -2089,6 +2103,22 @@
                 </div>
                 <div class="modal-body">
                     <div id="globalPaymentHistoryList"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-cancel" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="emiDetailsModal" tabindex="-1" aria-labelledby="emiDetailsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-scrollable modal-xl" style="max-width: 820px;">
+            <div class="modal-content">
+                <div class="modal-header" style="border-bottom:1px solid #e9ecef;padding:16px 20px;">
+                    <h5 class="modal-title" id="emiDetailsModalLabel">EMI Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">x</button>
+                </div>
+                <div class="modal-body" style="padding:18px 18px 20px;background:#f8f9fc;">
+                    <div id="emiDetailsModalBody" class="text-center text-muted py-4">Loading EMI details...</div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-cancel" data-bs-dismiss="modal">Close</button>
@@ -2264,12 +2294,41 @@
             });
         }
 
+        function formatCurrencyPlain(value) {
+            return parseFloat(value || 0).toLocaleString(undefined, {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+        }
+
+        function buildEmiMonthOptions(totalMonths, paidCount, monthlyAmount) {
+            const total = Math.max(parseInt(totalMonths || 0, 10) || 0, 1);
+            const paid = Math.max(parseInt(paidCount || 0, 10) || 0, 0);
+            const safeMonthlyAmount = formatCurrencyPlain(monthlyAmount);
+            let html = '<option value="" selected disabled>Select EMI Month</option>';
+
+            for (let month = 1; month <= total; month++) {
+                let label = `${month}${month % 100 >= 11 && month % 100 <= 13 ? 'th' : month % 10 === 1 ? 'st' : month % 10 === 2 ? 'nd' : month % 10 === 3 ? 'rd' : 'th'} Month - ₹${safeMonthlyAmount}`;
+                if (month <= paid) {
+                    label += ' (Paid)';
+                } else if (month === paid + 1) {
+                    label += ' (Pay now)';
+                } else {
+                    label += ' (Upcoming)';
+                }
+                html += `<option value="${month}" ${month === paid + 1 ? 'selected' : ''}>${label}</option>`;
+            }
+
+            return html;
+        }
+
         function getPaymentHistoryReference(payment) {
             return payment.reference_number || payment.transaction_id || payment.receipt_number || payment.ref_no || 'N/A';
         }
 
         let editPaymentModalInstance = null;
         let paymentHistoryModalInstance = null;
+        let emiDetailsModalInstance = null;
         let currentPaymentHistorySummary = {};
 
         function toPaymentInputDate(value) {
@@ -2365,6 +2424,117 @@
             recalculateEditPendingAmount();
         }
 
+        function formatEmiMonthLabel(index) {
+            const monthNumber = index + 1;
+            const suffix = monthNumber % 100 >= 11 && monthNumber % 100 <= 13
+                ? 'th'
+                : monthNumber % 10 === 1
+                    ? 'st'
+                    : monthNumber % 10 === 2
+                        ? 'nd'
+                        : monthNumber % 10 === 3
+                            ? 'rd'
+                            : 'th';
+            return `${monthNumber}${suffix} Month`;
+        }
+
+        function renderEmiDetailsContent(order, payments) {
+            const sale = order || {};
+            const totalInstallments = Math.max(
+                parseInt(sale.emi_months || sale.emi_duration || sale.emi_tenure || sale.remaining_emi_months || 0, 10) || 0,
+                1
+            );
+            const monthlyAmount = parseFloat(sale.emi_monthly_amount || 0);
+            const loanAmount = parseFloat(sale.emi_loan_amount || 0);
+            const downPayment = parseFloat(sale.emi_down_payment || 0);
+            const interestRate = sale.emi_interest_rate ?? '0.00';
+            const guarantorName = sale.emi_guarnator_name || 'N/A';
+            const aadharNumber = sale.emi_aadhar_number || 'N/A';
+            const panNumber = sale.emi_pan_number || 'N/A';
+            const customerName = sale.user_name || sale.customer_name || 'N/A';
+            const orderNumber = sale.order_number || 'N/A';
+            const currencySymbol = '₹';
+
+            const emiPayments = (payments || [])
+                .filter(payment => String(payment.payment_type || '').toLowerCase() === 'emi')
+                .sort((a, b) => new Date(a.payment_date || a.created_at || 0) - new Date(b.payment_date || b.created_at || 0));
+
+            const paidCount = emiPayments.length;
+            const nextDueLabel = paidCount < totalInstallments
+                ? formatEmiMonthLabel(paidCount)
+                : 'Completed';
+
+            const monthRows = Array.from({ length: totalInstallments }, (_, index) => {
+                const payment = emiPayments[index];
+                const isPaid = Boolean(payment);
+                const remark = payment ? (payment.remarks || '-') : '-';
+                const rowAmount = monthlyAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                return `
+                    <tr>
+                        <td>${formatEmiMonthLabel(index)}</td>
+                        <td>
+                            <span class="badge ${isPaid ? 'bg-success' : 'bg-danger'}" style="min-width:92px;padding:8px 14px;border-radius:6px;">
+                                ${isPaid ? 'Paid' : 'Pending'}
+                            </span>
+                        </td>
+                        <td>${currencySymbol}${rowAmount}</td>
+                        <td>${isPaid ? escapePaymentHistoryText(formatPaymentHistoryDate(payment.payment_date || payment.created_at)) : '-'}</td>
+                        <td>${escapePaymentHistoryText(String(remark))}</td>
+                    </tr>
+                `;
+            }).join('');
+
+            return `
+                <div style="background:#f8f9fc;">
+                    <div class="p-3 mb-3" style="background:linear-gradient(135deg,#202b63 0%, #2a3774 100%);border-radius:20px;color:#fff;">
+                    <div class="d-flex justify-content-between align-items-start gap-3 flex-wrap mb-2">
+                        <div>
+                            <div class="text-uppercase small fw-semibold" style="letter-spacing:.6px;opacity:.78;">EMI Account</div>
+                            <div style="font-size:24px;line-height:1.1;font-weight:700;margin-top:2px;">${escapePaymentHistoryText(orderNumber)}</div>
+                            <div style="opacity:.96;margin-top:4px;">Customer: ${escapePaymentHistoryText(customerName)}</div>
+                        </div>
+                        <div class="badge rounded-pill px-3 py-2" style="background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18);font-size:14px;">
+                            Next due: ${escapePaymentHistoryText(nextDueLabel)}
+                        </div>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-md-6"><div class="bg-white text-dark rounded-4 p-3 h-100" style="min-height:72px;"><div class="text-uppercase small fw-semibold" style="color:#7d8aa8;">EMI Tenure</div><div style="font-size:16px;font-weight:700;color:#1f295f;">${totalInstallments} Months</div></div></div>
+                        <div class="col-md-6"><div class="bg-white text-dark rounded-4 p-3 h-100" style="min-height:72px;"><div class="text-uppercase small fw-semibold" style="color:#7d8aa8;">Monthly EMI</div><div style="font-size:16px;font-weight:700;color:#1f295f;">${currencySymbol}${monthlyAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div></div></div>
+                        <div class="col-md-6"><div class="bg-white text-dark rounded-4 p-3 h-100" style="min-height:72px;"><div class="text-uppercase small fw-semibold" style="color:#7d8aa8;">Down Payment</div><div style="font-size:16px;font-weight:700;color:#1f295f;">${currencySymbol}${downPayment.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div></div></div>
+                        <div class="col-md-6"><div class="bg-white text-dark rounded-4 p-3 h-100" style="min-height:72px;"><div class="text-uppercase small fw-semibold" style="color:#7d8aa8;">Loan Amount</div><div style="font-size:16px;font-weight:700;color:#1f295f;">${currencySymbol}${loanAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div></div></div>
+                        <div class="col-md-6"><div class="bg-white text-dark rounded-4 p-3 h-100" style="min-height:72px;"><div class="text-uppercase small fw-semibold" style="color:#7d8aa8;">Interest Rate</div><div style="font-size:16px;font-weight:700;color:#1f295f;">${escapePaymentHistoryText(String(interestRate))}%</div></div></div>
+                        <div class="col-md-6"><div class="bg-white text-dark rounded-4 p-3 h-100" style="min-height:72px;"><div class="text-uppercase small fw-semibold" style="color:#7d8aa8;">Guarantor Name</div><div style="font-size:16px;font-weight:700;color:#1f295f;">${escapePaymentHistoryText(guarantorName)}</div></div></div>
+                        <div class="col-md-6"><div class="bg-white text-dark rounded-4 p-3 h-100" style="min-height:72px;"><div class="text-uppercase small fw-semibold" style="color:#7d8aa8;">Aadhar Number</div><div style="font-size:16px;font-weight:700;color:#1f295f;">${escapePaymentHistoryText(aadharNumber)}</div></div></div>
+                        <div class="col-md-6"><div class="bg-white text-dark rounded-4 p-3 h-100" style="min-height:72px;"><div class="text-uppercase small fw-semibold" style="color:#7d8aa8;">PAN Number</div><div style="font-size:16px;font-weight:700;color:#1f295f;">${escapePaymentHistoryText(panNumber)}</div></div></div>
+                    </div>
+                </div>
+
+                <div class="rounded-4 border p-3" style="background:#fff;box-shadow:0 1px 10px rgba(31,41,95,.06);">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+                        <h5 class="mb-0 fw-bold" style="color:#1f295f;">Month Wise EMI Details</h5>
+                        <span class="badge rounded-pill px-3 py-2 bg-light text-dark border" style="font-size:13px;">Next due: ${escapePaymentHistoryText(nextDueLabel)}</span>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table align-middle mb-0" style="border-collapse:separate;border-spacing:0;">
+                            <thead>
+                                <tr>
+                                    <th style="background:#eef3fa;color:#5d6b88;font-size:12px;text-transform:uppercase;font-weight:700;border:none;">Month</th>
+                                    <th style="background:#eef3fa;color:#5d6b88;font-size:12px;text-transform:uppercase;font-weight:700;border:none;">Status</th>
+                                    <th style="background:#eef3fa;color:#5d6b88;font-size:12px;text-transform:uppercase;font-weight:700;border:none;">Amount</th>
+                                    <th style="background:#eef3fa;color:#5d6b88;font-size:12px;text-transform:uppercase;font-weight:700;border:none;">Paid On</th>
+                                    <th style="background:#eef3fa;color:#5d6b88;font-size:12px;text-transform:uppercase;font-weight:700;border:none;">Remark</th>
+                                </tr>
+                            </thead>
+                            <tbody style="background:#fff;">
+                                ${monthRows || '<tr><td colspan="5" class="text-center text-muted">No EMI details found.</td></tr>'}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                </div>
+            `;
+        }
+
         function buildEditPaymentPayload() {
             const method = $('#edit_payment_method').val();
             const paymentDate = $('#edit_payment_date').val();
@@ -2408,29 +2578,47 @@
             }
 
             const itemsHtml = history.map(payment => {
-                const method = payment.payment_method ? payment.payment_method.replace(/_/g, ' ') : 'N/A';
+                const rawMethod = String(payment.payment_method || '').trim().toLowerCase();
+                const rawType = String(payment.payment_type || '').trim().toLowerCase();
+                const method = rawMethod
+                    ? rawMethod.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
+                    : 'N/A';
+                const type = rawType
+                    ? rawType.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
+                    : 'N/A';
                 const reference = getPaymentHistoryReference(payment);
+                const amount = formatPaymentHistoryAmount(payment.payment_amount);
+                const remarks = payment.remarks && String(payment.remarks).trim() !== ''
+                    ? payment.remarks
+                    : 'N/A';
+                const dateText = formatPaymentHistoryDate(payment.payment_date || payment.created_at);
+                const isEmi = rawMethod === 'emi' || rawType === 'emi';
+                const badgeText = rawType === 'partially' ? 'Partially' : rawType === 'fully' ? 'Fully' : type;
 
                 return `
-                    <div class="payment-history-card">
-                        <div class="payment-history-row">
-                            <div class="payment-history-meta">
-                                <div class="payment-history-date">${escapePaymentHistoryText(formatPaymentHistoryDate(payment.payment_date || payment.created_at))}</div>
-                                <div class="payment-history-subtext">
-                                    Method: ${escapePaymentHistoryText(method)} | Ref: ${escapePaymentHistoryText(reference)}
+                    <div class="payment-history-card" style="padding:14px 16px;">
+                        <div class="d-flex justify-content-between align-items-start gap-3">
+                            <div>
+                                <div class="payment-history-date" style="font-size:14px;font-weight:400;color:#3a3f4b;">${escapePaymentHistoryText(dateText)}</div>
+                                <div class="payment-history-subtext" style="margin-top:4px;color:#6b7280;">
+                                    Method: ${escapePaymentHistoryText(method)} | Type: ${escapePaymentHistoryText(badgeText)}
                                 </div>
-                            </div>
-                            <div class="payment-history-right">
-                                <div class="payment-history-amount">Rs.${formatPaymentHistoryAmount(payment.payment_amount)}</div>
-                                <div class="payment-history-actions">
-                                    <button type="button" class="payment-action-btn edit-payment-history" data-payment-id="${payment.id}" title="Edit payment">
-                                        <i class="fas fa-pen"></i>
-                                    </button>
-                                    <button type="button" class="payment-action-btn delete-payment-history" data-payment-id="${payment.id}" data-order-id="${payment.order_id || ''}" title="Delete payment">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
+                                <div class="payment-history-subtext" style="margin-top:4px;color:#6b7280;">
+                                    Remarks: ${escapePaymentHistoryText(remarks)}
                                 </div>
+                                ${isEmi ? `<div class="payment-history-subtext" style="margin-top:4px;color:#6b7280;">Ref: ${escapePaymentHistoryText(reference)}</div>` : ''}
                             </div>
+                            <div class="payment-history-actions" style="flex-shrink:0;">
+                                <button type="button" class="payment-action-btn edit-payment-history" data-payment-id="${payment.id}" title="Edit payment">
+                                    <i class="fas fa-pen"></i>
+                                </button>
+                                <button type="button" class="payment-action-btn delete-payment-history" data-payment-id="${payment.id}" data-order-id="${payment.order_id || ''}" title="Delete payment">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div style="margin-top:12px;font-weight:700;color:#2b2f3a;font-size:16px;">
+                            ₹${amount}
                         </div>
                     </div>
                 `;
@@ -3213,6 +3401,7 @@
             });
 
             $(document).on('click', '.make-payment-btn', function() {
+                $('.action-dropdown-menu.show').removeClass('show');
                 let jobCardId = $(this).data('id');
                 let totalAmount = $(this).data('total-amount');
                 let remainingAmount = $(this).data('remaining-amount');
@@ -3301,8 +3490,51 @@
 
                 // ✅ Reset payment method dropdown to default
                 $('#paymentMethodSelect').val('');
+                $('#emi_container').addClass('d-none');
+                $('#emiMonthSelect').html('<option value="" selected disabled>Select EMI Month</option>');
+                $('#emiMonthlyAmount').val('');
+                $('#emiMonthCountHidden').val('0');
+                $('#emiNextMonthHidden').val('1');
 
                 // ✅ Hide history box initially
+                if (String(method).toLowerCase() === 'emi') {
+                    $.when(
+                        $.ajax({
+                            url: '/api/getsalseById/' + jobCardId,
+                            method: 'GET',
+                            headers: { "Authorization": "Bearer " + authToken }
+                        }),
+                        $.ajax({
+                            url: '/api/order/payment-history/' + jobCardId,
+                            method: 'GET',
+                            headers: { "Authorization": "Bearer " + authToken }
+                        })
+                    ).done(function(orderResponse, historyResponse) {
+                        const sale = orderResponse[0]?.sales || {};
+                        const payments = historyResponse[0]?.data || [];
+                        const totalMonths = parseInt(sale.emi_months || sale.emi_duration || sale.emi_tenure || 0, 10) || 0;
+                        const emiPayments = payments.filter(p => String(p.payment_type || '').toLowerCase() === 'emi');
+                        const paidCount = emiPayments.length;
+                        const nextMonth = Math.min(paidCount + 1, Math.max(totalMonths, 1));
+                        const monthlyAmount = parseFloat(sale.emi_monthly_amount || sale.remaining_amount || 0);
+
+                        $('#emi_container').removeClass('d-none');
+                        $('#emiMonthCountHidden').val(totalMonths || 0);
+                        $('#emiNextMonthHidden').val(nextMonth);
+                        $('#emiMonthlyAmount').val(monthlyAmount.toLocaleString(undefined, {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2
+                        }));
+                        $('#emiMonthSelect').html(buildEmiMonthOptions(totalMonths, paidCount, monthlyAmount));
+                        $('#emiMonthSelect').val(String(nextMonth));
+                        $('#bank_container').removeClass('d-none');
+                    }).fail(function() {
+                        $('#emi_container').removeClass('d-none');
+                        $('#emiMonthSelect').html('<option value="" selected disabled>Select EMI Month</option>');
+                        $('#emiMonthlyAmount').val('');
+                    });
+                }
+
                 $('#paymentHistoryBox').addClass('d-none');
                 $('#paymentHistoryList').html('');
 
@@ -3396,7 +3628,7 @@ $('#paymentHistoryList').html(historyHtml);
                 let method = $(this).val();
 
                 // Hide all optional sections first
-                $('#cashOnlineTypeDiv, #fullyCashOnlineFields, #partialCashOnlineFields, #onlineTypeDiv, #paidTypeDiv, #upiAmountDiv, #partialPaidFields, #fullyPaidFields, #bank_container')
+                $('#cashOnlineTypeDiv, #fullyCashOnlineFields, #partialCashOnlineFields, #onlineTypeDiv, #paidTypeDiv, #upiAmountDiv, #partialPaidFields, #fullyPaidFields, #bank_container, #emi_container')
                     .addClass('d-none');
                 $('#bank_id').val('');
                 $("#bankError").text("");
@@ -3411,6 +3643,10 @@ $('#paymentHistoryList').html(historyHtml);
                 } else if (method === 'cash_online') {
                     $('#cashOnlineTypeDiv').removeClass('d-none'); // Show Cash + Online type dropdown
                     $('#bank_container').removeClass('d-none');
+                } else if (method === 'emi') {
+                    $('#emi_container, #bank_container').removeClass('d-none');
+                    $('#paidTypeDiv, #partialPaidFields, #upiAmountDiv, #fullyPaidFields').addClass('d-none');
+                    $('#paymentMethodError').text('');
                 }
             });
 
@@ -3683,6 +3919,20 @@ $('#paymentHistoryList').html(historyHtml);
                     return false;
                 }
 
+                if (paymentMethod === 'emi') {
+                    if (!$('#emiMonthSelect').val()) {
+                        isValid = false;
+                        $('#emiMonthError').text("Please select EMI month.");
+                        return false;
+                    }
+
+                    if (!$("#bank_id").val()) {
+                        isValid = false;
+                        $("#bankError").text("Please select a bank");
+                        return false;
+                    }
+                }
+
 
                 // Cash Payment Validation
                 if (paymentMethod === 'cash') {
@@ -3930,13 +4180,16 @@ $('#paymentHistoryList').html(historyHtml);
                 let submitButton = $(this).find('button[type="submit"]');
                 submitButton.prop('disabled', true).text('Processing...');
                 if (paymentMethodSelect === 'emi') {
-                    let emiTotal = $('#emiTotalCalculated').val();
-                    formData.append('emi_paid_value', emiTotal);
+                    let emiTotal = $('#emiMonthlyAmount').val();
+                    let emiMonth = $('#emiMonthSelect').val();
+                    formData.append('emi_paid_value', emiTotal.replace(/[,]/g, ''));
+                    formData.append('emi_month', emiMonth);
+                    formData.append('amount', emiTotal.replace(/[,]/g, ''));
                 }
 
                 if (selectedPaymentType === 'emi') {
-                    let emi_val = $('#emiTotalCalculated').val();
-                    formData.append('amount', emi_val);
+                    let emi_val = $('#emiMonthlyAmount').val();
+                    formData.append('amount', emi_val.replace(/[,]/g, ''));
                 }
 
                 $.ajax({
@@ -4041,6 +4294,13 @@ $('#paymentHistoryList').html(historyHtml);
                 items += `<button class="open-history" data-id="${order.id}">
                     <i class="fas fa-history"></i> History
                 </button>`;
+
+                // EMI Details
+                if (String(order.payment_method || '').toLowerCase() === 'emi') {
+                    items += `<a href="javascript:void(0);" class="open-emi-details" data-id="${order.id}">
+                        <i class="fas fa-calendar-alt"></i> EMI Details
+                    </a>`;
+                }
 
                 // Convert to Sales
                 if (status === 'quotation') {
@@ -5116,6 +5376,48 @@ $('#paymentHistoryList').html(historyHtml);
                         paymentHistoryModalInstance = new bootstrap.Modal(document.getElementById('paymentHistoryModal'));
                     }
                     paymentHistoryModalInstance.show();
+                }
+            });
+        });
+
+        $(document).off('click', '.open-emi-details').on('click', '.open-emi-details', function() {
+            $('.action-dropdown-menu.show').removeClass('show');
+            const authToken = localStorage.getItem("authToken");
+            const orderId = $(this).data('id');
+
+            if (!emiDetailsModalInstance) {
+                emiDetailsModalInstance = new bootstrap.Modal(document.getElementById('emiDetailsModal'));
+            }
+
+            $('#emiDetailsModalBody').html('<div class="text-center text-muted py-4">Loading EMI details...</div>');
+            emiDetailsModalInstance.show();
+
+            $.ajax({
+                url: '/api/getsalseById/' + orderId,
+                method: 'GET',
+                headers: {
+                    "Authorization": "Bearer " + authToken
+                },
+                success: function(orderResponse) {
+                    $.ajax({
+                        url: '/api/order/payment-history/' + orderId,
+                        method: 'GET',
+                        headers: {
+                            "Authorization": "Bearer " + authToken
+                        },
+                        success: function(historyResponse) {
+                            const order = orderResponse.sales || {};
+                            const payments = historyResponse.data || [];
+                            $('#emiDetailsModalBody').html(renderEmiDetailsContent(order, payments));
+                        },
+                        error: function() {
+                            const order = orderResponse.sales || {};
+                            $('#emiDetailsModalBody').html(renderEmiDetailsContent(order, []));
+                        }
+                    });
+                },
+                error: function() {
+                    $('#emiDetailsModalBody').html('<div class="text-danger text-center py-4">Failed to load EMI details.</div>');
                 }
             });
         });

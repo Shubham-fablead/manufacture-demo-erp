@@ -1113,6 +1113,22 @@ $roundedTotal = max(0, round($preTdsTotal - $tdsAmount, 2));
                 ? 0
                 : min($roundedTotal, $requestedPaidAmount);
 
+            if ($paymentMethod === 'emi') {
+                $emiDownPayment = max(0, (float) ($request->down_payment ?? $request->emi_down_payment ?? 0));
+                $emiLoanAmount = max(0, (float) ($request->loan_amount ?? $request->emi_loan_amount ?? 0));
+
+                if ($emiLoanAmount > 0) {
+                    $paidAmount = max(0, $roundedTotal - $emiLoanAmount);
+                    $requestedPaidAmount = $paidAmount;
+                } elseif ($emiDownPayment > 0) {
+                    $paidAmount = min($roundedTotal, $emiDownPayment);
+                    $requestedPaidAmount = $paidAmount;
+                } else {
+                    $paidAmount = 0;
+                    $requestedPaidAmount = 0;
+                }
+            }
+
             if ($paidAmount <= 0) {
                 $payment_status = 'pending';
             } elseif ($paidAmount < $roundedTotal) {
@@ -1566,7 +1582,7 @@ $roundedTotal = max(0, round($preTdsTotal - $tdsAmount, 2));
         }
 
         // ✅ Apply sorting
-        $sort = $request->input('sort', 'oldest');
+        $sort = $request->input('sort', 'latest');
         switch ($sort) {
             case 'latest':
                 $query->orderBy('created_at', 'desc');
