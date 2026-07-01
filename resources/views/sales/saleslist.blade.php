@@ -1624,6 +1624,31 @@
                                 class="datetimepicker form-control form-control-sm filter-date-input">
                         </div>
 
+                        <!-- Order Type Filter -->
+                        <div class="col-md-2 col-6 filter-field filter-order-type-col">
+                            <div class="mb-1 custom-select2">
+                                <select id="filter-order-type" data-placeholder="All Order Types"
+                                    class="form-control form-control-sm filter-select2">
+                                    <option value="all">All Order Types</option>
+                                    <option value="Self Pickup">Self Pickup</option>
+                                    <option value="Delivery">Delivery</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Sort Filter -->
+                        <div class="col-md-2 col-6 filter-field filter-sort-col">
+                            <div class="mb-1 custom-select2">
+                                <select id="filter-sort" data-placeholder="Oldest First"
+                                    class="form-control form-control-sm filter-select2">
+                                    <option value="oldest">Oldest First</option>
+                                    <option value="latest">Latest First</option>
+                                    <option value="order_no_asc">Order No. 1 to Last</option>
+                                    <option value="order_no_desc">Order No. Last to 1</option>
+                                </select>
+                            </div>
+                        </div>
+
                         <!-- Mobile-only: Excel + PDF buttons (full width, 2 columns) -->
                         <div class="col-12 px-2 mobile-export-row">
                             <button id="exportAllChallan-mobile" class="btn btn-sm btn-success"
@@ -4176,6 +4201,8 @@ $('#paymentHistoryList').html(historyHtml);
                         year: selectedYear,
                         date: selectedDate,
                         financial_year: normalizeFilterValue($('#filter-financial-year').val() || ''),
+                        order_type: normalizeFilterValue($('#filter-order-type').val() || ''),
+                        sort: normalizeFilterValue($('#filter-sort').val() || ''),
                         selectedSubAdminId: selectedSubAdminId || ''
                     },
                     headers: {
@@ -4625,6 +4652,22 @@ $('#paymentHistoryList').html(historyHtml);
                     calculateFilteredTotal();
                 }, 200);
             });
+
+            // Order Type filter
+            $('#filter-order-type').off('change select2:select select2:unselect').on(
+                'change select2:select select2:unselect',
+                function() {
+                    loadOrders(1);
+                }
+            );
+
+            // Sort filter
+            $('#filter-sort').off('change select2:select select2:unselect').on(
+                'change select2:select select2:unselect',
+                function() {
+                    loadOrders(1);
+                }
+            );
 
             function fetchAllOrders() {
                 loadOrders(1);

@@ -1149,6 +1149,12 @@
                 <button type="button" class="today-alert-tab" data-alert-tab="followups">
                     Follow Ups <span class="count-pill" id="todayFollowUpTabCount">0</span>
                 </button>
+                <button type="button" class="today-alert-tab" data-alert-tab="deliveries">
+                    Deliveries <span class="count-pill" id="todayDeliveriesTabCount">0</span>
+                </button>
+                <button type="button" class="today-alert-tab" data-alert-tab="pendingemis">
+                    Pending EMIs <span class="count-pill" id="todayPendingEmisTabCount">0</span>
+                </button>
                 <button type="button" class="today-alert-tab" data-alert-tab="lowstock">
                     Low Stock <span class="count-pill" id="todayLowStockTabCount">0</span>
                 </button>
@@ -1174,6 +1180,8 @@
     let todayAlertData = {
         meetings: [],
         followups: [],
+        deliveries: [],
+        pendingemis: [],
         lowstock: []
     };
     let todayLowStockThreshold = 0;
@@ -1263,18 +1271,24 @@
         const query = `per_page=100&selectedSubAdminId=${encodeURIComponent(selectedSubAdminId)}`;
 
         try {
-            const [meetingsResponse, followUpsResponse, dashboardResponse] = await Promise.all([
+            const [meetingsResponse, followUpsResponse, dashboardResponse, deliveriesResponse, pendingEmisResponse] = await Promise.all([
                 fetch(`/api/getAllMeetings?${query}`, { headers: getApiHeaders(), credentials: 'same-origin' }),
                 fetch(`/api/getAllFollowUps?${query}`, { headers: getApiHeaders(), credentials: 'same-origin' }),
-                fetch(`/api/dashboard-api?selectedSubAdminId=${encodeURIComponent(selectedSubAdminId)}`, { headers: getApiHeaders(), credentials: 'same-origin' })
+                fetch(`/api/dashboard-api?selectedSubAdminId=${encodeURIComponent(selectedSubAdminId)}`, { headers: getApiHeaders(), credentials: 'same-origin' }),
+                fetch(`/api/today-deliveries?selectedSubAdminId=${encodeURIComponent(selectedSubAdminId)}`, { headers: getApiHeaders(), credentials: 'same-origin' }),
+                fetch(`/api/pending-emis?selectedSubAdminId=${encodeURIComponent(selectedSubAdminId)}`, { headers: getApiHeaders(), credentials: 'same-origin' })
             ]);
 
-            const meetingsJson = meetingsResponse.ok ? await meetingsResponse.json() : { data: [] };
-            const followUpsJson = followUpsResponse.ok ? await followUpsResponse.json() : { data: [] };
-            const dashboardJson = dashboardResponse.ok ? await dashboardResponse.json() : null;
+            const meetingsJson    = meetingsResponse.ok    ? await meetingsResponse.json()    : { data: [] };
+            const followUpsJson   = followUpsResponse.ok   ? await followUpsResponse.json()   : { data: [] };
+            const dashboardJson   = dashboardResponse.ok   ? await dashboardResponse.json()   : null;
+            const deliveriesJson  = deliveriesResponse.ok  ? await deliveriesResponse.json()  : { data: [] };
+            const pendingEmisJson = pendingEmisResponse.ok ? await pendingEmisResponse.json() : { data: [] };
 
-            todayAlertData.meetings = (meetingsJson.data || []).filter(item => isTodayAlertDate(item.scheduled_on, item.formatted_scheduled_on));
-            todayAlertData.followups = (followUpsJson.data || []).filter(item => isTodayAlertDate(item.follow_up_datetime, item.formatted_follow_up_datetime));
+            todayAlertData.meetings    = (meetingsJson.data || []).filter(item => isTodayAlertDate(item.scheduled_on, item.formatted_scheduled_on));
+            todayAlertData.followups   = (followUpsJson.data || []).filter(item => isTodayAlertDate(item.follow_up_datetime, item.formatted_follow_up_datetime));
+            todayAlertData.deliveries  = deliveriesJson.data  || [];
+            todayAlertData.pendingemis = pendingEmisJson.data || [];
             const lowStock = dashboardJson?.data?.lowStock;
             todayLowStockThreshold = parseFloat(lowStock?.threshold || 0);
             todayAlertData.lowstock = Array.isArray(lowStock?.products) ? lowStock.products : [];
@@ -1318,18 +1332,25 @@
     }
 
     function updateTodayAlertCounts() {
-        const meetingCount = todayAlertData.meetings.length;
-        const followUpCount = todayAlertData.followups.length;
-        const lowStockCount = todayAlertData.lowstock.length;
-        const totalCount = meetingCount + followUpCount + lowStockCount;
-        const totalBadge = document.getElementById('todayAlertCount');
-        const meetingBadge = document.getElementById('todayMeetingTabCount');
-        const followUpBadge = document.getElementById('todayFollowUpTabCount');
-        const lowStockBadge = document.getElementById('todayLowStockTabCount');
+        const meetingCount     = todayAlertData.meetings.length;
+        const followUpCount    = todayAlertData.followups.length;
+        const deliveriesCount  = todayAlertData.deliveries.length;
+        const pendingEmisCount = todayAlertData.pendingemis.length;
+        const lowStockCount    = todayAlertData.lowstock.length;
+        const totalCount = meetingCount + followUpCount + deliveriesCount + pendingEmisCount + lowStockCount;
 
-        if (meetingBadge) meetingBadge.innerText = meetingCount;
-        if (followUpBadge) followUpBadge.innerText = followUpCount;
-        if (lowStockBadge) lowStockBadge.innerText = lowStockCount;
+        const totalBadge         = document.getElementById('todayAlertCount');
+        const meetingBadge       = document.getElementById('todayMeetingTabCount');
+        const followUpBadge      = document.getElementById('todayFollowUpTabCount');
+        const deliveriesBadge    = document.getElementById('todayDeliveriesTabCount');
+        const pendingEmisBadge   = document.getElementById('todayPendingEmisTabCount');
+        const lowStockBadge      = document.getElementById('todayLowStockTabCount');
+
+        if (meetingBadge)     meetingBadge.innerText     = meetingCount;
+        if (followUpBadge)    followUpBadge.innerText    = followUpCount;
+        if (deliveriesBadge)  deliveriesBadge.innerText  = deliveriesCount;
+        if (pendingEmisBadge) pendingEmisBadge.innerText = pendingEmisCount;
+        if (lowStockBadge)    lowStockBadge.innerText    = lowStockCount;
 
         if (totalBadge) {
             if (totalCount > 0) {
@@ -1347,21 +1368,28 @@
 
         const rows = todayAlertData[activeTodayAlertTab] || [];
         if (!rows.length) {
-            const emptyLabel = activeTodayAlertTab === 'meetings'
-                ? 'meetings'
-                : (activeTodayAlertTab === 'followups' ? 'follow ups' : 'low stock products');
-            content.innerHTML = `<div class="today-alert-empty">No ${emptyLabel} for today</div>`;
+            const emptyLabels = {
+                meetings:    'meetings scheduled for today',
+                followups:   'follow ups scheduled for today',
+                deliveries:  'deliveries scheduled for today',
+                pendingemis: 'pending EMIs',
+                lowstock:    'low stock products'
+            };
+            content.innerHTML = `<div class="today-alert-empty">No ${emptyLabels[activeTodayAlertTab] || 'items'}</div>`;
             return;
         }
 
         if (activeTodayAlertTab === 'meetings') {
             content.innerHTML = renderMeetingAlertTable(rows);
-            return;
+        } else if (activeTodayAlertTab === 'followups') {
+            content.innerHTML = renderFollowUpAlertTable(rows);
+        } else if (activeTodayAlertTab === 'deliveries') {
+            content.innerHTML = renderDeliveriesAlertTable(rows);
+        } else if (activeTodayAlertTab === 'pendingemis') {
+            content.innerHTML = renderPendingEmisAlertTable(rows);
+        } else {
+            content.innerHTML = renderLowStockAlertTable(rows);
         }
-
-        content.innerHTML = activeTodayAlertTab === 'followups'
-            ? renderFollowUpAlertTable(rows)
-            : renderLowStockAlertTable(rows);
     }
 
     window.setTodayLowStockAlerts = function(lowStock) {
@@ -1427,6 +1455,74 @@
                                 <td>${escapeHtml(item.formatted_follow_up_datetime || formatAlertDate(item.follow_up_datetime))}</td>
                                 <td>${escapeHtml(item.assigned_user?.name || 'N/A')}</td>
                                 <td><a class="action-link" href="/follow-up-view/${item.id}" title="View"><i class="fa fa-eye"></i></a></td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            </div>
+        `;
+    }
+
+    function renderDeliveriesAlertTable(rows) {
+        return `
+            <div class="table-responsive">
+                <table class="today-alert-table">
+                    <thead>
+                        <tr>
+                            <th>Order No</th>
+                            <th>Customer</th>
+                            <th>Phone</th>
+                            <th>Total</th>
+                            <th>Payment</th>
+                            <th>Staff</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${rows.map(item => `
+                            <tr>
+                                <td>${escapeHtml(item.order_number || 'N/A')}</td>
+                                <td>${escapeHtml(item.customer_name || 'N/A')}</td>
+                                <td>${escapeHtml(item.customer_phone || 'N/A')}</td>
+                                <td>₹${escapeHtml(item.total_amount || '0.00')}</td>
+                                <td><span class="badges ${item.payment_status === 'completed' ? 'bg-lightgreen' : 'bg-lightyellow'}" style="font-size:11px;">${escapeHtml(item.payment_status || 'N/A')}</span></td>
+                                <td>${escapeHtml(item.assigned_staff || 'Unassigned')}</td>
+                                <td><a class="action-link" href="/sales-details/${item.id}" title="View"><i class="fa fa-eye"></i></a></td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            </div>
+        `;
+    }
+
+    function renderPendingEmisAlertTable(rows) {
+        return `
+            <div class="table-responsive">
+                <table class="today-alert-table">
+                    <thead>
+                        <tr>
+                            <th>Order No</th>
+                            <th>Customer</th>
+                            <th>Phone</th>
+                            <th>Total</th>
+                            <th>Remaining</th>
+                            <th>Monthly EMI</th>
+                            <th>Next Due</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${rows.map(item => `
+                            <tr>
+                                <td>${escapeHtml(item.order_number || 'N/A')}</td>
+                                <td>${escapeHtml(item.customer_name || 'N/A')}</td>
+                                <td>${escapeHtml(item.customer_phone || 'N/A')}</td>
+                                <td>₹${escapeHtml(item.total_amount || '0.00')}</td>
+                                <td style="color:#ea5455;font-weight:600;">₹${escapeHtml(item.remaining_amount || '0.00')}</td>
+                                <td>₹${escapeHtml(item.emi_monthly_amount || 'N/A')}</td>
+                                <td>${escapeHtml(item.next_pending_date || 'N/A')}</td>
+                                <td><a class="action-link" href="/sales-details/${item.id}" title="View"><i class="fa fa-eye"></i></a></td>
                             </tr>
                         `).join('')}
                     </tbody>

@@ -1542,6 +1542,11 @@ $roundedTotal = max(0, round($preTdsTotal - $tdsAmount, 2));
             $query->where('user_id', $request->customerId);
         }
 
+        // ✅ Apply order type filter
+        if ($request->filled('order_type') && $request->order_type !== 'all') {
+            $query->where('order_type', $request->order_type);
+        }
+
         if ($request->filled('search')) {
             $search = trim((string) $request->search);
             $query->where(function ($q) use ($search) {
@@ -1561,7 +1566,22 @@ $roundedTotal = max(0, round($preTdsTotal - $tdsAmount, 2));
         }
 
         // ✅ Apply sorting
-        $query->orderBy('created_at', 'desc');
+        $sort = $request->input('sort', 'oldest');
+        switch ($sort) {
+            case 'latest':
+                $query->orderBy('created_at', 'desc');
+                break;
+            case 'order_no_asc':
+                $query->orderByRaw('CAST(REGEXP_REPLACE(order_number, "[^0-9]", "") AS UNSIGNED) ASC, order_number ASC');
+                break;
+            case 'order_no_desc':
+                $query->orderByRaw('CAST(REGEXP_REPLACE(order_number, "[^0-9]", "") AS UNSIGNED) DESC, order_number DESC');
+                break;
+            case 'oldest':
+            default:
+                $query->orderBy('created_at', 'asc');
+                break;
+        }
 
         $summaryOrders = (clone $query)->get();
         $totalAmount = 0;
@@ -4214,6 +4234,105 @@ if ($setting && $setting->invoice_size === 'small') {
             'status' => true,
             'message' => 'Order updated successfully.',
             'data' => $order->fresh(['assignedStaff:id,name']),
+        ]);
+    }
+
+    /**
+     * Today Deliveries — orders with order_type = 'Delivery' created today
+     */
+    public function todayDeliveries(Request $request)
+    {
+        $user = Auth::guard('api')->user();
+        if (!$user) {
+            return response()->json(['status' => false, 'message' => 'Unauthenticated.'], 401);
+        }
+
+        $selectedSubAdminID = $request->input('selectedSubAdminId');
+
+        $query = Order::with(['user:id,name,phone', 'assignedStaff:id,name'])
+            ->where('isDeleted', 0)
+            ->where('order_type', 'Delivery')
+            ->whereDate('created_at', Carbon::today('Asia/Kolkata'));
+
+        if ($user->role === 'sub-admin') {
+            $query->where('branch_id', $user->id);
+        } elseif ($user->role === 'admin' && $selectedSubAdminID) {
+            $query->where('branch_id', $selectedSubAdminID);
+        } elseif ($user->role === 'staff') {
+            $query->where('created_by', $user->id);
+        } else {
+            $query->where('branch_id', $user->id);
+        }
+
+        $orders = $query->orderByDesc('id')->get()->map(function ($order) {
+            return [
+                'id'              => $order->id,
+                'order_number'    => $order->order_number,
+                'customer_name'   => $order->user?->name ?? 'N/A',
+                'customer_phone'  => $order->user?->phone ?? 'N/A',
+                'total_amount'    => number_format((float) $order->total_amount, 2),
+                'payment_status'  => $order->payment_status,
+                'assigned_staff'  => $order->assignedStaff?->name ?? 'Unassigned',
+                'created_at'      => $order->created_at?->format('d-m-Y'),
+            ];
+        });
+
+        return response()->json([
+            'status' => true,
+            'data'   => $orders,
+            'total'  => $orders->count(),
+        ]);
+    }
+
+    /**
+     * Pending EMIs — orders with payment_method = EMI and remaining_amount > 0
+     * optionally filtered by next_pending_date = today
+     */
+    public function pendingEmis(Request $request)
+    {
+        $user = Auth::guard('api')->user();
+        if (!$user) {
+            return response()->json(['status' => false, 'message' => 'Unauthenticated.'], 401);
+        }
+
+        $selectedSubAdminID = $request->input('selectedSubAdminId');
+
+        $query = Order::with(['user:id,name,phone'])
+            ->where('isDeleted', 0)
+            ->whereRaw("LOWER(payment_method) = 'emi'")
+            ->where('remaining_amount', '>', 0)
+            ->whereIn('payment_status', ['pending', 'partially']);
+
+        if ($user->role === 'sub-admin') {
+            $query->where('branch_id', $user->id);
+        } elseif ($user->role === 'admin' && $selectedSubAdminID) {
+            $query->where('branch_id', $selectedSubAdminID);
+        } elseif ($user->role === 'staff') {
+            $query->where('created_by', $user->id);
+        } else {
+            $query->where('branch_id', $user->id);
+        }
+
+        $orders = $query->orderBy('next_pending_date', 'asc')->get()->map(function ($order) {
+            return [
+                'id'                => $order->id,
+                'order_number'      => $order->order_number,
+                'customer_name'     => $order->user?->name ?? 'N/A',
+                'customer_phone'    => $order->user?->phone ?? 'N/A',
+                'total_amount'      => number_format((float) $order->total_amount, 2),
+                'remaining_amount'  => number_format((float) $order->remaining_amount, 2),
+                'emi_monthly_amount'=> $order->emi_monthly_amount ? number_format((float) $order->emi_monthly_amount, 2) : 'N/A',
+                'next_pending_date' => $order->next_pending_date
+                    ? Carbon::parse($order->next_pending_date)->format('d-m-Y')
+                    : 'N/A',
+                'payment_status'    => $order->payment_status,
+            ];
+        });
+
+        return response()->json([
+            'status' => true,
+            'data'   => $orders,
+            'total'  => $orders->count(),
         ]);
     }
 }
