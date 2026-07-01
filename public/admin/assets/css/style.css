@@ -4440,7 +4440,421 @@ span.select2-container.select2-container--default.select2-container--open {
 }
 
 .sidebar .sidebar-menu {
-    padding: 12px 14px;
+    padding: 16px 14px 20px
+}
+
+/* =============================================
+   SIDEBAR SEARCH BAR (ported from ERP-ACshop)
+   ============================================= */
+.sidebar-search-wrap {
+    display: flex;
+    align-items: center;
+    box-sizing: border-box;
+    width: 100%;
+    height: 40px;
+    margin-bottom: 18px;
+    padding: 0 14px;
+    background: #fff;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    box-shadow: none;
+    transition: border-color .15s ease
+}
+
+.sidebar-search-wrap:focus-within {
+    border-color: #9ca3af;
+    box-shadow: none
+}
+
+.sidebar-search-icon {
+    flex-shrink: 0;
+    margin-right: 10px;
+    color: #9ca3af;
+    font-size: 14px;
+    line-height: 1;
+    width: auto
+}
+
+#sidebar-module-search.sidebar-search-input,
+.sidebar-search-input {
+    flex: 1;
+    width: 100%;
+    min-width: 0;
+    height: 100%;
+    margin: 0;
+    border: none;
+    border-radius: 0;
+    padding: 0;
+    font-size: 14px;
+    font-weight: 400;
+    color: #374151;
+    background: transparent;
+    outline: none;
+    box-shadow: none;
+    -webkit-appearance: none;
+    appearance: none
+}
+
+.sidebar-search-input::placeholder {
+    color: #9ca3af;
+    opacity: 1;
+    font-weight: 400
+}
+
+.sidebar-search-input:focus {
+    border: none;
+    box-shadow: none;
+    outline: none;
+    background: transparent
+}
+
+.sidebar-nav-list {
+    margin-top: 0
+}
+
+.sidebar-nav-list > li:first-child {
+    margin-bottom: 10px
+}
+
+/* Dashboard standalone card item (Image 2 style) */
+li.sidebar-dashboard-item {
+    margin-bottom: 10px
+}
+
+li.sidebar-dashboard-item > a {
+    display: flex;
+    align-items: center;
+    padding: 10px 15px;
+    background: #f4f6f8;
+    border-radius: 8px;
+    border-left: 3px solid #637381;
+    font-weight: 600;
+    color: #092c4c;
+    text-decoration: none;
+    transition: background .15s ease
+}
+
+li.sidebar-dashboard-item > a img,
+li.sidebar-dashboard-item > a svg {
+    width: 18px;
+    flex-shrink: 0
+}
+
+li.sidebar-dashboard-item > a span {
+    margin-left: 10px;
+    font-size: 15px;
+    font-weight: 600;
+    color: #092c4c
+}
+
+li.sidebar-dashboard-item > a:hover {
+    background: #eef1f4;
+    color: #092c4c
+}
+
+li.sidebar-dashboard-item > a:hover span {
+    color: #092c4c
+}
+
+li.sidebar-dashboard-item > a.active {
+    background: #1b2850;
+    border-left-color: #1b2850;
+    color: #fff
+}
+
+li.sidebar-dashboard-item > a.active span {
+    color: #fff
+}
+
+li.sidebar-dashboard-item > a.active img {
+    filter: brightness(0) invert(1)
+}
+
+/* =============================================
+   SIDEBAR CATEGORY SECTIONS (ported from ERP-ACshop)
+   ============================================= */
+
+/* Category header rows (ERP, CRM, Accounting, HR, Settings) */
+.sidebar .sidebar-menu > ul > li.sidebar-category {
+    margin-bottom: 6px;
+    margin-top: 6px
+}
+
+.sidebar .sidebar-menu > ul > li.sidebar-category > a {
+    background: #f4f6f8;
+    border-radius: 8px;
+    border-left: 3px solid #637381;
+    font-weight: 600;
+    padding: 10px 15px;
+    display: flex;
+    align-items: center
+}
+
+.sidebar .sidebar-menu > ul > li.sidebar-category > a span {
+    font-weight: 600;
+    color: #092c4c
+}
+
+.sidebar .sidebar-menu > ul > li.sidebar-category > a:hover,
+.sidebar .sidebar-menu > ul > li.sidebar-category > a.subdrop {
+    background: #eef1f4;
+    color: #092c4c
+}
+
+.sidebar .sidebar-menu > ul > li.sidebar-category > a:hover i,
+.sidebar .sidebar-menu > ul > li.sidebar-category > a.subdrop i {
+    color: #637381
+}
+
+.sidebar .sidebar-menu > ul > li.sidebar-category > a:hover span,
+.sidebar .sidebar-menu > ul > li.sidebar-category > a.subdrop span {
+    color: #092c4c
+}
+
+.sidebar .sidebar-menu > ul > li.sidebar-category > a:hover img {
+    filter: none
+}
+
+/* Category colour variants */
+.sidebar .sidebar-menu > ul > li.sidebar-category-erp > a {
+    border-left-color: #637381;
+    background: #f4f6f8
+}
+
+.sidebar .sidebar-menu > ul > li.sidebar-category-crm > a {
+    border-left-color: #7367f0;
+    background: #f8f7ff
+}
+
+.sidebar .sidebar-menu > ul > li.sidebar-category-crm > a:hover,
+.sidebar .sidebar-menu > ul > li.sidebar-category-crm > a.subdrop {
+    background: #efecff
+}
+
+.sidebar .sidebar-menu > ul > li.sidebar-category-crm > a i {
+    color: #7367f0
+}
+
+.sidebar .sidebar-menu > ul > li.sidebar-category-accounting > a {
+    border-left-color: #28a745;
+    background: #f4fbf6
+}
+
+.sidebar .sidebar-menu > ul > li.sidebar-category-accounting > a:hover,
+.sidebar .sidebar-menu > ul > li.sidebar-category-accounting > a.subdrop {
+    background: #e8f7ec
+}
+
+.sidebar .sidebar-menu > ul > li.sidebar-category-accounting > a i {
+    color: #28a745
+}
+
+.sidebar .sidebar-menu > ul > li.sidebar-category-hr > a {
+    border-left-color: #ff9f43;
+    background: #fff8f2
+}
+
+.sidebar .sidebar-menu > ul > li.sidebar-category-hr > a:hover,
+.sidebar .sidebar-menu > ul > li.sidebar-category-hr > a.subdrop {
+    background: #fff1e3
+}
+
+.sidebar .sidebar-menu > ul > li.sidebar-category-hr > a i {
+    color: #ff9f43
+}
+
+.sidebar .sidebar-menu > ul > li.sidebar-category-settings > a {
+    border-left-color: #007bff;
+    background: #f0f7ff
+}
+
+.sidebar .sidebar-menu > ul > li.sidebar-category-settings > a:hover,
+.sidebar .sidebar-menu > ul > li.sidebar-category-settings > a.subdrop {
+    background: #e1effe
+}
+
+.sidebar .sidebar-menu > ul > li.sidebar-category-settings > a i {
+    color: #007bff
+}
+
+/* Category sub-list container */
+.sidebar .sidebar-menu > ul > li.sidebar-category > ul {
+    background: #fafbfe;
+    padding: 8px 0;
+    margin: 2px 0 8px;
+    border-left: none;
+    border-radius: 5px
+}
+
+.sidebar .sidebar-menu > ul > li.sidebar-category > ul > li {
+    margin-bottom: 0
+}
+
+.sidebar .sidebar-menu > ul > li.sidebar-category > ul > li.submenu > ul {
+    margin-left: 0;
+    padding: 0
+}
+
+/* Module-level items inside a category */
+.sidebar .sidebar-menu > ul > li.sidebar-category > ul > li.sidebar-module > a::after {
+    display: none !important;
+    content: none !important
+}
+
+.sidebar .sidebar-menu > ul > li.sidebar-category > ul > li.sidebar-module > a {
+    padding: 8px 32px 8px 12px !important;
+    border-radius: 5px;
+    margin-bottom: 0;
+    pointer-events: auto;
+    cursor: pointer;
+    background: transparent !important;
+    border: none !important;
+    font-weight: 500;
+    box-shadow: none !important
+}
+
+.sidebar .sidebar-menu > ul > li.sidebar-category > ul > li.sidebar-module > a span {
+    font-size: 15px;
+    font-weight: 500;
+    color: #637381
+}
+
+.sidebar .sidebar-menu > ul > li.sidebar-category > ul > li.sidebar-module > a:hover {
+    background: #1b2850 !important;
+    color: #fff
+}
+
+.sidebar .sidebar-menu > ul > li.sidebar-category > ul > li.sidebar-module > a:hover i {
+    color: #fff
+}
+
+.sidebar .sidebar-menu > ul > li.sidebar-category > ul > li.sidebar-module > a:hover span {
+    color: #fff
+}
+
+.sidebar .sidebar-menu > ul > li.sidebar-category > ul > li.sidebar-module > a:hover img {
+    filter: brightness(0) invert(1)
+}
+
+.sidebar .sidebar-menu > ul > li.sidebar-category > ul > li.sidebar-module > a.subdrop {
+    background: #1b2850 !important;
+    border: none !important;
+    box-shadow: none !important
+}
+
+.sidebar .sidebar-menu > ul > li.sidebar-category > ul > li.sidebar-module > a.subdrop span,
+.sidebar .sidebar-menu > ul > li.sidebar-category > ul > li.sidebar-module > a.subdrop i {
+    color: #fff
+}
+
+.sidebar .sidebar-menu > ul > li.sidebar-category > ul > li.sidebar-module > a.subdrop img {
+    filter: brightness(0) invert(1)
+}
+
+/* Single-link module items (no sub-menu) */
+.sidebar .sidebar-menu > ul > li.sidebar-category > ul > li.sidebar-module-link > a {
+    padding: 8px 12px !important;
+    border-radius: 5px;
+    margin-bottom: 0;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important
+}
+
+.sidebar .sidebar-menu > ul > li.sidebar-category > ul > li.sidebar-module-link > a span {
+    font-size: 15px;
+    font-weight: 500;
+    color: #637381
+}
+
+.sidebar .sidebar-menu > ul > li.sidebar-category > ul > li.sidebar-module-link > a i {
+    color: #6d7c89
+}
+
+.sidebar .sidebar-menu > ul > li.sidebar-category > ul > li.sidebar-module-link > a:hover,
+.sidebar .sidebar-menu > ul > li.sidebar-category > ul > li.sidebar-module-link > a.active {
+    background: #1b2850 !important;
+    border: none !important
+}
+
+.sidebar .sidebar-menu > ul > li.sidebar-category > ul > li.sidebar-module-link > a:hover span,
+.sidebar .sidebar-menu > ul > li.sidebar-category > ul > li.sidebar-module-link > a.active span,
+.sidebar .sidebar-menu > ul > li.sidebar-category > ul > li.sidebar-module-link > a:hover i,
+.sidebar .sidebar-menu > ul > li.sidebar-category > ul > li.sidebar-module-link > a.active i {
+    color: #fff
+}
+
+/* Sub-pages under a category > module */
+.sidebar .sidebar-menu > ul > li.sidebar-category > ul > li.sidebar-module > ul {
+    background: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
+    margin: 0 !important;
+    padding: 0 0 4px !important;
+    display: none
+}
+
+.sidebar .sidebar-menu > ul > li.sidebar-category > ul > li.sidebar-module > a.subdrop + ul {
+    display: block !important
+}
+
+.sidebar .sidebar-menu > ul > li.sidebar-category > ul > li.sidebar-module > ul > li > a {
+    padding: 8px 8px 8px 40px !important;
+    font-size: 14px !important;
+    color: #212b36;
+    font-weight: 500;
+    position: relative;
+    border-radius: 0;
+    margin: 0;
+    display: block
+}
+
+.sidebar .sidebar-menu > ul > li.sidebar-category > ul > li.sidebar-module > ul > li > a::before {
+    display: none !important;
+    content: none !important
+}
+
+.sidebar .sidebar-menu > ul > li.sidebar-category > ul > li.sidebar-module > ul > li > a::after {
+    content: "" !important;
+    display: block !important;
+    border: 1px solid #a1a1a1;
+    width: 10px;
+    height: 10px;
+    border-radius: 50px;
+    position: absolute;
+    top: 13px;
+    left: 16px
+}
+
+.sidebar .sidebar-menu > ul > li.sidebar-category > ul > li.sidebar-module > ul > li > a:hover {
+    color: #ff9f43;
+    background: transparent
+}
+
+.sidebar .sidebar-menu > ul > li.sidebar-category > ul > li.sidebar-module > ul > li > a.active {
+    font-weight: 500;
+    color: #092c4c;
+    background: transparent
+}
+
+.sidebar .sidebar-menu > ul > li.sidebar-category > ul > li.sidebar-module > ul > li > a.active::after {
+    background: #092c4c;
+    border-color: #092c4c
+}
+
+/* Search-active states */
+#sidebar-menu.sidebar-search-active .sidebar-category > a.subdrop .menu-arrow {
+    transform: rotate(90deg);
+    -webkit-transform: rotate(90deg);
+    -ms-transform: rotate(90deg)
+}
+
+#sidebar-menu.sidebar-search-active .sidebar-category > ul > li.sidebar-module > ul {
+    display: block !important
+}
+
+#sidebar-menu.sidebar-search-active .sidebar-no-match {
+    display: none !important
 }
 
 .sidebar .sidebar-menu>ul>li {
