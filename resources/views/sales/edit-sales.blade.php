@@ -574,7 +574,7 @@
                             ? 'completed'
                             : ($prefillTotalPaid > 0 ? 'partially' : 'pending');
 
-                        if ($prefillPendingAmount > 0) {
+                        if ($prefillPendingAmount > 0 && $prefillPaymentMethod !== 'emi') {
                             $prefillPaymentMethod = 'pending';
                         }
 
@@ -1137,7 +1137,7 @@ $gstDataForAttribute = '[]';
                         <div class="col-md-6 col-12">
                             <div class="form-group">
                                 <label for="emiDoId">DO ID</label>
-                                <input type="text" class="form-control" id="emiDoId" placeholder="DO ID"
+                                <input type="number" class="form-control" id="emiDoId" placeholder="DO ID"
                                     value="{{ $emiDoIdValue }}">
                             </div>
                         </div>
@@ -1948,6 +1948,10 @@ $gstDataForAttribute = '[]';
                                 return 'cash';
                             }
 
+                            if (normalized === 'emi') {
+                                return 'emi';
+                            }
+
                             return 'pending';
                         }
 
@@ -2042,11 +2046,11 @@ $(document).on('blur', '#tds-percentage-input', function() {
                             $('#payment_method_col').toggle(!isQuotation);
                             $('#payment_status_col').show();
                             $('#payment_details_row').toggle(shouldShowPaymentRow);
-                            $('#paid_type_col').toggle(shouldShowPaymentRow);
+                            $('#paid_type_col').toggle(shouldShowPaymentRow && method !== 'emi');
                             $('#bank_container').toggle(shouldShowPaymentRow && (method === 'online' || method === 'cash+online'));
                             $('#cash_amount_col').toggle(shouldShowPaymentRow && (method === 'cash' || method === 'cash+online'));
                             $('#online_amount_col').toggle(shouldShowPaymentRow && (method === 'online' || method === 'cash+online'));
-                            $('#pending_amount_col').toggle(shouldShowPaymentRow);
+                            $('#pending_amount_col').toggle(shouldShowPaymentRow && method !== 'emi');
                             $('#emiBox').toggle(shouldShowPaymentRow && method === 'emi');
 
                             $('#cash_amount_label').text(method === 'cash' ? 'Payment Amount' : 'Cash Amount');

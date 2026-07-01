@@ -2529,7 +2529,7 @@
                                         <div class="col-md-6 col-6">
                                             <div class="form-group">
                                                 <label for="emiDoId">DO ID</label>
-                                                <input type="text" class="form-control" id="emiDoId"
+                                                <input type="number" class="form-control" id="emiDoId"
                                                     placeholder="DO ID">
                                             </div>
                                         </div>
