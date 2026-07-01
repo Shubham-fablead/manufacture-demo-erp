@@ -1134,4 +1134,45 @@ class TransactionApiController extends Controller
         $payment->save();
         return response()->json(['status' => true, 'message' => 'Payment deleted successfully.']);
     }
+
+    public function storeBankBookEntry(Request $request)
+    {
+        $user = Auth::guard('api')->user();
+        if (!$user) {
+            return response()->json(['status' => false, 'message' => 'Unauthenticated.'], 401);
+        }
+
+        $request->validate([
+            'type'           => 'required|in:credit,debit,expense',
+            'date'           => 'required|date',
+            'bank_id'        => 'required|integer|exists:bank_master,id',
+            'amount'         => 'required|numeric|min:0.01',
+            'transaction_id' => 'nullable|string|max:255',
+        ]);
+
+        $branchId = $this->resolveBranchId($request);
+
+        // Map status type to payment_method default
+        $paymentMethod = 'online';
+
+        $payment = PaymentStore::create([
+            'user_id'        => $user->id,
+            'order_id'       => null,
+            'payment_amount' => $request->amount,
+            'payment_date'   => $request->date,
+            'payment_method' => $paymentMethod,
+            'payment_type'   => 'fully',
+            'status'         => $request->type === 'debit' ? 'debit' : 'credit',
+            'bank_id'        => $request->bank_id,
+            'remarks'        => $request->transaction_id,
+            'remaining_amount' => 0,
+            'isDeleted'      => 0,
+        ]);
+
+        return response()->json([
+            'status'  => true,
+            'message' => 'Bank book entry added successfully.',
+            'data'    => $payment,
+        ]);
+    }
 }

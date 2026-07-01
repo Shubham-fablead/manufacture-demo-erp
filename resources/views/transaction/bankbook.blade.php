@@ -343,6 +343,11 @@
             <div class="page-title">
                 <h4>Bank Book</h4>
             </div>
+            <div class="page-btn">
+                <button class="btn btn-added" id="addBankBookEntryBtn">
+                    <i class="fa fa-plus me-1"></i> Bank Book
+                </button>
+            </div>
         </div>
 
         <div class="card">
@@ -525,6 +530,53 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                     <button type="button" class="btn btn-warning" id="bb_save_edit_btn">Save Changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- Add Bank Book Entry Modal --}}
+    <div class="modal fade" id="addBankBookModal" tabindex="-1" aria-labelledby="addBankBookModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header" style="background:#ff9f43;">
+                    <h5 class="modal-title text-white" id="addBankBookModalLabel">
+                        <i class="fas fa-landmark me-2"></i>Add Bank Book Entry
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close">x</button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Type</label>
+                        <select id="bb_add_type" class="form-control">
+                            <option value="credit">Receipts</option>
+                            <option value="debit">Payments</option>
+                            <option value="expense">Expenses</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Transaction ID</label>
+                        <input type="text" id="bb_add_transaction_id" class="form-control" placeholder="Transaction ID">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Date</label>
+                        <input type="date" id="bb_add_date" class="form-control">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Bank Name</label>
+                        <select id="bb_add_bank_id" class="form-control">
+                            <option value="">Select Bank</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Amount</label>
+                        <input type="number" id="bb_add_amount" class="form-control" placeholder="0.00" step="0.01" min="0">
+                    </div>
+                    <div id="bb_add_error" class="text-danger small" style="display:none;"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-warning" id="bb_save_add_btn">Save Entry</button>
                 </div>
             </div>
         </div>
@@ -1266,6 +1318,104 @@ $('#grandClosingBalance').text(formatINR(res.current_tab_total));
                             Swal.fire({ icon: 'error', title: 'Error', text: xhr.responseJSON?.message || 'Delete failed.', confirmButtonColor: '#ff9f43' });
                         }
                     });
+                }
+            });
+        });
+
+        // ── Add Bank Book Entry Button ──
+        $('#addBankBookEntryBtn').on('click', function () {
+            // Pre-select type based on active tab
+            const typeMap = { credit: 'credit', debit: 'debit', expense: 'expense' };
+            $('#bb_add_type').val(typeMap[currentStatus] || 'credit');
+            $('#bb_add_transaction_id').val('');
+            $('#bb_add_date').val(new Date().toISOString().split('T')[0]);
+            $('#bb_add_amount').val('');
+            $('#bb_add_error').hide().text('');
+            $('#bb_add_bank_id').html('<option value="">Loading banks...</option>');
+
+            // Fetch banks from API
+            $.ajax({
+                url: '{{ url("/api/banks/data") }}',
+                method: 'GET',
+                headers: { Authorization: 'Bearer ' + localStorage.getItem('authToken') },
+                data: { selectedSubAdminId: localStorage.getItem('selectedSubAdminId') },
+                success: function (res) {
+                    let html = '<option value="">Select Bank</option>';
+                    if (res.status && res.data && res.data.length > 0) {
+                        res.data.forEach(function (bank) {
+                            html += `<option value="${bank.id}">${bank.bank_name}</option>`;
+                        });
+                    } else {
+                        html = '<option value="">No banks found</option>';
+                    }
+                    $('#bb_add_bank_id').html(html);
+                },
+                error: function () {
+                    $('#bb_add_bank_id').html('<option value="">Failed to load banks</option>');
+                }
+            });
+
+            $('#addBankBookModal').modal('show');
+        });
+
+        // Keep type in sync when tab changes
+        $('#bankBookTabs .nav-link').on('click', function () {
+            const status = $(this).data('status');
+            if ($('#addBankBookModal').hasClass('show')) {
+                $('#bb_add_type').val(status);
+            }
+        });
+
+        // ── Save Add Entry ──
+        $('#bb_save_add_btn').on('click', function () {
+            const amount = $('#bb_add_amount').val();
+            const bankId = $('#bb_add_bank_id').val();
+            const date   = $('#bb_add_date').val();
+
+            if (!amount || parseFloat(amount) <= 0) {
+                $('#bb_add_error').text('Please enter a valid amount.').show();
+                return;
+            }
+            if (!bankId) {
+                $('#bb_add_error').text('Please select a bank.').show();
+                return;
+            }
+            if (!date) {
+                $('#bb_add_error').text('Please select a date.').show();
+                return;
+            }
+
+            $('#bb_add_error').hide();
+            $('#bb_save_add_btn').prop('disabled', true).text('Saving...');
+
+            $.ajax({
+                url: '{{ url("/api/bankbook-entry/store") }}',
+                method: 'POST',
+                headers: {
+                    Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                data: {
+                    type:           $('#bb_add_type').val(),
+                    transaction_id: $('#bb_add_transaction_id').val(),
+                    date:           date,
+                    bank_id:        bankId,
+                    amount:         amount,
+                    selectedSubAdminId: localStorage.getItem('selectedSubAdminId')
+                },
+                success: function (res) {
+                    $('#bb_save_add_btn').prop('disabled', false).text('Save Entry');
+                    if (res.status) {
+                        $('#addBankBookModal').modal('hide');
+                        Swal.fire({ icon: 'success', title: 'Saved!', text: res.message, confirmButtonColor: '#ff9f43', timer: 1500, showConfirmButton: false });
+                        loadBankBook(1);
+                    } else {
+                        $('#bb_add_error').text(res.message || 'Failed to save entry.').show();
+                    }
+                },
+                error: function (xhr) {
+                    $('#bb_save_add_btn').prop('disabled', false).text('Save Entry');
+                    $('#bb_add_error').text(xhr.responseJSON?.message || 'Something went wrong.').show();
                 }
             });
         });

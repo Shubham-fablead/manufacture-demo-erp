@@ -302,6 +302,7 @@ Route::middleware(['auth.api'])->group(function () {
      Route::get('/bankbook-payment/{id}', [TransactionApiController::class, 'getPayment'])->name('bankbook.payment.show');
     Route::post('/bankbook-payment/{id}/update', [TransactionApiController::class, 'updatePayment'])->name('bankbook.payment.update');
     Route::post('/bankbook-payment/{id}/delete', [TransactionApiController::class, 'deletePayment'])->name('bankbook.payment.delete');
+    Route::post('/bankbook-entry/store', [TransactionApiController::class, 'storeBankBookEntry'])->name('bankbook.entry.store');
 
 
 
@@ -634,6 +635,10 @@ Route::middleware(['auth.api'])->group(function () {
     Route::get('/getAllMeetings', [MeetingController::class, 'index'])->name('meeting.index');
     Route::post('/meeting/store', [MeetingController::class, 'store'])->name('meeting.store.api');
     Route::put('/meeting/{id}/update', [MeetingController::class, 'update'])->name('meeting.update.api');
+
+    // Today Alerts: Deliveries & Pending EMIs
+    Route::get('/today-deliveries', [SalesController::class, 'todayDeliveries'])->name('today.deliveries');
+    Route::get('/pending-emis', [SalesController::class, 'pendingEmis'])->name('pending.emis');
     Route::get('/meeting/{id}/show', [MeetingController::class, 'show'])->name('meeting.show.api');
     Route::delete('/meeting/{id}/delete', [MeetingController::class, 'destroy'])->name('meeting.delete.api');
     Route::get('/meeting/branches', [MeetingController::class, 'getBranches'])->name('meeting.branches.api');
