@@ -4296,12 +4296,25 @@ if ($setting && $setting->invoice_size === 'small') {
         }
 
         $selectedSubAdminID = $request->input('selectedSubAdminId');
+        $filterMonth = $request->input('month'); // e.g. "2026-07"
 
-        $query = Order::with(['user:id,name,phone'])
+        // Parse target year/month for filtering
+        $targetYear  = null;
+        $targetMonth = null;
+        if ($filterMonth) {
+            $parts = explode('-', $filterMonth);
+            if (count($parts) === 2) {
+                $targetYear  = (int) $parts[0];
+                $targetMonth = (int) $parts[1];
+            }
+        }
+
+        $query = Order::with(['user:id,name,phone', 'payments' => function ($q) {
+            $q->where('isDeleted', 0)->whereRaw("LOWER(payment_method) = 'emi'");
+        }])
             ->where('isDeleted', 0)
             ->whereRaw("LOWER(payment_method) = 'emi'")
-            ->where('remaining_amount', '>', 0)
-            ->whereIn('payment_status', ['pending', 'partially']);
+            ->whereIn('payment_status', ['pending', 'partially', 'completed']);
 
         if ($user->role === 'sub-admin') {
             $query->where('branch_id', $user->id);
@@ -4313,7 +4326,39 @@ if ($setting && $setting->invoice_size === 'small') {
             $query->where('branch_id', $user->id);
         }
 
-        $orders = $query->orderBy('next_pending_date', 'asc')->get()->map(function ($order) {
+        $allOrders = $query->orderBy('created_at', 'asc')->get();
+
+        $orders = $allOrders->map(function ($order) {
+            // Count paid EMI installments
+            $paidCount = $order->payments->count();
+            $totalInstallments = (int) ($order->emi_months ?: $order->emi_duration ?: 1);
+            $totalInstallments = max($totalInstallments, 1);
+
+            // Skip fully settled EMI plans
+            if ($paidCount >= $totalInstallments) {
+                return null;
+            }
+
+            $emiMonthNumber = $paidCount + 1;
+
+            // Build ordinal label: 1st, 2nd, 3rd, 4th...
+            $suffix = match(true) {
+                $emiMonthNumber % 100 >= 11 && $emiMonthNumber % 100 <= 13 => 'th',
+                $emiMonthNumber % 10 === 1 => 'st',
+                $emiMonthNumber % 10 === 2 => 'nd',
+                $emiMonthNumber % 10 === 3 => 'rd',
+                default => 'th',
+            };
+            $emiMonthLabel = $emiMonthNumber . $suffix . ' Month';
+
+            // Calculate next due date:
+            // If next_pending_date is set, use it; otherwise compute from created_at + paid months
+            if ($order->next_pending_date) {
+                $nextDue = Carbon::parse($order->next_pending_date);
+            } else {
+                $nextDue = Carbon::parse($order->created_at)->addMonths($paidCount);
+            }
+
             return [
                 'id'                => $order->id,
                 'order_number'      => $order->order_number,
@@ -4321,13 +4366,30 @@ if ($setting && $setting->invoice_size === 'small') {
                 'customer_phone'    => $order->user?->phone ?? 'N/A',
                 'total_amount'      => number_format((float) $order->total_amount, 2),
                 'remaining_amount'  => number_format((float) $order->remaining_amount, 2),
-                'emi_monthly_amount'=> $order->emi_monthly_amount ? number_format((float) $order->emi_monthly_amount, 2) : 'N/A',
-                'next_pending_date' => $order->next_pending_date
-                    ? Carbon::parse($order->next_pending_date)->format('d-m-Y')
-                    : 'N/A',
+                'emi_monthly_amount'=> $order->emi_monthly_amount
+                    ? number_format((float) $order->emi_monthly_amount, 2)
+                    : number_format((float) $order->remaining_amount, 2),
+                'emi_month_label'   => $emiMonthLabel,
+                'emi_paid_count'    => $paidCount,
+                'next_due_year'     => (int) $nextDue->format('Y'),
+                'next_due_month'    => (int) $nextDue->format('n'),
+                'next_pending_date' => $nextDue->format('d-m-Y'),
                 'payment_status'    => $order->payment_status,
             ];
         });
+
+        // Filter by computed due month
+        if ($targetYear && $targetMonth) {
+            $orders = $orders->filter(function ($item) use ($targetYear, $targetMonth) {
+                if (!$item) {
+                    return false;
+                }
+                return $item['next_due_year'] === $targetYear
+                    && $item['next_due_month'] === $targetMonth;
+            })->values();
+        } else {
+            $orders = $orders->filter()->values();
+        }
 
         return response()->json([
             'status' => true,

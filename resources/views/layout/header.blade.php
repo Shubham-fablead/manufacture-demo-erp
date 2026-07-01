@@ -1276,8 +1276,7 @@
                 fetch(`/api/getAllFollowUps?${query}`, { headers: getApiHeaders(), credentials: 'same-origin' }),
                 fetch(`/api/dashboard-api?selectedSubAdminId=${encodeURIComponent(selectedSubAdminId)}`, { headers: getApiHeaders(), credentials: 'same-origin' }),
                 fetch(`/api/today-deliveries?selectedSubAdminId=${encodeURIComponent(selectedSubAdminId)}`, { headers: getApiHeaders(), credentials: 'same-origin' }),
-                fetch(`/api/pending-emis?selectedSubAdminId=${encodeURIComponent(selectedSubAdminId)}`, { headers: getApiHeaders(), credentials: 'same-origin' })
-            ]);
+                fetch(`/api/pending-emis?month=${encodeURIComponent(new Date().getFullYear() + '-' + String(new Date().getMonth()+1).padStart(2,'0'))}&selectedSubAdminId=${encodeURIComponent(selectedSubAdminId)}`, { headers: getApiHeaders(), credentials: 'same-origin' })            ]);
 
             const meetingsJson    = meetingsResponse.ok    ? await meetingsResponse.json()    : { data: [] };
             const followUpsJson   = followUpsResponse.ok   ? await followUpsResponse.json()   : { data: [] };
@@ -1497,39 +1496,116 @@
     }
 
     function renderPendingEmisAlertTable(rows) {
+        const now = new Date();
+        const defaultMonth = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0');
+        const monthLabel = (() => {
+            const d = new Date(defaultMonth + '-01');
+            return d.toLocaleString('en-IN', { month: 'long', year: 'numeric' });
+        })();
+
+        const tableRows = rows.length > 0
+            ? rows.map(item => `
+                <tr>
+                    <td><a class="action-link" href="/sales-details/${item.id}" style="color:#1b2850;font-weight:600;">#${escapeHtml(item.order_number || 'N/A')}</a></td>
+                    <td>${escapeHtml(item.customer_name || 'N/A')}</td>
+                    <td>${escapeHtml(item.customer_phone || 'N/A')}</td>
+                    <td>${escapeHtml(item.emi_month_label || 'N/A')}</td>
+                    <td style="font-weight:600;">₹${escapeHtml(item.emi_monthly_amount || '0.00')}</td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-secondary pay-emi-btn"
+                            onclick="window.location.href='/sales-details/${item.id}'"
+                            style="font-size:12px;padding:3px 10px;border-radius:4px;">
+                            Pay Previous
+                        </button>
+                    </td>
+                </tr>
+            `).join('')
+            : `<tr><td colspan="6" class="text-center text-muted py-3">No pending EMIs for this month.</td></tr>`;
+
         return `
-            <div class="table-responsive">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
+                <div>
+                    <label style="font-size:13px;font-weight:600;color:#333;margin-bottom:4px;display:block;">Select Month</label>
+                    <input type="month" id="emiMonthFilter" class="form-control form-control-sm"
+                        value="${defaultMonth}" style="width:180px;height:32px;font-size:13px;">
+                </div>
+                <div style="font-size:13px;color:#555;" id="emiMonthLabel">
+                    Showing pending EMIs for <strong>${monthLabel}</strong>
+                </div>
+            </div>
+            <div class="table-responsive" id="emiTableWrapper">
                 <table class="today-alert-table">
                     <thead>
                         <tr>
-                            <th>Order No</th>
+                            <th>Order#</th>
                             <th>Customer</th>
-                            <th>Phone</th>
-                            <th>Total</th>
-                            <th>Remaining</th>
-                            <th>Monthly EMI</th>
-                            <th>Next Due</th>
+                            <th>Contact</th>
+                            <th>EMI Month</th>
+                            <th>EMI Amount</th>
                             <th>Action</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        ${rows.map(item => `
-                            <tr>
-                                <td>${escapeHtml(item.order_number || 'N/A')}</td>
-                                <td>${escapeHtml(item.customer_name || 'N/A')}</td>
-                                <td>${escapeHtml(item.customer_phone || 'N/A')}</td>
-                                <td>₹${escapeHtml(item.total_amount || '0.00')}</td>
-                                <td style="color:#ea5455;font-weight:600;">₹${escapeHtml(item.remaining_amount || '0.00')}</td>
-                                <td>₹${escapeHtml(item.emi_monthly_amount || 'N/A')}</td>
-                                <td>${escapeHtml(item.next_pending_date || 'N/A')}</td>
-                                <td><a class="action-link" href="/sales-details/${item.id}" title="View"><i class="fa fa-eye"></i></a></td>
-                            </tr>
-                        `).join('')}
-                    </tbody>
+                    <tbody id="emiTableBody">${tableRows}</tbody>
                 </table>
             </div>
         `;
     }
+
+    // Handle month filter change for Pending EMIs (delegated)
+    document.addEventListener('change', function(e) {
+        if (e.target && e.target.id === 'emiMonthFilter') {
+            const selectedMonth = e.target.value; // "2026-07"
+            const selectedSubAdminId = localStorage.getItem('selectedSubAdminId') || '';
+
+            // Update label
+            const labelEl = document.getElementById('emiMonthLabel');
+            if (labelEl && selectedMonth) {
+                const d = new Date(selectedMonth + '-01');
+                const label = d.toLocaleString('en-IN', { month: 'long', year: 'numeric' });
+                labelEl.innerHTML = `Showing pending EMIs for <strong>${label}</strong>`;
+            }
+
+            // Fetch filtered data
+            fetch(`/api/pending-emis?month=${encodeURIComponent(selectedMonth)}&selectedSubAdminId=${encodeURIComponent(selectedSubAdminId)}`, {
+                headers: getApiHeaders(),
+                credentials: 'same-origin'
+            })
+            .then(res => res.ok ? res.json() : { data: [] })
+            .then(json => {
+                todayAlertData.pendingemis = json.data || [];
+                updateTodayAlertCounts();
+
+                const rows = todayAlertData.pendingemis;
+                const tbody = document.getElementById('emiTableBody');
+                if (!tbody) return;
+
+                if (!rows.length) {
+                    tbody.innerHTML = `<tr><td colspan="6" class="text-center text-muted py-3">No pending EMIs for this month.</td></tr>`;
+                    return;
+                }
+                tbody.innerHTML = rows.map(item => `
+                    <tr>
+                        <td><a class="action-link" href="/sales-details/${item.id}" style="color:#1b2850;font-weight:600;">#${escapeHtml(item.order_number || 'N/A')}</a></td>
+                        <td>${escapeHtml(item.customer_name || 'N/A')}</td>
+                        <td>${escapeHtml(item.customer_phone || 'N/A')}</td>
+                        <td>${escapeHtml(item.emi_month_label || 'N/A')}</td>
+                        <td style="font-weight:600;">₹${escapeHtml(item.emi_monthly_amount || '0.00')}</td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-secondary"
+                                onclick="window.location.href='/sales-details/${item.id}'"
+                                style="font-size:12px;padding:3px 10px;border-radius:4px;">
+                                Pay Previous
+                            </button>
+                        </td>
+                    </tr>
+                `).join('');
+            })
+            .catch(() => {
+                const tbody = document.getElementById('emiTableBody');
+                if (tbody) tbody.innerHTML = `<tr><td colspan="6" class="text-center text-danger">Failed to load EMIs.</td></tr>`;
+            });
+        }
+    });
 
     function renderLowStockAlertTable(rows) {
         return `
