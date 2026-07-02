@@ -2572,7 +2572,99 @@
             return payload;
         }
 
-        function renderPaymentHistoryCards(history, summary) {
+        function getEmiMonthLabel(index) {
+            const monthNumber = index + 1;
+            const suffix = monthNumber % 100 >= 11 && monthNumber % 100 <= 13
+                ? 'th'
+                : monthNumber % 10 === 1
+                    ? 'st'
+                    : monthNumber % 10 === 2
+                        ? 'nd'
+                        : monthNumber % 10 === 3
+                            ? 'rd'
+                            : 'th';
+            return `${monthNumber}${suffix} Month`;
+        }
+
+        function renderEmiPaymentHistoryTable(sale, history, summary) {
+            const totalMonths = parseInt(sale.emi_months || sale.emi_duration || sale.emi_tenure || 0, 10) || 0;
+            if (!totalMonths) {
+                return '<div class="payment-history-card">No EMI details found.</div>';
+            }
+
+            const emiPayments = (history || [])
+                .filter(payment => String(payment.payment_method || payment.payment_type || '').toLowerCase() === 'emi')
+                .map(payment => ({
+                    ...payment,
+                    amount: parseFloat(payment.payment_amount || payment.emi_monthly_amount || sale.emi_monthly_amount || 0),
+                }));
+
+            const paidMonths = emiPayments.length;
+            const nextDueMonth = Math.min(paidMonths + 1, totalMonths);
+
+            const rowsHtml = Array.from({ length: totalMonths }, (_, index) => {
+                const payment = emiPayments[index] || null;
+                const isPaid = !!payment;
+                const status = isPaid ? 'Paid' : 'Pending';
+                const statusClass = isPaid ? 'bg-lightgreen' : 'bg-lightred';
+                const amount = payment ? payment.amount : parseFloat(sale.emi_monthly_amount || sale.remaining_amount || 0);
+                const paidDate = payment ? formatPaymentHistoryDate(payment.payment_date || payment.created_at) : '-';
+                const remark = payment?.remarks && String(payment.remarks).trim() !== '' ? payment.remarks : '-';
+
+                return `
+                    <tr>
+                        <td>${escapePaymentHistoryText(getEmiMonthLabel(index))}</td>
+                        <td><span class="badges ${statusClass}" style="font-size:11px;">${status}</span></td>
+                        <td>₹${formatPaymentHistoryAmount(amount)}</td>
+                        <td>${escapePaymentHistoryText(paidDate)}</td>
+                        <td>${escapePaymentHistoryText(remark)}</td>
+                    </tr>
+                `;
+            }).join('');
+
+            return `
+                <div class="payment-history-summary" style="margin-bottom:12px;">
+                    <div class="payment-history-summary-row">
+                        <strong>Order Total</strong>
+                        <span>Rs.${formatPaymentHistoryAmount(summary.order_total)}</span>
+                    </div>
+                    <div class="payment-history-summary-row">
+                        <strong>Total Paid</strong>
+                        <span>Rs.${formatPaymentHistoryAmount(summary.total_paid)}</span>
+                    </div>
+                    <div class="payment-history-summary-row">
+                        <strong>Remaining</strong>
+                        <span class="${parseFloat(summary.remaining || 0) > 0 ? 'summary-danger' : ''}">Rs.${formatPaymentHistoryAmount(summary.remaining)}</span>
+                    </div>
+                </div>
+                <div style="margin-bottom:10px;font-size:13px;color:#666;">
+                    Showing EMI month-wise history. Next due: ${escapePaymentHistoryText(getEmiMonthLabel(nextDueMonth - 1))}
+                </div>
+                <div class="table-responsive">
+                    <table class="today-alert-table">
+                        <thead>
+                            <tr>
+                                <th>Month</th>
+                                <th>Status</th>
+                                <th>Amount</th>
+                                <th>Paid On</th>
+                                <th>Remark</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${rowsHtml}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        function renderPaymentHistoryCards(history, summary, sale = {}) {
+            const isEmiSale = String(sale.payment_method || '').toLowerCase() === 'emi';
+            if (isEmiSale) {
+                return renderEmiPaymentHistoryTable(sale, history, summary);
+            }
+
             if (!history.length) {
                 return '<div class="payment-history-card">No payment history found.</div>';
             }
@@ -5338,6 +5430,9 @@ $('#paymentHistoryList').html(historyHtml);
                     }
 
                     $('#globalPaymentHistoryList').html(html);
+                    $('#globalPaymentHistoryList').html(
+                        renderPaymentHistoryCards(response.data || [], response.summary || {}, response.sales || {})
+                    );
 
                     new bootstrap.Modal(document.getElementById('paymentHistoryModal'))
                         .show();
@@ -5370,7 +5465,7 @@ $('#paymentHistoryList').html(historyHtml);
                 success: function(response) {
                     currentPaymentHistorySummary = response.summary || {};
                     $('#globalPaymentHistoryList').html(
-                        renderPaymentHistoryCards(response.data || [], currentPaymentHistorySummary)
+                        renderPaymentHistoryCards(response.data || [], currentPaymentHistorySummary, response.sales || {})
                     );
 
                     if (!paymentHistoryModalInstance) {
