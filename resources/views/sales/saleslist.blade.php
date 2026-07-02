@@ -1977,7 +1977,7 @@
                             <div class="text-danger" id="emiMonthError"></div>
 
                             <label for="emiMonthlyAmount" class="form-label mt-3">Monthly EMI</label>
-                            <input type="text" class="form-control" id="emiMonthlyAmount" readonly>
+                            <input type="text" class="form-control" id="emiMonthlyAmount" readonly disabled>
                             <input type="hidden" id="emiMonthCountHidden" value="0">
                             <input type="hidden" id="emiNextMonthHidden" value="1">
                         </div>
@@ -2586,8 +2586,8 @@
                 const type = rawType
                     ? rawType.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
                     : 'N/A';
-                const reference = getPaymentHistoryReference(payment);
-                const amount = formatPaymentHistoryAmount(payment.payment_amount);
+            const reference = getPaymentHistoryReference(payment);
+            const amount = formatPaymentHistoryAmount(payment.payment_amount || payment.emi_monthly_amount || 0);
                 const remarks = payment.remarks && String(payment.remarks).trim() !== ''
                     ? payment.remarks
                     : 'N/A';
@@ -3490,6 +3490,7 @@
 
                 // ✅ Reset payment method dropdown to default
                 $('#paymentMethodSelect').val('');
+                $('#paymentMethodSelect option').prop('disabled', false);
                 $('#emi_container').addClass('d-none');
                 $('#emiMonthSelect').html('<option value="" selected disabled>Select EMI Month</option>');
                 $('#emiMonthlyAmount').val('');
@@ -3498,6 +3499,10 @@
 
                 // ✅ Hide history box initially
                 if (String(method).toLowerCase() === 'emi') {
+                    $('#paymentMethodSelect option[value="cash"], #paymentMethodSelect option[value="online"], #paymentMethodSelect option[value="cash_online"]').prop('disabled', true);
+                    $('#cashOnlineTypeDiv, #onlineTypeDiv, #paidTypeDiv, #fullyCashOnlineFields, #partialCashOnlineFields, #fullyPaidFields, #partialPaidFields, #upiAmountDiv, #bank_container').addClass('d-none');
+                    $('#cashOnlineTypeSelect, #onlineTypeSelect, #paidTypeSelect, #cashAmount, #cashOnlineFullAmount, #cashOnlinePartialAmount, #upiAmountInput').val('');
+                    $('#bank_id').val('');
                     $.when(
                         $.ajax({
                             url: '/api/getsalseById/' + jobCardId,
@@ -3513,7 +3518,11 @@
                         const sale = orderResponse[0]?.sales || {};
                         const payments = historyResponse[0]?.data || [];
                         const totalMonths = parseInt(sale.emi_months || sale.emi_duration || sale.emi_tenure || 0, 10) || 0;
-                        const emiPayments = payments.filter(p => String(p.payment_type || '').toLowerCase() === 'emi');
+                        const emiPayments = payments.filter(p => {
+                            const method = String(p.payment_method || '').toLowerCase();
+                            const type = String(p.payment_type || '').toLowerCase();
+                            return method === 'emi' || type === 'emi';
+                        });
                         const paidCount = emiPayments.length;
                         const nextMonth = Math.min(paidCount + 1, Math.max(totalMonths, 1));
                         const monthlyAmount = parseFloat(sale.emi_monthly_amount || sale.remaining_amount || 0);
@@ -3533,6 +3542,8 @@
                         $('#emiMonthSelect').html('<option value="" selected disabled>Select EMI Month</option>');
                         $('#emiMonthlyAmount').val('');
                     });
+                } else {
+                    $('#paymentMethodSelect option[value="cash"], #paymentMethodSelect option[value="online"], #paymentMethodSelect option[value="cash_online"]').prop('disabled', false);
                 }
 
                 $('#paymentHistoryBox').addClass('d-none');
@@ -3584,7 +3595,7 @@ history.forEach(function(payment) {
 
             <strong>Remark:</strong> ${paymentRemark}<br>
 
-            ${payment.payment_type === 'emi'
+            ${String(payment.payment_method || '').toLowerCase() === 'emi' || String(payment.payment_type || '').toLowerCase() === 'emi'
                 ? `<strong>EMI Months:</strong> ${payment.emi_month || 0}<br>`
                 : ''}
         </li>

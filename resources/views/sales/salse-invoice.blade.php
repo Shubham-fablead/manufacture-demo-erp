@@ -348,34 +348,36 @@
                                             $emiTenureNumber = is_numeric($emiTenureValue) ? (float) $emiTenureValue : (float) preg_replace('/[^0-9.]/', '', (string) $emiTenureValue);
                                         @endphp
 
-                                        @if (($sales->payment_method ?? '') === 'emi' && ($emiTenureLabel || $emiMonthly || $emiLoanAmount))
-                                            <li style="border-top:1px solid #eef0f4; padding-top:12px;">
-                                                <div style="display:grid; grid-template-columns: 1fr auto; gap:18px; align-items:start; width:100%;">
-                                                    <div>
-                                                        <h4 style="color:#556; margin-bottom:4px;">EMI Plan</h4>
+                                        @if (strtolower((string) ($sales->payment_method ?? '')) === 'emi')
+                                            @if ($emiTenureLabel || $emiMonthly || $emiLoanAmount)
+                                                <li style="border-top:1px solid #eef0f4; padding-top:12px;">
+                                                    <div style="display:grid; grid-template-columns: 1fr auto; gap:18px; align-items:start; width:100%;">
+                                                        <div>
+                                                            <h4 style="color:#556; margin-bottom:4px;">EMI Plan</h4>
+                                                        </div>
+                                                        <div style="text-align:right;">
+                                                            <div style="font-weight:600; color:#1f2a44; white-space:nowrap;">
+                                                                @if($emiMonthly !== null && $emiTenureLabel && $emiTenureNumber > 0)
+                                                                    {{ formatCurrency($emiMonthly, $setting->currency_symbol ?? '₹', $setting->currency_position ?? 'left') }} x {{ $emiTenureLabel }} = {{ formatCurrency($emiMonthly * $emiTenureNumber, $setting->currency_symbol ?? '₹', $setting->currency_position ?? 'left') }}
+                                                                @elseif($emiMonthly !== null && $emiTenureLabel)
+                                                                    {{ formatCurrency($emiMonthly, $setting->currency_symbol ?? '₹', $setting->currency_position ?? 'left') }} x {{ $emiTenureLabel }}
+                                                                @else
+                                                                    EMI selected
+                                                                @endif
+                                                            </div>
+                                                            <div style="font-size:12px; color:#6c757d; margin-top:4px; white-space:nowrap;">
+                                                                Loan amount: {{ $emiLoanAmount !== null ? formatCurrency($emiLoanAmount, $setting->currency_symbol ?? '₹', $setting->currency_position ?? 'left') : '₹0.00' }}
+                                                                @if($emiTenureLabel)
+                                                                    | Tenure: {{ $emiTenureLabel }}
+                                                                @endif
+                                                            </div>
+                                                            <div style="font-size:11px; color:#8b92a2; margin-top:3px; white-space:nowrap;">
+                                                                Installment total shown separately from down payment.
+                                                            </div>
+                                                        </div>
                                                     </div>
-                                                    <div style="text-align:right;">
-                                                        <div style="font-weight:600; color:#1f2a44; white-space:nowrap;">
-                                                            @if($emiMonthly !== null && $emiTenureLabel && $emiTenureNumber > 0)
-                                                                {{ formatCurrency($emiMonthly, $setting->currency_symbol ?? '₹', $setting->currency_position ?? 'left') }} x {{ $emiTenureLabel }} = {{ formatCurrency($emiMonthly * $emiTenureNumber, $setting->currency_symbol ?? '₹', $setting->currency_position ?? 'left') }}
-                                                            @elseif($emiMonthly !== null && $emiTenureLabel)
-                                                                {{ formatCurrency($emiMonthly, $setting->currency_symbol ?? '₹', $setting->currency_position ?? 'left') }} x {{ $emiTenureLabel }}
-                                                            @else
-                                                                EMI selected
-                                                            @endif
-                                                        </div>
-                                                        <div style="font-size:12px; color:#6c757d; margin-top:4px; white-space:nowrap;">
-                                                            Loan amount: {{ $emiLoanAmount !== null ? formatCurrency($emiLoanAmount, $setting->currency_symbol ?? '₹', $setting->currency_position ?? 'left') : '₹0.00' }}
-                                                            @if($emiTenureLabel)
-                                                                | Tenure: {{ $emiTenureLabel }}
-                                                            @endif
-                                                        </div>
-                                                        <div style="font-size:11px; color:#8b92a2; margin-top:3px; white-space:nowrap;">
-                                                            Installment total shown separately from down payment.
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </li>
+                                                </li>
+                                            @endif
                                         @endif
 
                                         <li id="extraPaidRow" style="display: none;">
@@ -409,6 +411,7 @@
 @push('js')
     <script>
         const userAddress = @json($userAddress);
+        const userDeliveryAddress = @json($userDeliveryAddress ?? '');
     </script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -695,6 +698,14 @@
                                                                                                                                                                         <font style="vertical-align: inherit;">
                                                                                                                                                                             <font style="vertical-align: inherit; font-size: 14px; font-weight: 400;" class="customer-address">
                                                                                                                                                                                 ${userAddress}
+                                                                                                                                                                            </font>
+                                                                                                                                                                        </font><br>` : ''
+                                                                    }
+
+                                                                    ${userDeliveryAddress ? `
+                                                                                                                                                                        <font style="vertical-align: inherit;">
+                                                                                                                                                                            <font style="vertical-align: inherit; font-size: 14px; font-weight: 400;" class="customer-delivery-address">
+                                                                                                                                                                                Delivery Address: ${userDeliveryAddress}
                                                                                                                                                                             </font>
                                                                                                                                                                         </font><br>` : ''
                                                                     }

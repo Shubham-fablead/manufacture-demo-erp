@@ -126,6 +126,11 @@ class SalesController extends Controller
             ->where('branch_id', $branchIdToUse)
             ->get();
 
+        $staffUsers = User::where('role', 'staff')
+            ->where('branch_id', $branchIdToUse)
+            ->where('isDeleted', 0)
+            ->get();
+
         $setting = $this->fallbackSetting($branchIdToUse);
         $labourItems = LabourItem::where('created_by', $branchIdToUse)
             ->where('isDeleted', false)
@@ -135,7 +140,7 @@ class SalesController extends Controller
             ->where('isDeleted', 0)
             ->get();
 
-        return view('sales/edit-sales', compact('sales', 'TaxRate', 'category', 'usernames', 'products', 'update_id', 'setting', 'labourItems', 'banks'));
+        return view('sales/edit-sales', compact('sales', 'TaxRate', 'category', 'usernames', 'products', 'staffUsers', 'update_id', 'setting', 'labourItems', 'banks'));
     }
 
     public function sales_details($id)
@@ -295,6 +300,7 @@ class SalesController extends Controller
         $user = $sales->user_id ? User::with('userDetail')->find($sales->user_id) : null;
 
         $userAddress = $user && $user->userDetail ? $user->userDetail->address : null;
+        $userDeliveryAddress = $user && $user->userDetail ? $user->userDetail->delivery_address : null;
 
         // ✅ Check if payment already started for this order
         $hasPaymentStarted = PaymentStore::where('order_id', $view_id)
@@ -306,7 +312,7 @@ class SalesController extends Controller
 
         // dd($view_id,  $sales,  $totalAmount, $setting, $userAddress);
         // dd($orderItems);
-        return view('sales/salse-invoice', compact('view_id', 'sales', 'totalAmount', 'setting', 'userAddress', 'orderItems', 'hasPaymentStarted', 'hasReturnStarted'));
+        return view('sales/salse-invoice', compact('view_id', 'sales', 'totalAmount', 'setting', 'userAddress', 'userDeliveryAddress', 'orderItems', 'hasPaymentStarted', 'hasReturnStarted'));
     }
 
     // public function salse_invoice_pdf($id)
@@ -729,6 +735,7 @@ class SalesController extends Controller
             'email'      => $user->email ?? '',
             'phone'      => $user->phone ?? '',
             'address'    => optional($user->userDetail)->address ?? '',
+            'delivery_address' => optional($user->userDetail)->delivery_address ?? '',
             'gst_number' => $user->gst_number ?? '',
             'pan_number' => $user->pan_number ?? '',
         ] : [
@@ -737,6 +744,7 @@ class SalesController extends Controller
             'email'      => '',
             'phone'      => '',
             'address'    => '',
+            'delivery_address' => '',
             'gst_number' => '',
             'pan_number' => '',
         ];

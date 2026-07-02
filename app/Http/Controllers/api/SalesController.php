@@ -147,6 +147,31 @@ class SalesController extends Controller
 
         $order = Order::findOrFail($order_id);
 
+        $history = $history->map(function ($payment) use ($order) {
+            $method = strtolower((string) ($payment->payment_method ?? $payment->payment_type ?? ''));
+            $amount = (float) ($payment->payment_amount ?? 0);
+
+            if ($method === 'emi') {
+                $monthlyAmount = (float) (
+                    $payment->emi_monthly_amount
+                    ?? $order->emi_monthly_amount
+                    ?? $order->remaining_amount
+                    ?? 0
+                );
+
+                if ($amount <= 0) {
+                    $amount = $monthlyAmount;
+                }
+
+                $payment->payment_method = 'emi';
+                $payment->payment_type = 'emi';
+                $payment->emi_monthly_amount = round(max(0, $monthlyAmount), 2);
+            }
+
+            $payment->payment_amount = round(max(0, $amount), 2);
+            return $payment;
+        });
+
         $totalPaid = $history->sum('payment_amount');
 
         // Calculate Return Amount
@@ -192,6 +217,16 @@ class SalesController extends Controller
             // Determine payment amount
             $paymentAmount = $request->emi_total_new ?? $request->emi_total ?? $request->amount ?? $request->upi_online_amount ?? 0;
 
+            if (strtolower((string) ($request->payment_method ?? $request->payment_type ?? '')) === 'emi') {
+                $paymentAmount = $request->emi_paid_value
+                    ?? $request->emi_monthly_amount
+                    ?? $request->monthly_emi
+                    ?? $request->emi_monthly
+                    ?? $request->amount
+                    ?? $paymentAmount
+                    ?? 0;
+            }
+
             if ($request->filled('cash_amount') && $request->filled('online_amount')) {
                 $paymentAmount = (float) $request->cash_amount + (float) $request->online_amount;
             } elseif ($request->filled('fully_cash_amount') && $request->filled('full_online_amount')) {
@@ -219,9 +254,7 @@ class SalesController extends Controller
 
             ) {
                 $type = 'fully';
-            } elseif (
-                in_array($request->emi_type, ['emi'])
-            ) {
+            } elseif (strtolower((string) ($request->payment_method ?? $request->payment_type ?? '')) === 'emi' || in_array($request->emi_type, ['emi'])) {
                 $type = 'emi';
             } else {
                 $type = 'fully';
@@ -3437,7 +3470,11 @@ public function update_sale(Request $request)
                 'name' => $user->name ?? 'walk-in-customer',
                 'email' => $user->email ?? '',
                 'phone' => $user->phone ?? '',
-                'address' => optional($user->userDetail)->address ?? 'arga',
+                'address' => optional($user->userDetail)->address ?? '',
+                'delivery_address' => optional($user->userDetail)->delivery_address ?? '',
+                'company_name' => optional($user->userDetail)->company_name ?? '',
+                'gst_number' => optional($user->userDetail)->gst_number ?? '',
+                'pan_number' => optional($user->userDetail)->pan_number ?? '',
             ],
             'subtotal' => $formattedSubtotal,
             'discountPercent' => $discountPercent,
@@ -3448,6 +3485,13 @@ public function update_sale(Request $request)
             'paidAmount' => $formattedPaidAmount,
             'pendingAmount' => $formattedPendingAmount,
             'taxDetails' => $taxDetails,
+            'emiPayments' => PaymentStore::where('order_id', $view_id)
+                ->where('isDeleted', 0)
+                ->whereRaw("LOWER(payment_method) = 'emi'")
+                ->orderBy('payment_date', 'asc')
+                ->orderBy('id', 'asc')
+                ->get(['id', 'emi_month', 'payment_amount', 'payment_date'])
+                ->toArray(),
         ];
 
         // ========== NEW PART: INVOICE SIZE SELECTION ==========
