@@ -184,6 +184,7 @@ class SalesController extends Controller
         return response()->json([
             'status' => 'success',
             'data' => $history,
+            'sales' => $order->toArray(),
             'summary' => [
                 'order_total' => $order->total_amount,
                 'total_paid' => $totalPaid,
@@ -214,33 +215,36 @@ class SalesController extends Controller
         ]);
 
         if ($request->filled('order_id')) {
-            // Determine payment amount
-            $paymentAmount = $request->emi_total_new ?? $request->emi_total ?? $request->amount ?? $request->upi_online_amount ?? 0;
+            $paymentMethod = strtolower((string) ($request->payment_method ?? $request->payment_type ?? ''));
 
-            if (strtolower((string) ($request->payment_method ?? $request->payment_type ?? '')) === 'emi') {
-                $paymentAmount = $request->emi_paid_value
-                    ?? $request->emi_monthly_amount
+            // Determine payment amount. EMI must always use the EMI installment amount.
+            $paymentAmount = (float) ($request->payment_amount ?? $request->amount ?? 0);
+            if ($paymentMethod === 'emi' || $request->filled('emi_paid_value') || $request->filled('monthly_emi') || $request->filled('emi_monthly_amount')) {
+                $paymentAmount = (float) (
+                    $request->emi_paid_value
                     ?? $request->monthly_emi
+                    ?? $request->emi_monthly_amount
                     ?? $request->emi_monthly
                     ?? $request->amount
                     ?? $paymentAmount
-                    ?? 0;
-            }
-
-            if ($request->filled('cash_amount') && $request->filled('online_amount')) {
+                    ?? 0
+                );
+            } elseif ($request->filled('cash_amount') && $request->filled('online_amount')) {
                 $paymentAmount = (float) $request->cash_amount + (float) $request->online_amount;
             } elseif ($request->filled('fully_cash_amount') && $request->filled('full_online_amount')) {
                 $paymentAmount = (float) $request->fully_cash_amount + (float) $request->full_online_amount;
-            } elseif ($request->cashAmount) {
-                $paymentAmount = $request->cashAmount;
-            } elseif ($request->upi_online_amount) {
-                $paymentAmount = $request->upi_online_amount;
-            } elseif ($request->emi_monthly) {
-                $paymentAmount = $request->emi_monthly;
+            } elseif ($request->filled('cashAmount')) {
+                $paymentAmount = (float) $request->cashAmount;
+            } elseif ($request->filled('upi_online_amount')) {
+                $paymentAmount = (float) $request->upi_online_amount;
+            } elseif ($request->filled('emi_monthly')) {
+                $paymentAmount = (float) $request->emi_monthly;
             }
 
             // Determine payment type
-            if (
+            if ($paymentMethod === 'emi' || in_array($request->emi_type, ['emi'])) {
+                $type = 'emi';
+            } elseif (
                 in_array($request->paid_type, ['cash_partially']) ||
                 in_array($request->online_type, ['online_partially']) ||
                 in_array($request->cash_online_type, ['cash_online_partially'])
@@ -251,11 +255,8 @@ class SalesController extends Controller
                 in_array($request->online_type, ['online_fully']) ||
                 in_array($request->cash_online_type, ['cash_online_fully']) ||
                 $request->payment_type === 'fully'
-
             ) {
                 $type = 'fully';
-            } elseif (strtolower((string) ($request->payment_method ?? $request->payment_type ?? '')) === 'emi' || in_array($request->emi_type, ['emi'])) {
-                $type = 'emi';
             } else {
                 $type = 'fully';
             }
@@ -395,7 +396,7 @@ class SalesController extends Controller
                     $updateData['payment_status'] = 'pending';
                 }
                 // If new EMI is being set
-                if ($request->filled('new_emi_value') && $request->payment_method == 'emi' || $request->filled('emi_paid_value')) {
+                if (($request->filled('new_emi_value') && $paymentMethod === 'emi') || $request->filled('emi_paid_value')) {
                     //  dd($request->all());
                     $updateData['payment_method'] = 'EMI';
                     $updateData['emi_duration'] = $request->emi_month_new ?? $request->emi_month;
@@ -4373,7 +4374,11 @@ if ($setting && $setting->invoice_size === 'small') {
             $query->where('branch_id', $user->id);
         }
 
-        $orders = $query->orderBy('next_pending_date', 'asc')->get()->map(function ($order) {
+        $orders = $query
+            ->orderByDesc('remaining_amount')
+            ->orderByDesc('id')
+            ->get()
+            ->map(function ($order) {
             return [
                 'id'                => $order->id,
                 'order_number'      => $order->order_number,
@@ -4382,9 +4387,7 @@ if ($setting && $setting->invoice_size === 'small') {
                 'total_amount'      => number_format((float) $order->total_amount, 2),
                 'remaining_amount'  => number_format((float) $order->remaining_amount, 2),
                 'emi_monthly_amount'=> $order->emi_monthly_amount ? number_format((float) $order->emi_monthly_amount, 2) : 'N/A',
-                'next_pending_date' => $order->next_pending_date
-                    ? Carbon::parse($order->next_pending_date)->format('d-m-Y')
-                    : 'N/A',
+                'next_pending_date' => 'N/A',
                 'payment_status'    => $order->payment_status,
             ];
         });
