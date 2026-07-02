@@ -641,6 +641,35 @@
                         </div>
                     </div>
                     <div class="col-lg-12 col-sm-12 col-12">
+                        <div class="row">
+                            <div class="col-lg-3 col-sm-6 col-6">
+                                <div class="form-group">
+                                    <label>Assign Staff</label>
+                                    <select name="assigned_staff" id="assigned_staff" class="form-control select2">
+                                        <option value="">Select Staff</option>
+                                        @foreach ($staffUsers as $staff)
+                                            <option value="{{ $staff->id }}"
+                                                {{ (string) ($sales->assigned_staff ?? '') === (string) $staff->id ? 'selected' : '' }}>
+                                                {{ $staff->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-sm-6 col-6">
+                                <div class="form-group">
+                                    <label>Order Type</label>
+                                    <select name="order_type" id="order_type" class="form-control">
+                                        <option value="Self Pickup" {{ ($sales->order_type ?? 'Self Pickup') === 'Self Pickup' ? 'selected' : '' }}>
+                                            Self Pickup
+                                        </option>
+                                        <option value="Delivery" {{ ($sales->order_type ?? 'Self Pickup') === 'Delivery' ? 'selected' : '' }}>
+                                            Delivery
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
                         <div class="form-group">
                             <label>Product Name</label>
                             <div class="input-groupicon">
@@ -3608,7 +3637,9 @@ addProductToTable(
                                 emi_do_id: $('#emiDoId').val() || null,
                                 emi_pan_number: $('#emiPanNumber').val() || null,
                                 emi_guarnator_name: $('#emiGuarantorName').val() || null,
-                                emi_bank_id: $('#emi_bank_id').val() || null
+                                emi_bank_id: $('#emi_bank_id').val() || null,
+                                assigned_staff: $('#assigned_staff').val(),
+                                order_type: $('#order_type').val()
                             };
 
                             // Collect labour items

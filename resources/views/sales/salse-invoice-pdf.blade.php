@@ -250,6 +250,12 @@
                                 <td style="text-align: right; padding: 0 0 4px 0; word-wrap: break-word; white-space: normal;">{{ $customer['address'] }}</td>
                             </tr>
                         @endif
+                        @if (!empty($customer['delivery_address']))
+                            <tr>
+                                <td class="invoice-label-nowrap" style="padding: 0 0 4px 0; vertical-align: top;">Delivery Address :</td>
+                                <td style="text-align: right; padding: 0 0 4px 0; word-wrap: break-word; white-space: normal;">{{ $customer['delivery_address'] }}</td>
+                            </tr>
+                        @endif
                         @if (!empty($customer['gst_number']))
                             <tr>
                                 <td style="padding: 0 0 4px 0;">GST :</td>
@@ -573,6 +579,94 @@
 
                 </table>
 
+                @endif
+
+                @php
+                    $paymentMethod = strtolower((string) ($sales->payment_method ?? ''));
+                    $isEmiInvoice = $paymentMethod === 'emi';
+                    $emiTenure = (int) ($sales->emi_months ?? $sales->emi_duration ?? $sales->emi_tenure ?? 0);
+                    $emiMonthlyAmount = (float) ($sales->emi_monthly_amount ?? 0);
+                    $emiLoanAmount = (float) ($sales->emi_loan_amount ?? 0);
+                    $emiMonthLabel = $emiTenure > 0 ? $emiTenure . ' Months' : 'EMI';
+                    $emiDistributionRows = [];
+
+                    if ($isEmiInvoice && $emiTenure > 0) {
+                        // Build a map: month_number => payment record
+                        // emi_month stores which installment (1,2,3...) was paid.
+                        // If emi_month is null/0, use sequential position by payment order.
+                        $emiPaymentsSorted = collect($emiPayments ?? [])
+                            ->sortBy(['payment_date', 'id'])
+                            ->values();
+
+                        // Build lookup: installment index (1-based) => payment
+                        $paidMap = [];
+                        foreach ($emiPaymentsSorted as $idx => $pay) {
+                            $installment = !empty($pay['emi_month']) ? (int)$pay['emi_month'] : ($idx + 1);
+                            $paidMap[$installment] = $pay;
+                        }
+
+                        for ($month = 1; $month <= $emiTenure; $month++) {
+                            $isPaid = isset($paidMap[$month]);
+                            $paidDate = '-';
+                            if ($isPaid && !empty($paidMap[$month]['payment_date'])) {
+                                try {
+                                    $paidDate = \Carbon\Carbon::parse($paidMap[$month]['payment_date'])->format('d-m-Y');
+                                } catch (\Exception $e) {
+                                    $paidDate = '-';
+                                }
+                            }
+                            $emiDistributionRows[] = [
+                                'month'     => $month,
+                                'amount'    => $emiMonthlyAmount,
+                                'status'    => $isPaid ? 'Paid' : 'Pending',
+                                'paid_date' => $paidDate,
+                            ];
+                        }
+                    }
+                @endphp
+
+                @if ($isEmiInvoice && !empty($emiDistributionRows))
+                    <div style="margin-top:12px; border:1px solid #d9e1f2; page-break-inside: avoid;">
+                        <div style="background:#1f2f5f; color:#fff; padding:8px 10px; font-weight:700; text-transform:uppercase; font-size:12px;">
+                            EMI Distribution
+                        </div>
+                        <table style="width:100%; border-collapse:collapse; font-size:11px;">
+                            <tr>
+                                <td style="width:38%; vertical-align:top; padding:10px; border-right:1px solid #d9e1f2;">
+                                    <div style="font-weight:700; font-size:14px; margin-bottom:8px;">
+                                        {{ $setting->currency_symbol }}{{ number_format($emiMonthlyAmount, 2) }} x {{ $emiMonthLabel }} = {{ $setting->currency_symbol }}{{ number_format($emiMonthlyAmount * max($emiTenure, 1), 2) }}
+                                    </div>
+                                    <div style="margin-bottom:4px;">Loan Amount: {{ $setting->currency_symbol }}{{ number_format($emiLoanAmount, 2) }}</div>
+                                    <div style="margin-bottom:8px;">Tenure: {{ $emiMonthLabel }}</div>
+                                    <div style="font-size:10px; color:#c67a00; border:1px solid #f5c36a; background:#fff8e8; padding:8px; border-radius:3px; line-height:1.5;">
+                                        Note: EMI distribution is shown month-wise. Paid months are marked as Paid and remaining months are pending as per the selected EMI tenure.
+                                    </div>
+                                </td>
+                                <td style="width:62%; vertical-align:top;">
+                                    <table style="width:100%; border-collapse:collapse;">
+                                        <thead>
+                                            <tr style="background:#edf2fa;">
+                                                <th style="padding:7px; text-align:left; border:1px solid #d9e1f2;">Month</th>
+                                                <th style="padding:7px; text-align:right; border:1px solid #d9e1f2;">Amount</th>
+                                                <th style="padding:7px; text-align:center; border:1px solid #d9e1f2;">Status</th>
+                                                <th style="padding:7px; text-align:center; border:1px solid #d9e1f2;">Paid Date</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach ($emiDistributionRows as $row)
+                                                <tr>
+                                                    <td style="padding:7px; border:1px solid #d9e1f2;">{{ $loop->iteration }}{{ $loop->iteration === 1 ? 'st' : ($loop->iteration === 2 ? 'nd' : ($loop->iteration === 3 ? 'rd' : 'th')) }} Month</td>
+                                                    <td style="padding:7px; border:1px solid #d9e1f2; text-align:right;">{{ $setting->currency_symbol }}{{ number_format($row['amount'], 2) }}</td>
+                                                    <td style="padding:7px; border:1px solid #d9e1f2; text-align:center; color:{{ $row['status'] === 'Paid' ? '#28a745' : '#ff4d4f' }}; font-weight:700;">{{ $row['status'] }}</td>
+                                                    <td style="padding:7px; border:1px solid #d9e1f2; text-align:center;">{{ $row['paid_date'] }}</td>
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
                 @endif
 
 
