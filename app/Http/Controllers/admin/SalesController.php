@@ -18,6 +18,11 @@ use App\Models\User;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Style\Border;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class SalesController extends Controller
 {
@@ -1176,6 +1181,125 @@ class SalesController extends Controller
             ]);
 
         return $pdf->download('sales_report.pdf');
+    }
+
+    public function export_sales_report_excel($ids)
+    {
+        $authUser   = auth()->user();
+        $subAdminId = session('selectedSubAdminId');
+
+        if ($authUser->role === 'staff' && $authUser->branch_id) {
+            $branchIdToUse = $authUser->branch_id;
+        } elseif ($authUser->role === 'admin' && ! empty($subAdminId)) {
+            $branchIdToUse = $subAdminId;
+        } else {
+            $branchIdToUse = $authUser->id;
+        }
+
+        $idsArray = explode(',', $ids);
+        $sales = OrderItem::with('product.category', 'invoice', 'user.userDetail')
+            ->whereIn('id', $idsArray)
+            ->get();
+
+        if ($sales->isEmpty()) {
+            return redirect()->route('sales.index')->with('error', 'No sales data found.');
+        }
+
+        $setting = Setting::where('branch_id', $branchIdToUse)->first();
+        $currencySymbol = $setting->currency_symbol ?? '₹';
+        $currencyPosition = $setting->currency_position ?? 'left';
+
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setTitle('Sales Report');
+
+        $sheet->setCellValue('A1', 'Sales Report');
+        $sheet->mergeCells('A1:N1');
+        $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(14);
+        $sheet->getStyle('A1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+
+        $headers = ['Sr. No.', 'Order Number', 'Sale Date', 'Product', 'Customer', 'GST NO', 'Address', 'Category', 'Price', 'Discount', 'Final Price', 'Qty', 'Taxes', 'Total'];
+        $col = 'A';
+        foreach ($headers as $header) {
+            $sheet->setCellValue($col . '3', $header);
+            $col++;
+        }
+
+        $sheet->getStyle('A3:N3')->getFont()->setBold(true);
+        $sheet->getStyle('A3:N3')->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('FF9F43');
+        $sheet->getStyle('A3:N3')->getFont()->getColor()->setRGB('FFFFFF');
+        $sheet->getStyle('A3:N3')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('A3:N3')->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
+
+        foreach (range('A', 'N') as $column) {
+            $sheet->getColumnDimension($column)->setAutoSize(true);
+        }
+
+        $rowNum = 4;
+        foreach ($sales as $index => $sale) {
+            $discountPercent = $sale->invoice->discount ?? 0;
+            $originalUnitPrice = $sale->quantity ? $sale->total_amount / $sale->quantity : 0;
+            $discountPerUnit = ($originalUnitPrice * $discountPercent) / 100;
+            $finalUnitPrice = $originalUnitPrice - $discountPerUnit;
+            $finalTotal = $sale->rowFinalTotal ?? $finalUnitPrice * $sale->quantity;
+            $orderNumber = $sale->invoice->order_number ?? 'N/A';
+            $saleDate = optional($sale->created_at)->format('d M Y') ?? 'N/A';
+            $customerName = $sale->user->name ?? 'N/A';
+            $gstNo = $sale->user->gst_number ?? 'N/A';
+            $customerAddress = optional($sale->user->userDetail)->address ?? 'N/A';
+            $category = $sale->product->category->name ?? 'N/A';
+
+            $taxText = 'N/A';
+            if ($sale->rowGSTOption === 'with_gst' && ! empty($sale->rowTaxes)) {
+                $taxText = collect($sale->rowTaxes)->map(function ($t) use ($currencySymbol, $currencyPosition) {
+                    $amount = $currencyPosition === 'left'
+                        ? $currencySymbol . number_format($t['amount'], 2)
+                        : number_format($t['amount'], 2) . $currencySymbol;
+
+                    return ($t['name'] ?? 'Tax') . ' (' . ($t['rate'] ?? '0') . '%): ' . $amount;
+                })->implode("\n");
+            }
+
+            $sheet->fromArray([
+                $index + 1,
+                $orderNumber,
+                $saleDate,
+                $sale->product->name ?? '-',
+                $customerName,
+                $gstNo,
+                $customerAddress,
+                $category,
+                $currencyPosition === 'left' ? $currencySymbol . number_format($originalUnitPrice, 2) : number_format($originalUnitPrice, 2) . $currencySymbol,
+                number_format($discountPercent, 2) . '%',
+                $currencyPosition === 'left' ? $currencySymbol . number_format($finalUnitPrice, 2) : number_format($finalUnitPrice, 2) . $currencySymbol,
+                number_format($sale->quantity, 2),
+                $taxText,
+                $currencyPosition === 'left' ? $currencySymbol . number_format($finalTotal, 2) : number_format($finalTotal, 2) . $currencySymbol,
+            ], null, 'A' . $rowNum);
+
+            $sheet->getStyle('A' . $rowNum . ':N' . $rowNum)->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
+            $sheet->getStyle('M' . $rowNum)->getAlignment()->setWrapText(true);
+            $rowNum++;
+        }
+
+        $sheet->setCellValue('M' . $rowNum, 'Total Amount');
+        $sheet->setCellValue('N' . $rowNum, $currencyPosition === 'left'
+            ? $currencySymbol . number_format($sales->sum('rowFinalTotal'), 2)
+            : number_format($sales->sum('rowFinalTotal'), 2) . $currencySymbol);
+        $sheet->getStyle('M' . $rowNum . ':N' . $rowNum)->getFont()->setBold(true);
+        $sheet->getStyle('M' . $rowNum . ':N' . $rowNum)->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
+        $sheet->getStyle('M' . $rowNum . ':N' . $rowNum)->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('FFF6E8');
+
+        $sheet->getStyle('A3:N' . $rowNum)->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
+
+        $fileName = 'sales_report_' . now()->format('Ymd_His') . '.xlsx';
+        $writer = new Xlsx($spreadsheet);
+
+        return response()->streamDownload(function () use ($writer) {
+            $writer->save('php://output');
+        }, $fileName, [
+            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        ]);
     }
 
     public function show_sales_report_page(Request $request)

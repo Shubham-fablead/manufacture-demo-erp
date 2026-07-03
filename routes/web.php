@@ -408,6 +408,7 @@ Route::middleware(['auth:web', 'auto.permission'])->group(function () {
     Route::get('/sales/report/{ids}', [SalesController::class, 'sale_report']);
     Route::get('/sales/report/{ids}/export-pdf', [SalesController::class, 'export_sales_report_pdf'])->name('sale.report.exportPdf');
     Route::get('/sales/report/{ids}/export-pdf', [SalesController::class, 'export_sales_report_pdf'])->name('sale.report.exportPdf');
+    Route::get('/sales/report/{ids}/export-excel', [SalesController::class, 'export_sales_report_excel'])->name('sale.report.exportExcel');
 // TDS page (UI)
     Route::get('/tds', function () {
         return view('tds.index');
