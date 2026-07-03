@@ -3227,6 +3227,25 @@ function escapeHtml(text) {
             #subBranchContainer .select2-container {
                 min-width: unset !important;
             }
+
+            .header #todayAlertToggle {
+                display: flex !important;
+                align-items: center;
+                justify-content: center;
+                width: 24px;
+                height: 34px;
+                padding: 0;
+            }
+
+            .header .notification-wrapper {
+                margin-right: 0 !important;
+                width: 24px;
+                flex: 0 0 auto;
+            }
+
+            .header .today-alert-toggle i {
+                font-size: 16px;
+            }
         }
 
         /* iPhone SE */
@@ -3499,6 +3518,49 @@ function escapeHtml(text) {
             }
 
             .hide-on-ipad-pro {
+                display: none !important;
+            }
+        }
+
+        @media screen and (min-width: 768px) and (max-width: 1024px) {
+            .header .header-search-container.tab-view {
+                display: flex !important;
+                align-items: center;
+                gap: 8px;
+                min-width: 0;
+                flex: 1 1 auto;
+            }
+
+            .header .header-search {
+                display: none !important;
+            }
+
+            .header #todayAlertToggle {
+                display: flex !important;
+                align-items: center;
+                justify-content: center;
+                width: 28px;
+                height: 34px;
+                padding: 0;
+            }
+
+            .header .notification-wrapper {
+                display: flex !important;
+                align-items: center;
+                justify-content: center;
+                width: 28px;
+                height: 34px;
+                margin-right: 0 !important;
+                flex: 0 0 auto;
+            }
+
+            .header .notification-bell,
+            .header .today-alert-toggle i {
+                font-size: 17px;
+            }
+
+            .header .header-new-order-button,
+            .header .hide-on-ipad-pro {
                 display: none !important;
             }
         }
