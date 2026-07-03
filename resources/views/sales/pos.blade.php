@@ -1392,9 +1392,14 @@
 
     .pos-customer-row {
         display: grid;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: 12px;
+        grid-template-columns: 1fr;
+        gap: 10px;
         align-items: start;
+        padding: 14px 14px 12px;
+        border: 1px solid #4cd97b;
+        border-radius: 14px;
+        background: #fff;
+        box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
     }
 
     .pos-customer-row > .pos-customer-field,
@@ -1407,13 +1412,16 @@
 
     .pos-customer-row .form-group {
         margin-bottom: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
     }
 
     .pos-customer-row label {
         display: inline-flex;
         align-items: center;
         gap: 6px;
-        font-size: 14px;
+        font-size: 13px;
         margin-bottom: 6px;
         font-weight: 500;
         color: #1f2937;
@@ -1423,6 +1431,32 @@
         .pos-customer-row .select2-container .select2-selection--single {
             min-height: 42px;
             border-radius: 8px;
+        }
+
+        .pos-customer-row .select2-container {
+            width: 100% !important;
+        }
+
+        .pos-customer-row .customer-label-row {
+            margin-bottom: 8px;
+        }
+
+        .pos-customer-row .customer-action-group {
+            gap: 6px;
+        }
+
+        .pos-customer-row .customer-action-btn {
+            width: 30px;
+            height: 30px;
+            border-radius: 9px;
+        }
+
+        .pos-customer-row .select-group {
+            width: 100% !important;
+        }
+
+        .pos-customer-row .select-split {
+            width: 100%;
         }
 
         .customer-modal-dialog {
