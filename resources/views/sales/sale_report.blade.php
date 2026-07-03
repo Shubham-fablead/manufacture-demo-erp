@@ -17,11 +17,243 @@ $setting = ($setting ?? null) ?: ($settings ?? null) ?: $fallbackSetting;
 $settings = $setting;
 $currencySymbol = $currencySymbol ?? ($setting->currency_symbol ?? '?');
 $currencyPosition = $currencyPosition ?? ($setting->currency_position ?? 'left');
+
+$topSoldProducts = collect($sales ?? [])
+    ->groupBy(fn($sale) => $sale->product->name ?? 'Unknown')
+    ->map(function ($items, $name) {
+        return [
+            'name' => $name,
+            'qty' => (float) $items->sum('quantity'),
+        ];
+    })
+    ->sortByDesc('qty')
+    ->take(14)
+    ->values();
+
+$topSoldMaxQty = max(1, (float) ($topSoldProducts->max('qty') ?? 1));
 @endphp
 
     <style>
         .invoice-box tr td {
             vertical-align: middle
+        }
+
+        .purchase_report_table1 {
+            table-layout: fixed;
+            width: 100%;
+            border-collapse: collapse;
+            border: 1px solid #dee2e6;
+        }
+
+        .purchase_report_table1 th,
+        .purchase_report_table1 td {
+            padding: 8px 8px !important;
+            font-size: 12px;
+            line-height: 1.45;
+            word-break: break-word;
+            white-space: normal;
+            vertical-align: top;
+            border: 1px solid #dee2e6;
+        }
+
+        .purchase_report_table1 thead th {
+            background: #f3f2f7;
+            font-weight: 600;
+            color: #222;
+            border: 1px solid #dee2e6;
+            vertical-align: middle;
+            white-space: nowrap;
+            text-align: left;
+        }
+
+        .purchase_report_table1 tbody tr:hover {
+            background: #fafafa;
+        }
+
+        /* Remove borders from the inner Company Info / Report Info table */
+        .purchase_report_table1 tr:first-child td {
+            border: none !important;
+        }
+
+        .purchase_report_table1 tr:first-child td table,
+        .purchase_report_table1 tr:first-child td table td {
+            border: none !important;
+            background: transparent !important;
+        }
+
+        .purchase_report_table1 .col-sr {
+            width: 46px;
+        }
+
+        .purchase_report_table1 .col-order {
+            width: 95px;
+        }
+
+        .purchase_report_table1 .col-date {
+            width: 78px;
+        }
+
+        .purchase_report_table1 .col-product {
+            width: 160px;
+        }
+
+        .purchase_report_table1 .col-customer {
+            width: 130px;
+        }
+
+        .purchase_report_table1 .col-gst {
+            width: 85px;
+        }
+
+        .purchase_report_table1 .col-address {
+            width: 220px;
+        }
+
+        .purchase_report_table1 .col-category {
+            width: 95px;
+        }
+
+        .purchase_report_table1 .col-price,
+        .purchase_report_table1 .col-discount,
+        .purchase_report_table1 .col-final,
+        .purchase_report_table1 .col-qty,
+        .purchase_report_table1 .col-total {
+            width: 76px;
+        }
+
+        .purchase_report_table1 .col-taxes {
+            width: 96px;
+        }
+
+        .purchase_report_table1 .heading th {
+            font-size: 12px;
+            padding-top: 10px !important;
+            padding-bottom: 10px !important;
+        }
+
+        .purchase_report_table1 .details td {
+            font-size: 12px;
+        }
+
+        .report-metrics {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            margin: 8px 0 18px;
+        }
+
+        .report-total-badge {
+            border: 1px solid #2a3270;
+            color: #1b214f;
+            background: #fff;
+            border-radius: 4px;
+            padding: 8px 16px;
+            font-size: 17px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .report-total-badge span {
+            color: #ff8f2a;
+        }
+
+        .chart-card {
+            border: 1px solid #e3e6ef;
+            border-radius: 12px;
+            overflow: hidden;
+            background: #fff;
+            margin-bottom: 22px;
+        }
+
+        .chart-card__header {
+            background: linear-gradient(90deg, #11172f 0%, #2c315d 100%);
+            color: #fff;
+            padding: 14px 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .chart-card__icon {
+            width: 34px;
+            height: 28px;
+            border-radius: 8px;
+            background: rgba(78, 153, 255, 0.22);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: #6fb4ff;
+            font-size: 16px;
+        }
+
+        .chart-card__title {
+            font-size: 18px;
+            font-weight: 700;
+            line-height: 1.1;
+        }
+
+        .chart-card__subtitle {
+            margin-top: 3px;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.75);
+        }
+
+        .chart-card__body {
+            padding: 18px 16px 12px;
+            background: linear-gradient(180deg, #ffffff 0%, #fbfcff 100%);
+        }
+
+        .top-sold-chart {
+            display: flex;
+            align-items: flex-end;
+            gap: 10px;
+            min-height: 300px;
+            overflow-x: auto;
+            padding: 8px 6px 6px;
+        }
+
+        .chart-column {
+            width: 48px;
+            flex: 0 0 48px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-end;
+            height: 100%;
+        }
+
+        .chart-bar-wrap {
+            height: 240px;
+            width: 100%;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            padding-bottom: 4px;
+        }
+
+        .chart-bar {
+            width: 34px;
+            border-radius: 6px 6px 2px 2px;
+            box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.12);
+        }
+
+        .chart-value {
+            font-size: 11px;
+            color: #667085;
+            margin-bottom: 4px;
+        }
+
+        .chart-label {
+            margin-top: 8px;
+            font-size: 11px;
+            color: #6e7787;
+            transform: rotate(-28deg);
+            transform-origin: top left;
+            width: 92px;
+            height: 38px;
+            text-align: left;
+            white-space: nowrap;
         }
 
         @media screen and (max-width: 768px) {
@@ -80,6 +312,9 @@ $currencyPosition = $currencyPosition ?? ($setting->currency_position ?? 'left')
                     Back
                 </a>
                 @if (!empty($ids))
+                    <a href="{{ url('/sales/report/' . $ids . '/export-excel') }}" class="btn btn-success">
+                        Export Excel
+                    </a>
                     <a href="{{ url('/sales/report/' . $ids . '/export-pdf') }}" class="btn btn-danger">
                         Export PDF
                     </a>
@@ -88,6 +323,45 @@ $currencyPosition = $currencyPosition ?? ($setting->currency_position ?? 'left')
         </div>
         <div class="card">
             <div class="card-body">
+                <div class="report-metrics">
+                    <div></div>
+                    <div class="report-total-badge">
+                        Total: <span>{{ $currencyPosition === 'left' ? $currencySymbol . number_format($totalAmount, 2) : number_format($totalAmount, 2) . $currencySymbol }}</span>
+                    </div>
+                </div>
+
+                <div class="chart-card">
+                    <div class="chart-card__header">
+                        <div class="chart-card__icon">
+                            <i class="fas fa-chart-bar"></i>
+                        </div>
+                        <div>
+                            <div class="chart-card__title">Top Sold Products</div>
+                            <div class="chart-card__subtitle">Ranked by quantity sold</div>
+                        </div>
+                    </div>
+                    <div class="chart-card__body">
+                        <div class="top-sold-chart">
+                            @forelse ($topSoldProducts as $topProduct)
+                                @php
+                                    $barHeight = max(18, round(($topProduct['qty'] / $topSoldMaxQty) * 200));
+                                    $barColors = ['#5B6EE1', '#5AA0FF', '#8B3FD9', '#FF4F93', '#55C8F2', '#28D7A0', '#3FA3C6', '#FFD166', '#F15F79', '#4B6B79', '#F4C96B', '#F8A96B', '#F07D62', '#5B7487'];
+                                    $barColor = $barColors[$loop->index % count($barColors)];
+                                @endphp
+                                <div class="chart-column">
+                                    <div class="chart-value">{{ rtrim(rtrim(number_format($topProduct['qty'], 2), '0'), '.') }}</div>
+                                    <div class="chart-bar-wrap">
+                                        <div class="chart-bar" style="height: {{ $barHeight }}px; background: {{ $barColor }};"></div>
+                                    </div>
+                                    <div class="chart-label" title="{{ $topProduct['name'] }}">{{ \Illuminate\Support\Str::limit($topProduct['name'], 18) }}</div>
+                                </div>
+                            @empty
+                                <div class="text-center w-100 py-4">No product data available.</div>
+                            @endforelse
+                        </div>
+                    </div>
+                </div>
+
                 <input type="hidden" name="selse_id" id="selse_id" value="">
                 <tr class="top">
                     <td colspan="6">
@@ -107,7 +381,7 @@ $currencyPosition = $currencyPosition ?? ($setting->currency_position ?? 'left')
                 <div class="download_pdf">
                     <div class="invoice-box table-height"
                         style="max-width: 1600px; width:100%; margin:15px auto; padding: 0; font-size: 14px; line-height: 24px; color: #555;">
-                        <table style="width: 100%; line-height: inherit; text-align: left;">
+                        <table class="purchase_report_table1" style="line-height: inherit; text-align: left;">
                             <tr>
                                 <td colspan="12">
                                     <table style="width: 100%;">
@@ -170,25 +444,36 @@ $currencyPosition = $currencyPosition ?? ($setting->currency_position ?? 'left')
                                 </td>
                             </tr>
 
-                            <tr class="heading" style="background: #F3F2F7;">
-                                <td style="padding: 10px;"><strong>Product</strong></td>
-                                <td style="padding: 10px;"><strong>Category</strong></td>
-                                <td style="padding: 10px;"><strong>Original Price</strong></td>
-                                <td style="padding: 10px;"><strong>Discount</strong></td>
-                                <td style="padding: 10px;"><strong>Final Unit Price</strong></td>
-                                <td style="padding: 10px;"><strong>Quantity</strong></td>
-                                <td style="padding: 10px;"><strong>Taxes</strong></td>
-                                <td style="padding: 10px;"><strong>Total</strong></td>
+                            <tr class="heading">
+                                <th class="col-sr">Sr. No.</th>
+                                <th class="col-order">Order Number</th>
+                                <th class="col-date">Sale Date</th>
+                                <th class="col-product">Product</th>
+                                <th class="col-customer">Customer Name</th>
+                                <th class="col-gst">GST NO</th>
+                                <th class="col-address">Customer Address</th>
+                                <th class="col-category">Category</th>
+                                <th class="col-price">Price</th>
+                                <th class="col-discount">Discount</th>
+                                <th class="col-final">Final Price</th>
+                                <th class="col-qty">Qty</th>
+                                <th class="col-taxes">Taxes</th>
+                                <th class="col-total">Total</th>
                             </tr>
 
                             @php $subtotal = 0; @endphp
-                            @foreach ($sales as $sale)
+                            @foreach ($sales as $index => $sale)
                                 @php
                                     $discountPercent = $sale->invoice->discount ?? 0;
                                     $originalUnitPrice = $sale->quantity ? $sale->total_amount / $sale->quantity : 0;
                                     $discountPerUnit = ($originalUnitPrice * $discountPercent) / 100;
                                     $finalUnitPrice = $originalUnitPrice - $discountPerUnit;
                                     $finalTotal = $finalUnitPrice * $sale->quantity;
+                                    $orderNumber = $sale->invoice->order_number ?? 'N/A';
+                                    $saleDate = optional($sale->created_at)->format('d M Y') ?? 'N/A';
+                                    $customerName = $sale->user->name ?? 'N/A';
+                                    $gstNo = $sale->user->gst_number ?? 'N/A';
+                                    $customerAddress = optional($sale->user->userDetail)->address ?? 'N/A';
 
                                     $subtotal += $finalTotal;
 
@@ -199,26 +484,27 @@ $currencyPosition = $currencyPosition ?? ($setting->currency_position ?? 'left')
                                             : env('ImagePath') . 'admin/assets/img/product/noimage.png';
                                 @endphp
 
-                                <tr class="details" style="border-bottom: 1px solid #E9ECEF;">
-                                    <td style="padding: 10px; white-space: normal;">
+                                <tr class="details">
+                                    <td>{{ $index + 1 }}</td>
+                                    <td>{{ $orderNumber }}</td>
+                                    <td>{{ $saleDate }}</td>
+                                    <td>
                                         <a href="{{ url('product-view/' . ($sale->product->id ?? '')) }}"
-                                            style="display: flex; align-items: center; gap: 10px; text-decoration: none; color: inherit;">
+                                            style="display:flex;align-items:center;gap:10px;text-decoration:none;color:inherit;">
                                             <img src="{{ $imagePath }}" alt="Product Image"
-                                                style="width: 50px; height: 50px;">
-                                            <div style="font-weight: 500;">{{ $sale->product->name ?? '-' }}</div>
+                                                style="width: 30px; height: 30px; object-fit: cover;">
+                                            <span>{{ $sale->product->name ?? '-' }}</span>
                                         </a>
                                     </td>
-                                    <td style="padding: 10px; white-space: normal;">
-                                        {{ $sale->product->category->name ?? 'N/A' }}</td>
-                                    <td style="padding: 10px;">
-                                        {{ $currencyPosition === 'left' ? $currencySymbol . number_format($originalUnitPrice, 2) : number_format($originalUnitPrice, 2) . $currencySymbol }}
-                                    </td>
-                                    <td style="padding: 10px;">{{ $discountPercent }}%</td>
-                                    <td style="padding: 10px;">
-                                        {{ $currencyPosition === 'left' ? $currencySymbol . number_format($finalUnitPrice, 2) : number_format($finalUnitPrice, 2) . $currencySymbol }}
-                                    </td>
-                                    <td style="padding: 10px;">{{ $sale->quantity }}</td>
-                                    <td style="padding: 10px;">
+                                    <td>{{ $customerName }}</td>
+                                    <td>{{ $gstNo }}</td>
+                                    <td>{{ $customerAddress }}</td>
+                                    <td>{{ $sale->product->category->name ?? 'N/A' }}</td>
+                                    <td>{{ $currencyPosition === 'left' ? $currencySymbol . number_format($originalUnitPrice, 2) : number_format($originalUnitPrice, 2) . $currencySymbol }}</td>
+                                    <td>{{ $discountPercent }}%</td>
+                                    <td>{{ $currencyPosition === 'left' ? $currencySymbol . number_format($finalUnitPrice, 2) : number_format($finalUnitPrice, 2) . $currencySymbol }}</td>
+                                    <td>{{ $sale->quantity }}</td>
+                                    <td>
                                         @if ($sale->rowGSTOption === 'with_gst' && !empty($sale->rowTaxes))
                                             @foreach ($sale->rowTaxes as $t)
                                                 <div>
@@ -228,37 +514,13 @@ $currencyPosition = $currencyPosition ?? ($setting->currency_position ?? 'left')
                                             @endforeach
                                         @else
                                             <span>N/A</span>
-                                        @endif
+                                            @endif
                                     </td>
-                                    <td style="padding: 10px;">
-                                        {{ $currencyPosition === 'left' ? $currencySymbol . number_format($sale->rowFinalTotal, 2) : number_format($sale->rowFinalTotal, 2) . $currencySymbol }}
-                                    </td>
-
+                                    <td>{{ $currencyPosition === 'left' ? $currencySymbol . number_format($sale->rowFinalTotal, 2) : number_format($sale->rowFinalTotal, 2) . $currencySymbol }}</td>
                                 </tr>
                             @endforeach
 
                         </table>
-
-                        <div class="row mt-3">
-                            <div class="col-lg-6"></div>
-                            <div class="col-lg-6">
-                                <div class="total-order w-100 max-widthauto m-auto mb-4">
-                                    <ul>
-                                        <li class="total">
-                                            <h4>Total Amount</h4>
-                                            <h5>
-                                                {{ $currencyPosition === 'left'
-                                                    ? $currencySymbol . number_format($totalAmount, 2)
-                                                    : number_format($totalAmount, 2) . $currencySymbol }}
-                                            </h5>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-
-
-
                     </div>
                 </div>
 

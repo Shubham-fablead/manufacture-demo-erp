@@ -3736,6 +3736,17 @@ $('#paymentHistoryList').html(historyHtml);
                 $('#bank_id').val('');
                 $("#bankError").text("");
 
+                const emiSelected = method === 'emi';
+                $('#paymentMethodSelect option[value="cash"], #paymentMethodSelect option[value="online"], #paymentMethodSelect option[value="cash_online"]')
+                    .prop('disabled', emiSelected);
+
+                if (emiSelected) {
+                    $('#paymentMethodSelect').val('emi');
+                    $('#paidTypeSelect, #onlineTypeSelect, #cashOnlineTypeSelect').val('');
+                    $('#cashAmount, #upiAmountInput, #partialAmount, #cashOnlineFullAmount, #upiOnlineFullAmount, #cashOnlinePartialAmount, #upiOnlinePartialAmount')
+                        .val('');
+                }
+
                 if (method === 'cash') {
                     $('#paidTypeDiv').removeClass('d-none'); // Show paid type options
 

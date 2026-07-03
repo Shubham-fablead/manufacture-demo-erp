@@ -524,11 +524,15 @@
     }
 
     .today-alert-modal {
-        width: min(650px, 96vw);
+        width: min(820px, 96vw);
         background: #fff;
-        border-radius: 4px;
-        box-shadow: 0 12px 35px rgba(0, 0, 0, 0.18);
+        border-radius: 2px;
+        box-shadow: 0 14px 40px rgba(0, 0, 0, 0.2);
         border: 1px solid #e5e7eb;
+        max-height: min(90vh, 860px);
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
     }
 
     .today-alert-modal-header {
@@ -556,25 +560,29 @@
     }
 
     .today-alert-modal-body {
-        padding: 18px;
+        padding: 0 18px 12px;
+        overflow-y: auto;
+        flex: 1 1 auto;
     }
 
     .today-alert-tabs {
         display: flex;
         align-items: center;
-        gap: 18px;
+        gap: 0;
         border-bottom: 1px solid #e5e7eb;
-        margin-bottom: 14px;
+        margin: 0 -18px 14px;
     }
 
     .today-alert-tab {
         border: 0;
         background: transparent;
-        padding: 0 4px 10px;
+        padding: 14px 12px 12px;
         color: #6b7280;
         font-size: 13px;
         font-weight: 700;
         border-bottom: 1px solid transparent;
+        flex: 1 1 0;
+        text-align: center;
     }
 
     .today-alert-tab.active {
@@ -600,6 +608,43 @@
         width: 100%;
         border-collapse: collapse;
         font-size: 13px;
+    }
+
+    .today-alert-panel {
+        padding-bottom: 6px;
+    }
+
+    .today-alert-toolbar {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 14px;
+        flex-wrap: wrap;
+    }
+
+    .today-alert-toolbar label {
+        display: block;
+        margin-bottom: 6px;
+        color: #5f6b7a;
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+    .today-alert-month-select {
+        min-width: 160px;
+        height: 34px;
+        border: 1px solid #cfd6df;
+        border-radius: 2px;
+        padding: 0 10px;
+        color: #414d5d;
+        background: #fff;
+    }
+
+    .today-alert-toolbar-note {
+        color: #6b7280;
+        font-size: 14px;
+        text-align: right;
     }
 
     .today-alert-table th {
@@ -629,6 +674,25 @@
         color: #8c8c8c;
         border: 1px dashed #e5e7eb;
         border-radius: 6px;
+    }
+
+    .today-alert-table tbody tr:nth-child(3n) {
+        background: #f1f1f1;
+    }
+
+    .today-alert-table tbody tr:hover {
+        background: #f2f6fb;
+    }
+
+    .today-alert-table .pay-previous-btn {
+        border: 1px solid #b8c0cc;
+        background: #fff;
+        color: #9aa3af;
+        border-radius: 3px;
+        padding: 6px 12px;
+        font-size: 13px;
+        line-height: 1.2;
+        cursor: pointer;
     }
 
     .today-alert-footer {
@@ -1386,7 +1450,7 @@
         } else if (activeTodayAlertTab === 'deliveries') {
             content.innerHTML = renderDeliveriesAlertTable(rows);
         } else if (activeTodayAlertTab === 'pendingemis') {
-            content.innerHTML = renderPendingEmisAlertTable(rows);
+            content.innerHTML = renderPendingEmisAlertTableV2(rows);
         } else {
             content.innerHTML = renderLowStockAlertTable(rows);
         }
@@ -1527,6 +1591,51 @@
                         `).join('')}
                     </tbody>
                 </table>
+            </div>
+        `;
+    }
+
+    function renderPendingEmisAlertTableV2(rows) {
+        const currentLabel = new Date().toLocaleString('en-US', { month: 'long', year: 'numeric' });
+        return `
+            <div class="today-alert-panel">
+                <div class="today-alert-toolbar">
+                    <div>
+                        <label for="pendingEmiMonthSelect">Select Month</label>
+                        <select id="pendingEmiMonthSelect" class="today-alert-month-select">
+                            <option selected>${escapeHtml(currentLabel)}</option>
+                        </select>
+                    </div>
+                    <div class="today-alert-toolbar-note">Showing pending EMIs for ${escapeHtml(currentLabel)}</div>
+                </div>
+                <div class="table-responsive">
+                    <table class="today-alert-table">
+                        <thead>
+                            <tr>
+                                <th>Order#</th>
+                                <th>Customer</th>
+                                <th>Contact</th>
+                                <th>EMI Month</th>
+                                <th>EMI Amount</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${rows.map((item, index) => `
+                                <tr ${index === 2 ? 'style="background:#e9e9e9;"' : ''}>
+                                    <td>${escapeHtml(item.order_number || 'N/A')}</td>
+                                    <td>${escapeHtml(item.customer_name || 'N/A')}</td>
+                                    <td>${escapeHtml(item.customer_phone || 'N/A')}</td>
+                                    <td>${escapeHtml(item.emi_month_label || item.emi_month || '3rd Month')}</td>
+                                    <td>₹${escapeHtml(item.emi_monthly_amount || '0.00')}</td>
+                                    <td>
+                                        <button type="button" class="pay-previous-btn" disabled>Pay Previous</button>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         `;
     }

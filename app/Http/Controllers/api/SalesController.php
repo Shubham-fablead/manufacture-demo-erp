@@ -2913,7 +2913,7 @@ public function update_sale(Request $request)
         $categoryId = $request->query('category_id');
         $search = $request->query('search'); // ✅ Add search parameter
 
-        $query = OrderItem::with(['product.category', 'product.brand', 'order'])
+        $query = OrderItem::with(['product.category', 'product.brand', 'order.user.userDetail', 'order'])
             ->whereHas('order', function ($q) use ($filter, $month, $year, $customerId, $role, $effectiveBranchId, $userId) {
                 $q->where('payment_status', 'completed')->where('isDeleted', 0);
 
@@ -2990,8 +2990,26 @@ public function update_sale(Request $request)
 
         $orderItems = collect($orderItemsPaginated->items())->map(function ($item) {
             $product = $item->product;
+            $order = $item->order;
+            $customer = $order?->user;
+            $customerDetail = $customer?->userDetail;
             $soldQty = $item->quantity;
             $soldAmount = $item->price * $soldQty;
+            $taxDetails = [];
+            if (!empty($item->product_gst_details)) {
+                $decodedTaxes = is_string($item->product_gst_details)
+                    ? json_decode($item->product_gst_details, true)
+                    : $item->product_gst_details;
+
+                if (is_array($decodedTaxes)) {
+                    foreach ($decodedTaxes as $tax) {
+                        $taxName = $tax['name'] ?? $tax['tax_name'] ?? 'Tax';
+                        $taxRate = $tax['rate'] ?? $tax['tax_rate'] ?? null;
+                        $taxAmount = (float) ($tax['amount'] ?? 0);
+                        $taxDetails[] = trim($taxName . ($taxRate !== null ? " ({$taxRate}%)" : '')) . ': ' . number_format($taxAmount, 2);
+                    }
+                }
+            }
 
             // Decode product images
             $decodedImages = json_decode($product->images, true);
@@ -3001,11 +3019,18 @@ public function update_sale(Request $request)
                 'id' => $item->id,
                 'product_id' => $product->id,
                 'name' => $product->name,
+                'order_number' => $order->order_number ?? 'N/A',
+                'customer_name' => $customer->name ?? 'N/A',
+                'gst_no' => $customer->gst_number ?? 'N/A',
+                'customer_address' => $customerDetail->address ?? 'N/A',
+                'taxes' => !empty($taxDetails) ? implode(', ', $taxDetails) : ($item->product_gst_total ? number_format((float) $item->product_gst_total, 2) : 'N/A'),
+                'amount' => number_format((float) ($item->total_amount ?? $soldAmount), 2),
                 'SKU' => $product->SKU,
                 'category' => $product->category->name ?? 'N/A',
                 'brand' => $product->brand->name ?? 'N/A',
                 'sold_qty' => $soldQty,
                 'sold_amount' => number_format($soldAmount, 2),
+                'qty' => $soldQty,
                 // Simple image path
                 'image' => 'storage/' . $firstImage,
                 // Uses accessor (returns full URLs)
