@@ -4526,15 +4526,45 @@ $('#paymentHistoryList').html(historyHtml);
                 });
             }
 
+            let isRevertingAssignedStaffSelection = false;
+
             $(document).on('change', '.assigned-staff-select', function() {
+                if (isRevertingAssignedStaffSelection) {
+                    return;
+                }
+
                 const $select = $(this);
                 const orderId = $select.data('order-id');
                 const previousValue = $select.data('previous-value') ?? '';
                 const assignedStaff = $select.val();
 
-                updateInlineOrderField(orderId, {
-                    assigned_staff: assignedStaff
-                }, $select, previousValue);
+                if (assignedStaff === previousValue) {
+                    return;
+                }
+
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Are you sure?',
+                    text: 'Are you sure you want to assign this staff?',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes, assign!',
+                    cancelButtonText: 'Cancel',
+                    confirmButtonColor: '#ff9f43',
+                    cancelButtonColor: '#dc3545'
+                }).then((result) => {
+                    if (!result.isConfirmed) {
+                        isRevertingAssignedStaffSelection = true;
+                        $select.val(previousValue);
+                        $select.data('previous-value', previousValue);
+                        isRevertingAssignedStaffSelection = false;
+                        return;
+                    }
+
+                    updateInlineOrderField(orderId, {
+                        assigned_staff: assignedStaff
+                    }, $select, previousValue);
+                    $select.data('previous-value', assignedStaff);
+                });
             });
 
             $(document).on('change', '.order-type-select', function() {
