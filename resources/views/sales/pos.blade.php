@@ -1867,7 +1867,8 @@
                             <div class="col-md-4 col-6">
                                 <div class="form-group">
                                     <label>Assign Staff</label>
-                                    <select id="assigned_staff" name="assigned_staff" class="form-control select2">
+                                    <select id="assigned_staff" name="assigned_staff" class="form-control select2"
+                                        data-previous-value="">
                                         <option value="">Select Staff (Optional)</option>
                                         @foreach ($staffUsers as $staff)
                                             <option value="{{ $staff->id }}">{{ $staff->name }}</option>
@@ -5377,6 +5378,7 @@
         }) : null;
         const initialCustomerId = $('#customer_name').val();
         let isOpeningCustomerModalFromSelect = false;
+        let isRevertingAssignedStaff = false;
 
         if ($('#customer_name').length) {
             if ($('#customer_name').hasClass('select2-hidden-accessible')) {
@@ -5436,6 +5438,65 @@
                 addCustomerModal.show();
             }
         });
+
+        const $assignedStaff = $('#assigned_staff');
+        if ($assignedStaff.length) {
+            $assignedStaff.attr('data-previous-value', $assignedStaff.val() || '');
+
+            $assignedStaff.on('focus', function() {
+                $(this).attr('data-previous-value', $(this).val() || '');
+            });
+
+            $assignedStaff.on('select2:opening', function() {
+                $(this).attr('data-previous-value', $(this).val() || '');
+            });
+
+            $assignedStaff.on('change', function() {
+                if (isRevertingAssignedStaff) {
+                    return;
+                }
+
+                const $select = $(this);
+                const previousValue = $select.attr('data-previous-value') || '';
+                const currentValue = $select.val() || '';
+
+                if (!currentValue || currentValue === previousValue) {
+                    $select.attr('data-previous-value', currentValue);
+                    return;
+                }
+
+                const selectedStaffName = $select.find('option:selected').text().trim();
+
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Are you sure?',
+                    text: 'Are you sure you want to assign this staff?',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes, assign!',
+                    cancelButtonText: 'Cancel',
+                    confirmButtonColor: '#ff9f43',
+                    cancelButtonColor: '#dc3545'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $select.attr('data-previous-value', currentValue);
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Assigned',
+                            text: selectedStaffName ? selectedStaffName + ' assigned successfully.' :
+                                'Staff assigned successfully.',
+                            timer: 1400,
+                            showConfirmButton: false
+                        });
+                        return;
+                    }
+
+                    isRevertingAssignedStaff = true;
+                    $select.val(previousValue).trigger('change.select2');
+                    $select.attr('data-previous-value', previousValue);
+                    isRevertingAssignedStaff = false;
+                });
+            });
+        }
 
         $('#customer_name').on('change', function() {
             const $selectedOption = $(this).find(':selected');
