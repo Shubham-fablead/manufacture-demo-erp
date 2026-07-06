@@ -55,7 +55,6 @@
             cursor: pointer;
             white-space: nowrap;
             width: auto;
-            /* ðŸ‘ˆ Prevent tab name from wrapping */
             padding: 0;
         }
 
@@ -69,7 +68,6 @@
             align-items: center;
             transition: 0.3s ease;
             min-width: max-content;
-            /* ðŸ‘ˆ Ensure box width fits content */
         }
 
         .product-details h6 {
@@ -78,12 +76,9 @@
             margin: 0;
             text-align: center;
             white-space: nowrap;
-            /* ðŸ‘ˆ Prevent text wrap */
             overflow: hidden;
             text-overflow: ellipsis;
-            /* ðŸ‘ˆ Optional: show ... if too long */
             max-width: 100%;
-            /* ðŸ‘ˆ Avoid overflow outside parent */
         }
 
         .tabs_wrapper ul.tabs li.active .product-details {
@@ -96,10 +91,70 @@
         }
 
         .payment_panel {
-            position: fixed;
-            bottom: 0;
+            position: fixed !important;
             background-color: white;
-            width: 37%;
+            border-radius: 14px;
+            box-shadow: 0 4px 24px rgba(15,23,42,0.18);
+            z-index: 99999 !important;
+            cursor: default;
+            overflow: visible;
+            box-sizing: border-box !important;
+            touch-action: none;
+            transition: box-shadow 0.2s;
+        }
+        .card-order .card-body.body_space{
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* When JS sets top, remove bottom so they don't conflict */
+        .payment_panel.drag-ready {
+            bottom: auto !important;
+        }
+
+        .payment_panel.is-dragging {
+            box-shadow: 0 12px 40px rgba(15,23,42,0.28);
+            opacity: 0.97;
+            transition: none;
+        }
+
+        .payment-panel-drag-handle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 10px 14px 8px;
+            cursor: grab;
+            background: linear-gradient(to bottom, #f0f2f5, #e8eaf0);
+            border-radius: 14px 14px 0 0;
+            color: #8892a4;
+            font-size: 11px;
+            user-select: none;
+            touch-action: none;
+        }
+
+        .payment-panel-drag-handle:active {
+            cursor: grabbing;
+        }
+
+        .payment-panel-drag-handle .drag-dots {
+            display: flex;
+            gap: 3px;
+        }
+
+        .payment-panel-drag-handle .drag-dots span {
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background: #8892a4;
+            display: block;
+        }
+
+        .payment-panel-drag-handle .drag-label {
+            font-size: 10px;
+            color: #8892a4;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
         }
 
         .body_space {
@@ -179,8 +234,77 @@
             background: #f8fafc;
         }
 
-        .payment_panel {
-            z-index: 999;
+        .payment-panel-inner {
+            padding: 4px 4px 0;
+            overflow-y: auto;
+            max-height: calc(100vh - 420px);
+        }
+
+        .payment_panel .btn-totallabel {
+            border-radius: 0 0 14px 14px;
+            overflow: hidden;
+        }
+        .btn-totallabel {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: space-between !important;
+            color: #fff !important;
+            background: #1b2850 !important;
+            border-radius: 0 0 14px 14px !important;
+            margin: 0 !important;
+            padding: 12px 16px !important;
+            cursor: pointer !important;
+            width: 100% !important;
+            box-sizing: border-box !important;
+            flex-wrap: wrap !important;
+            gap: 10px !important;
+        }
+        .btn-totallabel h5, .btn-totallabel h6 {
+            margin: 0 !important;
+            color: #fff !important;
+            font-size: 14px !important;
+            font-weight: 600 !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 6px !important;
+        }
+
+        /* Payment method buttons inside the floating panel */
+        .payment_panel .setvaluecash ul {
+            display: flex;
+            flex-wrap: nowrap !important;
+            gap: 4px !important;
+            padding: 0;
+            margin: 0 0 10px;
+            list-style: none;
+        }
+
+        .payment_panel .setvaluecash ul li {
+            flex: 1 1 0% !important;
+            min-width: 0 !important;
+            margin: 0;
+            list-style: none;
+        }
+
+        .payment_panel .setvaluecash ul li a {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 60px;
+            height: 100%;
+            font-size: 10px;
+            font-weight: 600;
+            padding: 6px 2px;
+            border-radius: 6px;
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        .payment_panel .setvaluecash ul li a i {
+            font-size: 16px !important;
+            margin-bottom: 4px !important;
+            display: block !important;
         }
 
         .price {
@@ -243,6 +367,10 @@
             color: #fff;
         }
 
+        .select-split {
+            margin-bottom: 10px !important;
+        }
+
         .pos-back-btn i {
             font-size: 12px;
             line-height: 1;
@@ -299,10 +427,143 @@
             margin: 0;
             font-weight: 500;
         }
-        .card .card-body {
-    padding: 20px;
-    padding-bottom: 280px !important;
-}
+
+        .customer-details-card {
+            /* border: 1px solid rgba(40, 167, 69, 0.18); */
+            /* border-radius: 14px; */
+            /* background: #fff; */
+            /* box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06); */
+        }
+
+        .customer-details-card .card-header {
+            background: transparent;
+            border-bottom: 0;
+            padding: 3px 0px 0;
+        }
+
+        .customer-details-card .card-body {
+            padding: 6px 0px 0px;
+        }
+
+        .sale-meta-row {
+            /* margin-top: 5px; */
+        }
+
+        .sale-meta-row .form-label {
+            font-size: 14px;
+            font-weight: 500;
+            color: #111827;
+            margin-bottom: 6px;
+        }
+
+        .sale-meta-row .form-control,
+        .sale-meta-row .select2-container--default .select2-selection--single {
+            height: 42px;
+            min-height: 42px;
+            border: 1px solid #cfd8e3;
+            border-radius: 4px;
+            box-shadow: none;
+            background: #fff;
+        }
+
+        .sale-meta-row .select2-container--default .select2-selection--single .select2-selection__rendered {
+            line-height: 40px !important;
+            padding-left: 12px;
+            color: #111827;
+        }
+
+        .sale-meta-row .select2-container--default .select2-selection--single .select2-selection__arrow {
+            height: 40px;
+        }
+
+        .customer-details-title {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 16px;
+            font-weight: 700;
+            color: #111827;
+        }
+
+        .customer-details-title i {
+            color: #ff9f43;
+        }
+
+        .customer-action-group {
+            display: inline-flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .customer-action-btn {
+            width: 34px;
+            height: 34px;
+            padding: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            font-size: 16px;
+            line-height: 1;
+            border: 1px solid #d1d5db;
+            background: #fff;
+            color: #374151;
+            transition: all 0.2s ease;
+        }
+
+        .customer-action-btn:hover:not(:disabled) {
+            border-color: #ff9f43;
+            color: #ff9f43;
+            box-shadow: 0 4px 10px rgba(255, 159, 67, 0.12);
+        }
+
+        .customer-action-btn:disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+        }
+
+        .customer-details-card .form-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 6px;
+        }
+
+        .customer-details-card .form-control,
+        .customer-details-card .select2-container--default .select2-selection--single {
+            min-height: 40px;
+            border-radius: 10px;
+            border-color: #d1d5db;
+            box-shadow: none;
+        }
+
+        .customer-details-card .select2-container--default .select2-selection--single .select2-selection__rendered {
+            line-height: 38px !important;
+        }
+
+        .customer-details-card .select2-container--default .select2-selection--single .select2-selection__arrow {
+            height: 38px;
+        }
+
+        .customer-details-card .form-control[readonly] {
+            background-color: #f8fafc;
+        }
+
+        .customer-field-error {
+            min-height: 18px;
+            font-size: 12px;
+            color: #dc3545;
+            margin-top: 4px;
+        }
+
+        .customer-modal .modal-title {
+            font-weight: 700;
+        }
+
+        /* .card .card-body {
+                padding: 20px;
+                padding-bottom: 280px !important;
+            } */
 
         @media screen and (max-width: 992px) {
             .pos-top-controls {
@@ -316,7 +577,7 @@
                 --bs-gutter-y: 12px;
             }
 
-            .tabs_container .row > .col-lg-3.d-flex.position-relative {
+            .tabs_container .row>.col-lg-3.d-flex.position-relative {
                 padding-left: calc(var(--bs-gutter-x) * 0.5);
                 padding-right: calc(var(--bs-gutter-x) * 0.5);
             }
@@ -326,26 +587,15 @@
                 min-height: 100%;
             }
 
-            .payment_panel {
-                position: fixed;
-                left: 16px;
-                right: 16px;
-                bottom: 60px;
-                width: auto;
-                margin-left: 0;
-                border-radius: 14px 14px 0 0;
-                background-color: white;
-                overflow: hidden;
-                box-sizing: border-box;
-            }
 
-            .card-order .card-body {
-                padding-bottom: 300px;
-            }
+
+            /* .card-order .card-body {
+                    padding-bottom: 300px;
+                } */
         }
 
         @media screen and (min-width: 993px) and (max-width: 1199px) {
-            .tabs_container .row > .col-lg-3.d-flex.position-relative {
+            .tabs_container .row>.col-lg-3.d-flex.position-relative {
                 flex: 0 0 33.333333%;
                 max-width: 33.333333%;
             }
@@ -354,63 +604,11 @@
                 min-height: 100%;
             }
 
-            .payment_panel {
-                position: fixed;
-                right: 16px;
-                left: auto;
-                bottom: 220px;
-                width: min(360px, calc(50vw - 32px));
-                margin-left: 0;
-                border-radius: 14px;
-                background-color: white;
-                overflow: visible;
-                box-sizing: border-box;
-                z-index: 999;
-            }
 
-            .payment_panel .setvaluecash {
-                display: block !important;
-                margin: 0 0 12px;
-            }
 
-            .payment_panel .setvaluecash ul {
-                display: flex;
-                flex-wrap: wrap;
-                gap: 8px;
-                margin: 0;
-                padding: 0;
-            }
-
-            .payment_panel .setvaluecash ul li {
-                width: calc(33.33% - 8px);
-                margin: 0;
-                list-style: none;
-            }
-
-            .payment_panel .setvaluecash ul li a {
-                min-height: 38px;
-                height: 100%;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                gap: 4px;
-                padding: 4px 8px;
-                text-align: center;
-                font-size: 11px;
-            }
-
-            .payment_panel .setvaluecash ul li a i {
-                font-size: 14px !important;
-                margin-bottom: 0 !important;
-            }
-
-            .payment_panel .btn-totallabel {
-                margin: 0;
-            }
-
-            .card-order .card-body {
-                padding-bottom: 300px;
-            }
+            /* .card-order .card-body {
+                    padding-bottom: 300px;
+                } */
         }
 
         @media screen and (device-width: 1024px) and (device-height: 1366px) and (orientation: portrait) {
@@ -419,96 +617,179 @@
                 --bs-gutter-y: 12px;
             }
 
-            .tabs_container .row > .col-lg-3.d-flex.position-relative {
+            .tabs_container .row>.col-lg-3.d-flex.position-relative {
                 flex: 0 0 50%;
                 max-width: 50%;
             }
 
             /* iPad Pro portrait: payment panel sits at the bottom of the right column,
-               not floating over the totals */
-            .payment_panel {
-                position: static !important;
-                width: 100% !important;
-                bottom: auto !important;
-                right: auto !important;
-                left: auto !important;
-                border-radius: 0 !important;
-                margin-top: 12px;
-            }
+                           not floating over the totals */
 
-            .card-order .card-body {
-                padding-bottom: 300px !important;
-            }
+
+            /* .card-order .card-body {
+                    padding-bottom: 300px !important;
+                } */
         }
 
         /* iPad Pro landscape (1366x1024) */
         @media screen and (device-width: 1366px) and (device-height: 1024px) and (orientation: landscape) {
-            .payment_panel {
-                position: static !important;
-                width: 100% !important;
-                bottom: auto !important;
-                right: auto !important;
-                left: auto !important;
-                border-radius: 0 !important;
-                margin-top: 12px;
-            }
 
-            .card-order .card-body {
-                padding-bottom: 300px !important;
-            }
+
+            /* .card-order .card-body {
+                    padding-bottom: 300px !important;
+                } */
         }
 
-        /* iPad Pro viewport-based fix (1024px wide, portrait) — covers modern browsers
-           where device-width queries may not fire */
+        /* iPad Pro viewport-based fix (1024px wide, portrait) ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â covers modern browsers
+                       where device-width queries may not fire */
         @media screen and (min-width: 1024px) and (max-width: 1024px) {
-            .payment_panel {
-                position: static !important;
-                width: 100% !important;
-                bottom: auto !important;
-                right: auto !important;
-                left: auto !important;
-                border-radius: 8px !important;
-                margin-top: 12px;
-                box-shadow: 0 -2px 8px rgba(0,0,0,0.06);
-            }
+
 
             .card-order .card-body {
                 padding-bottom: 300px !important;
             }
         }
 
-        @media screen and (max-width: 767px) {
-            .payment_panel {
-                position: fixed;
-                left: 0px;
-                right: 0px;
-                bottom: 50px;
-                background-color: white;
-                width: auto;
-                margin-left: 0;
-                border-radius: 14px 14px 0 0;
-                /* box-shadow: 0 10px 30px rgba(15, 23, 42, 0.12); */
-                overflow: hidden;
+        @media screen and (max-width: 768px) {
+
+
+            .payment-panel-drag-handle {
+                display: none !important;
             }
+
+            body {
+                overflow-x: hidden !important;
+            }
+
+            /* Stack sale meta fields vertically on mobile */
+            .sale-meta-row .col-12 {
+                display: flex !important;
+                flex-direction: column !important;
+                align-items: stretch !important;
+                width: 100% !important;
+                margin-bottom: 12px !important;
+            }
+
+            .sale-meta-row .col-12 .select2-container {
+                width: 100% !important;
+            }
+
+            /* Stack customer details card fields vertically on mobile */
+            .customer-details-card .card-body .col-md-4 {
+                display: flex !important;
+                flex-direction: column !important;
+                align-items: stretch !important;
+                width: 100% !important;
+                margin-bottom: 12px !important;
+            }
+
+            .customer-details-card .card-body .col-md-4 .select2-container {
+                width: 100% !important;
+            }
+
+            /* Override parent card-body overflow for sticky position */
+            .card-order .card-body.body_space {
+                overflow: visible !important;
+                padding-bottom: 220px !important; /* Spacing so last content is not hidden behind sticky panel */
+            }
+
+            #paymentPanelFloat {
+                position: fixed !important; /* Fixed by default on mobile so it shows anywhere on the page */
+                bottom: 60px !important; /* Remains above the mobile-bottom-nav */
+                left: 0 !important;
+                width: 100vw !important;
+                margin-left: calc(-50vw + 50%) !important;
+                margin-right: calc(-50vw + 50%) !important;
+                background-color: #ffffff !important;
+                border-radius: 16px 16px 0 0 !important; /* Rounded top corners only */
+                box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.08) !important; /* Soft shadow */
+                z-index: 999 !important; /* High z-index but below mobile-bottom-nav (1050) */
+                margin-top: 20px !important;
+                margin-bottom: 0 !important;
+                height: auto !important;
+                max-height: calc(100vh - 120px) !important;
+                overflow: visible !important;
+                touch-action: auto !important;
+            }
+
+            /* When scrolled to the bottom, make it relative so it stays in the normal flow above the footer */
+            #paymentPanelFloat.at-bottom {
+                position: relative !important;
+                bottom: auto !important;
+                margin-left: 0 !important;
+                margin-right: 0 !important;
+                width: 100% !important;
+                border-radius: 16px 16px 0 0 !important;
+                box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.08) !important;
+            }
+
+            #paymentPanelFloat.drag-ready {
+                bottom: 60px !important;
+                top: auto !important; /* Ensure top is not set by JS */
+            }
+
+            .payment-panel-inner {
+                padding: 10px 10px 0 !important;
+                max-height: calc(100vh - 180px) !important;
+                overflow-y: auto !important;
+            }
+
+            .payment_panel .setvaluecash ul {
+                display: flex !important;
+                flex-wrap: nowrap !important; /* Force all buttons in one row */
+                gap: 4px !important; /* Narrow gap to fit all items */
+                padding: 4px 6px 10px !important;
+                margin: 0 !important;
+                overflow-x: visible !important;
+            }
+
+            .payment_panel .setvaluecash ul::-webkit-scrollbar {
+                display: none !important;
+            }
+
+            .payment_panel .setvaluecash ul li {
+                flex: 1 1 0% !important; /* Share space equally */
+                min-width: 0 !important; /* Allow shrinking below min-content */
+                margin: 0 !important;
+            }
+
+            .payment_panel .setvaluecash ul li a {
+                min-height: 48px !important;
+                padding: 6px 2px !important;
+                font-size: 8px !important; /* Smaller font size to fit text in one row */
+                letter-spacing: -0.3px !important;
+                white-space: nowrap !important;
+            }
+
+            .payment_panel .setvaluecash ul li a i {
+                font-size: 13px !important;
+                margin-bottom: 2px !important;
+            }
+
+            .payment_panel .btn-totallabel {
+                border-radius: 0 !important; /* No rounded corners on mobile */
+            }
+
             .gst-info {
                 margin: 4px 0 !important;
                 padding: 3px 8px !important;
                 background: #f8f9fa !important;
                 border-radius: 4px !important;
                 border-left: 3px solid #4caf50 !important;
-                width:80% !important;
+                width: 80% !important;
             }
+
             .product-lists .gst-no-message {
-            margin: 4px 0 !important;
-            padding: 6px 8px !important;
-            background: #fff8e1 !important;
-            border-left: 3px solid #ff9f43 !important;
-            border-radius: 4px !important;
-            color: #640a06 !important;
-            font-size: 12px !important;
-            line-height: 1.4 !important;
-            width: 80% !important;
-        }
+                margin: 4px 0 !important;
+                padding: 6px 8px !important;
+                background: #fff8e1 !important;
+                border-left: 3px solid #ff9f43 !important;
+                border-radius: 4px !important;
+                color: #640a06 !important;
+                font-size: 12px !important;
+                line-height: 1.4 !important;
+                width: 80% !important;
+            }
 
             .responsive-mobile-view {
                 display: none !important;
@@ -647,6 +928,7 @@
                 justify-content: space-between;
                 gap: 8px;
             }
+
             .increment-decrement .input-groups input[type=button] {
                 width: 75px;
                 height: 25px;
@@ -691,8 +973,8 @@
             }
 
             /* .body_space_two {
-                                margin-bottom: 4rem;
-                            } */
+                                            margin-bottom: 4rem;
+                                        } */
 
             a.confirm-text.remove-item {
                 /* font-size: 116px; */
@@ -717,7 +999,7 @@
             /* Give space below so content not hide */
             .card-order .card-body {
                 margin-top: 10px;
-                padding: 12px 12px 275px;
+                /* padding: 12px 12px 275px; */
             }
 
             /* Make radio inline properly */
@@ -738,7 +1020,7 @@
                 justify-content: space-between;
                 gap: 8px;
                 flex-wrap: wrap;
-                margin-bottom: 10px;
+                margin-bottom: 3px !important;
             }
 
             .product-discount-box {
@@ -766,7 +1048,7 @@
             }
 
             .setvalue {
-                padding: 0 0 16px 0 !important;
+                padding: 0 0 10px 0 !important;
             }
 
             .setvalue ul li {
@@ -828,7 +1110,7 @@
             background: #f8f9fa;
             border-radius: 4px;
             border-left: 3px solid #4caf50;
-            width:135px;
+            width: 135px;
         }
 
         .product-lists .gst-info small {
@@ -1018,9 +1300,9 @@
             color: #222;
         }
 
-        .setvalue {
-            padding: 0 0 40px 0 !important;
-        }
+        /* .setvalue {
+                    padding: 0 0 40px 0 !important;
+                } */
 
         .setvalue .total-value h6 {
             font-size: 18px;
@@ -1119,390 +1401,314 @@
             line-height: 1.3;
             max-width: 150px;
         }
+
         /* ===== POS PAYMENT PANEL FIELDS FIX ===== */
-#posPaidTypeBox,
-#cashOnlineBox,
-#bankSelectionBox,
-#emiBox {
-    width: 100%;
-    box-sizing: border-box;
-}
+        #posPaidTypeBox,
+        #cashOnlineBox,
+        #bankSelectionBox {
+            width: 100%;
+            box-sizing: border-box;
+        }
 
-#posPaidTypeBox .form-group,
-#cashOnlineBox .form-group,
-#bankSelectionBox .form-group,
-#emiBox .form-group {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    margin-bottom: 10px;
-}
-
-#posPaidTypeBox .form-group label,
-#cashOnlineBox .form-group label,
-#bankSelectionBox .form-group label,
-#emiBox .form-group label {
-    font-size: 12px;
-    font-weight: 600;
-    margin-bottom: 4px;
-    color: #444;
-    width: 100%;
-}
-
-#posPaidTypeBox .form-group select,
-#posPaidTypeBox .form-group input,
-#cashOnlineBox .form-group input,
-#bankSelectionBox .form-group select,
-#emiBox .form-group select,
-#emiBox .form-group input {
-    width: 100% !important;
-    box-sizing: border-box;
-    height: 36px;
-    font-size: 13px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    padding: 4px 10px;
-    background: #fff;
-}
-
-#posPaidAmountFields {
-    width: 100%;
-}
-
-#cashOnlineBox .row,
-#bankSelectionBox .row {
-    margin-left: -6px;
-    margin-right: -6px;
-}
-
-#cashOnlineBox .row > [class*="col-"],
-#bankSelectionBox .row > [class*="col-"] {
-    padding-left: 6px;
-    padding-right: 6px;
-}
-
-.bank-label-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
-    margin-bottom: 4px;
-}
-
-.bank-add-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    white-space: nowrap;
-    border: 1px solid #ff9f43;
-    background: #fff7ed;
-    color: #ff9f43;
-    border-radius: 4px;
-    padding: 3px 10px;
-    font-size: 12px;
-    font-weight: 600;
-    line-height: 1.2;
-    text-decoration: none;
-}
-
-.bank-add-btn:hover {
-    color: #fff;
-    background: #ff9f43;
-}
-
-#posPaidAmountFields .form-group {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    margin-bottom: 10px;
-}
-
-#posPaidAmountFields .form-group label {
-    font-size: 12px;
-    font-weight: 600;
-    margin-bottom: 4px;
-    color: #444;
-}
-
-#posPaidAmountFields .form-group input {
-    width: 100% !important;
-    box-sizing: border-box;
-    height: 36px;
-    font-size: 13px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    padding: 4px 10px;
-    background: #fff;
-}
-
-#posPendingAmount {
-    background: #f8f9fa !important;
-    color: #555;
-}
-
-/* Readonly/computed fields */
-#posPaidAmount[readonly],
-#posCashOnlineOnlineAmount[readonly] {
-    background: #f8f9fa !important;
-    color: #555;
-    cursor: not-allowed;
-}
-/* ===== POS PAYMENT PANEL - TWO COLUMN LAYOUT FOR FIELDS ===== */
-
-/* Make the payment panel containers use grid layout */
-.payment_panel #posPaidTypeBox,
-.payment_panel #cashOnlineBox,
-.payment_panel #bankSelectionBox {
-    display: block;
-    width: 100%;
-}
-
-/* Apply grid to form groups inside payment boxes */
-.payment_panel #posPaidTypeBox .form-group,
-.payment_panel #cashOnlineBox .form-group,
-.payment_panel #bankSelectionBox .form-group,
-.payment_panel #emiBox .form-group {
-    display: block;
-    width: 100%;
-    margin-bottom: 12px;
-}
-
-/* For the Paid Type Box - keep select full width, but amount fields in 2 columns */
-#posPaidTypeBox #posPaidAmountFields {
-    display: grid;
-    /* grid-template-columns: repeat(2, 1fr); */
-    gap: 12px;
-    margin-top: 8px;
-}
-
-#posPaidTypeBox #posPaidAmountFields .form-group {
-    margin-bottom: 0;
-}
-
-#posPaidTypeBox #posPaidAmountFields .form-group:first-child {
-    grid-column: 1 / 2;
-}
-
-#posPaidTypeBox #posPaidAmountFields .form-group:last-child {
-    grid-column: 2 / 3;
-}
-
-/* For Cash+Online box - cash and online amounts in 2 columns */
-/* #cashOnlineBox {
-    display: grid !important;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
-    margin-top: 10px;
-} */
-
-#cashOnlineBox .form-group {
-    margin-bottom: 0;
-}
-
-/* For Bank Selection box - keep full width (but can be full width) */
-#bankSelectionBox .form-group {
-    width: 100%;
-}
-
-#emiBox {
-    border: 1px solid #eef1f7;
-    border-radius: 12px;
-    background: #fff;
-    padding: 12px 12px 10px;
-    max-height: 240px;
-    overflow-y: auto;
-    scrollbar-width: thin;
-}
-
-#emiBox::-webkit-scrollbar {
-    width: 4px;
-}
-
-#emiBox::-webkit-scrollbar-thumb {
-    background: #d1d5db;
-    border-radius: 999px;
-}
-
-        .emi-action-row {
+        #posPaidTypeBox .form-group,
+        #cashOnlineBox .form-group,
+        #bankSelectionBox .form-group {
             display: flex;
-            justify-content: flex-end;
-            margin: 8px 0 8px;
+            flex-direction: column;
+            width: 100%;
+            margin-bottom: 10px;
         }
 
-.emi-cancel-btn {
-    border: 1px solid #ff4d4f;
-    background: #fff;
-    color: #ff4d4f;
-    border-radius: 6px;
-    padding: 4px 12px;
-    font-size: 12px;
-    line-height: 1.2;
-}
-
-.emi-cancel-btn:hover {
-    background: #fff1f0;
-    color: #ff4d4f;
-}
-
-/* Make all inputs inside payment panel have consistent styling */
-.payment_panel input,
-.payment_panel select {
-    width: 100% !important;
-    box-sizing: border-box;
-}
-
-/* Responsive adjustments for mobile */
-@media screen and (max-width: 767px) {
-    /* On mobile, stack them vertically */
-    #posPaidTypeBox #posPaidAmountFields {
-        grid-template-columns: 1fr;
-        gap: 10px;
-    }
-
-    #cashOnlineBox {
-        grid-template-columns: 1fr;
-        gap: 10px;
-    }
-
-    .bank-label-row {
-        align-items: flex-start;
-        /* flex-direction: column; */
-        gap: 6px;
-    }
-
-    #posPaidTypeBox #posPaidAmountFields .form-group:first-child,
-    #posPaidTypeBox #posPaidAmountFields .form-group:last-child {
-        grid-column: auto;
-    }
-
-    /* Mobile validation message styling */
-    .error_total {
-        display: block !important;
-        width: 100% !important;
-        min-height: auto !important;
-        height: auto !important;
-        /* padding: 12px !important; */
-        margin-bottom: 15px !important;
-        margin-top: 10px !important;
-        box-sizing: border-box !important;
-        line-height: 1.4 !important;
-        white-space: normal !important;
-        word-wrap: break-word !important;
-    }
-
-    .pos-customer-row {
-        display: grid;
-        grid-template-columns: 1fr;
-        gap: 10px;
-        align-items: start;
-        padding: 14px 14px 12px;
-        border: 1px solid #4cd97b;
-        border-radius: 14px;
-        background: #fff;
-        box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
-    }
-
-    .pos-customer-row > .pos-customer-field,
-    .pos-customer-row > .pos-customer-field--date {
-        width: 100%;
-        max-width: none;
-        padding: 0;
-        flex: none;
-    }
-
-    .pos-customer-row .form-group {
-        margin-bottom: 0;
-        display: flex;
-        flex-direction: column;
-        gap: 4px;
-    }
-
-    .pos-customer-row label {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        font-size: 13px;
-        margin-bottom: 6px;
-        font-weight: 500;
-        color: #1f2937;
-    }
-
-        .pos-customer-row .form-control,
-        .pos-customer-row .select2-container .select2-selection--single {
-            min-height: 42px;
-            border-radius: 8px;
-        }
-
-        .pos-customer-row .select2-container {
-            width: 100% !important;
-        }
-
-        .pos-customer-row .customer-label-row {
-            margin-bottom: 8px;
-        }
-
-        .pos-customer-row .customer-action-group {
-            gap: 6px;
-        }
-
-        .pos-customer-row .customer-action-btn {
-            width: 30px;
-            height: 30px;
-            border-radius: 9px;
-        }
-
-        .pos-customer-row .select-group {
-            width: 100% !important;
-        }
-
-        .pos-customer-row .select-split {
+        #posPaidTypeBox .form-group label,
+        #cashOnlineBox .form-group label,
+        #bankSelectionBox .form-group label {
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 4px;
+            color: #444;
             width: 100%;
         }
 
-        .customer-modal-dialog {
-            max-width: 1080px;
-            width: calc(100% - 48px);
+        #posPaidTypeBox .form-group select,
+        #posPaidTypeBox .form-group input,
+        #cashOnlineBox .form-group input,
+        #bankSelectionBox .form-group select {
+            width: 100% !important;
+            box-sizing: border-box;
+            height: 36px;
+            font-size: 13px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 4px 10px;
+            background: #fff;
         }
 
-        .customer-modal-dialog .modal-content {
-            border-radius: 10px;
+        #posPaidAmountFields {
+            width: 100%;
         }
-}
 
-/* For tablet devices */
-@media screen and (min-width: 768px) and (max-width: 1024px) {
-    #posPaidTypeBox #posPaidAmountFields {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 15px;
-    }
+        #cashOnlineBox .row,
+        #bankSelectionBox .row {
+            margin-left: -6px;
+            margin-right: -6px;
+        }
 
-    #cashOnlineBox {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 15px;
-    }
+        #cashOnlineBox .row>[class*="col-"],
+        #bankSelectionBox .row>[class*="col-"] {
+            padding-left: 6px;
+            padding-right: 6px;
+        }
 
-    .pos-customer-row {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 12px;
-    }
+        .bank-label-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 4px;
+        }
 
-    .pos-customer-row > .pos-customer-field {
-        width: 100%;
-        max-width: none;
-        padding: 0;
-        flex: none;
-    }
+        .bank-add-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            white-space: nowrap;
+            border: 1px solid #ff9f43;
+            background: #fff7ed;
+            color: #ff9f43;
+            border-radius: 4px;
+            padding: 3px 10px;
+            font-size: 12px;
+            font-weight: 600;
+            line-height: 1.2;
+            text-decoration: none;
+        }
 
-    .pos-customer-row > .pos-customer-field--date {
-        grid-column: 1 / -1;
-    }
-}
+        .bank-add-btn:hover {
+            color: #fff;
+            background: #ff9f43;
+        }
+
+        #posPaidAmountFields .form-group {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        #posPaidAmountFields .form-group label {
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 4px;
+            color: #444;
+        }
+
+        #posPaidAmountFields .form-group input {
+            width: 100% !important;
+            box-sizing: border-box;
+            height: 36px;
+            font-size: 13px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 4px 10px;
+            background: #fff;
+        }
+
+        #posPendingAmount {
+            background: #f8f9fa !important;
+            color: #555;
+        }
+
+        /* Readonly/computed fields */
+        #posPaidAmount[readonly],
+        #posCashOnlineOnlineAmount[readonly] {
+            background: #f8f9fa !important;
+            color: #555;
+            cursor: not-allowed;
+        }
+
+        /* ===== POS PAYMENT PANEL - TWO COLUMN LAYOUT FOR FIELDS ===== */
+
+        /* Make the payment panel containers use grid layout */
+        .payment_panel #posPaidTypeBox,
+        .payment_panel #cashOnlineBox,
+        .payment_panel #bankSelectionBox {
+            display: block;
+            width: 100%;
+        }
+
+        /* Apply grid to form groups inside payment boxes */
+        .payment_panel #posPaidTypeBox .form-group,
+        .payment_panel #cashOnlineBox .form-group,
+        .payment_panel #bankSelectionBox .form-group {
+            display: block;
+            width: 100%;
+            margin-bottom: 12px;
+        }
+
+        /* For the Paid Type Box - keep select full width, but amount fields in 2 columns */
+        #posPaidTypeBox #posPaidAmountFields {
+            display: grid;
+            /* grid-template-columns: repeat(2, 1fr); */
+            gap: 12px;
+            margin-top: 8px;
+        }
+
+        #posPaidTypeBox #posPaidAmountFields .form-group {
+            margin-bottom: 0;
+        }
+
+        #posPaidTypeBox #posPaidAmountFields .form-group:first-child {
+            grid-column: 1 / 2;
+        }
+
+        #posPaidTypeBox #posPaidAmountFields .form-group:last-child {
+            grid-column: 2 / 3;
+        }
+
+        /* For Cash+Online box - cash and online amounts in 2 columns */
+        /* #cashOnlineBox {
+                display: grid !important;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+                margin-top: 10px;
+            } */
+
+        #cashOnlineBox .form-group {
+            margin-bottom: 0;
+        }
+
+        /* For Bank Selection box - keep full width (but can be full width) */
+        #bankSelectionBox .form-group {
+            width: 100%;
+        }
+
+        /* Make all inputs inside payment panel have consistent styling */
+        .payment_panel input,
+        .payment_panel select {
+            width: 100% !important;
+            box-sizing: border-box;
+        }
+
+        /* Responsive adjustments for mobile */
+        @media screen and (max-width: 768px) {
+
+            /* On mobile, stack them vertically */
+            #posPaidTypeBox #posPaidAmountFields {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+
+            #cashOnlineBox {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+
+            .bank-label-row {
+                align-items: flex-start;
+                /* flex-direction: column; */
+                gap: 6px;
+            }
+
+            #posPaidTypeBox #posPaidAmountFields .form-group:first-child,
+            #posPaidTypeBox #posPaidAmountFields .form-group:last-child {
+                grid-column: auto;
+            }
+
+            /* Mobile validation message styling */
+            .error_total {
+                display: block !important;
+                width: 100% !important;
+                min-height: auto !important;
+                height: auto !important;
+                line-height: 1.4 !important;
+                white-space: normal !important;
+                word-wrap: break-word !important;
+            }
+
+
+        }
+
+        /* For tablet devices */
+        @media screen and (min-width: 768px) and (max-width: 1024px) {
+            #posPaidTypeBox #posPaidAmountFields {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 15px;
+            }
+
+            #cashOnlineBox {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 15px;
+            }
+
+            .pos-customer-row {
+                display: grid;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 12px;
+            }
+
+            .pos-customer-row>.pos-customer-field {
+                width: 100%;
+                max-width: none;
+                padding: 0;
+                flex: none;
+            }
+
+            .pos-customer-row>.pos-customer-field--date {
+                grid-column: 1 / -1;
+            }
+        }
+
+        /* Scrollable areas for POS Layout */
+        .tabs_wrapper .tabs_container {
+            height: calc(100vh - 220px);
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding-right: 5px;
+        }
+
+        .tabs_wrapper .tabs_container::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .tabs_wrapper .tabs_container::-webkit-scrollbar-thumb {
+            background-color: #ccc;
+            border-radius: 4px;
+        }
+
+        #emiBox {
+            max-height: none;
+            overflow-y: visible;
+            overflow-x: hidden;
+            padding-right: 5px;
+        }
+
+        #emiBox::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        #emiBox::-webkit-scrollbar-thumb {
+            background-color: #ccc;
+            border-radius: 4px;
+        }
+
+       /* .card-order .card-body .payment_panel {
+    position: sticky !important;
+    top: 20px;
+    width: 100%;
+    margin-top: 15px;
+    z-index: 100;
+} */
+
+        i.fa-regular.fa-circle-user.me-1,
+        i.fa-solid.fa-phone.me-1,
+        i.fa-regular.fa-id-card.me-1 {
+            color: #ff9f43;
+        }
     </style>
     <div class="content">
         @php
             $isQuotationMode = request('sale_type') === 'quotation';
-            $showNewBillModal = request('new_bill') == 1;
+            $showNewBillModal = request('new_bill') == 1 && !request()->has('sale_type');
         @endphp
         <input type="hidden" id="quotation_status" name="quotation_status"
             value="{{ $isQuotationMode ? 'quotation' : 'sales' }}">
@@ -1512,10 +1718,10 @@
                 <h4 id="posPageTitle">{{ $isQuotationMode ? 'Add Quotation' : 'Add Sale' }}</h4>
             </div>
             <div class="page-btn">
-                 <a href="{{ route('sales.list') }}" class="pos-back-btn">
-                                <i class="fa-solid fa-arrow-left"></i>
-                                Back
-                            </a>
+                <a href="{{ route('sales.list') }}" class="pos-back-btn">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    Back
+                </a>
             </div>
         </div>
 
@@ -1545,15 +1751,13 @@
             </div>
         @endif
 
-        <div class="modal fade" id="addBankModal" tabindex="-1" aria-labelledby="addBankModalLabel"
-            aria-hidden="true">
+        <div class="modal fade" id="addBankModal" tabindex="-1" aria-labelledby="addBankModalLabel" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <form id="addBankForm">
                         <div class="modal-header">
                             <h5 class="modal-title" id="addBankModalLabel">Add Bank</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                aria-label="Close">x</button>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">x</button>
                         </div>
                         <div class="modal-body">
                             <div class="row">
@@ -1615,20 +1819,20 @@
             <div class=" d-flex justify-content-between ">
 
                 <div class="form-check m-0">
-                    <input class="form-check-input quotationToggle" type="checkbox" id="quotationToggle1" value="quotation"
-                        {{ $isQuotationMode ? 'checked' : '' }}>
+                    <input class="form-check-input quotationToggle" type="checkbox" id="quotationToggle1"
+                        value="quotation" {{ $isQuotationMode ? 'checked' : '' }}>
                     <label class="form-check-label" for="quotationToggle1">Quotation</label>
                 </div>
                 <div class="d-flex gap-3">
-    <label class="custom-radio-label m-0">
-        <input type="radio" name="gst_option_mobile" id="without_gst_mobile" value="without" checked>
-        Without GST
-    </label>
-    <label class="custom-radio-label m-0">
-        <input type="radio" name="gst_option_mobile" id="with_gst_mobile" value="with">
-        With GST
-    </label>
-</div>
+                    <label class="custom-radio-label m-0">
+                        <input type="radio" name="gst_option_mobile" id="without_gst_mobile" value="without" checked>
+                        Without GST
+                    </label>
+                    <label class="custom-radio-label m-0">
+                        <input type="radio" name="gst_option_mobile" id="with_gst_mobile" value="with">
+                        With GST
+                    </label>
+                </div>
 
             </div>
 
@@ -1692,14 +1896,16 @@
                             <div class="pos-top-controls-left">
                                 @if ($role == 'admin' || $role == 'staff' || $role == 'sub-admin')
                                     <div class="form-check pos-quotation-toggle">
-                                        <input class="form-check-input quotationToggle" type="checkbox" id="quotationToggle2"
-                                            value="quotation" {{ $isQuotationMode ? 'checked' : '' }}>
+                                        <input class="form-check-input quotationToggle" type="checkbox"
+                                            id="quotationToggle2" value="quotation"
+                                            {{ $isQuotationMode ? 'checked' : '' }}>
                                         <label class="form-check-label" for="quotationToggle2">Quotation</label>
                                     </div>
                                 @endif
                                 <div class="pos-gst-options">
                                     <label class="custom-radio-label">
-                                        <input type="radio" name="gst_option" id="without_gst" value="without" checked />
+                                        <input type="radio" name="gst_option" id="without_gst" value="without"
+                                            checked />
                                         Without GST
                                     </label>
 
@@ -1736,9 +1942,8 @@
                                             alt="Search"
                                             style="position: absolute; left: 55px; width: 18px; height: 18px; z-index: 10; opacity: 0.6;">
                                         <input type="text" id="customerSearch1"
-                                            class="form-control form-control-sm rounded px-3 ps-5"
-                                            placeholder="Search..." autocomplete="off"
-                                            style="height: 38px; font-size: 14px; padding-left: 42px;">
+                                            class="form-control form-control-sm rounded px-3 ps-5" placeholder="Search..."
+                                            autocomplete="off" style="height: 38px; font-size: 14px; padding-left: 42px;">
                                         <!-- Search Results (existing) -->
                                         <div id="searchResults1"
                                             class="list-group bg-white position-absolute rounded shadow mt-1 w-100"
@@ -1765,406 +1970,397 @@
                                                 <div id="scan-message" class="text-center mt-2 small text-muted">
                                                     Initializing camera...</div>
                                             </div>
-                                <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary"
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary"
                                                     data-bs-dismiss="modal">Close</button>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        </div>
-
-                        <div class="d-flex align-items-center justify-content-between mb-2 mt-3">
-                            <div class="d-flex align-items-center gap-2">
-                                <i class="fas fa-user-friends text-success"></i>
-                                <h5 class="mb-0" style="font-size: 18px; font-weight: 700;">Customer details</h5>
-                            </div>
-                            <div class="d-flex align-items-center gap-2">
-                                <button type="button" id="openAddCustomerModal"
-                                    class="btn btn-sm btn-outline-success d-inline-flex align-items-center justify-content-center"
-                                    style="width: 28px; height: 29px; border-radius: 10px;" title="Add Customer">
-                                    <i class="fas fa-plus"></i>
-                                </button>
-                                <button type="button" id="openEditCustomerModal"
-                                    class="btn btn-sm btn-outline-warning d-inline-flex align-items-center justify-content-center"
-                                    style="width: 28px; height: 29px; border-radius: 10px; display:none;"
-                                    title="Edit Customer">
-                                    <i class="fas fa-pen"></i>
-                                </button>
-                            </div>
-                        </div>
-
-                        <div class="row w-105 pos-customer-row">
-                            <!-- Customer Name -->
-                            <div class="col-md-4 col-6 pos-customer-field">
-                                        <div class="select-split select-group w-100">
-                                            <div class="select-group w-100">
-                                                <label>Customer Name</label>
-                                                <select id="customer_name" name="customer_name" style="z-index:1;"
-                                                    class="form-control select2">
+                                <div class="customer-details-card  mb-3">
+                                    <div class="card-header">
+                                        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                                            <div class="customer-details-title">
+                                                <i class="fa-solid fa-users"></i>
+                                                <span>Customer details</span>
+                                            </div>
+                                            <div class="customer-action-group">
+                                                <button type="button" id="openAddCustomerModal"
+                                                    class="customer-action-btn" title="Add Customer">
+                                                    <i class="fa-solid fa-plus"></i>
+                                                </button>
+                                                <button type="button" id="openEditCustomerModal"
+                                                    class="customer-action-btn d-none" title="Edit Customer" disabled>
+                                                    <i class="fa-solid fa-pen-to-square"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row g-3 align-items-end">
+                                            <div class="col-md-4">
+                                                <label class="form-label">
+                                                    <i class="fa-regular fa-circle-user me-1 "></i>
+                                                    Customer name
+                                                </label>
+                                                <select id="customer_name" name="customer_name"
+                                                    class="form-control select2 customer-select">
                                                     <option value="">Select Customer</option>
-                                                    @foreach ($customers as $username)
-                                                        <option value="{{ $username->id }}"
-                                                            data-phone="{{ $username->phone }}">
-                                                            {{ $username->name }}
-                                                        </option>
-                                                    @endforeach
                                                 </select>
-                                                <span class="error_customername text-danger"></span>
+                                                <div class="customer-field-error error_customername"></div>
                                             </div>
-                                        </div>
-                                    </div>
-
-                                    <!-- Customer Phone -->
-                                    <div class="col-md-4 col-6 pos-customer-field">
-                                        <div class="select-split">
-                                            <div class="select-group w-100">
-                                                <label>Customer Phone</label>
-                                                <input type="tel" id="customer_phone" class="form-control"
-                                                    placeholder="Customer number" name="customer_phone">
-                                                <span class="error_customerphone text-danger"></span>
+                                            <div class="col-md-4">
+                                                <label class="form-label">
+                                                    <i class="fa-solid fa-phone me-1 "></i>
+                                                    Customer phone
+                                                </label>
+                                                <input type="text" id="customer_phone" class="form-control"
+                                                    placeholder="Customer number" name="customer_phone" maxlength="10"
+                                                    readonly>
+                                                <div class="customer-field-error error_customerphone"></div>
                                             </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4 col-6 pos-customer-field">
-                                        <div class="select-split">
-                                            <div class="select-group w-100">
-                                                <label>Customer GST no</label>
+                                            <div class="col-md-4">
+                                                <label class="form-label">
+                                                    <i class="fa-regular fa-id-card me-1 "></i>
+                                                    Customer GST no
+                                                </label>
                                                 <input type="text" id="customer_gst_number" class="form-control"
-                                                    placeholder="Enter GST to auto-fill" name="customer_gst_number">
-                                                <span class="error_customergst text-danger"></span>
+                                                    placeholder="Enter GST to auto fill" name="customer_gst_number"
+                                                    maxlength="15" readonly>
+                                                <div class="customer-field-error error_customergst"></div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        </div>
 
-                        @php
-                            $staffUsers = \App\Models\User::where('role', 'staff')
-                                ->where('isDeleted', 0)
-                                ->when(!empty($subAdminId) && $subAdminId !== 'null', function ($query) use ($subAdminId) {
-                                    $query->where('branch_id', $subAdminId);
-                                })
-                                ->get();
-                        @endphp
-
-                        <div class="row mt-3">
-                            <div class="col-md-4 col-6">
-                                <div class="form-group">
-                                    <label>Order Date</label>
-                                    <input type="hidden" id="order_date" name="order_date"
-                                        value="{{ now()->format('Y-m-d') }}">
-                                    <div class="input-groupicon">
-                                        <input type="text" id="order_date_display" class="form-control"
-                                            value="{{ now()->format('d/m/Y') }}" autocomplete="off">
-                                        <a class="addonset">
-                                            <img src="{{ env('ImagePath') . 'admin/assets/img/icons/calendars.svg' }}"
-                                                alt="Calendar">
-                                        </a>
+                                <div class="row g-3 sale-meta-row mb-4">
+                                    <div class="col-md-4 col-12">
+                                        <label class="form-label">Order Date</label>
+                                        <input type="hidden" id="order_date" name="order_date"
+                                            value="{{ now()->format('Y-m-d') }}">
+                                        <div class="input-groupicon">
+                                            <input type="text" id="order_date_display" class="form-control"
+                                                value="{{ now()->format('d/m/Y') }}" autocomplete="off">
+                                            {{-- <a class="addonset">
+                                                <img src="{{ env('ImagePath') . 'admin/assets/img/icons/calendars.svg' }}"
+                                                    alt="Calendar">
+                                            </a> --}}
+                                        </div>
                                     </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4 col-6">
-                                <div class="form-group">
-                                    <label>Assign Staff</label>
-                                    <select id="assigned_staff" name="assigned_staff" class="form-control select2"
-                                        data-previous-value="">
-                                        <option value="">Select Staff (Optional)</option>
-                                        @foreach ($staffUsers as $staff)
-                                            <option value="{{ $staff->id }}">{{ $staff->name }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-md-4 col-6">
-                                <div class="form-group">
-                                    <label>Order Type</label>
-                                    <select id="order_type" name="order_type" class="form-control">
-                                        <option value="Self Pickup" selected>Self Pickup</option>
-                                        <option value="Delivery">Delivery</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="modal fade" id="editCustomerModal" tabindex="-1"
-                            aria-labelledby="editCustomerModalLabel" aria-hidden="true">
-                            <div class="modal-dialog modal-lg modal-dialog-centered customer-modal-dialog">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title" id="editCustomerModalLabel">Edit Customer</h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                            aria-label="Close">x</button>
+                                    <div class="col-md-4 col-12">
+                                        <label class="form-label">Assign Staff</label>
+                                        <select id="assign_staff" name="assign_staff" class="form-control select2">
+                                            <option value="">Select Staff (Optional)</option>
+                                        </select>
                                     </div>
-                                    <div class="modal-body">
-                                        <form id="posEditCustomerForm" enctype="multipart/form-data">
-                                            @csrf
-                                            <input type="hidden" id="pos_edit_customer_id">
-                                            <div class="row">
-                                                <div class="col-lg-3 col-sm-6 col-12">
-                                                    <div class="form-group mb-3">
-                                                        <label>Customer Name <span class="text-danger">*</span></label>
-                                                        <input type="text" name="customer_name" id="pos_edit_customer_name"
-                                                            class="form-control" placeholder="Customer Name">
-                                                        <small class="text-danger error-customer_name"></small>
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-3 col-sm-6 col-12">
-                                                    <div class="form-group mb-3">
-                                                        <label>Company Name</label>
-                                                        <input type="text" name="company_name" id="pos_edit_company_name"
-                                                            class="form-control" placeholder="Company Name">
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-3 col-sm-6 col-12">
-                                                    <div class="form-group mb-3">
-                                                        <label>Phone <span class="text-danger">*</span></label>
-                                                        <input type="text" maxlength="10" name="phone" id="pos_edit_phone"
-                                                            class="form-control" placeholder="10-digit phone">
-                                                        <small class="text-danger error-phone"></small>
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-3 col-sm-6 col-12">
-                                                    <div class="form-group mb-3">
-                                                        <label>Alternate Phone</label>
-                                                        <input type="text" maxlength="10" name="alternate_phone"
-                                                            id="pos_edit_alternate_phone" class="form-control"
-                                                            placeholder="10-digit phone (optional)">
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-3 col-sm-6 col-12">
-                                                    <div class="form-group mb-3">
-                                                        <label>Email</label>
-                                                        <input type="email" name="email" id="pos_edit_email"
-                                                            class="form-control" placeholder="Email">
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-3 col-sm-6 col-12">
-                                                    <div class="form-group mb-3">
-                                                        <label>GST Number</label>
-                                                        <input type="text" name="gst_number" maxlength="15"
-                                                            id="pos_edit_gst_number" class="form-control"
-                                                            placeholder="GST Number">
-                                                        <small class="text-danger error-gst_number"></small>
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-3 col-sm-6 col-12">
-                                                    <div class="form-group mb-3">
-                                                        <label>PAN Number</label>
-                                                        <input type="text" name="pan_number" maxlength="10"
-                                                            id="pos_edit_pan_number" class="form-control"
-                                                            placeholder="PAN Number">
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-3 col-sm-6 col-12">
-                                                    <div class="form-group mb-3">
-                                                        <label>State Code</label>
-                                                        <input type="text" name="state_code" id="pos_edit_state_code"
-                                                            class="form-control" placeholder="e.g. 27">
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-3 col-sm-6 col-12">
-                                                    <div class="form-group mb-3">
-                                                        <label>State Name</label>
-                                                        <input type="text" name="state_name" id="pos_edit_state_name"
-                                                            class="form-control" placeholder="Auto-filled from state"
-                                                            readonly>
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-3 col-sm-6 col-12">
-                                                    <div class="form-group mb-3">
-                                                        <label>Country</label>
-                                                        <input type="text" name="country" id="pos_edit_country"
-                                                            class="form-control" placeholder="Country">
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-3 col-sm-6 col-12">
-                                                    <div class="form-group mb-3">
-                                                        <label>City</label>
-                                                        <input type="text" name="city" id="pos_edit_city"
-                                                            class="form-control" placeholder="City">
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-6 col-12">
-                                                    <div class="form-group mb-3">
-                                                        <div class="d-flex align-items-center justify-content-between mb-1">
-                                                            <label class="mb-0">Address</label>
-                                                        </div>
-                                                        <textarea name="address" id="pos_edit_address" class="form-control" rows="3" placeholder="Address"></textarea>
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-6 col-12">
-                                                    <div class="form-group mb-3">
-                                                        <div class="d-flex align-items-center justify-content-between mb-1">
-                                                            <label class="mb-0">Delivery Address</label>
-                                                            <div class="form-check m-0">
-                                                                <input class="form-check-input" type="checkbox"
-                                                                    id="pos_edit_use_address" checked>
-                                                                <label class="form-check-label" for="pos_edit_use_address">
-                                                                    Use Address
-                                                                </label>
-                                                            </div>
-                                                        </div>
-                                                        <textarea name="delivery_address" id="pos_edit_delivery_address" class="form-control" rows="3"
-                                                            placeholder="Delivery Address"></textarea>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </form>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary"
-                                            data-bs-dismiss="modal">Cancel</button>
-                                        <button type="button" id="updatePosCustomerBtn"
-                                            class="btn btn-warning">Update Customer</button>
+                                    <div class="col-md-4 col-12">
+                                        <label class="form-label">Order Type</label>
+                                        <select id="order_type" name="order_type" class="form-control select2">
+                                            <option value="Self Pickup">Self Pickup</option>
+                                            <option value="Delivery">Delivery</option>
+                                            <option value="Take Away">Take Away</option>
+                                        </select>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="modal fade" id="addCustomerModal" tabindex="-1"
+                        <div class="modal fade customer-modal" id="addCustomerModal" tabindex="-1"
                             aria-labelledby="addCustomerModalLabel" aria-hidden="true">
-                            <div class="modal-dialog modal-lg modal-dialog-centered customer-modal-dialog">
+                            <div class="modal-dialog modal-lg modal-dialog-centered">
                                 <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title" id="addCustomerModalLabel">Add New Customer</h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                            aria-label="Close">x</button>
-                                    </div>
-                                    <div class="modal-body">
-                                        <form id="posCustomerForm" enctype="multipart/form-data">
-                                            @csrf
-                                            <div class="row">
-                                                <div class="col-lg-3 col-sm-6 col-12">
-                                                    <div class="form-group mb-3">
-                                                        <label>Customer Name <span class="text-danger">*</span></label>
-                                                        <input type="text" name="customer_name" id="pos_customer_name"
-                                                            class="form-control" placeholder="Customer Name">
-                                                        <small class="text-danger error-customer_name"></small>
-                                                    </div>
+                                    <form id="addCustomerForm">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="addCustomerModalLabel">Add New Customer</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                aria-label="Close">x</button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="row g-3">
+
+                                                <!-- Row 1 -->
+
+                                                <div class="col-md-3">
+                                                    <label class="form-label">Customer Name <span
+                                                            class="text-danger">*</span></label>
+                                                    <input type="text" class="form-control" id="add_customer_name"
+                                                        name="customer_name" placeholder="Customer Name" maxlength="80">
+                                                    <div class="customer-field-error" data-field="customer_name"></div>
                                                 </div>
-                                                <div class="col-lg-3 col-sm-6 col-12">
-                                                    <div class="form-group mb-3">
-                                                        <label>Company Name</label>
-                                                        <input type="text" name="company_name" id="pos_company_name"
-                                                            class="form-control" placeholder="Company Name">
-                                                    </div>
+
+                                                <div class="col-md-3">
+                                                    <label class="form-label">Company Name</label>
+                                                    <input type="text" class="form-control"
+                                                        id="add_customer_company_name" name="company_name"
+                                                        placeholder="Company Name" maxlength="80">
+                                                    <div class="customer-field-error" data-field="company_name"></div>
                                                 </div>
-                                                <div class="col-lg-3 col-sm-6 col-12">
-                                                    <div class="form-group mb-3">
-                                                        <label>Phone <span class="text-danger">*</span></label>
-                                                        <input type="text" maxlength="10" name="phone" id="pos_phone"
-                                                            class="form-control" placeholder="10-digit phone">
-                                                        <small class="text-danger error-phone"></small>
-                                                    </div>
+
+                                                <div class="col-md-3">
+                                                    <label class="form-label">Phone <span
+                                                            class="text-danger">*</span></label>
+                                                    <input type="tel" class="form-control" id="add_customer_phone"
+                                                        name="phone" placeholder="10-digit phone" maxlength="10">
+                                                    <div class="customer-field-error" data-field="phone"></div>
                                                 </div>
-                                                <div class="col-lg-3 col-sm-6 col-12">
-                                                    <div class="form-group mb-3">
-                                                        <label>Alternate Phone</label>
-                                                        <input type="text" maxlength="10" name="alternate_phone"
-                                                            id="pos_alternate_phone" class="form-control"
-                                                            placeholder="10-digit phone (optional)">
-                                                    </div>
+
+                                                <div class="col-md-3">
+                                                    <label class="form-label">Alternate Phone</label>
+                                                    <input type="text" class="form-control"
+                                                        id="add_customer_alternate_phone" name="alternate_phone"
+                                                        placeholder="10-digit phone (optional)" maxlength="10">
+                                                    <div class="customer-field-error" data-field="alternate_phone"></div>
                                                 </div>
-                                                <div class="col-lg-3 col-sm-6 col-12">
-                                                    <div class="form-group mb-3">
-                                                        <label>Email</label>
-                                                        <input type="email" name="email" id="pos_email"
-                                                            class="form-control" placeholder="Email">
-                                                    </div>
+
+                                                <!-- Row 2 -->
+
+                                                <div class="col-md-3">
+                                                    <label class="form-label">Email</label>
+                                                    <input type="email" class="form-control" id="add_customer_email"
+                                                        name="email" placeholder="Email">
+                                                    <div class="customer-field-error" data-field="email"></div>
                                                 </div>
-                                                <div class="col-lg-3 col-sm-6 col-12">
-                                                    <div class="form-group mb-3">
-                                                        <label>GST Number</label>
-                                                        <input type="text" name="gst_number" maxlength="15"
-                                                            id="pos_gst_number" class="form-control"
-                                                            placeholder="GST Number">
-                                                        <small class="text-danger error-gst_number"></small>
-                                                    </div>
+
+                                                <div class="col-md-3">
+                                                    <label class="form-label">GST Number</label>
+                                                    <input type="text" class="form-control"
+                                                        id="add_customer_gst_number" name="gst_number"
+                                                        placeholder="GST Number" maxlength="15">
+                                                    <div class="customer-field-error" data-field="gst_number"></div>
                                                 </div>
-                                                <div class="col-lg-3 col-sm-6 col-12">
-                                                    <div class="form-group mb-3">
-                                                        <label>PAN Number</label>
-                                                        <input type="text" name="pan_number" maxlength="10"
-                                                            id="pos_pan_number" class="form-control"
-                                                            placeholder="PAN Number">
-                                                    </div>
+
+                                                <div class="col-md-3">
+                                                    <label class="form-label">PAN Number</label>
+                                                    <input type="text" class="form-control"
+                                                        id="add_customer_pan_number" name="pan_number"
+                                                        placeholder="PAN Number">
+                                                    <div class="customer-field-error" data-field="pan_number"></div>
                                                 </div>
-                                                <div class="col-lg-3 col-sm-6 col-12">
-                                                    <div class="form-group mb-3">
-                                                        <label>State Code</label>
-                                                        <input type="text" name="state_code" id="pos_state_code"
-                                                            class="form-control" placeholder="e.g. 27">
-                                                    </div>
+
+                                                <div class="col-md-3">
+                                                    <label class="form-label">State Code</label>
+                                                    <input type="text" class="form-control"
+                                                        id="add_customer_state_code" name="state_code"
+                                                        placeholder="e.g. 24">
+                                                    <div class="customer-field-error" data-field="state_code"></div>
                                                 </div>
-                                                <div class="col-lg-3 col-sm-6 col-12">
-                                                    <div class="form-group mb-3">
-                                                        <label>State Name</label>
-                                                        <input type="text" name="state_name" id="pos_state_name"
-                                                            class="form-control" placeholder="Auto-filled from state"
-                                                            readonly>
-                                                    </div>
+
+                                                <!-- Row 3 -->
+
+                                                <div class="col-md-4">
+                                                    <label class="form-label">State Name</label>
+                                                    <input type="text" class="form-control"
+                                                        id="add_customer_state_name" name="state_name"
+                                                        placeholder="Auto-filled from state" readonly>
+                                                    <div class="customer-field-error" data-field="state_name"></div>
                                                 </div>
-                                                <div class="col-lg-3 col-sm-6 col-12">
-                                                    <div class="form-group mb-3">
-                                                        <label>Country</label>
-                                                        <input type="text" name="country" id="pos_country"
-                                                            class="form-control" placeholder="Country">
-                                                    </div>
+
+                                                <div class="col-md-4">
+                                                    <label class="form-label">Country</label>
+                                                    <input type="text" class="form-control" id="add_customer_country"
+                                                        name="country" placeholder="Country">
+                                                    <div class="customer-field-error" data-field="country"></div>
                                                 </div>
-                                                <div class="col-lg-3 col-sm-6 col-12">
-                                                    <div class="form-group mb-3">
-                                                        <label>City</label>
-                                                        <input type="text" name="city" id="pos_city"
-                                                            class="form-control" placeholder="City">
-                                                    </div>
+
+                                                <div class="col-md-4">
+                                                    <label class="form-label">City</label>
+                                                    <input type="text" class="form-control" id="add_customer_city"
+                                                        name="city" placeholder="City">
+                                                    <div class="customer-field-error" data-field="city"></div>
                                                 </div>
-                                                <div class="col-lg-6 col-12">
-                                                    <div class="form-group mb-3">
-                                                        <div class="d-flex align-items-center justify-content-between mb-1">
-                                                            <label class="mb-0">Address</label>
+
+                                                <!-- Row 4 -->
+
+                                                <div class="col-md-6">
+                                                    <label class="form-label">Address</label>
+                                                    <textarea class="form-control" id="add_customer_address" name="address" rows="3" placeholder="Address"></textarea>
+                                                    <div class="customer-field-error" data-field="address"></div>
+                                                </div>
+
+                                                <div class="col-md-6">
+
+                                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                                        <label class="form-label mb-0">Delivery Address</label>
+
+                                                        <div>
+                                                            <input type="checkbox" id="add_same_address">
+
+                                                            <label for="add_same_address" class="mb-0">
+                                                                Use Address
+                                                            </label>
                                                         </div>
-                                                        <textarea name="address" id="pos_address" class="form-control" rows="3" placeholder="Address"></textarea>
                                                     </div>
+
+                                                    <textarea class="form-control" id="add_customer_delivery_address" name="delivery_address" rows="3"
+                                                        placeholder="Delivery Address"></textarea>
+
+                                                    <div class="customer-field-error" data-field="delivery_address"></div>
+
                                                 </div>
-                                                <div class="col-lg-6 col-12">
-                                                    <div class="form-group mb-3">
-                                                        <div class="d-flex align-items-center justify-content-between mb-1">
-                                                            <label class="mb-0">Delivery Address</label>
-                                                            <div class="form-check m-0">
-                                                                <input class="form-check-input" type="checkbox"
-                                                                    id="pos_use_address" checked>
-                                                                <label class="form-check-label" for="pos_use_address">
-                                                                    Use Address
-                                                                </label>
-                                                            </div>
-                                                        </div>
-                                                        <textarea name="delivery_address" id="pos_delivery_address" class="form-control" rows="3"
-                                                            placeholder="Delivery Address"></textarea>
-                                                    </div>
-                                                </div>
+
                                             </div>
-                                        </form>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary"
-                                            data-bs-dismiss="modal">Cancel</button>
-                                        <button type="button" id="savePosCustomerBtn"
-                                            class="btn btn-primary">Save Customer</button>
-                                    </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="submit" class="btn btn-primary btn-submit"
+                                                id="saveCustomerBtn">Save Customer</button>
+                                            <button type="button" class="btn btn-secondary btn-cancel"
+                                                data-bs-dismiss="modal">Cancel</button>
+                                        </div>
+                                    </form>
                                 </div>
                             </div>
                         </div>
 
-                        <script>
-                            document.getElementById('customer_name').addEventListener('change', function() {
-                                var phone = this.options[this.selectedIndex].getAttribute('data-phone');
-                                document.getElementById('customer_phone').value = phone || '';
-                            });
-                        </script>
-                        <div class="split-card">
+                        <div class="modal fade customer-modal" id="editCustomerModal" tabindex="-1"
+                            aria-labelledby="editCustomerModalLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-lg modal-dialog-centered">
+                                <div class="modal-content">
+                                    <form id="editCustomerForm">
+                                        <input type="hidden" id="edit_customer_id" name="id">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="editCustomerModalLabel">Edit Customer</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                aria-label="Close">x</button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="row g-3">
 
+                                                <!-- Row 1 -->
+
+                                                <div class="col-md-3">
+                                                    <label class="form-label">Customer Name <span
+                                                            class="text-danger">*</span></label>
+                                                    <input type="text" class="form-control" id="edit_customer_name"
+                                                        name="customer_name" placeholder="Customer Name" maxlength="80">
+                                                    <div class="customer-field-error" data-field="customer_name"></div>
+                                                </div>
+
+                                                <div class="col-md-3">
+                                                    <label class="form-label">Company Name</label>
+                                                    <input type="text" class="form-control"
+                                                        id="edit_customer_company_name" name="company_name"
+                                                        placeholder="Company Name" maxlength="80">
+                                                    <div class="customer-field-error" data-field="company_name"></div>
+                                                </div>
+
+                                                <div class="col-md-3">
+                                                    <label class="form-label">Phone <span
+                                                            class="text-danger">*</span></label>
+                                                    <input type="tel" class="form-control" id="edit_customer_phone"
+                                                        name="phone" placeholder="10-digit phone" maxlength="10">
+                                                    <div class="customer-field-error" data-field="phone"></div>
+                                                </div>
+
+                                                <div class="col-md-3">
+                                                    <label class="form-label">Alternate Phone</label>
+                                                    <input type="text" class="form-control"
+                                                        id="edit_customer_alternate_phone" name="alternate_phone"
+                                                        placeholder="10-digit phone (optional)" maxlength="10">
+                                                    <div class="customer-field-error" data-field="alternate_phone"></div>
+                                                </div>
+
+                                                <!-- Row 2 -->
+
+                                                <div class="col-md-3">
+                                                    <label class="form-label">Email</label>
+                                                    <input type="email" class="form-control" id="edit_customer_email"
+                                                        name="email" placeholder="Email">
+                                                    <div class="customer-field-error" data-field="email"></div>
+                                                </div>
+
+                                                <div class="col-md-3">
+                                                    <label class="form-label">GST Number</label>
+                                                    <input type="text" class="form-control"
+                                                        id="edit_customer_gst_number" name="gst_number"
+                                                        placeholder="GST Number" maxlength="15">
+                                                    <div class="customer-field-error" data-field="gst_number"></div>
+                                                </div>
+
+                                                <div class="col-md-3">
+                                                    <label class="form-label">PAN Number</label>
+                                                    <input type="text" class="form-control"
+                                                        id="edit_customer_pan_number" name="pan_number"
+                                                        placeholder="PAN Number">
+                                                    <div class="customer-field-error" data-field="pan_number"></div>
+                                                </div>
+
+                                                <div class="col-md-3">
+                                                    <label class="form-label">State Code</label>
+                                                    <input type="text" class="form-control"
+                                                        id="edit_customer_state_code" name="state_code"
+                                                        placeholder="e.g. 24">
+                                                    <div class="customer-field-error" data-field="state_code"></div>
+                                                </div>
+
+                                                <!-- Row 3 -->
+
+                                                <div class="col-md-4">
+                                                    <label class="form-label">State Name</label>
+                                                    <input type="text" class="form-control"
+                                                        id="edit_customer_state_name" name="state_name"
+                                                        placeholder="Auto-filled from state" readonly>
+                                                    <div class="customer-field-error" data-field="state_name"></div>
+                                                </div>
+
+                                                <div class="col-md-4">
+                                                    <label class="form-label">Country</label>
+                                                    <input type="text" class="form-control" id="edit_customer_country"
+                                                        name="country" placeholder="Country">
+                                                    <div class="customer-field-error" data-field="country"></div>
+                                                </div>
+
+                                                <div class="col-md-4">
+                                                    <label class="form-label">City</label>
+                                                    <input type="text" class="form-control" id="edit_customer_city"
+                                                        name="city" placeholder="City">
+                                                    <div class="customer-field-error" data-field="city"></div>
+                                                </div>
+
+                                                <!-- Row 4 -->
+
+                                                <div class="col-md-6">
+                                                    <label class="form-label">Address</label>
+                                                    <textarea class="form-control" id="edit_customer_address" name="address" rows="3" placeholder="Address"></textarea>
+                                                    <div class="customer-field-error" data-field="address"></div>
+                                                </div>
+
+                                                <div class="col-md-6">
+
+                                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                                        <label class="form-label mb-0">Delivery Address</label>
+
+                                                        <div>
+                                                            <input type="checkbox" id="edit_same_address">
+
+                                                            <label for="edit_same_address" class="mb-0">
+                                                                Use Address
+                                                            </label>
+                                                        </div>
+                                                    </div>
+
+                                                    <textarea class="form-control" id="edit_customer_delivery_address" name="delivery_address" rows="3"
+                                                        placeholder="Delivery Address"></textarea>
+
+                                                    <div class="customer-field-error" data-field="delivery_address"></div>
+
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="submit" class="btn btn-primary btn-submit"
+                                                id="updateCustomerBtn">Update Customer</button>
+                                            <button type="button" class="btn btn-secondary btn-cancel"
+                                                data-bs-dismiss="modal">Cancel</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
                         </div>
+
+                        {{-- <div class="split-card">
+
+                        </div> --}}
                         <div class="pt-0">
                             <div class="totalitem">
                                 <h4>Total items : 0</h4>
@@ -2174,12 +2370,11 @@
 
                             </div>
                         </div>
-                        <div class="split-card">
-                        </div>
+
                         <div class="pt-0 pb-2 body_space_two select-group w-100">
                             @if ($role == 'admin' || $role == 'staff' || $role == 'sub-admin')
                                 <!-- Labour Items Section -->
-                                <div class="col-lg-12 mb-3">
+                                <div class="col-lg-12">
                                     <div class="select-split">
                                         <div class="select-group w-100">
                                             <hr>
@@ -2188,8 +2383,8 @@
                                                 <!-- Labour items will be added here dynamically -->
                                             </div>
                                             <!-- <button type="button" class="btn btn-primary mt-2" id="add-labour-item">
-                                                                                                                                            <i class="fas fa-plus"></i> Add Labour Item
-                                                                                                                                        </button> -->
+                                                                                                                                                        <i class="fas fa-plus"></i> Add Labour Item
+                                                                                                                                                    </button> -->
                                             <hr>
                                         </div>
                                     </div>
@@ -2211,26 +2406,23 @@
                                     </div>
                                 </div>
                             </div>
-                            @if (!empty($setting->tds_apply) && $setting->tds_apply == 1)
-                            <div class="row mt-2">
+                            @if ((bool) ($setting->tds_apply ?? false))
+                                <div class="row mt-2">
                                     <div class="col-lg-6 col-6">
                                         <div class="select-group w-100">
                                             <label for="tds_percentage">TDS Percentage (%)</label>
                                             <input type="text" class="form-control" name="tds_percentage"
-                                                id="tds_percentage" >
+                                                id="tds_percentage">
                                         </div>
                                     </div>
                                     <div class="col-lg-6 col-6">
                                         <div class="select-group w-100 ">
                                             <label for="tds_amount">TDS Amount</label>
                                             <input type="text" class="form-control" name="tds_amount" id="tds_amount"
-                                                min="0"  value="0.00" readonly>
+                                                min="0" value="0.00">
                                         </div>
                                     </div>
                                 </div>
-                            @else
-                                <input type="hidden" name="tds_percentage" id="tds_percentage" value="0">
-                                <input type="hidden" name="tds_amount" id="tds_amount" value="0.00">
                             @endif
                         </div>
                         <div class="col-lg-12 ">
@@ -2372,34 +2564,46 @@
                                 </li>
                             </ul>
                         </div>
-                        <div class="payment_panel">
+                        <div class="payment_panel" id="paymentPanelFloat">
+                            <div class="payment-panel-drag-handle" id="paymentPanelDragHandle">
+                                <div class="drag-dots">
+                                    <span></span><span></span><span></span>
+                                    <span></span><span></span><span></span>
+                                </div>
+                                <span class="drag-label">drag to move</span>
+                            </div>
+                            <div class="payment-panel-inner">
                             <div class="setvaluecash" id="paymentSection">
                                 <ul>
                                     <li>
                                         <a href="javascript:void(0);" class="paymentmethod">
                                             <input type="radio" name="payment_method" value="pending" hidden>
-                                            <i class="fas fa-history" style="font-size: 16px; display: block; margin-bottom: 4px;"></i>
+                                            <i class="fas fa-history"
+                                                style="font-size: 16px; display: block; margin-bottom: 4px;"></i>
                                             Pay Later
                                         </a>
                                     </li>
                                     <li>
                                         <a href="javascript:void(0);" class="paymentmethod">
                                             <input type="radio" name="payment_method" value="cash" hidden>
-                                            <i class="fas fa-money-bill-wave" style="font-size: 16px; display: block; margin-bottom: 4px;"></i>
+                                            <i class="fas fa-money-bill-wave"
+                                                style="font-size: 16px; display: block; margin-bottom: 4px;"></i>
                                             Cash
                                         </a>
                                     </li>
                                     <li>
                                         <a href="javascript:void(0);" class="paymentmethod">
                                             <input type="radio" name="payment_method" value="debit card" hidden>
-                                            <i class="fas fa-credit-card" style="font-size: 16px; display: block; margin-bottom: 4px;"></i>
+                                            <i class="fas fa-credit-card"
+                                                style="font-size: 16px; display: block; margin-bottom: 4px;"></i>
                                             Debit
                                         </a>
                                     </li>
                                     <li>
                                         <a href="javascript:void(0);" class="paymentmethod">
                                             <input type="radio" name="payment_method" value="cash+online" hidden>
-                                            <i class="fas fa-money-check-alt" style="font-size: 16px; display: block; margin-bottom: 4px;"></i>
+                                            <i class="fas fa-money-check-alt"
+                                                style="font-size: 16px; display: block; margin-bottom: 4px;"></i>
                                             Cash+Online
                                         </a>
                                     </li>
@@ -2407,22 +2611,28 @@
                                     <li>
                                         <a href="javascript:void(0);" class="paymentmethod">
                                             <input type="radio" name="payment_method" value="scan" hidden>
-                                            <i class="fas fa-qrcode" style="font-size: 16px; display: block; margin-bottom: 4px;"></i>
+                                            <i class="fas fa-qrcode"
+                                                style="font-size: 16px; display: block; margin-bottom: 4px;"></i>
                                             Scan
                                         </a>
                                     </li>
-
-                                    <li>
+                                    <li id="emiPaymentOption">
                                         <a href="javascript:void(0);" class="paymentmethod">
                                             <input type="radio" name="payment_method" value="emi" hidden>
-                                            <i class="fas fa-calendar-alt" style="font-size: 16px; display: block; margin-bottom: 4px;"></i>
+                                            <i class="fas fa-calendar-alt"
+                                                style="font-size: 16px; display: block; margin-bottom: 4px;"></i>
                                             EMI
                                         </a>
                                     </li>
 
                                 </ul>
-                                <div class="emi-action-row">
-                                    <button type="button" class="emi-cancel-btn" id="emiCancelBtn">Cancel</button>
+
+                                <div id="paymentDetailActions" class="payment-detail-actions text-end mt-2"
+                                    style="display:none;">
+                                    <button type="button" id="cancelPaymentDetails"
+                                        class="btn btn-outline-danger btn-sm">
+                                        Cancel
+                                    </button>
                                 </div>
                                 <div id="posPaidTypeBox" style="display:none; margin-top:10px;">
                                     <div class="form-group mb-2">
@@ -2478,8 +2688,8 @@
                                             <div class="form-group">
                                                 <div class="bank-label-row">
                                                     <label>Select Bank</label>
-                                                    <button type="button" id="openAddBankModal"
-                                                        class="bank-add-btn">Add Bank</button>
+                                                    <button type="button" id="openAddBankModal" class="bank-add-btn">Add
+                                                        Bank</button>
                                                 </div>
                                                 <select name="bank_id" id="bank_id" class="form-control">
                                                     <option value="">Select Bank</option>
@@ -2505,91 +2715,94 @@
                                     <div class="row g-2">
                                         <div class="col-md-6 col-6">
                                             <div class="form-group">
-                                                <label for="emiDownPayment">Down Payment (Optional)</label>
+                                                <label>Down Payment (Optional)</label>
                                                 <input type="number" class="form-control" id="emiDownPayment"
-                                                    placeholder="₹ Amount" min="0" step="0.01">
+                                                    placeholder="DownPayment" min="0" step="0.01">
+                                                <small class="text-danger d-none" id="emiDownPaymentError"></small>
                                             </div>
                                         </div>
                                         <div class="col-md-6 col-6">
                                             <div class="form-group">
-                                                <label for="emiLoanAmount">Loan Amount</label>
+                                                <label>Loan Amount</label>
                                                 <input type="number" class="form-control" id="emiLoanAmount"
-                                                    placeholder="0.00" min="0" step="0.01" readonly>
+                                                    placeholder="Auto Calculate" min="0" step="0.01" readonly>
                                             </div>
                                         </div>
                                         <div class="col-md-6 col-6">
                                             <div class="form-group">
-                                                <label for="emiTenure">EMI Tenure</label>
-                                                <select id="emiTenure" class="form-control" required>
+                                                <label>EMI Tenure</label>
+                                                <select class="form-control" id="emiTenure">
                                                     <option value="">Select Tenure</option>
                                                     <option value="3">3 Months</option>
                                                     <option value="6">6 Months</option>
                                                     <option value="9">9 Months</option>
                                                     <option value="12">12 Months</option>
-                                                    <option value="18">18 Months</option>
-                                                    <option value="24">24 Months</option>
                                                     <option value="custom">Custom</option>
                                                 </select>
-                                                <span class="error_emi_tenure text-danger"></span>
+                                                <small class="text-danger d-none" id="emiTenureError"></small>
                                             </div>
                                         </div>
-                                        <div class="col-md-6 col-6" id="emiCustomTenureWrap" style="display:none;">
+                                        <div class="col-md-6 col-6 d-none" id="emiCustomTenureCol">
                                             <div class="form-group">
-                                                <label for="emiCustomTenure">Custom Tenure (Months)</label>
+                                                <label>Custom Tenure (Months)</label>
                                                 <input type="number" class="form-control" id="emiCustomTenure"
-                                                    placeholder="Enter months" min="1" step="1">
+                                                    min="1" max="120" step="1"
+                                                    placeholder="Enter months">
+                                                <small class="text-danger d-none" id="emiCustomTenureError"></small>
                                             </div>
                                         </div>
                                         <div class="col-md-6 col-6">
                                             <div class="form-group">
-                                                <label for="emiInterestRate">Interest Rate (%) Optional</label>
+                                                <label>Interest Rate (%) <small class="text-muted">Optional</small></label>
                                                 <input type="number" class="form-control" id="emiInterestRate"
-                                                    placeholder="0" min="0" step="0.01">
+                                                    value="0" min="0" step="0.01">
                                             </div>
                                         </div>
                                         <div class="col-md-6 col-6">
                                             <div class="form-group">
-                                                <label for="emiMonthlyValue">Monthly EMI</label>
-                                                <input type="number" class="form-control" id="emiMonthlyValue"
-                                                    placeholder="0.00" min="0" step="0.01" readonly>
+                                                <label>Monthly EMI</label>
+                                                <input type="number" class="form-control" id="emiMonthlyAmount"
+                                                    placeholder="Auto Calculate" min="0" step="0.01" readonly>
                                             </div>
                                         </div>
                                         <div class="col-md-6 col-6">
                                             <div class="form-group">
-                                                <label for="emiAadharNumber">Aadhar Number</label>
+                                                <label>Aadhar Number</label>
                                                 <input type="text" class="form-control" id="emiAadharNumber"
-                                                    placeholder="Enter Aadhar number">
+                                                    placeholder="Customer Aadhar Number">
+                                                <small class="text-danger d-none" id="emiAadharError"></small>
                                             </div>
                                         </div>
                                         <div class="col-md-6 col-6">
                                             <div class="form-group">
-                                                <label for="emiDoId">DO ID</label>
-                                                <input type="number" class="form-control" id="emiDoId"
+                                                <label>DO ID <small class="text-muted"></small></label>
+                                                <input type="text" class="form-control" id="emiDoId"
                                                     placeholder="DO ID">
                                             </div>
                                         </div>
                                         <div class="col-md-6 col-6">
                                             <div class="form-group">
-                                                <label for="emiPanNumber">PAN Number Optional</label>
+                                                <label>PAN Number <small class="text-muted">Optional</small></label>
                                                 <input type="text" class="form-control" id="emiPanNumber"
                                                     placeholder="PAN Number">
                                             </div>
                                         </div>
                                         <div class="col-md-6 col-6">
                                             <div class="form-group">
-                                                <label for="emiGuarantorName">Guarantor Name Optional</label>
+                                                <label>Guarantor Name <small class="text-muted">Optional</small></label>
                                                 <input type="text" class="form-control" id="emiGuarantorName"
                                                     placeholder="Guarantor Name">
                                             </div>
                                         </div>
-                                        <div class="col-md-6 col-6">
+                                        <div class="col-12">
                                             <div class="form-group">
-                                                <div class="bank-label-row">
-                                                    <label>Select Bank Optional</label>
-                                                    <button type="button" id="openAddBankModal"
-                                                        class="bank-add-btn">Add Bank</button>
+                                                <div
+                                                    class="bank-label-row d-flex justify-content-between align-items-center mb-1">
+                                                    <label class="mb-0">Select Bank</label>
+                                                    <button type="button" id="openAddBankModalEmi"
+                                                        class="btn btn-sm btn-outline-primary">Add Bank</button>
                                                 </div>
-                                                <select name="emi_bank_id" id="emi_bank_id" class="form-control">
+                                                <select class="form-control" id="emiBankId">
                                                     <option value="">Select Bank</option>
                                                     @foreach ($banks as $bank)
                                                         <option value="{{ $bank->id }}">{{ $bank->bank_name }}
@@ -2597,13 +2810,14 @@
                                                         </option>
                                                     @endforeach
                                                 </select>
-                                                <span class="error_bank text-danger"></span>
+                                                <small class="text-danger d-none" id="emiBankError"></small>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                                 <span class="error_peymentmethod"></span>
                             </div>
+                            </div>{{-- end payment-panel-inner --}}
 
                             <div class="btn-totallabel">
                                 <h6>Total Amount : 60.00$</h6>
@@ -2635,11 +2849,167 @@
         }
     </script>
     <script>
-        let isOrderSubmitting = false;
+        // ==================== DRAGGABLE PAYMENT PANEL (vertical only, fixed right) ====================
+        (function () {
+            function initDrag() {
+                var panel  = document.getElementById('paymentPanelFloat');
+                var handle = document.getElementById('paymentPanelDragHandle');
 
+                if (!panel || !handle) return;
+
+                function alignPanel() {
+                    if (window.innerWidth <= 768) {
+                        panel.style.width = '';
+                        panel.style.left = '';
+                        panel.style.top = '';
+                        return;
+                    }
+                    var customerCard = document.querySelector('.customer-details-card');
+                    if (customerCard) {
+                        var rect = customerCard.getBoundingClientRect();
+                        panel.style.width = rect.width + 'px';
+                        panel.style.left = rect.left + 'px';
+                    }
+                }
+
+                function handleScrollPosition() {
+                    if (window.innerWidth <= 768) {
+                        var scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                        var windowHeight = window.innerHeight;
+                        var docHeight = document.documentElement.scrollHeight;
+
+                        var footer = document.querySelector('footer');
+                        var footerHeight = footer ? footer.offsetHeight : 50;
+
+                        // Switch to relative layout if user scrolls to the bottom
+                        if (scrollTop + windowHeight >= docHeight - footerHeight - 20) {
+                            panel.classList.add('at-bottom');
+                        } else {
+                            panel.classList.remove('at-bottom');
+                        }
+                    } else {
+                        panel.classList.remove('at-bottom');
+                    }
+                }
+
+                // Run alignment immediately and bind listeners
+                alignPanel();
+                handleScrollPosition();
+                window.addEventListener('resize', function() {
+                    alignPanel();
+                    handleScrollPosition();
+                });
+                window.addEventListener('scroll', function() {
+                    alignPanel();
+                    handleScrollPosition();
+                });
+
+                // Use ResizeObserver to watch for layout shifts
+                if (typeof ResizeObserver !== 'undefined') {
+                    var customerCard = document.querySelector('.customer-details-card');
+                    if (customerCard) {
+                        var observer = new ResizeObserver(function() {
+                            alignPanel();
+                            handleScrollPosition();
+                        });
+                        observer.observe(customerCard);
+                    }
+                }
+
+                var dragging = false;
+                var startY, startTop;
+
+                // Restore saved top from localStorage
+                var savedTop = null;
+                try { savedTop = parseInt(localStorage.getItem('paymentPanelTop'), 10); } catch(e) {}
+
+                if (window.innerWidth > 768) {
+                    if (!isNaN(savedTop) && savedTop !== null) {
+                        var maxTop = window.innerHeight - panel.offsetHeight;
+                        var t = Math.max(0, Math.min(savedTop, maxTop));
+                        panel.style.top = t + 'px';
+                        panel.classList.add('drag-ready');
+                    } else {
+                        // Position dynamically near bottom
+                        setTimeout(function() {
+                            if (window.innerWidth <= 768) return;
+                            var maxTop = window.innerHeight - panel.offsetHeight;
+                            var t = maxTop - 80;
+                            panel.style.top = Math.max(0, t) + 'px';
+                            panel.classList.add('drag-ready');
+                        }, 100);
+                    }
+                } else {
+                    panel.style.top = '';
+                    panel.style.left = '';
+                    panel.style.width = '';
+                    panel.classList.remove('drag-ready');
+                }
+
+                handle.addEventListener('mousedown', onDragStart);
+                handle.addEventListener('touchstart', onDragStart, { passive: false });
+
+                function onDragStart(e) {
+                    if (window.innerWidth <= 768) return;
+                    e.preventDefault();
+                    dragging = true;
+                    panel.classList.add('is-dragging');
+
+                    var rect = panel.getBoundingClientRect();
+                    startTop = rect.top;
+                    startY   = (e.type === 'touchstart') ? e.touches[0].clientY : e.clientY;
+
+                    // Lock top, clear bottom
+                    panel.style.top = startTop + 'px';
+                    panel.classList.add('drag-ready');
+
+                    document.addEventListener('mousemove', onDragMove);
+                    document.addEventListener('mouseup',   onDragEnd);
+                    document.addEventListener('touchmove', onDragMove, { passive: false });
+                    document.addEventListener('touchend',  onDragEnd);
+                }
+
+                function onDragMove(e) {
+                    if (!dragging) return;
+                    e.preventDefault();
+
+                    var cy = (e.type === 'touchmove') ? e.touches[0].clientY : e.clientY;
+                    var newTop = startTop + (cy - startY);
+
+                    // Clamp vertically within viewport
+                    newTop = Math.max(0, Math.min(newTop, window.innerHeight - panel.offsetHeight));
+
+                    panel.style.top = newTop + 'px';
+                }
+
+                function onDragEnd() {
+                    if (!dragging) return;
+                    dragging = false;
+                    panel.classList.remove('is-dragging');
+
+                    document.removeEventListener('mousemove', onDragMove);
+                    document.removeEventListener('mouseup',   onDragEnd);
+                    document.removeEventListener('touchmove', onDragMove);
+                    document.removeEventListener('touchend',  onDragEnd);
+
+                    // Save only top position
+                    try {
+                        localStorage.setItem('paymentPanelTop', parseInt(panel.style.top, 10));
+                    } catch(e) {}
+                }
+            }
+
+            if (document.readyState === 'complete') {
+                initDrag();
+            } else {
+                window.addEventListener('load', initDrag);
+            }
+        })();
+    </script>
+    <script>
         // ==================== BARCODE SCANNER ====================
         // let html5QrCode = null;
-        // ✅ MUST be defined BEFORE initScanner calls it
+        //  MUST be defined BEFORE initScanner calls it
         // async function onScanSuccess(decodedText) {
         //     console.log("Scan success:", decodedText);
         //     stopScanner();
@@ -2674,11 +3044,12 @@
         //         });
         //     }
         // }
+
         let html5QrCode = null;
 
-        // 🔊 ADD THIS FUNCTION HERE
+
         function playBeep() {
-            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const audioCtx = new(window.AudioContext || window.webkitAudioContext)();
 
             function beep(time, freq) {
                 const osc = audioCtx.createOscillator();
@@ -2696,14 +3067,14 @@
                 osc.stop(audioCtx.currentTime + time + 0.2);
             }
 
-            // 🔥 DOUBLE BEEP
+            //  DOUBLE BEEP
             beep(0, 1200);
             beep(0.25, 1500);
         }
         async function onScanSuccess(decodedText) {
             console.log("Scan success:", decodedText);
 
-            // 🔊 NEW SOUND
+            // ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒâ€¦Ã‚Â  NEW SOUND
             playBeep();
 
             stopScanner();
@@ -2721,6 +3092,7 @@
                 console.log(error);
             }
         }
+
         function onScanError(errorMessage) {
             console.debug("Scan error:", errorMessage);
         }
@@ -2848,12 +3220,15 @@
 
             const config = {
                 fps: 10,
-                qrbox: { width: 250, height: 250 }
+                qrbox: {
+                    width: 250,
+                    height: 250
+                }
             };
 
             $('#scan-message').text('Starting camera...');
 
-            // 🔥 NEW CODE (IMPORTANT)
+            //  NEW CODE (IMPORTANT)
             Html5Qrcode.getCameras().then(devices => {
                 if (devices && devices.length) {
 
@@ -3032,7 +3407,7 @@
             }
 
             // ----------------------------------------------------------------------
-            // 5. GST option – ensure it's exactly "with_gst" or "without_gst"
+            // 5. GST option ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œ ensure it's exactly "with_gst" or "without_gst"
             // ----------------------------------------------------------------------
             let gstOption = product.gst_option || 'without_gst';
             if (gstOption !== 'with_gst' && gstOption !== 'without_gst') {
@@ -3040,7 +3415,7 @@
             }
 
             // ----------------------------------------------------------------------
-            // 6. GST data – parse JSON string to array if needed
+            // 6. GST data ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œ parse JSON string to array if needed
             // ----------------------------------------------------------------------
             let productGst = product.product_gst || null;
             if (productGst) {
@@ -3253,15 +3628,317 @@
             $('#qr-reader').html('').css('min-height', '300px');
             $('#scan-message').text('Initializing camera...').show().css('color', '');
         });
-
-        $('#openBarcodeScannerFromPayment').on('click', function() {
-            $('#barcodeScannerModal').modal('show');
-        });
     </script>
     <script>
         let labourItemsList = [];
         let authToken = localStorage.getItem("authToken");
         let selectedSubAdminId = localStorage.getItem("selectedSubAdminId");
+
+        function getCustomerApiHeaders() {
+            return {
+                "Authorization": "Bearer " + authToken,
+                "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr('content')
+            };
+        }
+
+        function getCustomerSelect() {
+            return $('#customer_name');
+        }
+
+        function getSelectedCustomerData() {
+            const $select = getCustomerSelect();
+            const $option = $select.find(':selected');
+
+            return {
+                id: $option.val() || '',
+                name: $option.text() || '',
+                phone: $option.data('phone') || $option.attr('data-phone') || '',
+                gst_number: $option.data('gst-number') || $option.data('gst_number') || $option.attr('data-gst-number') ||
+                    $option.attr('data-gst_number') || '',
+                company_name: $option.data('company-name') || $option.data('company_name') || $option.attr(
+                    'data-company-name') || '',
+                email: $option.data('email') || $option.attr('data-email') || ''
+            };
+        }
+
+        function syncCustomerFields(customerData) {
+            const customer = customerData || getSelectedCustomerData();
+            const hasCustomer = !!customer.id;
+
+            $('#customer_phone').val(customer.phone || '');
+            $('#customer_gst_number').val(customer.gst_number || '');
+            const $editButton = $('#openEditCustomerModal');
+
+            $editButton
+                .prop('disabled', !hasCustomer)
+                .toggleClass('d-none', !hasCustomer)
+                .css('display', hasCustomer ? 'inline-flex' : 'none')
+                .attr('aria-hidden', hasCustomer ? 'false' : 'true');
+        }
+
+        function clearCustomerFieldErrors(formSelector) {
+            $(`${formSelector} .customer-field-error`).text('');
+            $(`${formSelector} .is-invalid`).removeClass('is-invalid');
+        }
+
+        function renderCustomerFieldErrors(formSelector, errors) {
+            clearCustomerFieldErrors(formSelector);
+
+            if (!errors) {
+                return;
+            }
+
+            Object.keys(errors).forEach(function(field) {
+                const message = Array.isArray(errors[field]) ? errors[field][0] : errors[field];
+                const $input = $(`${formSelector} [name="${field}"]`);
+
+                if ($input.length) {
+                    $input.addClass('is-invalid');
+                }
+
+                const $error = $(`${formSelector} .customer-field-error[data-field="${field}"]`);
+                if ($error.length) {
+                    $error.text(message);
+                }
+            });
+        }
+
+        function upsertCustomerOption(customer, shouldSelect = true) {
+            if (!customer || !customer.id) {
+                return;
+            }
+
+            const $select = getCustomerSelect();
+            const customerId = String(customer.id);
+            const label = customer.name || 'Customer';
+            let $option = $select.find(`option[value="${customerId}"]`);
+
+            if ($option.length) {
+                $option.text(label);
+            } else {
+                $option = $('<option>', {
+                    value: customerId,
+                    text: label
+                });
+                $select.append($option);
+            }
+
+            $option.attr('data-phone', customer.phone || '');
+            $option.attr('data-gst-number', customer.gst_number || '');
+            $option.attr('data-gst_number', customer.gst_number || '');
+            $option.attr('data-company-name', customer.company_name || '');
+            $option.attr('data-company_name', customer.company_name || '');
+            $option.attr('data-email', customer.email || '');
+            $option.data('phone', customer.phone || '');
+            $option.data('gst-number', customer.gst_number || '');
+            $option.data('gst_number', customer.gst_number || '');
+            $option.data('company-name', customer.company_name || '');
+            $option.data('company_name', customer.company_name || '');
+            $option.data('email', customer.email || '');
+
+            if (shouldSelect) {
+                $select.val(customerId).trigger('change');
+            } else {
+                $select.trigger('change.select2');
+            }
+        }
+
+        window.triggerCreateCustomerFromSelect2 = function(name) {
+            const $customerSelect = getCustomerSelect();
+            $customerSelect.select2('close');
+
+            const $form = $('#addCustomerForm');
+            resetCustomerForm($form, 'add');
+            clearCustomerFieldErrors('#addCustomerForm');
+
+            $('#add_customer_name').val(name);
+
+            const addCustomerModal = openCustomerModal('addCustomerModal');
+            if (addCustomerModal) {
+                addCustomerModal.show();
+            }
+        };
+
+        function initCustomerSelect2() {
+            const $customerSelect = getCustomerSelect();
+
+            if ($customerSelect.hasClass('select2-hidden-accessible')) {
+                $customerSelect.select2('destroy');
+            }
+
+            $customerSelect.select2({
+                placeholder: 'Select Customer',
+                allowClear: true,
+                width: '100%',
+                ajax: {
+                    url: '/api/getAllCustomer',
+                    dataType: 'json',
+                    delay: 250,
+                    headers: getCustomerApiHeaders(),
+                    data: function(params) {
+                        return {
+                            search: params.term || '',
+                            per_page: 20,
+                            selectedSubAdminId: selectedSubAdminId
+                        };
+                    },
+                    processResults: function(response) {
+                        if (!response || !response.status) {
+                            return {
+                                results: []
+                            };
+                        }
+
+                        return {
+                            results: (response.data || []).map(function(customer) {
+                                return {
+                                    id: customer.id,
+                                    text: customer.name || 'Customer',
+                                    name: customer.name || 'Customer',
+                                    phone: customer.phone || '',
+                                    gst_number: customer.gst_number || '',
+                                    company_name: customer.company_name || '',
+                                    email: customer.email || ''
+                                };
+                            })
+                        };
+                    },
+                    cache: true
+                },
+                templateResult: function(customer) {
+                    if (!customer.id) {
+                        return customer.text;
+                    }
+
+                    const phone = customer.phone ?
+                        `<span class="badge bg-light text-dark ms-2">${customer.phone}</span>` : '';
+                    const gstNumber = customer.gst_number ?
+                        `<div class="small text-muted mt-1">GST: ${customer.gst_number}</div>` : '';
+
+                    return $(`
+                        <div class="d-flex flex-column">
+                            <div class="fw-semibold">${customer.name || customer.text || 'Customer'}${phone}</div>
+                            ${gstNumber}
+                        </div>
+                    `);
+                },
+                templateSelection: function(customer) {
+                    return customer.name || customer.text || 'Select Customer';
+                },
+                minimumInputLength: 0,
+                language: {
+                    noResults: function() {
+                        const term = $('.select2-container--open .select2-search__field').val() || '';
+                        if (term.trim() !== '') {
+                            return `<button type="button" class="btn btn-primary btn-sm w-100" style="margin: 4px 0;" onclick="triggerCreateCustomerFromSelect2('${term.replace(/'/g, "\\'")}')">Create Customer "${term}"</button>`;
+                        }
+                        return 'No results found';
+                    }
+                },
+                escapeMarkup: function(markup) {
+                    return markup;
+                }
+            });
+
+            $customerSelect.on('select2:select', function(e) {
+                const customer = e.params.data || {};
+                upsertCustomerOption(customer, true);
+                syncCustomerFields(customer);
+            });
+
+            $customerSelect.on('select2:clear change', function() {
+                syncCustomerFields(getSelectedCustomerData());
+            });
+
+            syncCustomerFields(getSelectedCustomerData());
+        }
+
+        function loadCustomerForEdit(customerId) {
+            return $.ajax({
+                url: `/api/getCustomer/${customerId}`,
+                type: 'GET',
+                headers: getCustomerApiHeaders(),
+                dataType: 'json'
+            });
+        }
+
+        function loadAssignStaffOptions() {
+            const $staffSelect = $('#assign_staff');
+
+            $.ajax({
+                url: '/api/staff',
+                type: 'GET',
+                dataType: 'json',
+                headers: getCustomerApiHeaders(),
+                data: {
+                    selectedSubAdminId: selectedSubAdminId || ''
+                },
+                success: function(response) {
+                    if (!response || !response.status) {
+                        return;
+                    }
+
+                    const staffList = response.staff || response.data || [];
+                    const currentValue = $staffSelect.val() || '';
+                    let options = '<option value="">Select Staff (Optional)</option>';
+
+                    staffList.forEach(function(staff) {
+                        options += `<option value="${staff.id}">${staff.name || 'Staff'}</option>`;
+                    });
+
+                    $staffSelect.html(options);
+
+                    if (currentValue) {
+                        $staffSelect.val(currentValue).trigger('change');
+                    }
+                }
+            });
+        }
+
+        function openCustomerModal(modalId) {
+            const modalElement = document.getElementById(modalId);
+            if (!modalElement) {
+                return null;
+            }
+
+            return bootstrap.Modal.getOrCreateInstance(modalElement);
+        }
+
+        function resetCustomerForm($form, mode = 'add') {
+            $form[0].reset();
+            clearCustomerFieldErrors(`#${$form.attr('id')}`);
+
+            if (mode === 'edit') {
+                $('#edit_customer_id').val('');
+            }
+        }
+
+        function fillCustomerForm(customer) {
+            if (!customer) {
+                return;
+            }
+
+            $('#edit_customer_id').val(customer.id || '');
+            $('#edit_customer_name').val(customer.name || '');
+            $('#edit_customer_phone').val(customer.phone || '');
+            $('#edit_customer_gst_number').val(customer.gst_number || '');
+            $('#edit_customer_company_name').val(customer.company_name || '');
+            $('#edit_customer_email').val(customer.email || '');
+            $('#edit_customer_alternate_phone').val(customer.alternate_phone || '');
+            $('#edit_customer_pan_number').val(customer.pan_number || '');
+            $('#edit_customer_state_code').val(customer.state_code || '');
+            $('#edit_customer_state_name').val(customer.state_name || '');
+            $('#edit_customer_country').val(customer.country || '');
+            $('#edit_customer_city').val(customer.city || '');
+            $('#edit_customer_address').val(customer.address || '');
+            $('#edit_customer_delivery_address').val(customer.delivery_address || '');
+
+            if (customer.address && customer.address === customer.delivery_address) {
+                $('#edit_same_address').prop('checked', true);
+            } else {
+                $('#edit_same_address').prop('checked', false);
+            }
+        }
 
         function loadLabourItems() {
 
@@ -3323,7 +4000,7 @@
                             placeholder="Price" disabled>
                     </div>
                     <div class="col-1">
-                        <button type="button" class="btn btn-danger  remove-labour" style="display:none; width: 40px; height: 38px; padding: 0;">×</button>
+                        <button type="button" class="btn btn-danger  remove-labour" style="display:none; width: 40px; height: 38px; padding: 0;">x</button>
                         <button type="button" class="btn btn-success  add-labour" style="width: 40px; height: 38px; padding: 0;">+</button>
                     </div>
                 </div>
@@ -3434,15 +4111,27 @@
             const bankName = bank.bank_name || 'Unnamed Bank';
             const accountNumber = bank.account_number ? ` (${bank.account_number})` : '';
             const optionLabel = `${bankName}${accountNumber}`;
-            const existingOption = $('#bank_id option[value="' + bankId + '"]');
 
+            // Update main bank_id dropdown
+            const existingOption = $('#bank_id option[value="' + bankId + '"]');
             if (existingOption.length) {
                 existingOption.text(optionLabel);
             } else {
                 $('#bank_id').append(new Option(optionLabel, bankId));
             }
-
             $('#bank_id').val(bankId).trigger('change');
+
+            // Update emiBankId dropdown
+            const existingEmiOption = $('#emiBankId option[value="' + bankId + '"]');
+            if (existingEmiOption.length) {
+                existingEmiOption.text(optionLabel);
+            } else {
+                $('#emiBankId').append(new Option(optionLabel, bankId));
+            }
+            // Only auto-select for emiBankId if EMI is currently selected payment method
+            if ($("input[name='payment_method']:checked").val() === "emi") {
+                $('#emiBankId').val(bankId).trigger('change');
+            }
         }
 
         function formatPosOrderDateForDisplay(value) {
@@ -3531,7 +4220,59 @@
             });
         });
         $(document).ready(function() {
+
             initPosOrderDatePicker();
+            initCustomerSelect2();
+            loadAssignStaffOptions();
+
+            // Hide/Show floating payment panel when modals are opened/closed
+            $(document).on('show.bs.modal', '.modal', function () {
+                $('#paymentPanelFloat').fadeOut(200);
+            });
+
+            $(document).on('hidden.bs.modal', '.modal', function () {
+                if ($('.modal.show').length === 0) {
+                    $('#paymentPanelFloat').fadeIn(200);
+                }
+            });
+
+            // Handle Add same address checkbox
+            $('#add_same_address').on('change', function() {
+                if ($(this).is(':checked')) {
+                    $('#add_customer_delivery_address').val($('#add_customer_address').val());
+                }
+            });
+
+            $('#add_customer_address').on('input', function() {
+                if ($('#add_same_address').is(':checked')) {
+                    $('#add_customer_delivery_address').val($(this).val());
+                }
+            });
+
+            $('#add_customer_delivery_address').on('input', function() {
+                if ($('#add_same_address').is(':checked')) {
+                    $('#add_same_address').prop('checked', false);
+                }
+            });
+
+            // Handle Edit same address checkbox
+            $('#edit_same_address').on('change', function() {
+                if ($(this).is(':checked')) {
+                    $('#edit_customer_delivery_address').val($('#edit_customer_address').val());
+                }
+            });
+
+            $('#edit_customer_address').on('input', function() {
+                if ($('#edit_same_address').is(':checked')) {
+                    $('#edit_customer_delivery_address').val($(this).val());
+                }
+            });
+
+            $('#edit_customer_delivery_address').on('input', function() {
+                if ($('#edit_same_address').is(':checked')) {
+                    $('#edit_same_address').prop('checked', false);
+                }
+            });
 
             function toAmount(value) {
                 const parsed = parseFloat(value);
@@ -3555,36 +4296,52 @@
                 const total = getCurrentSaleTotal();
                 const $paidType = $("#posPaidType");
 
-                $(".error_bank, .error_paidtype, .error_paidamount, .error_emi_tenure").text("");
+                $(".error_bank, .error_paidtype, .error_paidamount").text("");
 
                 if (!selectedPayment || selectedPayment === "pending") {
                     $("#posPaidTypeBox, #posPaidAmountFields, #cashOnlineBox, #bankSelectionBox, #emiBox")
-                        .slideUp();
-                    $("#emiCancelBtn").hide();
+                .slideUp();
                     $("#posPaidAmount, #posPendingAmount, #posCashOnlineCashAmount, #posCashOnlineOnlineAmount")
                         .val("");
-                    $("#emiDownPayment, #emiLoanAmount, #emiTenure, #emiCustomTenure, #emiInterestRate, #emiMonthlyValue, #emiAadharNumber, #emiDoId, #emiPanNumber, #emiGuarantorName, #emi_bank_id")
-                        .val("");
                     $("#posPaidType").val("");
+                    $('#paymentDetailActions').hide();
                     return;
                 }
 
+                $('#paymentDetailActions').show();
+
                 if (selectedPayment === "emi") {
-                    $("#posPaidTypeBox, #posPaidAmountFields, #cashOnlineBox, #bankSelectionBox").hide();
-                    $("#emiCancelBtn").show();
-                    $("#emiBox").slideDown();
+                    $("#emiBox").slideDown(300, function() {
+                        // After EMI box opens, clamp panel top so it stays within viewport
+                        if (window.innerWidth > 768) {
+                            var panel = document.getElementById('paymentPanelFloat');
+                            if (panel) {
+                                var maxTop = window.innerHeight - panel.offsetHeight - 10;
+                                if (maxTop < 0) maxTop = 0;
+                                var curTop = panel.getBoundingClientRect().top;
+                                if (curTop > maxTop) {
+                                    panel.style.top = maxTop + 'px';
+                                    panel.classList.add('drag-ready');
+                                    try { localStorage.setItem('paymentPanelTop', maxTop); } catch(e) {}
+                                }
+                            }
+                        }
+                    });
+                    $("#posPaidTypeBox, #posPaidAmountFields, #cashOnlineBox, #bankSelectionBox").slideUp();
+                    if (typeof window.calculateEmi === "function") {
+                        window.calculateEmi();
+                    }
                     return;
+                } else {
+                    $("#emiBox").slideUp();
                 }
 
                 $("#posPaidTypeBox").slideDown();
-                $("#emiCancelBtn").show();
                 const paidType = $paidType.val();
 
                 if (!paidType) {
-                    $("#posPaidAmountFields, #cashOnlineBox, #bankSelectionBox, #emiBox").slideUp();
+                    $("#posPaidAmountFields, #cashOnlineBox, #bankSelectionBox").slideUp();
                     $("#posPaidAmount, #posPendingAmount, #posCashOnlineCashAmount, #posCashOnlineOnlineAmount")
-                        .val("");
-                    $("#emiDownPayment, #emiLoanAmount, #emiTenure, #emiCustomTenure, #emiInterestRate, #emiMonthlyValue, #emiAadharNumber, #emiDoId, #emiPanNumber, #emiGuarantorName, #emi_bank_id")
                         .val("");
                     return;
                 }
@@ -3592,14 +4349,9 @@
                 if (selectedPayment === "debit card" || selectedPayment === "scan" || selectedPayment ===
                     "cash+online") {
                     $("#bankSelectionBox").slideDown();
-                    $("#emiBox").slideUp();
-                } else if (selectedPayment === "emi") {
-                    $("#bankSelectionBox").slideUp();
-                    $("#emiBox").slideDown();
                 } else {
                     $("#bankSelectionBox").slideUp();
                     $("#bank_id").val("");
-                    $("#emiBox").slideUp();
                 }
 
                 $("#posPaidAmountFields").slideDown();
@@ -3648,7 +4400,6 @@
                 } else {
                     $("#cashOnlineBox").slideUp();
                     $("#posCashOnlineCashAmount, #posCashOnlineOnlineAmount").val("");
-                    $("#emiLoanAmount").val("");
 
                     if (paidType === "fully") {
                         paidAmount = total;
@@ -3682,13 +4433,37 @@
                 const cashAmount = toAmount($("#posCashOnlineCashAmount").val());
                 const onlineAmount = toAmount($("#posCashOnlineOnlineAmount").val());
 
+                // EMI data
+                const emiDownPayment = toAmount($("#emiDownPayment").val());
+                const emiLoanAmount = toAmount($("#emiLoanAmount").val());
+                const emiInterestRate = toAmount($("#emiInterestRate").val());
+                const emiTenure = $("#emiTenure").val();
+                const emiCustomTenure = $("#emiCustomTenure").val();
+                const emiMonthlyAmount = toAmount($("#emiMonthlyAmount").val());
+                const emiAadharNumber = $("#emiAadharNumber").val();
+                const emiDoId = $("#emiDoId").val();
+                const emiPanNumber = $("#emiPanNumber").val();
+                const emiGuarantorName = $("#emiGuarantorName").val();
+                const emiBankId = $("#emiBankId").val();
+
                 return {
                     selectedPayment,
                     paidType,
                     paidAmount,
                     pendingAmount,
                     cashAmount,
-                    onlineAmount
+                    onlineAmount,
+                    emiDownPayment,
+                    emiLoanAmount,
+                    emiInterestRate,
+                    emiTenure,
+                    emiCustomTenure,
+                    emiMonthlyAmount,
+                    emiAadharNumber,
+                    emiDoId,
+                    emiPanNumber,
+                    emiGuarantorName,
+                    emiBankId
                 };
             }
 
@@ -3697,31 +4472,36 @@
                 $("#posPaidAmount, #posPendingAmount, #posCashOnlineCashAmount, #posCashOnlineOnlineAmount, #posPaymentRemark")
                     .val("");
                 $("#bank_id").val("");
-                $("#emiDownPayment, #emiLoanAmount, #emiTenure, #emiCustomTenure, #emiInterestRate, #emiMonthlyValue, #emiAadharNumber, #emiDoId, #emiPanNumber, #emiGuarantorName, #emi_bank_id")
-                    .val("");
-                $("#emiCancelBtn").hide();
                 $("#posPaidTypeBox, #posPaidAmountFields, #cashOnlineBox, #bankSelectionBox, #emiBox").hide();
+                $('#paymentDetailActions').hide();
+
+                // Reset EMI fields
+                $("#emiDownPayment, #emiLoanAmount, #emiInterestRate, #emiCustomTenure, #emiMonthlyAmount, #emiAadharNumber, #emiDoId, #emiPanNumber, #emiGuarantorName")
+                    .val("");
+                $("#emiTenure").val("");
+                $("#emiBankId").val("");
+                $("#emiCustomTenureCol").addClass('d-none');
             }
 
             window.refreshPosPaymentUi = refreshPosPaymentUi;
             window.getPosPaymentMeta = getPosPaymentMeta;
             window.resetPosPaymentUi = resetPosPaymentUi;
 
-    // Mobile → Desktop
-    $(document).on('change', 'input[name="gst_option_mobile"]', function () {
-        var val = $(this).val();
-        $('input[name="gst_option"][value="' + val + '"]').prop('checked', true).trigger('change');
-    });
+            // Mobile ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ Desktop
+            $(document).on('change', 'input[name="gst_option_mobile"]', function() {
+                var val = $(this).val();
+                $('input[name="gst_option"][value="' + val + '"]').prop('checked', true).trigger('change');
+            });
 
-    // Desktop → Mobile
-    $(document).on('change', 'input[name="gst_option"]', function () {
-        var val = $(this).val();
-        $('input[name="gst_option_mobile"][value="' + val + '"]').prop('checked', true);
-    });
+            // Desktop ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ Mobile
+            $(document).on('change', 'input[name="gst_option"]', function() {
+                var val = $(this).val();
+                $('input[name="gst_option_mobile"][value="' + val + '"]').prop('checked', true);
+            });
 
-    // On page load: make sure mobile reflects desktop default (without = checked)
-    var currentGst = $('input[name="gst_option"]:checked').val() || 'without';
-    $('input[name="gst_option_mobile"][value="' + currentGst + '"]').prop('checked', true);
+            // On page load: make sure mobile reflects desktop default (without = checked)
+            var currentGst = $('input[name="gst_option"]:checked').val() || 'without';
+            $('input[name="gst_option_mobile"][value="' + currentGst + '"]').prop('checked', true);
 
 
             $(".paymentmethod").on("click", function() {
@@ -3742,53 +4522,6 @@
 
             $("#posPaidAmount, #posCashOnlineCashAmount, #posCashOnlineOnlineAmount").on("input", function() {
                 refreshPosPaymentUi(false);
-            });
-
-            $("#emiTenure").on("change", function() {
-                const selectedTenure = $(this).val();
-                if (selectedTenure === "custom") {
-                    $("#emiCustomTenureWrap").show();
-                } else {
-                    $("#emiCustomTenureWrap").hide();
-                    $("#emiCustomTenure").val("");
-                }
-                refreshPosPaymentUi(false);
-            });
-
-            $("#emiDownPayment, #emiCustomTenure, #emiInterestRate").on("input change", function() {
-                const total = getCurrentSaleTotal();
-                const downPayment = toAmount($("#emiDownPayment").val());
-                const loanAmount = Math.max(total - downPayment, 0);
-                const selectedTenure = $("#emiTenure").val();
-                const tenure = selectedTenure === "custom"
-                    ? parseFloat($("#emiCustomTenure").val()) || 0
-                    : parseFloat(selectedTenure) || 0;
-                const interestRate = toAmount($("#emiInterestRate").val());
-                let monthlyEmi = 0;
-
-                $("#emiLoanAmount").val(loanAmount ? loanAmount.toFixed(2) : "");
-
-                if (loanAmount > 0 && tenure > 0) {
-                    const monthlyRate = interestRate > 0 ? (interestRate / 100) / 12 : 0;
-                    if (monthlyRate > 0) {
-                        const factor = Math.pow(1 + monthlyRate, tenure);
-                        monthlyEmi = (loanAmount * monthlyRate * factor) / (factor - 1);
-                    } else {
-                        monthlyEmi = loanAmount / tenure;
-                    }
-                }
-
-                $("#emiMonthlyValue").val(monthlyEmi ? monthlyEmi.toFixed(2) : "");
-            });
-
-            $("#emiCancelBtn").on("click", function() {
-                $("#emiBox").hide();
-                $("input[name='payment_method'][value='emi']").prop("checked", false);
-                $(".paymentmethod").removeClass("active");
-                $("#emiCancelBtn").hide();
-                $("#posPaidTypeBox, #posPaidAmountFields, #cashOnlineBox, #bankSelectionBox").hide();
-                $("#emiDownPayment, #emiLoanAmount, #emiTenure, #emiInterestRate, #emiMonthlyValue, #emiAadharNumber, #emiDoId, #emiPanNumber, #emiGuarantorName, #emi_bank_id")
-                    .val("");
             });
 
             refreshPosPaymentUi(true);
@@ -3824,7 +4557,7 @@
 
                     if ($(this).is(":checked")) {
 
-                        // ✅ mark quotation
+                        //  mark quotation
                         $("#quotation_status").val("quotation");
 
                         // Hide payment UI
@@ -3843,7 +4576,7 @@
 
                     } else {
 
-                        // ✅ normal sale
+                        //  normal sale
                         $("#quotation_status").val("sales");
 
                         $("#paymentSection").slideDown();
@@ -3953,7 +4686,7 @@
                         }
                     }
 
-                    // ✅ GST INCLUDED AMOUNT
+                    //  GST INCLUDED AMOUNT
                     let gstIncludedAmount = baseAmount + productGst;
 
                     // ===== DISCOUNT ON GST INCLUDED PRICE =====
@@ -3967,7 +4700,7 @@
                     item.discount_amount = discountAmount;
                     selectedItems.set(item.id, item);
 
-                    // ✅ FINAL PRODUCT AMOUNT AFTER DISCOUNT
+                    //  FINAL PRODUCT AMOUNT AFTER DISCOUNT
                     let afterDiscountAmount = gstIncludedAmount - discountAmount;
 
                     // ===== TOTALS =====
@@ -3978,13 +4711,8 @@
                 });
                 // ================= GLOBAL DISCOUNT (REMOVED) =================
                 let globalDiscountAmount = 0;
-                // TDS basis = base price after discount, excluding GST.
-                // subtotalAfterDiscount = sum of (gstIncludedAmount - discountAmount) per item
-                //   = (baseSubtotal + totalProductGst) - totalProductDiscount
-                // So: base-after-discount (excluding GST) = subtotalAfterDiscount - totalProductGst
-                //   = baseSubtotal - totalProductDiscount  ... but discount was on gst+base amount
-                // Correct: priceAfterGlobalDiscount = subtotalAfterDiscount - totalProductGst
-                let priceAfterGlobalDiscount = subtotalAfterDiscount - totalProductGst;
+                // Subtotal = product amount + GST - discount.
+                let subtotalAmount = subtotalAfterDiscount;
 
                 // ================= FINAL TOTAL =================
                 let shipping = parseFloat($("#shipping").val()) || 0;
@@ -3992,10 +4720,10 @@
                 const tdsPercentageInput = isTdsEnabled ? (parseFloat(rawTdsPercentage) || 0) : 0;
                 const tdsPercentage = Math.max(0, Math.min(100, tdsPercentageInput));
 
-                const preTdsTotal = priceAfterGlobalDiscount + totalProductGst + shipping + labourTotal;
-                // TDS is calculated on original product base price (before discount, before GST)
-                const tdsBasis = baseSubtotal;
-                const tdsAmount = isTdsEnabled ? (tdsBasis * tdsPercentage) / 100 : 0;
+                // TDS applies only to the product base amount.
+                const tdsBaseAmount = Math.max(0, baseSubtotal);
+                const preTdsTotal = subtotalAmount + shipping + labourTotal;
+                const tdsAmount = isTdsEnabled ? (tdsBaseAmount * tdsPercentage) / 100 : 0;
 
                 let finalTotal = preTdsTotal - tdsAmount;
                 let roundedTotal = Math.round(finalTotal);
@@ -4013,7 +4741,7 @@
                 );
 
                 $(".price-after-discount").html(
-                    `${formatCurrency((priceAfterGlobalDiscount + totalProductGst).toFixed(2), currencySymbol, currencyPosition)}`
+                    `${formatCurrency(subtotalAmount.toFixed(2), currencySymbol, currencyPosition)}`
                 );
 
                 $(".shipping-cost-summary").html(
@@ -4026,7 +4754,6 @@
                     $(".tds-amount-summary").html(
                         `- ${formatCurrency(tdsAmount.toFixed(2), currencySymbol, currencyPosition)}`
                     );
-                    // Always show TDS row (even at 0.00 so user can see it)
                     $(".tds-summary-row").show();
                 } else {
                     $(".tds-summary-row").hide();
@@ -4048,8 +4775,7 @@
                 $("input[name='subtotal']").val(baseSubtotal.toFixed(2));
                 $("input[name='discount_amount']").val((totalProductDiscount + globalDiscountAmount).toFixed(
                     2));
-                $("input[name='price_after_discount']").val((priceAfterGlobalDiscount + totalProductGst)
-                    .toFixed(2));
+                $("input[name='price_after_discount']").val(subtotalAmount.toFixed(2));
                 $("input[name='round_off']").val(roundOffAmount.toFixed(2));
                 $("input[name='total']").val(roundedTotal.toFixed(0));
                 if (typeof window.refreshPosPaymentUi === "function") {
@@ -4140,18 +4866,18 @@
                                     const taxAmount = productTotal * taxRate;
 
 
-                                productGstTotal += taxAmount;
-                                // console.log(productGstTotal);
-                                return `<small class="d-block" style="font-size: 11px; color: #666;">
+                                    productGstTotal += taxAmount;
+                                    // console.log(productGstTotal);
+                                    return `<small class="d-block" style="font-size: 11px; color: #666;">
                                 ${tax.tax_name}: ${tax.tax_rate}%
                                 (${formatCurrency(taxAmount.toFixed(2), '{{ $currency_symbol }}', '{{ $currency_position }}')})
                             </small>`;
                                 }).join('');
 
-                                // ✅ GST Included Total
+                                //  GST Included Total
                                 gstIncludedTotal = productTotal + productGstTotal;
 
-                                // ✅ Discount on GST Included Amount
+                                //  Discount on GST Included Amount
                                 discountAmount = (gstIncludedTotal * (item.discount_percentage || 0)) / 100;
 
                                 finalProductTotal = gstIncludedTotal - discountAmount;
@@ -4162,7 +4888,7 @@
 
                         } else {
 
-                            // ✅ Discount on Base Amount
+                            //  Discount on Base Amount
                             discountAmount = (productTotal * (item.discount_percentage || 0)) / 100;
 
                             finalProductTotal = productTotal - discountAmount;
@@ -4187,21 +4913,21 @@
 
                                                     ${(globalGstOption === "with" && hasProductGST && gstDisplay) ?
                                                         `<div class="gst-info" style="margin: 4px 0; padding: 8px; background: #f8f9fa; border-radius: 6px;width:135px;">
-                                                                                                                          ${gstDisplay}
-                                                                                                                                     <small class="d-block" id="gstrates"
-                                                                                                                                    data-value="${productGstTotal.toFixed(2)}" style="font-weight: bold; color: #333; margin-top: 4px; font-size: 12px;">
-                                                                                                                         Product GST Total: ${formatCurrency(productGstTotal.toFixed(2), '{{ $currency_symbol }}', '{{ $currency_position }}')}
-                                                                                                                                                        </small>
-                                                                                                                             <small
-                                                                                                                             class="d-block"
-                                                                                                                                 id="gstamount"
-                                                                                                                                data-value="${gstIncludedTotal.toFixed(2)}"
-                                                                                                                               style="font-weight: bold; color: #333; margin-top: 4px; font-size: 12px;"
-                                                                                                                          >
-                                                                                                                                Product GST WITH Total:
-                                                                                                                                    ${formatCurrency(gstIncludedTotal.toFixed(2), '{{ $currency_symbol }}', '{{ $currency_position }}')}
-                                                                                                                                    </small>
-                                                                                                                          </div>`
+                                                                                                                                      ${gstDisplay}
+                                                                                                                                                 <small class="d-block" id="gstrates"
+                                                                                                                                                data-value="${productGstTotal.toFixed(2)}" style="font-weight: bold; color: #333; margin-top: 4px; font-size: 12px;">
+                                                                                                                                     Product GST Total: ${formatCurrency(productGstTotal.toFixed(2), '{{ $currency_symbol }}', '{{ $currency_position }}')}
+                                                                                                                                                                    </small>
+                                                                                                                                         <small
+                                                                                                                                         class="d-block"
+                                                                                                                                             id="gstamount"
+                                                                                                                                            data-value="${gstIncludedTotal.toFixed(2)}"
+                                                                                                                                           style="font-weight: bold; color: #333; margin-top: 4px; font-size: 12px;"
+                                                                                                                                      >
+                                                                                                                                            Product GST WITH Total:
+                                                                                                                                                ${formatCurrency(gstIncludedTotal.toFixed(2), '{{ $currency_symbol }}', '{{ $currency_position }}')}
+                                                                                                                                                </small>
+                                                                                                                                      </div>`
                                                         : ''
                                                     }
 
@@ -4254,16 +4980,16 @@
     </div>
 
     ${(globalGstOption === "with" && hasProductGST) ? `
-                                        <div class="price-row gst-inc">
-                                            <span>GST Inc:</span>
-                                            <span>${formatCurrency(gstIncludedTotal.toFixed(2), '{{ $currency_symbol }}', '{{ $currency_position }}')}</span>
-                                        </div>` : ''}
+                                                    <div class="price-row gst-inc">
+                                                        <span>GST Inc:</span>
+                                                        <span>${formatCurrency(gstIncludedTotal.toFixed(2), '{{ $currency_symbol }}', '{{ $currency_position }}')}</span>
+                                                    </div>` : ''}
 
     ${discountAmount > 0 ? `
-                                        <div class="price-row discount">
-                                            <span>Disc Amt:</span>
-                                            <span>- ${formatCurrency(discountAmount.toFixed(2), '{{ $currency_symbol }}', '{{ $currency_position }}')}</span>
-                                        </div>` : ''}
+                                                    <div class="price-row discount">
+                                                        <span>Disc Amt:</span>
+                                                        <span>- ${formatCurrency(discountAmount.toFixed(2), '{{ $currency_symbol }}', '{{ $currency_position }}')}</span>
+                                                    </div>` : ''}
 
     <div class="price-row final-total">
         <span>Final Total:</span>
@@ -4299,7 +5025,7 @@
 
                 let item = selectedItems.get(id);
 
-                let baseTotal = getItemBaseAmount(item); // ✅ GST aware
+                let baseTotal = getItemBaseAmount(item); //  GST aware
 
                 let discountAmount = (baseTotal * percent) / 100;
 
@@ -4327,7 +5053,8 @@
                     amount = 0;
                 }
 
-                item.price = formatCurrency(amount.toFixed(2), '{{ $currency_symbol }}', '{{ $currency_position }}');
+                item.price = formatCurrency(amount.toFixed(2), '{{ $currency_symbol }}',
+                    '{{ $currency_position }}');
 
                 let baseTotal = getItemBaseAmount(item);
 
@@ -4356,7 +5083,7 @@
 
                 let item = selectedItems.get(id);
 
-                let baseTotal = getItemBaseAmount(item); // ✅ GST aware
+                let baseTotal = getItemBaseAmount(item); //  GST aware
 
                 if (amount > baseTotal) amount = baseTotal;
 
@@ -4498,7 +5225,7 @@
                             productGstTotal += productTotal * (parseFloat(tax.tax_rate) / 100);
                         });
 
-                        return productTotal + productGstTotal; // ✅ GST Included Amount
+                        return productTotal + productGstTotal; //  GST Included Amount
 
                     } catch (e) {
                         return productTotal;
@@ -4533,7 +5260,7 @@
                 // Increase quantity
                 item.quantity = nextQuantity;
 
-                // 🔥 Recalculate discount properly
+                //  Recalculate discount properly
                 let baseAmount = getItemBaseAmount(item);
 
                 if (item.discount_percentage > 0) {
@@ -4574,7 +5301,7 @@
 
                 item.quantity = newQty;
 
-                // 🔥 Recalculate discount properly
+                //  Recalculate discount properly
                 let baseAmount = getItemBaseAmount(item);
 
                 if (item.discount_percentage > 0) {
@@ -4604,7 +5331,7 @@
                 // Decrease quantity
                 item.quantity = Math.max(1, parseQuantityValue(item.quantity) - 1);
 
-                // 🔥 Recalculate discount properly
+                //  Recalculate discount properly
                 let baseAmount = getItemBaseAmount(item);
 
                 if (item.discount_percentage > 0) {
@@ -4643,6 +5370,10 @@
                 calculateTotals();
             });
             $("#tds_percentage").on("blur", function() {
+                if (!isTdsEnabled) {
+                    return;
+                }
+
                 const rawValue = ($(this).val() || "").trim();
                 if (rawValue === "") {
                     $("#tds_amount").val("0.00");
@@ -4652,6 +5383,27 @@
 
                 const normalizedValue = Math.max(0, Math.min(100, parseFloat(rawValue) || 0));
                 $(this).val(normalizedValue.toFixed(2));
+                calculateTotals();
+            });
+            $("#tds_amount").on("input", function() {
+                if (!isTdsEnabled) {
+                    return;
+                }
+
+                const rawAmount = parseFloat($(this).val()) || 0;
+                const tdsBaseAmount = parseFloat($("input[name='price_after_discount']").val()) || 0;
+                const tdsPercentage = tdsBaseAmount > 0 ? (rawAmount / tdsBaseAmount) * 100 : 0;
+
+                $("#tds_percentage").val(tdsPercentage.toFixed(2));
+            });
+
+            $("#tds_amount").on("blur", function() {
+                if (!isTdsEnabled) {
+                    return;
+                }
+
+                const normalizedAmount = Math.max(0, parseFloat($(this).val()) || 0);
+                $(this).val(normalizedAmount.toFixed(2));
                 calculateTotals();
             });
 
@@ -4672,7 +5424,7 @@
                     selectedItems.set(id, item);
                 });
 
-                updateTotalItems(); // 🔥 re-render + re-calc totals
+                updateTotalItems(); //  re-render + re-calc totals
             });
             $(document).on("change", "input[name='gst_option']", function() {
                 let gstOption = $("input[name='gst_option']:checked").val();
@@ -4689,10 +5441,6 @@
                 calculateTotals();
             });
             $(".btn-totallabel").click(function(event) {
-                if (isOrderSubmitting) {
-                    return;
-                }
-
                 // ================= LABOUR ITEMS =================
                 let labourItems = [];
 
@@ -4719,7 +5467,6 @@
                 const selectedSubAdminId = localStorage.getItem("selectedSubAdminId");
 
                 // Show loading text and disable the button
-                isOrderSubmitting = true;
                 $btn.html(
                     '<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> Placing Order...'
                 ).prop('disabled', true);
@@ -4737,6 +5484,8 @@
                 let orderDate = $("#order_date").val();
                 let selectedPayment = $("input[name='payment_method']:checked").val();
                 let bank_id = $("#bank_id").val();
+                let assign_staff = $("#assign_staff").val();
+                let order_type = $("#order_type").val();
                 let subtotal = parseFloat($("input[name='subtotal']").val()) || 0;
                 let total = parseFloat($("input[name='total']").val()) || 0;
                 let discount_amount = parseFloat($("input[name='discount_amount']").val()) || 0;
@@ -4747,8 +5496,34 @@
                 let tds_amount = parseFloat($("#tds_amount").val()) || 0;
                 let posPaymentMeta = (typeof window.getPosPaymentMeta === "function") ? window
                     .getPosPaymentMeta() : null;
-                // Validation
+
                 let isValid = true;
+
+                // Determine if this is a quotation or a sale
+                const quotationStatus = $(".quotationToggle:checked").length > 0 ? 'quotation' : 'sales';
+
+                // Validate EMI
+                if (quotationStatus !== 'quotation' && selectedPayment === 'emi') {
+                    if (!posPaymentMeta.emiTenure) {
+                        $("#emiTenureError").text("Please select a tenure.").removeClass('d-none');
+                        isValid = false;
+                    } else {
+                        $("#emiTenureError").addClass('d-none');
+                        if (posPaymentMeta.emiTenure === 'custom' && !posPaymentMeta.emiCustomTenure) {
+                            $("#emiCustomTenureError").text("Please enter custom tenure.").removeClass(
+                                'd-none');
+                            isValid = false;
+                        } else {
+                            $("#emiCustomTenureError").addClass('d-none');
+                        }
+                    }
+                    if (!posPaymentMeta.emiBankId) {
+                        $("#emiBankError").text("Please select a bank.").removeClass('d-none');
+                        isValid = false;
+                    } else {
+                        $("#emiBankError").addClass('d-none');
+                    }
+                }
 
                 // if (name === "") {
                 //     $(".error_customername").text("Customer name is required").css("color", "red");
@@ -4764,33 +5539,11 @@
                     isValid = false;
                 }
 
-                // Determine if this is a quotation or a sale
-                const quotationStatus = $(".quotationToggle:checked").length > 0 ? 'quotation' : 'sales';
-
                 // only require a payment method for actual sales
                 if (quotationStatus !== 'quotation') {
                     if (!selectedPayment) {
                         $(".error_peymentmethod").text("Please select a payment method").css("color",
                             "red");
-                        isValid = false;
-                    }
-                }
-
-                if (quotationStatus !== 'quotation' && selectedPayment === "emi") {
-                    const emiBankId = $("#emi_bank_id").val();
-                    const emiTenure = $("#emiTenure").val();
-                    const emiCustomTenure = $("#emiCustomTenure").val();
-
-                    if (!emiTenure) {
-                        $(".error_emi_tenure").text("EMI tenure is required.").css("color", "red");
-                        isValid = false;
-                    } else if (emiTenure === "custom" && !emiCustomTenure) {
-                        $(".error_emi_tenure").text("Custom EMI tenure is required.").css("color", "red");
-                        isValid = false;
-                    }
-
-                    if (!emiBankId) {
-                        $(".error_bank").text("Bank selection is required.").css("color", "red");
                         isValid = false;
                     }
                 }
@@ -4939,7 +5692,7 @@
                         });
                     });
                 } else {
-                    taxes = []; // ✅ explicitly empty when "without GST"
+                    taxes = []; //  explicitly empty when "without GST"
                 }
 
                 // Prepare order data
@@ -4949,9 +5702,9 @@
                     selectedSubAdminId: selectedSubAdminId,
                     customer_id: name,
                     customer_phone: phone,
-                    assigned_staff: $("#assigned_staff").val() || '',
-                    order_type: $("#order_type").val() || 'Self Pickup',
                     order_date: orderDate,
+                    assign_staff: assign_staff,
+                    order_type: order_type,
                     subtotal: subtotal,
                     discount: 0,
                     discount_amount: discount_amount,
@@ -4964,13 +5717,13 @@
                     tds_percentage: tds_percentage,
                     tds_amount: tds_amount,
                     labour_items: labourItems,
-                    quotation_status: quotationStatus, // ✅ IMPORTANT
+                    quotation_status: quotationStatus, //  IMPORTANT
                 };
 
                 // add payment fields only when this is a sale
                 if (quotationStatus === 'sales') {
                     orderData.payment_method = selectedPayment;
-                    orderData.bank_id = selectedPayment === "emi" ? ($("#emi_bank_id").val() || "") : bank_id;
+                    orderData.bank_id = bank_id;
                     orderData.payment_amount = posPaymentMeta ? posPaymentMeta.paidAmount : 0;
                     orderData.pending_amount = posPaymentMeta ? posPaymentMeta.pendingAmount : total;
                     orderData.payment_remarks = paymentRemarks;
@@ -4980,7 +5733,8 @@
                             "cash_partially" : "cash_fully";
                         orderData.amount = posPaymentMeta ? posPaymentMeta.paidAmount : 0;
                     } else if (selectedPayment === "debit card" || selectedPayment === "scan") {
-                        orderData.online_type = (posPaymentMeta && posPaymentMeta.paidType === "partially") ?
+                        orderData.online_type = (posPaymentMeta && posPaymentMeta.paidType ===
+                                "partially") ?
                             "online_partially" : "online_fully";
                         orderData.amount = posPaymentMeta ? posPaymentMeta.paidAmount : 0;
                     } else if (selectedPayment === "cash+online") {
@@ -4989,22 +5743,17 @@
                         orderData.cash_amount = posPaymentMeta ? posPaymentMeta.cashAmount : 0;
                         orderData.online_amount = posPaymentMeta ? posPaymentMeta.onlineAmount : 0;
                     } else if (selectedPayment === "emi") {
-                        orderData.online_type = (posPaymentMeta && posPaymentMeta.paidType === "partially") ?
-                            "emi_partially" : "emi_fully";
-                        orderData.amount = posPaymentMeta ? posPaymentMeta.paidAmount : 0;
-                        orderData.down_payment = $("#emiDownPayment").val() || 0;
-                        orderData.loan_amount = $("#emiLoanAmount").val() || 0;
-                        orderData.emi_tenure = $("#emiTenure").val() === "custom"
-                            ? ($("#emiCustomTenure").val() || "")
-                            : ($("#emiTenure").val() || "");
-                        orderData.emi_month = orderData.emi_tenure;
-                        orderData.interest_rate = $("#emiInterestRate").val() || "";
-                        orderData.monthly_emi = $("#emiMonthlyValue").val() || "";
-                        orderData.aadhar_number = $("#emiAadharNumber").val().trim();
-                        orderData.emi_do_id = $("#emiDoId").val().trim();
-                        orderData.emi_pan_number = $("#emiPanNumber").val().trim();
-                        orderData.emi_guarnator_name = $("#emiGuarantorName").val().trim();
-                        orderData.emi_bank_id = $("#emi_bank_id").val() || "";
+                        orderData.emi_down_payment = posPaymentMeta.emiDownPayment || 0;
+                        orderData.emi_loan_amount = posPaymentMeta.emiLoanAmount || 0;
+                        orderData.emi_interest_rate = posPaymentMeta.emiInterestRate || 0;
+                        orderData.emi_tenure = posPaymentMeta.emiTenure || "";
+                        orderData.emi_custom_tenure = posPaymentMeta.emiCustomTenure || "";
+                        orderData.emi_monthly_amount = posPaymentMeta.emiMonthlyAmount || 0;
+                        orderData.emi_aadhar_number = posPaymentMeta.emiAadharNumber || "";
+                        orderData.emi_do_id = posPaymentMeta.emiDoId || "";
+                        orderData.emi_pan_number = posPaymentMeta.emiPanNumber || "";
+                        orderData.emi_guarantor_name = posPaymentMeta.emiGuarantorName || "";
+                        orderData.bank_id = posPaymentMeta.emiBankId || "";
                     }
                 }
 
@@ -5028,7 +5777,6 @@
                     data: JSON.stringify(orderData),
                     success: function(response) {
                         // Re-enable and reset the button
-                        isOrderSubmitting = false;
                         $btn.html(originalText).prop('disabled', false);
                         if (response.status) {
                             orderId = response.order_id;
@@ -5050,7 +5798,11 @@
                             // Reset form
                             selectedItems.clear();
                             $(".check-product i").removeClass("selected");
-                            $("input[name='customer_name'], input[name='customer_phone']").val("");
+                            $("#customer_name").val(null).trigger('change');
+                            $("#customer_phone, #customer_gst_number").val("");
+                            $("#openEditCustomerModal").prop('disabled', true);
+                            $("#assign_staff").val("").trigger("change");
+                            $("#order_type").val("Self Pickup").trigger("change");
                             setPosOrderDate("{{ now()->format('Y-m-d') }}");
                             $("input[name='payment_method']").prop("checked", false);
                             $(".paymentmethod").removeClass("active");
@@ -5069,7 +5821,6 @@
                     //     alert("Error placing order. Please try again.");
                     // }
                     error: function(xhr, status, error) {
-                        isOrderSubmitting = false;
                         $btn.html(originalText).prop('disabled', false);
 
                         // Try to extract error message from response
@@ -5148,7 +5899,8 @@
                     },
                     success: function(response) {
                         // console.log('respone:', response)
-                        const currencySymbol = response.currency_symbol || 'Ã¢â€šÂ¹';
+                        const currencySymbol = response.currency_symbol ||
+                            'ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¹';
                         const currencyPosition = response.currency_position || 'left';
 
 
@@ -5253,7 +6005,7 @@
                             }
                         }
 
-                        // ✅ ADD data-gst-option and data-product-gst ATTRIBUTES HERE
+                        //  ADD data-gst-option and data-product-gst ATTRIBUTES HERE
                         productsHtml += `
                 <div class="col-lg-3 col-sm-6 d-flex position-relative">
                     <div class="productset flex-fill text-center ${disabledClass}"
@@ -5323,458 +6075,19 @@
             startConnectedDeviceScannerSync();
             updateTotalItems();
         });
-        $(".select2").select2({
+        $(".select2").not("#customer_name, #assign_staff, #order_type").select2({
             tags: true,
+            width: '100%'
         });
-        const posStateCodeToName = {
-            "01": "Jammu and Kashmir",
-            "02": "Himachal Pradesh",
-            "03": "Punjab",
-            "04": "Chandigarh",
-            "05": "Uttarakhand",
-            "06": "Haryana",
-            "07": "Delhi",
-            "08": "Rajasthan",
-            "09": "Uttar Pradesh",
-            "10": "Bihar",
-            "11": "Sikkim",
-            "12": "Arunachal Pradesh",
-            "13": "Nagaland",
-            "14": "Manipur",
-            "15": "Mizoram",
-            "16": "Tripura",
-            "17": "Meghalaya",
-            "18": "Assam",
-            "19": "West Bengal",
-            "20": "Jharkhand",
-            "21": "Odisha",
-            "22": "Chhattisgarh",
-            "23": "Madhya Pradesh",
-            "24": "Gujarat",
-            "25": "Daman and Diu",
-            "26": "Dadra and Nagar Haveli",
-            "27": "Maharashtra",
-            "28": "Andhra Pradesh",
-            "29": "Karnataka",
-            "30": "Goa",
-            "31": "Lakshadweep",
-            "32": "Kerala",
-            "33": "Tamil Nadu",
-            "34": "Puducherry",
-            "35": "Andaman and Nicobar Islands",
-            "36": "Telangana",
-            "37": "Andhra Pradesh (New)"
-        };
-
-        const $addCustomerModalEl = document.getElementById('addCustomerModal');
-        const addCustomerModal = $addCustomerModalEl ? new bootstrap.Modal($addCustomerModalEl, {
-            backdrop: 'static',
-            keyboard: false
-        }) : null;
-        const $editCustomerModalEl = document.getElementById('editCustomerModal');
-        const editCustomerModal = $editCustomerModalEl ? new bootstrap.Modal($editCustomerModalEl, {
-            backdrop: 'static',
-            keyboard: false
-        }) : null;
-        const initialCustomerId = $('#customer_name').val();
-        let isOpeningCustomerModalFromSelect = false;
-        let isRevertingAssignedStaff = false;
-
-        if ($('#customer_name').length) {
-            if ($('#customer_name').hasClass('select2-hidden-accessible')) {
-                $('#customer_name').select2('destroy');
-            }
-
-            $('#customer_name').select2({
-                tags: true,
-                placeholder: 'Select Customer',
-                allowClear: true,
-                width: '100%',
-                createTag: function(params) {
-                    const term = $.trim(params.term);
-                    if (!term) {
-                        return null;
-                    }
-
-                    return {
-                        id: term,
-                        text: term,
-                        newTag: true
-                    };
-                },
-                templateResult: function(data) {
-                    if (data.loading) {
-                        return data.text;
-                    }
-
-                    if (data.newTag) {
-                        return $('<span>Create Customer "' + data.text + '"</span>');
-                    }
-
-                    return data.text;
-                },
-                templateSelection: function(data) {
-                    return data.text || data.id;
-                }
-            });
-        }
-
-        function syncAddressFields(addressSelector, deliverySelector, useCheckboxSelector) {
-            const $address = $(addressSelector);
-            const $delivery = $(deliverySelector);
-            const $useAddress = $(useCheckboxSelector);
-
-            $delivery.prop('readonly', $useAddress.is(':checked'));
-            if ($useAddress.is(':checked')) {
-                $delivery.val($address.val());
-            }
-        }
-
-        $('#openAddCustomerModal').on('click', function() {
-            $('#posCustomerForm')[0].reset();
-            $('#posCustomerForm .text-danger').text('');
-            $('#pos_use_address').prop('checked', true).trigger('change');
-            if (addCustomerModal) {
-                addCustomerModal.show();
-            }
-        });
-
-        const $assignedStaff = $('#assigned_staff');
-        if ($assignedStaff.length) {
-            $assignedStaff.attr('data-previous-value', $assignedStaff.val() || '');
-
-            $assignedStaff.on('focus', function() {
-                $(this).attr('data-previous-value', $(this).val() || '');
-            });
-
-            $assignedStaff.on('select2:opening', function() {
-                $(this).attr('data-previous-value', $(this).val() || '');
-            });
-
-            $assignedStaff.on('change', function() {
-                if (isRevertingAssignedStaff) {
-                    return;
-                }
-
-                const $select = $(this);
-                const previousValue = $select.attr('data-previous-value') || '';
-                const currentValue = $select.val() || '';
-
-                if (!currentValue || currentValue === previousValue) {
-                    $select.attr('data-previous-value', currentValue);
-                    return;
-                }
-
-                const selectedStaffName = $select.find('option:selected').text().trim();
-
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Are you sure?',
-                    text: 'Are you sure you want to assign this staff?',
-                    showCancelButton: true,
-                    confirmButtonText: 'Yes, assign!',
-                    cancelButtonText: 'Cancel',
-                    confirmButtonColor: '#ff9f43',
-                    cancelButtonColor: '#dc3545'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        $select.attr('data-previous-value', currentValue);
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Assigned',
-                            text: selectedStaffName ? selectedStaffName + ' assigned successfully.' :
-                                'Staff assigned successfully.',
-                            timer: 1400,
-                            showConfirmButton: false
-                        });
-                        return;
-                    }
-
-                    isRevertingAssignedStaff = true;
-                    $select.val(previousValue).trigger('change.select2');
-                    $select.attr('data-previous-value', previousValue);
-                    isRevertingAssignedStaff = false;
-                });
-            });
-        }
-
         $('#customer_name').on('change', function() {
-            const $selectedOption = $(this).find(':selected');
-            const customerId = $(this).val();
-            const phone = $selectedOption.data('phone');
-            const isRealCustomer = !!customerId;
-
-            if (isOpeningCustomerModalFromSelect) {
-                return;
-            }
-
-            if (customerId && isNaN(customerId)) {
-                const typedCustomerName = String(customerId).trim();
-
-                isOpeningCustomerModalFromSelect = true;
-                $(this).val('').trigger('change.select2');
-                isOpeningCustomerModalFromSelect = false;
-
-                $('#posCustomerForm')[0].reset();
-                $('#posCustomerForm .text-danger').text('');
-                $('#pos_customer_name').val(typedCustomerName);
-                $('#pos_use_address').prop('checked', true).trigger('change');
-
-                if (addCustomerModal) {
-                    addCustomerModal.show();
-                }
-                return;
-            }
-
-            $('#customer_phone').val(phone || '');
-            $('#openAddCustomerModal').toggle(!isRealCustomer);
-            $('#openEditCustomerModal').toggle(isRealCustomer);
+            syncCustomerFields();
         });
-
-        $('#openAddCustomerModal').show();
-        $('#openEditCustomerModal').hide();
-
-        $('#openEditCustomerModal').on('click', function() {
-            const customerId = $('#customer_name').val();
-            if (!customerId) {
-                return;
-            }
-
-            $('#posEditCustomerForm .text-danger').text('');
-
-            $.ajax({
-                url: `/api/getCustomer/${customerId}`,
-                method: 'GET',
-                headers: {
-                    'X-CSRF-TOKEN': "{{ csrf_token() }}",
-                    'Authorization': 'Bearer ' + authToken
-                },
-                success: function(response) {
-                    const customer = response?.customer || {};
-                    const details = customer?.details || {};
-
-                    $('#pos_edit_customer_id').val(customer.id || '');
-                    $('#pos_edit_customer_name').val(customer.name || '');
-                    $('#pos_edit_company_name').val(customer.company_name || '');
-                    $('#pos_edit_phone').val(customer.phone || '');
-                    $('#pos_edit_alternate_phone').val(customer.alternate_phone || '');
-                    $('#pos_edit_email').val(customer.email || '');
-                    $('#pos_edit_gst_number').val(customer.gst_number || '');
-                    $('#pos_edit_pan_number').val(customer.pan_number || '');
-                    $('#pos_edit_state_code').val(customer.state_code || '');
-                    $('#pos_edit_state_name').val(customer.state_name || '');
-                    $('#pos_edit_country').val(details.country || '');
-                    $('#pos_edit_city').val(details.city || '');
-                    $('#pos_edit_address').val(details.address || '');
-                    $('#pos_edit_delivery_address').val(details.delivery_address || details.address || '');
-                    $('#pos_edit_use_address').prop('checked', true);
-                    syncAddressFields('#pos_edit_address', '#pos_edit_delivery_address', '#pos_edit_use_address');
-
-                    if (editCustomerModal) {
-                        editCustomerModal.show();
-                    }
-                },
-                error: function(xhr) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: xhr.responseJSON?.error || 'Failed to fetch customer.'
-                    });
-                }
-            });
+        $('#assign_staff, #order_type').select2({
+            width: '100%'
         });
-
-        $('#pos_state_code').on('input', function() {
-            let code = $(this).val().replace(/\D/g, '').slice(0, 2);
-            $(this).val(code);
-            $('#pos_state_name').val(posStateCodeToName[code.padStart(2, '0')] || '');
-        });
-
-        $('#pos_phone, #pos_alternate_phone').on('input', function() {
-            let value = $(this).val().replace(/\D/g, '').slice(0, 10);
-            $(this).val(value);
-        });
-
-        $('#pos_gst_number').on('input', function() {
-            $(this).val($(this).val().toUpperCase().slice(0, 15));
-        });
-
-        $('#pos_address').on('input', function() {
-            if ($('#pos_use_address').is(':checked')) {
-                $('#pos_delivery_address').val($(this).val());
-            }
-        });
-
-        $('#pos_use_address').on('change', function() {
-            if ($(this).is(':checked')) {
-                $('#pos_delivery_address').val($('#pos_address').val());
-                $('#pos_delivery_address').prop('readonly', true);
-            } else {
-                $('#pos_delivery_address').prop('readonly', false);
-            }
-        });
-
-        $('#pos_delivery_address').prop('readonly', true);
-
-        $('#pos_edit_address').on('input', function() {
-            if ($('#pos_edit_use_address').is(':checked')) {
-                $('#pos_edit_delivery_address').val($(this).val());
-            }
-        });
-
-        $('#pos_edit_use_address').on('change', function() {
-            if ($(this).is(':checked')) {
-                $('#pos_edit_delivery_address').val($('#pos_edit_address').val());
-                $('#pos_edit_delivery_address').prop('readonly', true);
-            } else {
-                $('#pos_edit_delivery_address').prop('readonly', false);
-            }
-        });
-
-        $('#pos_edit_delivery_address').prop('readonly', true);
-
-        $('#savePosCustomerBtn').on('click', function() {
-            const $btn = $(this);
-            const originalText = $btn.text();
-            const formData = new FormData(document.getElementById('posCustomerForm'));
-            if (selectedSubAdminId && selectedSubAdminId !== "null" && selectedSubAdminId !== "undefined") {
-                formData.append('selectedSubAdminId', selectedSubAdminId);
-            }
-
-            $('#posCustomerForm .text-danger').text('');
-            $btn.prop('disabled', true).text('Saving...');
-
-            $.ajax({
-                url: '/api/createCustomer',
-                method: 'POST',
-                data: formData,
-                processData: false,
-                contentType: false,
-                headers: {
-                    'X-CSRF-TOKEN': "{{ csrf_token() }}",
-                    'Authorization': 'Bearer ' + authToken
-                },
-                success: function(response) {
-                    const customerName = $('#pos_customer_name').val().trim();
-                    const customerPhone = $('#pos_phone').val().trim();
-                    const createdCustomer = response?.customer || null;
-                    const newId = createdCustomer?.id;
-
-                    if (newId && $('#customer_name option[value="' + newId + '"]').length === 0) {
-                        $('#customer_name').append(
-                            $('<option>', {
-                                value: newId,
-                                text: customerName,
-                                'data-phone': customerPhone
-                            })
-                        );
-                    }
-
-                    if (newId) {
-                        $('#customer_name').val(String(newId)).trigger('change');
-                    }
-                    $('#customer_phone').val(customerPhone);
-
-                    if (addCustomerModal) {
-                        addCustomerModal.hide();
-                    }
-
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Success',
-                        text: response.message || 'Customer created successfully.'
-                    });
-                },
-                error: function(xhr) {
-                    const errors = xhr.responseJSON?.errors || {};
-                    $('#posCustomerForm .error-customer_name').text(errors.customer_name ? errors.customer_name[0] : '');
-                    $('#posCustomerForm .error-phone').text(errors.phone ? errors.phone[0] : '');
-                    $('#posCustomerForm .error-gst_number').text(errors.gst_number ? errors.gst_number[0] : '');
-
-                    if (!Object.keys(errors).length) {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error',
-                            text: xhr.responseJSON?.message || 'Failed to create customer.'
-                        });
-                    }
-                },
-                complete: function() {
-                    $btn.prop('disabled', false).text(originalText);
-                }
-            });
-        });
-
-        $('#updatePosCustomerBtn').on('click', function() {
-            const customerId = $('#pos_edit_customer_id').val();
-            if (!customerId) {
-                return;
-            }
-
-            const $btn = $(this);
-            const originalText = $btn.text();
-            const formData = new FormData(document.getElementById('posEditCustomerForm'));
-            if (selectedSubAdminId && selectedSubAdminId !== "null" && selectedSubAdminId !== "undefined") {
-                formData.append('selectedSubAdminId', selectedSubAdminId);
-            }
-
-            $('#posEditCustomerForm .text-danger').text('');
-            $btn.prop('disabled', true).text('Updating...');
-
-            $.ajax({
-                url: `/api/updateCustomer/${customerId}`,
-                method: 'POST',
-                data: formData,
-                processData: false,
-                contentType: false,
-                headers: {
-                    'X-CSRF-TOKEN': "{{ csrf_token() }}",
-                    'Authorization': 'Bearer ' + authToken
-                },
-                success: function(response) {
-                    const customerName = $('#pos_edit_customer_name').val().trim();
-                    const customerPhone = $('#pos_edit_phone').val().trim();
-
-                    $('#customer_name option[value="' + customerId + '"]')
-                        .text(customerName)
-                        .attr('data-phone', customerPhone);
-
-                    $('#customer_name').val(String(customerId)).trigger('change');
-                    $('#customer_phone').val(customerPhone);
-
-                    if (editCustomerModal) {
-                        editCustomerModal.hide();
-                    }
-
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Success',
-                        text: response.message || 'Customer updated successfully.'
-                    });
-                },
-                error: function(xhr) {
-                    const errors = xhr.responseJSON?.errors || {};
-                    $('#posEditCustomerForm .error-customer_name').text(errors.customer_name ? errors.customer_name[0] : '');
-                    $('#posEditCustomerForm .error-phone').text(errors.phone ? errors.phone[0] : '');
-                    $('#posEditCustomerForm .error-gst_number').text(errors.gst_number ? errors.gst_number[0] : '');
-
-                    if (!Object.keys(errors).length) {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error',
-                            text: xhr.responseJSON?.message || 'Failed to update customer.'
-                        });
-                    }
-                },
-                complete: function() {
-                    $btn.prop('disabled', false).text(originalText);
-                }
-            });
-        });
-
-        // $(document).ready(function() {
-        // });
         $(document).ready(function() {
+            const addCustomerModal = openCustomerModal('addCustomerModal');
+            const editCustomerModal = openCustomerModal('editCustomerModal');
             const $searchInput = $('#customerSearch1');
             const $resultBox = $('#searchResults1');
             const addBankModalElement = document.getElementById('addBankModal');
@@ -5791,11 +6104,189 @@
                 }
             @endif
 
-            $('#openAddBankModal').on('click', function() {
+            $('#openAddBankModal, #openAddBankModalEmi').on('click', function() {
                 resetPosAddBankForm();
                 if (addBankModal) {
                     addBankModal.show();
                 }
+            });
+
+            $('#openAddCustomerModal').on('click', function() {
+                const $form = $('#addCustomerForm');
+                resetCustomerForm($form, 'add');
+                clearCustomerFieldErrors('#addCustomerForm');
+
+                if (addCustomerModal) {
+                    addCustomerModal.show();
+                }
+            });
+
+            $('#openEditCustomerModal').on('click', function() {
+                const customerData = getSelectedCustomerData();
+
+                if (!customerData.id) {
+                    Swal.fire({
+                        icon: 'info',
+                        title: 'Select a customer',
+                        text: 'Please choose a customer before editing details.'
+                    });
+                    return;
+                }
+
+                const $button = $(this);
+                const originalHtml = $button.html();
+                $button.prop('disabled', true).html(
+                    '<span class="spinner-border spinner-border-sm"></span>');
+
+                loadCustomerForEdit(customerData.id)
+                    .done(function(response) {
+                        if (!response || !response.status || !response.customer) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Unable to load customer',
+                                text: 'Could not load the selected customer.'
+                            });
+                            return;
+                        }
+
+                        fillCustomerForm(response.customer);
+                        clearCustomerFieldErrors('#editCustomerForm');
+
+                        if (editCustomerModal) {
+                            editCustomerModal.show();
+                        }
+                    })
+                    .fail(function() {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Unable to load customer',
+                            text: 'Please try again.'
+                        });
+                    })
+                    .always(function() {
+                        $button.prop('disabled', false).html(originalHtml);
+                    });
+            });
+
+            $('#addCustomerForm').on('submit', function(e) {
+                e.preventDefault();
+
+                const $form = $(this);
+                const $submitButton = $('#saveCustomerBtn');
+                const originalHtml = $submitButton.html();
+                const formData = new FormData(this);
+
+                if (selectedSubAdminId && selectedSubAdminId !== 'null' && selectedSubAdminId !==
+                    'undefined') {
+                    formData.append('selectedSubAdminId', selectedSubAdminId);
+                }
+
+                clearCustomerFieldErrors('#addCustomerForm');
+                $submitButton.prop('disabled', true).html(
+                    '<span class="spinner-border spinner-border-sm me-1"></span>Saving...');
+
+                $.ajax({
+                    url: '/api/createCustomer',
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    headers: getCustomerApiHeaders(),
+                    success: function(response) {
+                        if (response.status && response.customer) {
+                            upsertCustomerOption(response.customer, true);
+                            if (addCustomerModal) {
+                                addCustomerModal.hide();
+                            }
+
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Customer saved',
+                                text: response.message ||
+                                    'Customer created successfully.'
+                            });
+                        }
+                    },
+                    error: function(xhr) {
+                        const response = xhr.responseJSON || {};
+                        if (xhr.status === 422 && response.errors) {
+                            renderCustomerFieldErrors('#addCustomerForm', response.errors);
+                            return;
+                        }
+
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Save failed',
+                            text: response.message || 'Unable to save customer.'
+                        });
+                    },
+                    complete: function() {
+                        $submitButton.prop('disabled', false).html(originalHtml);
+                    }
+                });
+            });
+
+            $('#editCustomerForm').on('submit', function(e) {
+                e.preventDefault();
+
+                const customerId = $('#edit_customer_id').val();
+
+                if (!customerId) {
+                    return;
+                }
+
+                const $submitButton = $('#updateCustomerBtn');
+                const originalHtml = $submitButton.html();
+                const formData = new FormData(this);
+
+                if (selectedSubAdminId && selectedSubAdminId !== 'null' && selectedSubAdminId !==
+                    'undefined') {
+                    formData.append('selectedSubAdminId', selectedSubAdminId);
+                }
+
+                clearCustomerFieldErrors('#editCustomerForm');
+                $submitButton.prop('disabled', true).html(
+                    '<span class="spinner-border spinner-border-sm me-1"></span>Updating...');
+
+                $.ajax({
+                    url: `/api/updateCustomer/${customerId}`,
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    headers: getCustomerApiHeaders(),
+                    success: function(response) {
+                        if (response.status && response.customer) {
+                            upsertCustomerOption(response.customer, true);
+                            if (editCustomerModal) {
+                                editCustomerModal.hide();
+                            }
+
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Customer updated',
+                                text: response.message ||
+                                    'Customer updated successfully.'
+                            });
+                        }
+                    },
+                    error: function(xhr) {
+                        const response = xhr.responseJSON || {};
+                        if (xhr.status === 422 && response.errors) {
+                            renderCustomerFieldErrors('#editCustomerForm', response.errors);
+                            return;
+                        }
+
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Update failed',
+                            text: response.message || 'Unable to update customer.'
+                        });
+                    },
+                    complete: function() {
+                        $submitButton.prop('disabled', false).html(originalHtml);
+                    }
+                });
             });
 
             $('#addBankForm').on('submit', function(e) {
@@ -5840,11 +6331,14 @@
                     error: function(xhr) {
                         const errors = xhr.responseJSON?.errors || {};
 
-                        $('#addBankNameError').text(errors.bank_name ? errors.bank_name[0] : '');
+                        $('#addBankNameError').text(errors.bank_name ? errors.bank_name[0] :
+                            '');
                         $('#addAccountNumberError').text(errors.account_number ? errors
                             .account_number[0] : '');
-                        $('#addIfscCodeError').text(errors.ifsc_code ? errors.ifsc_code[0] : '');
-                        $('#addBranchNameError').text(errors.branch_name ? errors.branch_name[0] :
+                        $('#addIfscCodeError').text(errors.ifsc_code ? errors.ifsc_code[0] :
+                            '');
+                        $('#addBranchNameError').text(errors.branch_name ? errors.branch_name[
+                                0] :
                             '');
                         $('#addOpeningBalanceError').text(errors.opening_balance ? errors
                             .opening_balance[0] : '');
@@ -5854,7 +6348,8 @@
                             Swal.fire({
                                 icon: 'error',
                                 title: 'Error',
-                                text: xhr.responseJSON?.message || 'Failed to add bank.',
+                                text: xhr.responseJSON?.message ||
+                                    'Failed to add bank.',
                                 confirmButtonText: 'OK'
                             });
                         }
@@ -5945,9 +6440,9 @@
                 });
             });
 
-                $(document).on('click', '.close-search-result', function () {
-                    $resultBox.hide().empty();
-                });
+            $(document).on('click', '.close-search-result', function() {
+                $resultBox.hide().empty();
+            });
 
             $(document).on("click", ".add-product", function() {
                 const $btn = $(this);
@@ -6060,6 +6555,57 @@
                     $resultBox.hide();
                 }
             });
+            $('#cancelPaymentDetails').on('click', function() {
+                $("input[name='payment_method']").prop('checked', false);
+                $('.paymentmethod').removeClass('active');
+                if (typeof window.resetPosPaymentUi === "function") {
+                    window.resetPosPaymentUi();
+                }
+            });
+
+            window.calculateEmi = function() {
+                const totalAmount = parseFloat($("input[name='total']").val()) || 0;
+                let downPayment = parseFloat($('#emiDownPayment').val()) || 0;
+
+                if (downPayment > totalAmount) {
+                    downPayment = totalAmount;
+                    $('#emiDownPayment').val(downPayment);
+                }
+
+                const loanAmount = Math.max(0, totalAmount - downPayment);
+                $('#emiLoanAmount').val(loanAmount.toFixed(2));
+
+                let tenureStr = $('#emiTenure').val();
+                let tenureMonths = 0;
+
+                if (tenureStr === 'custom') {
+                    $('#emiCustomTenureCol').removeClass('d-none');
+                    tenureMonths = parseInt($('#emiCustomTenure').val()) || 0;
+                } else {
+                    $('#emiCustomTenureCol').addClass('d-none');
+                    tenureMonths = parseInt(tenureStr) || 0;
+                }
+
+                let interestRate = parseFloat($('#emiInterestRate').val()) || 0;
+
+                if (tenureMonths > 0 && loanAmount > 0) {
+                    let totalInterest = (loanAmount * interestRate) / 100;
+                    let totalRepayment = loanAmount + totalInterest;
+                    let monthlyAmount = totalRepayment / tenureMonths;
+                    $('#emiMonthlyAmount').val(monthlyAmount.toFixed(2));
+                } else {
+                    $('#emiMonthlyAmount').val('');
+                }
+            };
+
+            $('#emiDownPayment, #emiInterestRate, #emiCustomTenure').on('input', function() {
+                window.calculateEmi();
+            });
+
+            $('#emiTenure').on('change', function() {
+                window.calculateEmi();
+            });
+
         });
     </script>
 @endpush

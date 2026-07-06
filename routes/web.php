@@ -239,6 +239,7 @@ Route::middleware(['auth:web', 'auto.permission'])->group(function () {
     Route::get('/edit-sales/{num}', [SalesController::class, 'edit_sales'])->name('sales.edit');
     Route::get('/sales-report', [SalesController::class, 'sales_report'])->name('sales.report');
     Route::get('/sales-details/{num}', [SalesController::class, 'sales_details'])->name('sales.details');
+    Route::get('/sales/emi-details/{id}', [SalesController::class, 'emiDetails'])->name('sales.emi.details');
     Route::get('/sales-invoice/{num}', [SalesController::class, 'salse_invoice'])->name('sales.invoice');
     Route::get('/add-sales', [SalesController::class, 'pos'])->name('sales.add');
     Route::get('/sales/invoice/pdf/{id}', [SalesController::class, 'salse_invoice_pdf'])->name('sales.invoice.pdf');

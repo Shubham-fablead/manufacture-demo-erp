@@ -109,32 +109,6 @@
             /* white-space: nowrap; */
         }
 
-        .sales-pdf-btn {
-            width: 38px;
-            height: 38px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            border: 1px solid #ff5a1f;
-            border-radius: 4px;
-            background: #fff;
-            color: #ff9f43;
-            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
-            padding: 0;
-        }
-
-        .sales-pdf-btn:hover,
-        .sales-pdf-btn:focus {
-            background: #fff7f1;
-            color: #ff5a1f;
-            border-color: #ff5a1f;
-        }
-
-        .sales-pdf-btn i {
-            font-size: 14px;
-            line-height: 1;
-        }
-
         .total_expense {
             font-weight: 600;
             color: #1b2850;
@@ -246,13 +220,9 @@
             .datanew thead th:nth-child(4),
             .datanew thead th:nth-child(5),
             .datanew thead th:nth-child(6),
-            .datanew thead th:nth-child(7),
-            .datanew thead th:nth-child(8),
             .datanew tbody td:nth-child(4),
             .datanew tbody td:nth-child(5),
-            .datanew tbody td:nth-child(6),
-            .datanew tbody td:nth-child(7),
-            .datanew tbody td:nth-child(8) {
+            .datanew tbody td:nth-child(6) {
                 display: none;
             }
 
@@ -271,11 +241,7 @@
 
             /* Small devices - show checkbox, product name, sold amount, sold qty, and details */
             .datanew thead th:nth-child(4),
-            .datanew thead th:nth-child(5),
-            .datanew thead th:nth-child(6),
-            .datanew tbody td:nth-child(4),
-            .datanew tbody td:nth-child(5),
-            .datanew tbody td:nth-child(6) {
+            .datanew tbody td:nth-child(4) {
                 display: none;
             }
 
@@ -543,11 +509,12 @@
                     <div class="wordset">
                         <ul>
                             <li>
-                                <button id="generate-pdf" type="button" class="sales-pdf-btn"
-                                    data-bs-toggle="tooltip" data-bs-placement="top" title="Download PDF"
-                                    aria-label="Download PDF">
-                                    <i class="fa-solid fa-file-pdf"></i>
-                                </button>
+                                <a id="generate-pdf" href="javascript:void(0);" data-bs-toggle="tooltip"
+                                    data-bs-placement="top" title="Download PDF">
+
+                                    <button class="btn btn-primary btn-sm"><i class="fa-solid fa-file-pdf"></i> View
+                                        PDF</button>
+                                </a>
                             </li>
                         </ul>
                     </div>
@@ -578,12 +545,8 @@
                                     </label>
                                 </th>
                                 <th>Product Name</th>
-                                <th>Order Number</th>
-                                <th>Customer Name</th>
-                                <th>GST NO</th>
-                                <th>Customer Address</th>
+                                <th class="text-center">Details</th>
                                 <th>Category</th>
-                                <th>Taxes</th>
                                 <th>Amount</th>
                                 <th>Qty</th>
                             </tr>
@@ -750,40 +713,16 @@
                 return `
                     <div class="order-details-content">
                         <div class="detail-item">
-                            <span class="detail-label">Product Name:</span>
-                            <span class="detail-value">${item.name || 'N/A'}</span>
-                        </div>
-                        <div class="detail-item">
-                            <span class="detail-label">Order Number:</span>
-                            <span class="detail-value">${item.order_number || 'N/A'}</span>
-                        </div>
-                        <div class="detail-item">
-                            <span class="detail-label">Customer Name:</span>
-                            <span class="detail-value">${item.customer_name || 'N/A'}</span>
-                        </div>
-                        <div class="detail-item">
-                            <span class="detail-label">GST No:</span>
-                            <span class="detail-value">${item.gst_no || 'N/A'}</span>
-                        </div>
-                        <div class="detail-item">
-                            <span class="detail-label">Customer Address:</span>
-                            <span class="detail-value">${item.customer_address || 'N/A'}</span>
-                        </div>
-                        <div class="detail-item">
                             <span class="detail-label">Category:</span>
                             <span class="detail-value">${item.category || 'N/A'}</span>
                         </div>
                         <div class="detail-item">
-                            <span class="detail-label">Taxes:</span>
-                            <span class="detail-value">${item.taxes || 'N/A'}</span>
-                        </div>
-                        <div class="detail-item">
                             <span class="detail-label">Amount:</span>
-                            <span class="detail-value" style="color: #28a745; font-weight: 600;">${item.amount || item.sold_amount || '₹0.00'}</span>
+                            <span class="detail-value" style="color: #28a745; font-weight: 600;">${item.sold_amount || '₹0.00'}</span>
                         </div>
                         <div class="detail-item">
-                            <span class="detail-label">Qty:</span>
-                            <span class="detail-value" style="color: #ff9f43; font-weight: 600;">${item.qty || item.sold_qty || '0'}</span>
+                            <span class="detail-label">Quantity:</span>
+                            <span class="detail-value" style="color: #ff9f43; font-weight: 600;">${item.sold_qty || '0'}</span>
                         </div>
                     </div>
                 `;
@@ -809,7 +748,7 @@
                     const expandableContent = buildSalesReportExpandableRowContent(item);
                     const newRow = $(`
                         <tr class="order-details-row show" data-product-details-id="${productId}">
-                            <td colspan="10">${expandableContent}</td>
+                            <td colspan="6">${expandableContent}</td>
                         </tr>
                     `);
                     row.after(newRow);
@@ -840,7 +779,7 @@
                             const expandableContent = buildSalesReportExpandableRowContent(item);
                             const expandableRow = $(`
                                 <tr class="order-details-row" data-product-details-id="${productId}">
-                                    <td colspan="10">${expandableContent}</td>
+                                    <td colspan="6">${expandableContent}</td>
                                 </tr>
                             `);
                             row.after(expandableRow);
@@ -999,7 +938,7 @@
     //             });
     //         }
 
-            function fetchOrderReport(page = 1) {
+    function fetchOrderReport(page = 1) {
 
     const filters = getSalesReportFilters({
         page: page,
@@ -1095,16 +1034,6 @@
             let tbody = "";
             $.each(response.data, function(index, item) {
                 const itemId = String(item.id);
-                const srNo = ((currentPage - 1) * perPage) + index + 1;
-                const orderNumber = item.order_number || 'N/A';
-                const productName = item.name || 'N/A';
-                const customerName = item.customer_name || 'N/A';
-                const gstNo = item.gst_no || 'N/A';
-                const customerAddress = item.customer_address || 'N/A';
-                const category = item.category || 'N/A';
-                const taxes = item.taxes || 'N/A';
-                const amount = item.amount || item.sold_amount || '₹0.00';
-                const qty = item.qty || item.sold_qty || '0';
 
                 window.salesReportDataMap[itemId] = item;
 
@@ -1116,20 +1045,20 @@
                             <span class="checkmarks"></span>
                         </label>
                     </td>
-                    <td class="productimgname">
-                        <div style="display:flex;align-items:flex-start;gap:8px;white-space:normal;">
-                            <span style="min-width:18px;flex:0 0 auto;">${srNo}</span>
-                            <span style="flex:1 1 auto;word-break:break-word;">${productName}</span>
+                    <td class="productimgname" >
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <a href="/product-view/${item.product_id}" style="display: flex; align-items: center; text-decoration: none; color: inherit;">
+
+                                <span style="margin-left: 10px;">${item.name}</span>
+                            </a>
                         </div>
                     </td>
-                    <td>${orderNumber}</td>
-                    <td>${customerName}</td>
-                    <td>${gstNo}</td>
-                    <td>${customerAddress}</td>
-                    <td>${category}</td>
-                    <td>${taxes}</td>
-                    <td>${amount}</td>
-                    <td>${qty}</td>
+                    <td class="text-center">
+                        <button class="mobile-toggle-btn-table" onclick="window.toggleSalesReportRowDetails('${itemId}')">+</button>
+                    </td>
+                    <td>${item.category}</td>
+                    <td>${item.sold_amount}</td>
+                    <td>${item.sold_qty}</td>
                 </tr>`;
             });
 
