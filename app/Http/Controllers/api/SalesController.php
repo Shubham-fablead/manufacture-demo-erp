@@ -71,6 +71,10 @@ class SalesController extends Controller
 
     private function resolveSalesSettingsBranchId($user, $selectedSubAdminID): int
     {
+        if ($selectedSubAdminID === 'null' || $selectedSubAdminID === 'undefined' || empty($selectedSubAdminID)) {
+            $selectedSubAdminID = null;
+        }
+
         if ($user->role === 'staff' && !empty($user->branch_id)) {
             return (int) $user->branch_id;
         }
@@ -147,31 +151,6 @@ class SalesController extends Controller
 
         $order = Order::findOrFail($order_id);
 
-        $history = $history->map(function ($payment) use ($order) {
-            $method = strtolower((string) ($payment->payment_method ?? $payment->payment_type ?? ''));
-            $amount = (float) ($payment->payment_amount ?? 0);
-
-            if ($method === 'emi') {
-                $monthlyAmount = (float) (
-                    $payment->emi_monthly_amount
-                    ?? $order->emi_monthly_amount
-                    ?? $order->remaining_amount
-                    ?? 0
-                );
-
-                if ($amount <= 0) {
-                    $amount = $monthlyAmount;
-                }
-
-                $payment->payment_method = 'emi';
-                $payment->payment_type = 'emi';
-                $payment->emi_monthly_amount = round(max(0, $monthlyAmount), 2);
-            }
-
-            $payment->payment_amount = round(max(0, $amount), 2);
-            return $payment;
-        });
-
         $totalPaid = $history->sum('payment_amount');
 
         // Calculate Return Amount
@@ -184,7 +163,6 @@ class SalesController extends Controller
         return response()->json([
             'status' => 'success',
             'data' => $history,
-            'sales' => $order->toArray(),
             'summary' => [
                 'order_total' => $order->total_amount,
                 'total_paid' => $totalPaid,
@@ -194,6 +172,153 @@ class SalesController extends Controller
             ],
         ]);
     }
+
+    public function getPayment($id)
+    {
+        $payment = PaymentStore::where('id', $id)
+            ->where('isDeleted', 0)
+            ->firstOrFail();
+
+        return response()->json([
+            'status' => true,
+            'data' => $payment,
+        ]);
+    }
+
+    public function updatePayment(Request $request, $id)
+    {
+        $validated = $request->validate([
+            'payment_amount' => 'required|numeric|min:0',
+            'payment_date' => 'required',
+            'payment_method' => 'required|string|max:50',
+            'payment_type' => 'nullable|string|max:50',
+            'bank_id' => 'nullable|integer',
+            'remarks' => 'nullable|string|max:500',
+        ]);
+
+        return DB::transaction(function () use ($validated, $request, $id) {
+            $payment = PaymentStore::where('id', $id)
+                ->where('isDeleted', 0)
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            $order = Order::where('id', $payment->order_id)
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            $paymentDate = $this->normalizePaymentDate($validated['payment_date']);
+            $paymentMethod = strtolower(trim($validated['payment_method']));
+            $paymentType = strtolower(trim($validated['payment_type'] ?? $payment->payment_type ?? 'fully'));
+            $paymentAmount = round((float) $validated['payment_amount'], 2);
+
+            $payment->payment_amount = $paymentAmount;
+            $payment->payment_date = $paymentDate->toDateString();
+            $payment->payment_method = $paymentMethod;
+            $payment->payment_type = $paymentType;
+            $payment->bank_id = $validated['bank_id'] ?? null;
+            $payment->remarks = $validated['remarks'] ?? null;
+            if ($paymentMethod === 'cash') {
+                $payment->cash_amount = $paymentAmount;
+                $payment->upi_amount = 0;
+            } elseif ($paymentMethod === 'online') {
+                $payment->cash_amount = 0;
+                $payment->upi_amount = $paymentAmount;
+            } else {
+                $payment->cash_amount = 0;
+                $payment->upi_amount = 0;
+            }
+            $payment->emi_month = $paymentType === 'emi' ? ($request->emi_month ?? $payment->emi_month ?? 1) : $payment->emi_month;
+            $payment->save();
+
+            $summary = $this->recalculateSalesOrderPaymentSummary($order);
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Payment updated successfully.',
+                'summary' => $summary,
+                'data' => $payment->fresh(),
+            ]);
+        });
+    }
+
+    public function deletePayment(Request $request, $id)
+    {
+        return DB::transaction(function () use ($id) {
+            $payment = PaymentStore::where('id', $id)
+                ->where('isDeleted', 0)
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            $order = Order::where('id', $payment->order_id)
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            $payment->isDeleted = 1;
+            $payment->save();
+
+            $summary = $this->recalculateSalesOrderPaymentSummary($order);
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Payment deleted successfully.',
+                'summary' => $summary,
+            ]);
+        });
+    }
+
+    private function normalizePaymentDate(string $value): Carbon
+    {
+        $value = trim($value);
+
+        foreach (['Y-m-d', 'd-m-Y', 'Y-m-d H:i:s', Carbon::ATOM] as $format) {
+            try {
+                return Carbon::createFromFormat($format, $value, 'Asia/Kolkata');
+            } catch (\Throwable $e) {
+                // Try next format.
+            }
+        }
+
+        return Carbon::parse($value, 'Asia/Kolkata');
+    }
+
+    private function recalculateSalesOrderPaymentSummary(Order $order): array
+    {
+        $returnAmount = (float) SalesReturn::where('order_id', $order->id)->sum('total_amount');
+        $totalPaid = (float) PaymentStore::where('order_id', $order->id)
+            ->where('isDeleted', 0)
+            ->sum('payment_amount');
+
+        $netTotal = max(0, (float) $order->total_amount - $returnAmount);
+        $remaining = max(0, $netTotal - $totalPaid);
+
+        if ($remaining <= 0) {
+            $paymentStatus = 'completed';
+        } elseif ($totalPaid > 0) {
+            $paymentStatus = 'partially';
+        } else {
+            $paymentStatus = 'pending';
+        }
+
+        $latestPaymentMethod = PaymentStore::where('order_id', $order->id)
+            ->where('isDeleted', 0)
+            ->orderByDesc('created_at')
+            ->value('payment_method');
+
+        $order->update([
+            'remaining_amount' => $remaining,
+            'payment_status' => $paymentStatus,
+            'payment_method' => $latestPaymentMethod ? ucfirst(strtolower($latestPaymentMethod)) : $order->payment_method,
+        ]);
+
+        return [
+            'order_total' => (float) $order->total_amount,
+            'total_paid' => $totalPaid,
+            'return_amount' => $returnAmount,
+            'remaining' => $remaining,
+            'extra_paid' => max(0, $totalPaid - $netTotal),
+        ];
+    }
+
     public function makePaymentSubmit(Request $request)
     {
         // dd($request->all());
@@ -215,36 +340,28 @@ class SalesController extends Controller
         ]);
 
         if ($request->filled('order_id')) {
-            $paymentMethod = strtolower((string) ($request->payment_method ?? $request->payment_type ?? ''));
+            // Resolve payment date: use submitted date or fall back to now (IST)
+            $paymentDate = $request->filled('payment_date')
+                ? \Carbon\Carbon::createFromFormat('d-m-Y', $request->payment_date, 'Asia/Kolkata')->startOfDay()
+                : \Carbon\Carbon::now('Asia/Kolkata');
 
-            // Determine payment amount. EMI must always use the EMI installment amount.
-            $paymentAmount = (float) ($request->payment_amount ?? $request->amount ?? 0);
-            if ($paymentMethod === 'emi' || $request->filled('emi_paid_value') || $request->filled('monthly_emi') || $request->filled('emi_monthly_amount')) {
-                $paymentAmount = (float) (
-                    $request->emi_paid_value
-                    ?? $request->monthly_emi
-                    ?? $request->emi_monthly_amount
-                    ?? $request->emi_monthly
-                    ?? $request->amount
-                    ?? $paymentAmount
-                    ?? 0
-                );
-            } elseif ($request->filled('cash_amount') && $request->filled('online_amount')) {
+            // Determine payment amount
+            $paymentAmount = $request->emi_total_new ?? $request->emi_total ?? $request->amount ?? $request->upi_online_amount ?? 0;
+
+            if ($request->filled('cash_amount') && $request->filled('online_amount')) {
                 $paymentAmount = (float) $request->cash_amount + (float) $request->online_amount;
             } elseif ($request->filled('fully_cash_amount') && $request->filled('full_online_amount')) {
                 $paymentAmount = (float) $request->fully_cash_amount + (float) $request->full_online_amount;
-            } elseif ($request->filled('cashAmount')) {
-                $paymentAmount = (float) $request->cashAmount;
-            } elseif ($request->filled('upi_online_amount')) {
-                $paymentAmount = (float) $request->upi_online_amount;
-            } elseif ($request->filled('emi_monthly')) {
-                $paymentAmount = (float) $request->emi_monthly;
+            } elseif ($request->cashAmount) {
+                $paymentAmount = $request->cashAmount;
+            } elseif ($request->upi_online_amount) {
+                $paymentAmount = $request->upi_online_amount;
+            } elseif ($request->emi_monthly) {
+                $paymentAmount = $request->emi_monthly;
             }
 
             // Determine payment type
-            if ($paymentMethod === 'emi' || in_array($request->emi_type, ['emi'])) {
-                $type = 'emi';
-            } elseif (
+            if (
                 in_array($request->paid_type, ['cash_partially']) ||
                 in_array($request->online_type, ['online_partially']) ||
                 in_array($request->cash_online_type, ['cash_online_partially'])
@@ -255,8 +372,13 @@ class SalesController extends Controller
                 in_array($request->online_type, ['online_fully']) ||
                 in_array($request->cash_online_type, ['cash_online_fully']) ||
                 $request->payment_type === 'fully'
+
             ) {
                 $type = 'fully';
+            } elseif (
+                in_array($request->emi_type, ['emi'])
+            ) {
+                $type = 'emi';
             } else {
                 $type = 'fully';
             }
@@ -301,7 +423,7 @@ class SalesController extends Controller
                         'payment_amount' => $cashValue,
                         'remaining_amount' => $newRemaining,
                         'payment_method' => 'cash',
-                        'payment_date' => \Carbon\Carbon::now(),
+                        'payment_date' => $paymentDate,
                         'payment_type' => ($request->cash_online_type === 'cash_online_partially') ? 'partially' : 'fully',
                         'cash_amount' => $cashValue,
                         'upi_amount' => 0,
@@ -327,7 +449,7 @@ class SalesController extends Controller
                         'payment_amount' => $onlineValue,
                         'remaining_amount' => $newRemaining,
                         'payment_method' => 'online',
-                        'payment_date' => \Carbon\Carbon::now(),
+                        'payment_date' => $paymentDate,
                         'payment_type' => ($request->cash_online_type === 'cash_online_partially') ? 'partially' : 'fully',
                         'cash_amount' => 0,
                         'upi_amount' => $onlineValue,
@@ -350,21 +472,11 @@ class SalesController extends Controller
                     'payment_amount' => $paymentAmount,
                     'remaining_amount' => $newRemaining,
                     'payment_method' => $request->payment_method ?? $request->payment_type ?? '',
-                    'payment_date' => \Carbon\Carbon::now(),
+                    'payment_date' => $paymentDate,
                     'payment_type' => $type,
                     'cash_amount' => $request->cash_amount,
                     'upi_amount' => $request->online_amount,
                     'emi_month' => $request->emi_month ?? 1,
-                    'emi_down_payment' => $request->emi_down_payment ?? $request->down_payment ?? null,
-                    'emi_loan_amount' => $request->emi_loan_amount ?? $request->loan_amount ?? null,
-                    'emi_interest_rate' => $request->emi_interest_rate ?? $request->interest_rate ?? null,
-                    'emi_tenure' => $request->emi_tenure ?? $request->emi_month ?? null,
-                    'emi_monthly_amount' => $request->emi_monthly_amount ?? $request->monthly_emi ?? null,
-                    'emi_aadhar_number' => $request->emi_aadhar_number ?? $request->aadhar_number ?? null,
-                    'emi_pan_number' => $request->emi_pan_number ?? $request->pan_number ?? null,
-                    'emi_guarnator_name' => $request->emi_guarnator_name ?? $request->guarantor_name ?? null,
-                    'emi_do_id' => $request->emi_do_id ?? $request->do_id ?? null,
-                    'emi_bank_id' => $request->emi_bank_id ?? ($request->bank_id ?? null),
                     'bank_id' => $request->bank_id,
                     'remarks' => $request->remarks,
                     'status' => 'credit',
@@ -396,7 +508,7 @@ class SalesController extends Controller
                     $updateData['payment_status'] = 'pending';
                 }
                 // If new EMI is being set
-                if (($request->filled('new_emi_value') && $paymentMethod === 'emi') || $request->filled('emi_paid_value')) {
+                if ($request->filled('new_emi_value') && $request->payment_method == 'emi' || $request->filled('emi_paid_value')) {
                     //  dd($request->all());
                     $updateData['payment_method'] = 'EMI';
                     $updateData['emi_duration'] = $request->emi_month_new ?? $request->emi_month;
@@ -606,10 +718,12 @@ class SalesController extends Controller
 
     private function fetchExternalBarcodeProduct(string $barcode): ?array
     {
-        foreach ([
-            fn () => $this->fetchOpenFoodFactsProduct($barcode),
-            fn () => $this->fetchUpcItemDbProduct($barcode),
-        ] as $resolver) {
+        foreach (
+            [
+                fn() => $this->fetchOpenFoodFactsProduct($barcode),
+                fn() => $this->fetchUpcItemDbProduct($barcode),
+            ] as $resolver
+        ) {
             try {
                 $product = $resolver();
                 if (! empty($product)) {
@@ -958,8 +1072,9 @@ class SalesController extends Controller
             'customer_email' => 'nullable|email|max:255',
             'payment_method' => $isQuotation ? 'nullable|string' : 'required|string',
             'bank_id'        => 'nullable|integer',
+            'assign_staff'   => 'nullable|integer|exists:users,id',
             'paid_type' => 'nullable|in:cash_partially,cash_fully',
-            'online_type' => 'nullable|in:online_partially,online_fully,emi_partially,emi_fully',
+            'online_type' => 'nullable|in:online_partially,online_fully',
             'cash_online_type' => 'nullable|in:cash_online_partially,cash_online_fully',
             'amount' => 'nullable|numeric|min:0',
             'payment_amount' => 'nullable|numeric|min:0',
@@ -970,7 +1085,6 @@ class SalesController extends Controller
             'discount'       => 'nullable|numeric|min:0|max:100',
             'remarks'        => 'nullable|string|max:500',
             'payment_remarks' => 'nullable|string|max:500',
-            'assigned_staff' => 'nullable|integer|exists:users,id',
             'tax'            => 'nullable|array',
             'items'          => 'required|array|min:1',
             'labour_items'   => 'nullable|array',
@@ -1015,34 +1129,20 @@ class SalesController extends Controller
                 }
             }
 
-           $productOriginalTotal = 0;
-$productAfterDiscountTotal = 0;
+            $productBaseTotal = 0;
+            $productTotalBeforeTds = 0;
+            foreach ($request->items as $item) {
+                $baseAmount = ((float) ($item['price'] ?? 0)) * ((float) ($item['quantity'] ?? 0));
+                $itemGstAmount = (float) ($item['product_gst_total'] ?? 0);
+                $itemDiscountAmount = (float) ($item['discount_amount'] ?? 0);
+                $productBaseTotal += $baseAmount;
+                $productTotalBeforeTds += ($baseAmount + $itemGstAmount - $itemDiscountAmount);
+            }
 
-foreach ($request->items as $item) {
-
-    $baseAmount = ((float) ($item['price'] ?? 0)) * ((float) ($item['quantity'] ?? 0));
-
-    $itemGstAmount = (float) ($item['product_gst_total'] ?? 0);
-
-    $itemDiscountAmount = (float) ($item['discount_amount'] ?? 0);
-
-    // Original Amount (Before Discount)
-  $productOriginalTotal += $baseAmount;
-    
-
-    // Amount After Discount
-    $productAfterDiscountTotal += ($baseAmount + $itemGstAmount - $itemDiscountAmount);
-}
-
-$preTdsTotal = $productAfterDiscountTotal + $shippingAmount + $labourSubtotal;
-
-$tdsPercentage = max(0, min(100, (float) ($request->tds_percentage ?? 0)));
-
-// TDS ON ORIGINAL PRODUCT VALUE
-$tdsAmount = round(($productOriginalTotal * $tdsPercentage) / 100, 2);
-
-// Final Total
-$roundedTotal = max(0, round($preTdsTotal - $tdsAmount, 2));
+            $preTdsTotal = $productTotalBeforeTds + $shippingAmount + $labourSubtotal;
+            $tdsPercentage = $isTdsEnabled ? max(0, min(100, (float) ($request->tds_percentage ?? 0))) : 0;
+            $tdsAmount = $isTdsEnabled ? round(($productBaseTotal * $tdsPercentage) / 100, 2) : 0;
+            $roundedTotal = max(0, round($preTdsTotal - $tdsAmount));
 
             /*
         |--------------------------------------------------------------------------
@@ -1143,43 +1243,42 @@ $roundedTotal = max(0, round($preTdsTotal - $tdsAmount, 2));
                 $requestedPaidAmount = $roundedTotal;
             }
 
-            $paidAmount = $isQuotation || $paymentMethod === 'pending'
-                ? 0
-                : min($roundedTotal, $requestedPaidAmount);
-
-            if ($paymentMethod === 'emi') {
-                $emiDownPayment = max(0, (float) ($request->down_payment ?? $request->emi_down_payment ?? 0));
-                $emiLoanAmount = max(0, (float) ($request->loan_amount ?? $request->emi_loan_amount ?? 0));
-
-                if ($emiLoanAmount > 0) {
-                    $paidAmount = max(0, $roundedTotal - $emiLoanAmount);
-                    $requestedPaidAmount = $paidAmount;
-                } elseif ($emiDownPayment > 0) {
-                    $paidAmount = min($roundedTotal, $emiDownPayment);
-                    $requestedPaidAmount = $paidAmount;
+            // For EMI: paid amount = down payment, remaining = loan amount
+            if (!$isQuotation && $normalizedPaymentMethod === 'emi') {
+                $emiDownPayment = max(0, (float) ($request->emi_down_payment ?? 0));
+                $emiLoanAmount  = max(0, (float) ($request->emi_loan_amount ?? $roundedTotal));
+                $paidAmount     = $emiDownPayment;
+                $remain         = $emiLoanAmount;
+                if ($paidAmount <= 0) {
+                    $payment_status = 'pending';
+                } elseif ($paidAmount < $roundedTotal) {
+                    $payment_status = 'partially';
                 } else {
-                    $paidAmount = 0;
-                    $requestedPaidAmount = 0;
+                    $payment_status = 'completed';
                 }
-            }
-
-            if ($paidAmount <= 0) {
-                $payment_status = 'pending';
-            } elseif ($paidAmount < $roundedTotal) {
-                $payment_status = 'partially';
             } else {
-                $payment_status = 'completed';
-            }
+                $paidAmount = $isQuotation || $paymentMethod === 'pending'
+                    ? 0
+                    : min($roundedTotal, $requestedPaidAmount);
 
-            $remain = max($roundedTotal - $paidAmount, 0);
+                if ($paidAmount <= 0) {
+                    $payment_status = 'pending';
+                } elseif ($paidAmount < $roundedTotal) {
+                    $payment_status = 'partially';
+                } else {
+                    $payment_status = 'completed';
+                }
+
+                $remain = max($roundedTotal - $paidAmount, 0);
+            }
 
             $orderCreatedAt = $request->filled('order_date')
                 ? Carbon::createFromFormat('Y-m-d', $request->order_date, 'Asia/Kolkata')
-                    ->setTime(
-                        $indiaNow->hour,
-                        $indiaNow->minute,
-                        $indiaNow->second
-                    )
+                ->setTime(
+                    $indiaNow->hour,
+                    $indiaNow->minute,
+                    $indiaNow->second
+                )
                 : $indiaNow->copy();
 
             $financialYearNumberingEnabled = $this->isFinancialYearOrderNumberingEnabled((int) $branchIdToUse);
@@ -1206,9 +1305,8 @@ $roundedTotal = max(0, round($preTdsTotal - $tdsAmount, 2));
             $order = Order::create([
                 'order_number' => $orderNumber,
                 'user_id' => $customer_id,
+                'staff_id' => $request->filled('assign_staff') ? (int) $request->assign_staff : null,
                 'payment_method' => $paymentMethod,
-                'assigned_staff' => $request->assigned_staff ?: null,
-                'order_type' => $request->order_type ?: 'Self Pickup',
                 'discount' => $request->discount ?? 0,
                 'tax_id' => !empty($request->tax) ? json_encode($request->tax) : null,
                 'gst_option' => $request->gst_option === 'with'
@@ -1222,20 +1320,22 @@ $roundedTotal = max(0, round($preTdsTotal - $tdsAmount, 2));
                 'tds_percentage'   => $tdsPercentage,
                 'tds_amount'       => $tdsAmount,
                 'remarks'          => $request->remarks,
-                'emi_down_payment' => $request->emi_down_payment ?? $request->down_payment ?? null,
-                'emi_loan_amount'  => $request->emi_loan_amount ?? $request->loan_amount ?? null,
-                'emi_interest_rate'=> $request->emi_interest_rate ?? $request->interest_rate ?? null,
-                'emi_tenure'       => $request->emi_tenure ?? $request->emi_month ?? null,
-                'emi_monthly_amount' => $request->emi_monthly_amount ?? $request->monthly_emi ?? null,
-                'emi_aadhar_number' => $request->emi_aadhar_number ?? $request->aadhar_number ?? null,
-                'emi_pan_number'   => $request->emi_pan_number ?? $request->pan_number ?? null,
-                'emi_guarnator_name' => $request->emi_guarnator_name ?? $request->guarantor_name ?? null,
-                'emi_do_id'        => $request->emi_do_id ?? $request->do_id ?? null,
-                'emi_bank_id'      => $request->emi_bank_id ?? ($request->bank_id ?? null),
+                'order_type'       => $request->order_type,
                 'branch_id'        => $branchIdToUse,
                 'created_by'       => $userData->id,
                 'created_at'       => $orderCreatedAt,
                 'updated_at'       => $orderCreatedAt,
+                // EMI fields
+                'emi_down_payment'  => $normalizedPaymentMethod === 'emi' ? (float) ($request->emi_down_payment ?? 0) : null,
+                'emi_loan_amount'   => $normalizedPaymentMethod === 'emi' ? (float) ($request->emi_loan_amount ?? 0) : null,
+                'emi_interest_rate' => $normalizedPaymentMethod === 'emi' ? (float) ($request->emi_interest_rate ?? 0) : null,
+                'emi_tenure'        => $normalizedPaymentMethod === 'emi' ? ($request->emi_tenure === 'custom' ? $request->emi_custom_tenure : $request->emi_tenure) : null,
+                'emi_monthly_amount'=> $normalizedPaymentMethod === 'emi' ? (float) ($request->emi_monthly_amount ?? 0) : null,
+                'emi_aadhar_number' => $normalizedPaymentMethod === 'emi' ? ($request->emi_aadhar_number ?? null) : null,
+                'emi_do_id'         => $normalizedPaymentMethod === 'emi' ? ($request->emi_do_id ?? null) : null,
+                'emi_pan_number'    => $normalizedPaymentMethod === 'emi' ? ($request->emi_pan_number ?? null) : null,
+                'emi_guarantor_name'=> $normalizedPaymentMethod === 'emi' ? ($request->emi_guarantor_name ?? null) : null,
+                'emi_bank_id'       => $normalizedPaymentMethod === 'emi' ? ($request->bank_id ?? null) : null,
             ]);
 
             /*
@@ -1394,6 +1494,22 @@ $roundedTotal = max(0, round($preTdsTotal - $tdsAmount, 2));
                             'created_at' => now(),
                         ]);
                     }
+                } elseif ($paymentMethod === 'emi') {
+                    // For EMI, store the down payment as the initial payment
+                    PaymentStore::create([
+                        'user_id' => $customer_id,
+                        'order_id' => $order->id,
+                        'payment_amount' => $paidAmount, // down payment
+                        'payment_date' => now(),
+                        'payment_method' => 'emi',
+                        'payment_type' => 'partially',
+                        'cash_amount' => $paidAmount,
+                        'upi_amount' => 0,
+                        'remaining_amount' => $remain,
+                        'bank_id' => $bankId,
+                        'remarks' => $request->payment_remarks ?? $request->remarks,
+                        'created_at' => now(),
+                    ]);
                 } else {
                     PaymentStore::create([
                         'user_id' => $customer_id,
@@ -1413,33 +1529,419 @@ $roundedTotal = max(0, round($preTdsTotal - $tdsAmount, 2));
             }
 
 
-        // ==============================================
-        // 🔔 CREATE NOTIFICATIONS
-        // ==============================================
+            // ==============================================
+            // 🔔 CREATE NOTIFICATIONS
+            // ==============================================
 
-        // Get customer details
-        $customer = User::find($customer_id);
+            // Get customer details
+            $customer = User::find($customer_id);
 
-        // 1. Notification for the admin/staff who created the order
-        $creatorNotificationTitle = $isQuotation ? 'Quotation Created Successfully' : 'Order Placed Successfully';
-        $creatorNotificationMessage = $isQuotation
-            ? "Quotation #{$order->order_number} has been created successfully for customer: " . ($customer->name ?? 'N/A')
-            : "Order #{$order->order_number} has been placed successfully for customer: " . ($customer->name ?? 'N/A') . ". Total: {$roundedTotal}";
+            // 1. Notification for the admin/staff who created the order
+            $creatorNotificationTitle = $isQuotation ? 'Quotation Created Successfully' : 'Order Placed Successfully';
+            $creatorNotificationMessage = $isQuotation
+                ? "Quotation #{$order->order_number} has been created successfully for customer: " . ($customer->name ?? 'N/A')
+                : "Order #{$order->order_number} has been placed successfully for customer: " . ($customer->name ?? 'N/A') . ". Total: {$roundedTotal}";
 
-        Notification::create([
-            'user_id'   => $userData->id,
-            'type'      => $isQuotation ? 'quotation_created' : 'order_created',
-            'title'     => $creatorNotificationTitle,
-            'message'   => $creatorNotificationMessage,
-            'link'      => $isQuotation ? '/sales-invoice/' . $order->id : '/sales-invoice/' . $order->id,
-            'is_read'   => 0,
-            'is_sound'  => 0,
-            'branch_id' => $branchIdToUse,
-        ]);
+            Notification::create([
+                'user_id'   => $userData->id,
+                'type'      => $isQuotation ? 'quotation_created' : 'order_created',
+                'title'     => $creatorNotificationTitle,
+                'message'   => $creatorNotificationMessage,
+                'link'      => $isQuotation ? '/sales-invoice/' . $order->id : '/sales-invoice/' . $order->id,
+                'is_read'   => 0,
+                'is_sound'  => 0,
+                'branch_id' => $branchIdToUse,
+            ]);
 
 
 
             DB::commit();
+
+            $subscriptionInvoiceMeta = null;
+            if (!$isQuotation) {
+                $subscriptionInvoiceMeta = $this->generateAndSendSubscriptionInvoice(
+                    (int) $order->id,
+                    (int) $customer_id,
+                    (int) $branchIdToUse
+                );
+            }
+            try {
+                $orderTemplateWhatsAppSent = false;
+                // ✅ OPTIMIZED: Only load customer if needed
+                $customer = User::select('id', 'name', 'phone', 'email')->find($customer_id);
+                if ($customer && !empty($customer->phone)) {
+                    $waSetting = Setting::select('customer_whatsapp_message')
+                        ->where('branch_id', $branchIdToUse)
+                        ->first();
+                    $isCustomerWhatsAppEnabled = (int) ($waSetting->customer_whatsapp_message ?? 0) === 1;
+
+                    if (! $isCustomerWhatsAppEnabled) {
+                        Log::info('Customer WhatsApp disabled in settings; skipping order WhatsApp send', [
+                            'order_id' => $order->id,
+                            'branch_id' => $branchIdToUse,
+                        ]);
+                    }
+
+                    $phoneNumber = preg_replace('/[^0-9]/', '', $customer->phone);
+
+                    if (!empty($phoneNumber) && $isCustomerWhatsAppEnabled) {
+                        $templateName = null;
+                        $templateParams = [];
+                        $templateLanguage = 'en'; // Default language code
+                        $templateExtraComponents = [];
+                        $invoiceFileUrl = (string) data_get($subscriptionInvoiceMeta, 'file_url', '');
+                        $invoiceFileName = (string) data_get($subscriptionInvoiceMeta, 'file_name', 'subscription_invoice.pdf');
+
+                        $hasSubscriptionInvoicePdf = is_array($subscriptionInvoiceMeta)
+                            && (($subscriptionInvoiceMeta['status'] ?? true) !== false)
+                            && $invoiceFileUrl !== '';
+
+                        $subscriptionUseFor = null;
+                        if ($hasSubscriptionInvoicePdf) {
+                            $subscriptionUseFor = match ($payment_status) {
+                                'completed' => 'Subscription complete',
+                                'pending', 'partially' => 'Subscription pending',
+                                default => null,
+                            };
+                        }
+
+                        $genericUseFor = $payment_status === 'completed'
+                            ? 'Complete order'
+                            : (($payment_status === 'pending' || $payment_status === 'partially') ? 'Pending order' : null);
+
+                        $template = null;
+                        $useForTemplate = null;
+
+                        if ($subscriptionUseFor) {
+                            $useForTemplate = $subscriptionUseFor;
+                            $template = $this->findWhatsAppOrderTemplate($branchIdToUse, [$useForTemplate]);
+                        }
+
+                        if (! $template && $genericUseFor) {
+                            $useForTemplate = $genericUseFor;
+                            $template = $this->findWhatsAppOrderTemplate($branchIdToUse, [$useForTemplate]);
+                            if ($template && $subscriptionUseFor) {
+                                Log::info('WhatsApp: subscription PDF present but no template for subscription use_for; using generic order template', [
+                                    'branch_id' => $branchIdToUse,
+                                    'order_id' => $order->id,
+                                    'subscription_use_for' => $subscriptionUseFor,
+                                    'fallback_use_for' => $genericUseFor,
+                                ]);
+                            }
+                        }
+
+                        // Pay later / partial: many sites only map the invoice PDF template to "Subscription complete".
+                        // If "Subscription pending" and "Pending order" are unset, reuse the complete-slot template and
+                        // fill {{4}} (status) from actual payment_status.
+                        if (! $template && $subscriptionUseFor === 'Subscription pending') {
+                            foreach (['Subscription complete', 'Complete order'] as $completeSlot) {
+                                $useForTemplate = $completeSlot;
+                                $template = $this->findWhatsAppOrderTemplate($branchIdToUse, [$completeSlot]);
+                                if ($template) {
+                                    Log::info('WhatsApp: pending payment + invoice PDF — no Subscription pending/Pending order template; using complete-slot template for WhatsApp.', [
+                                        'branch_id' => $branchIdToUse,
+                                        'order_id' => $order->id,
+                                        'fallback_use_for' => $completeSlot,
+                                        'payment_status' => $payment_status,
+                                    ]);
+                                    break;
+                                }
+                            }
+                        }
+
+                        if ($template) {
+                            // Check if template is APPROVED
+                            if ($template->status !== 'APPROVED') {
+                                Log::error("WhatsApp template not approved", [
+                                    'branch_id' => $branchIdToUse,
+                                    'use_for_template' => $useForTemplate,
+                                    'template_name' => $template->name ?? 'N/A',
+                                    'template_status' => $template->status ?? 'UNKNOWN',
+                                    'message' => 'Template must be APPROVED in Meta Business Manager to send messages. Current status: ' . ($template->status ?? 'UNKNOWN')
+                                ]);
+                                $templateName = null; // Don't send if not approved
+                            } elseif (empty($template->name)) {
+                                Log::warning("WhatsApp template found but name is empty", [
+                                    'branch_id' => $branchIdToUse,
+                                    'use_for_template' => $useForTemplate,
+                                    'template_id' => $template->id ?? null
+                                ]);
+                            } else {
+                                $templateName = trim($template->name);
+                                // Get language code from template, default to 'en' if not set
+                                $templateLanguage = !empty($template->language) ? $template->language : 'en';
+
+                                // Warn if MARKETING category (but still allow sending)
+                                if ($template->category === 'MARKETING') {
+                                    Log::warning("WhatsApp MARKETING template detected - may have delivery restrictions", [
+                                        'branch_id' => $branchIdToUse,
+                                        'use_for_template' => $useForTemplate,
+                                        'template_name' => $templateName,
+                                        'template_category' => $template->category,
+                                        'message' => 'MARKETING templates require user opt-in and have 24-hour messaging window restrictions. Consider changing template category to UTILITY for order notifications.'
+                                    ]);
+                                }
+
+                                // Validate template name matches use_for_template to prevent mismatches
+                                $templateNameLower = strtolower($templateName);
+                                $useForTemplateLower = strtolower($useForTemplate);
+
+                                // Check for obvious mismatches (e.g., "complete" template name used for "Pending order")
+                                if (($useForTemplate === 'Pending order' || $useForTemplate === 'Subscription pending')
+                                    && (strpos($templateNameLower, 'complete') !== false || strpos($templateNameLower, 'order_complete') !== false)
+                                ) {
+                                    Log::error("WhatsApp template name mismatch detected", [
+                                        'branch_id' => $branchIdToUse,
+                                        'use_for_template' => $useForTemplate,
+                                        'template_name' => $templateName,
+                                        'payment_status' => $payment_status,
+                                        'message' => 'Template name contains "complete" but use_for_template is a pending-type slot. Please check your template configuration.'
+                                    ]);
+                                    $templateName = null; // Prevent sending with wrong template
+                                } elseif (($useForTemplate === 'Complete order' || $useForTemplate === 'Subscription complete')
+                                    && (strpos($templateNameLower, 'pending') !== false && strpos($templateNameLower, 'complete') === false)
+                                ) {
+                                    Log::error("WhatsApp template name mismatch detected", [
+                                        'branch_id' => $branchIdToUse,
+                                        'use_for_template' => $useForTemplate,
+                                        'template_name' => $templateName,
+                                        'payment_status' => $payment_status,
+                                        'message' => 'Template name contains "pending" but use_for_template is a complete-type slot. Please check your template configuration.'
+                                    ]);
+                                    $templateName = null; // Prevent sending with wrong template
+                                } else {
+                                    // Log template details for debugging
+                                    Log::info("WhatsApp template found for order notification", [
+                                        'branch_id' => $branchIdToUse,
+                                        'use_for_template' => $useForTemplate,
+                                        'template_name' => $templateName,
+                                        'template_status' => $template->status ?? 'UNKNOWN',
+                                        'template_category' => $template->category ?? 'UNKNOWN',
+                                        'payment_status' => $payment_status,
+                                        'note' => $template->category === 'MARKETING'
+                                            ? 'MARKETING category - requires opt-in and has 24-hour window. Consider using UTILITY category for order notifications.'
+                                            : 'Template status must be APPROVED for messages to be delivered'
+                                    ]);
+                                }
+
+                                // Only process components if template name is valid
+                                if ($templateName) {
+                                    $components = is_string($template->components) ? json_decode($template->components, true) : $template->components;
+
+                                    if (is_array($components)) {
+                                        foreach ($components as $component) {
+                                            $componentType = strtoupper((string) ($component['type'] ?? ''));
+
+                                            if ($componentType === 'HEADER' && strtoupper((string) ($component['format'] ?? '')) === 'DOCUMENT') {
+                                                if (! empty($invoiceFileUrl)) {
+                                                    $templateExtraComponents[] = [
+                                                        'type' => 'header',
+                                                        'parameters' => [
+                                                            [
+                                                                'type' => 'document',
+                                                                'document' => [
+                                                                    'link' => $invoiceFileUrl,
+                                                                    'filename' => $invoiceFileName,
+                                                                ],
+                                                            ],
+                                                        ],
+                                                    ];
+                                                } else {
+                                                    Log::warning('WhatsApp template requires HEADER DOCUMENT but invoice file_url is empty', [
+                                                        'order_id' => $order->id,
+                                                        'branch_id' => $branchIdToUse,
+                                                        'template_name' => $templateName,
+                                                    ]);
+                                                }
+                                            }
+
+                                            if ($componentType === 'BODY' && isset($component['text'])) {
+                                                preg_match_all('/\{\{(\d+)\}\}/', $component['text'], $matches);
+
+                                                if (!empty($matches[1])) {
+                                                    // ✅ OPTIMIZED: Cache setting query
+                                                    $setting = cache()->remember("setting_branch_{$branchIdToUse}", 300, function () use ($branchIdToUse) {
+                                                        return Setting::select('name')->where('branch_id', $branchIdToUse)->first();
+                                                    });
+
+                                                    $customerName = $customer->name ?? 'Customer';
+                                                    $orderNumber = $order->order_number ?? '';
+                                                    $totalAmount = number_format($order->total_amount ?? 0, 2);
+                                                    $companyName = $setting->name ?? 'Company';
+
+                                                    $bodyVarNums = array_values(array_unique(array_map('intval', $matches[1])));
+                                                    sort($bodyVarNums, SORT_NUMERIC);
+
+                                                    // Different parameter mappings for Pending vs Complete order templates
+                                                    // {{7}} = public subscription invoice PDF URL (same as API response subscription_invoice.file_url)
+                                                    if ($useForTemplate === 'Complete order' || $useForTemplate === 'Subscription complete') {
+                                                        // Complete order template structure:
+                                                        // {{1}} Customer Name, {{2}} Order ID, {{3}} Company Name,
+                                                        // {{4}} Order Status, {{5}} Order ID, {{6}} Amount, {{7}} Invoice PDF URL
+                                                        $statusForTemplate = match ($payment_status) {
+                                                            'completed' => 'completed',
+                                                            'partially' => 'partially',
+                                                            default => 'pending',
+                                                        };
+                                                        foreach ($bodyVarNums as $varNum) {
+                                                            $templateParams[] = match ((int)$varNum) {
+                                                                1 => $customerName,           // {{1}}: Customer Name
+                                                                2 => $orderNumber,            // {{2}}: Order ID
+                                                                3 => $companyName,            // {{3}}: Company Name
+                                                                4 => $statusForTemplate,      // {{4}}: Order status (matches payment when using same Meta template for Pay later)
+                                                                5 => $orderNumber,            // {{5}}: Order ID
+                                                                6 => $totalAmount,            // {{6}}: Amount
+                                                                7 => $invoiceFileUrl,         // {{7}}: Subscription invoice PDF link
+                                                                default => ''
+                                                            };
+                                                        }
+
+                                                        Log::info("Complete order template parameters built", [
+                                                            'variables_found' => $bodyVarNums,
+                                                            'params_count' => count($templateParams),
+                                                            'params' => $templateParams
+                                                        ]);
+                                                    } elseif ($useForTemplate === 'Pending order' || $useForTemplate === 'Subscription pending') {
+                                                        // Pending order template structure:
+                                                        // {{1}} Customer Name, {{2}} Order ID, {{3}} Company Name,
+                                                        // {{4}} Order ID, {{5}} Amount, {{6}} Status, {{7}} Invoice PDF URL
+                                                        foreach ($bodyVarNums as $varNum) {
+                                                            $templateParams[] = match ((int)$varNum) {
+                                                                1 => $customerName,           // {{1}}: Customer Name
+                                                                2 => $orderNumber,            // {{2}}: Order ID
+                                                                3 => $companyName,            // {{3}}: Company Name
+                                                                4 => $orderNumber,            // {{4}}: Order ID
+                                                                5 => $totalAmount,            // {{5}}: Amount
+                                                                6 => 'pending',               // {{6}}: Order Status (pending)
+                                                                7 => $invoiceFileUrl,         // {{7}}: Subscription invoice PDF link
+                                                                default => ''
+                                                            };
+                                                        }
+
+                                                        Log::info("Pending order template parameters built", [
+                                                            'variables_found' => $bodyVarNums,
+                                                            'params_count' => count($templateParams),
+                                                            'params' => $templateParams
+                                                        ]);
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        } else {
+                            Log::warning("WhatsApp template not found", [
+                                'branch_id' => $branchIdToUse,
+                                'tried_subscription_use_for' => $subscriptionUseFor,
+                                'tried_generic_use_for' => $genericUseFor,
+                                'payment_status' => $payment_status,
+                            ]);
+                        }
+
+                        if ($templateName) {
+                            // Log before sending
+                            Log::info("Sending WhatsApp message", [
+                                'branch_id' => $branchIdToUse,
+                                'phone' => $phoneNumber,
+                                'template_name' => $templateName,
+                                'template_params_count' => count($templateParams),
+                                'template_extra_components_count' => count($templateExtraComponents),
+                                'template_params' => $templateParams,
+                                'language' => $templateLanguage,
+                                'use_for_template' => $useForTemplate
+                            ]);
+
+                            // Send WhatsApp message asynchronously (non-blocking)
+                            // Use try-catch to prevent blocking order creation
+                            try {
+                                $result = WhatsAppService::sendTemplateMessage(
+                                    $branchIdToUse,
+                                    $phoneNumber,
+                                    $templateName,
+                                    $templateParams,
+                                    $templateLanguage,
+                                    $templateExtraComponents
+                                );
+
+                                if ($result['success']) {
+                                    $orderTemplateWhatsAppSent = true;
+                                    // Check if template is MARKETING and warn about delivery restrictions
+                                    $deliveryWarning = '';
+                                    if ($template->category === 'MARKETING') {
+                                        $deliveryWarning = ' ⚠️ MARKETING template - Message may not be delivered due to WhatsApp restrictions (requires opt-in and 24-hour window). Change template category to UTILITY for reliable delivery.';
+                                        Log::warning("WhatsApp MARKETING template message sent but may not be delivered", [
+                                            'branch_id' => $branchIdToUse,
+                                            'phone' => $phoneNumber,
+                                            'template_name' => $templateName,
+                                            'template_category' => $template->category,
+                                            'message_id' => $result['message_id'] ?? null,
+                                            'warning' => 'MARKETING templates have delivery restrictions. Change to UTILITY category in Meta Business Manager for order notifications.'
+                                        ]);
+                                    }
+
+                                    Log::info("WhatsApp message sent successfully" . $deliveryWarning, [
+                                        'branch_id' => $branchIdToUse,
+                                        'phone' => $phoneNumber,
+                                        'template_name' => $templateName,
+                                        'template_category' => $template->category ?? 'UNKNOWN',
+                                        'message_id' => $result['message_id'] ?? null,
+                                        'message_status' => $result['message_status'] ?? 'unknown'
+                                    ]);
+                                } else {
+                                    Log::error("WhatsApp message failed to send", [
+                                        'branch_id' => $branchIdToUse,
+                                        'phone' => $phoneNumber,
+                                        'template_name' => $templateName,
+                                        'error' => $result['message'] ?? 'Unknown error',
+                                        'error_code' => $result['error_code'] ?? null
+                                    ]);
+                                }
+                            } catch (\Throwable $e) {
+                                // Log error but don't block order creation
+                                Log::error("WhatsApp sending exception (non-blocking)", [
+                                    'branch_id' => $branchIdToUse,
+                                    'phone' => $phoneNumber,
+                                    'template_name' => $templateName,
+                                    'error' => $e->getMessage()
+                                ]);
+                            }
+                        } else {
+                            Log::warning("WhatsApp message not sent - template name is null", [
+                                'branch_id' => $branchIdToUse,
+                                'phone' => $phoneNumber,
+                                'use_for_template' => $useForTemplate
+                            ]);
+                        }
+                    }
+
+                    // Do not send legacy text + separate PDF — that duplicated chats. Subscription WhatsApp must use the Meta template only.
+                    if (
+                        ! $isQuotation
+                        && $isCustomerWhatsAppEnabled
+                        && ! empty($phoneNumber)
+                        && ! $orderTemplateWhatsAppSent
+                        && is_array($subscriptionInvoiceMeta)
+                        && ! empty($subscriptionInvoiceMeta['file_url'] ?? null)
+                    ) {
+                        Log::warning('Subscription WhatsApp: no template message was delivered; legacy text+PDF is disabled.', [
+                            'order_id' => $order->id,
+                            'branch_id' => $branchIdToUse,
+                            'payment_status' => $payment_status,
+                            'hint' => 'Assign an APPROVED template to "Subscription pending" or "Pending order" for Pay later, or to "Subscription complete" for paid orders (HEADER document + body {{1}}-{{7}}). Re-sync from Meta after APPROVED.',
+                        ]);
+                        $subscriptionInvoiceMeta['whatsapp'] = [
+                            'success' => false,
+                            'message' => 'Template was not sent; configure Subscription complete/pending with APPROVED status. Separate text+PDF fallback removed.',
+                        ];
+                    }
+                }
+            } catch (\Exception $e) {
+                Log::error("WhatsApp message exception for order", [
+                    'order_id' => $order->id,
+                    'error' => $e->getMessage()
+                ]);
+            }
 
             $mailSent = $this->sendOrderOrQuotationMail(
                 $customer,
@@ -1466,6 +1968,274 @@ $roundedTotal = max(0, round($preTdsTotal - $tdsAmount, 2));
                 'message' => $e->getMessage(),
             ], 500);
         }
+    }
+
+
+    private function generateAndSendSubscriptionInvoice(int $orderId, int $customerId, int $branchId): ?array
+    {
+        try {
+            Log::info('Subscription invoice flow started', [
+                'order_id' => $orderId,
+                'customer_id' => $customerId,
+                'branch_id' => $branchId,
+            ]);
+
+            $order = Order::with(['orderItems.product'])->find($orderId);
+            if (! $order) {
+                return null;
+            }
+
+            $planOrderItem = $order->orderItems->first(function ($item) {
+                return (bool) optional($item->product)->is_plan;
+            });
+
+            if (! $planOrderItem || ! $planOrderItem->product) {
+                return null;
+            }
+
+            $user = User::select('id', 'name', 'phone', 'age', 'gender', 'distance_from_shop')
+                ->find($customerId);
+            if (! $user) {
+                return [
+                    'status' => false,
+                    'message' => 'Customer not found for subscription invoice generation.',
+                ];
+            }
+
+            $userDetails = UserDetail::where('user_id', $customerId)->first();
+            $product = $planOrderItem->product;
+
+            $normalizedPlanItems = collect($product->plan_items ?? [])
+                ->map(function ($item) {
+                    if (is_array($item)) {
+                        $itemId = (int) ($item['item_id'] ?? $item['product_id'] ?? $item['id'] ?? 0);
+                        $quantity = (int) ($item['quantity'] ?? 1);
+                    } elseif (is_numeric($item)) {
+                        $itemId = (int) $item;
+                        $quantity = 1;
+                    } else {
+                        $itemId = 0;
+                        $quantity = 0;
+                    }
+
+                    if ($itemId <= 0) {
+                        return null;
+                    }
+
+                    return [
+                        'item_id' => $itemId,
+                        'quantity' => max(1, $quantity),
+                    ];
+                })
+                ->filter()
+                ->values();
+
+            $planItemIds = $normalizedPlanItems
+                ->pluck('item_id')
+                ->unique()
+                ->values();
+
+            $planProducts = $planItemIds->isEmpty()
+                ? collect()
+                : Product::select('id', 'name', 'price')
+                ->whereIn('id', $planItemIds)
+                ->get()
+                ->keyBy('id');
+
+            $planItemsDetailed = $normalizedPlanItems
+                ->map(function ($item) use ($planProducts) {
+                    $meal = $planProducts->get((int) $item['item_id']);
+                    if (! $meal) {
+                        return null;
+                    }
+
+                    $quantity = (int) ($item['quantity'] ?? 1);
+                    $price = (float) ($meal->price ?? 0);
+
+                    return [
+                        'name' => (string) $meal->name,
+                        'price' => $price,
+                        'quantity' => max(1, $quantity),
+                        'line_total' => $price * max(1, $quantity),
+                    ];
+                })
+                ->filter()
+                ->values();
+
+            $planItems = $planItemsDetailed
+                ->map(fn($item) => $this->normalizePlanMealName((string) ($item['name'] ?? '')))
+                ->filter()
+                ->unique()
+                ->values()
+                ->all();
+
+            $totalSubscriptionAmount = (float) $planItemsDetailed->sum(function ($item) {
+                if (isset($item['line_total'])) {
+                    return (float) $item['line_total'];
+                }
+
+                return (float) ($item['price'] ?? 0);
+            });
+            if ($totalSubscriptionAmount <= 0) {
+                $totalSubscriptionAmount = (float) ($planOrderItem->total_amount ?? 0);
+            }
+
+            $distanceFromShop = (float) ($user->distance_from_shop ?? 0);
+            $deliveryCharge = (float) ($order->extra_charges ?? 0);
+
+            $setting = Setting::where('branch_id', $branchId)->first();
+
+            // Build base64 logo for PDF (external URLs don't load in PDF renderers)
+            $logoBase64 = null;
+            $logoMime   = 'image/png';
+            if ($setting && !empty($setting->logo)) {
+                $logoPath = storage_path('app/public/' . $setting->logo);
+                if (file_exists($logoPath)) {
+                    $logoBase64 = base64_encode(file_get_contents($logoPath));
+                    $logoMime   = mime_content_type($logoPath);
+                }
+            }
+
+            $pdf = Pdf::loadView('sales.subscription_invoice', [
+                'order' => $order,
+                'user' => $user,
+                'userDetails' => $userDetails,
+                'product' => $product,
+                'planItems' => $planItems,
+                'planItemsDetailed' => $planItemsDetailed,
+                'totalSubscriptionAmount' => $totalSubscriptionAmount,
+                'deliveryCharge' => $deliveryCharge,
+                'distanceFromShop' => $distanceFromShop,
+                'setting' => $setting,
+                'logoBase64' => $logoBase64,
+                'logoMime' => $logoMime,
+            ])->setPaper('A4', 'portrait')->setOptions([
+                'defaultFont' => 'DejaVu Sans',
+                'isHtml5ParserEnabled' => true,
+            ]);
+
+            Storage::disk('public')->makeDirectory('subscriptions');
+
+            $fileName = 'subscription_invoice_' . $order->id . '_' . now()->format('Ymd_His') . '.pdf';
+            $relativePath = 'subscriptions/' . $fileName;
+            Storage::disk('public')->put($relativePath, $pdf->output());
+            $absolutePath = Storage::disk('public')->path($relativePath);
+
+            $fileUrl = asset(env('ImagePath') . 'storage/' . $relativePath);
+
+            // WhatsApp is sent after order save: "Subscription complete" / "Subscription pending" when a subscription PDF exists,
+            // otherwise "Complete order" / "Pending order"; or plain text + document fallback if no template sends.
+
+            return [
+                'status' => true,
+                'file_url' => $fileUrl,
+                'file_name' => $fileName,
+                'relative_path' => $relativePath,
+                'local_path' => $absolutePath,
+                'whatsapp' => null,
+            ];
+        } catch (\Throwable $e) {
+            Log::error('Subscription invoice generation failed', [
+                'order_id' => $orderId,
+                'customer_id' => $customerId,
+                'branch_id' => $branchId,
+                'error' => $e->getMessage(),
+            ]);
+
+            return [
+                'status' => false,
+                'message' => 'Failed to generate/send subscription invoice: ' . $e->getMessage(),
+            ];
+        }
+    }
+
+    private function findWhatsAppOrderTemplate(int $branchId, array $useForCandidates): ?WhatsAppMessageTemplate
+    {
+        $templates = WhatsAppMessageTemplate::select(
+            'id',
+            'branch_id',
+            'name',
+            'components',
+            'language',
+            'status',
+            'category',
+            'use_for_template',
+            'on_off',
+            'isDeleted'
+        )
+            ->where('branch_id', $branchId)
+            ->where('on_off', 'active')
+            ->where('isDeleted', 0)
+            ->get();
+
+        if ($templates->isEmpty()) {
+            return null;
+        }
+
+        $normalize = static function ($value): string {
+            return trim(mb_strtolower((string) $value));
+        };
+
+        $candidates = collect($useForCandidates)
+            ->filter(fn($value) => trim((string) $value) !== '')
+            ->map(fn($value) => trim((string) $value))
+            ->unique()
+            ->values();
+
+        foreach ($candidates as $candidate) {
+            $normalizedCandidate = $normalize($candidate);
+
+            $template = $templates->first(function ($template) use ($normalize, $normalizedCandidate) {
+                return $normalize($template->use_for_template ?? '') === $normalizedCandidate;
+            });
+
+            if ($template) {
+                return $template;
+            }
+        }
+
+        $aliasMap = [
+            'pending order' => [
+                'pending order',
+                'subscription pending',
+                'order_pending_notification',
+                'order_panding_notification',
+                'order_pending',
+            ],
+            'subscription pending' => [
+                'subscription pending',
+                'pending order',
+                'order_pending_notification',
+                'order_panding_notification',
+                'order_pending',
+            ],
+            'complete order' => [
+                'complete order',
+                'subscription complete',
+                'order_complete_notification',
+                'order_confirmation',
+                'order_conform',
+            ],
+            'subscription complete' => [
+                'subscription complete',
+                'complete order',
+                'order_complete_notification',
+                'order_confirmation',
+                'order_conform',
+            ],
+        ];
+
+        $aliasCandidates = [];
+        foreach ($candidates as $candidate) {
+            $aliasCandidates = array_merge($aliasCandidates, $aliasMap[$normalize($candidate)] ?? [$candidate]);
+        }
+
+        $aliasCandidates = array_values(array_unique(array_map($normalize, $aliasCandidates)));
+
+        return $templates->first(function ($template) use ($normalize, $aliasCandidates) {
+            return in_array($normalize($template->use_for_template ?? ''), $aliasCandidates, true)
+                || in_array($normalize($template->name ?? ''), $aliasCandidates, true);
+        });
     }
 
     private function sendOrderOrQuotationMail(?User $customer, Order $order, bool $isQuotation, $branchId): bool
@@ -1538,6 +2308,9 @@ $roundedTotal = max(0, round($preTdsTotal - $tdsAmount, 2));
 
         // ✅ Prefer request input over route param
         $selectedSubAdminID = $request->input('selectedSubAdminId');
+        if ($selectedSubAdminID === 'null' || $selectedSubAdminID === 'undefined' || empty($selectedSubAdminID)) {
+            $selectedSubAdminID = null;
+        }
 
         // ✅ Build the query
         $query = Order::select('orders.*') // 👈 ensure created_by is included
@@ -1545,7 +2318,6 @@ $roundedTotal = max(0, round($preTdsTotal - $tdsAmount, 2));
                 'user:id,name,phone',
                 'orderItems:id,order_id',
                 'creator:id,name,role',
-                'assignedStaff:id,name',
             ])
             ->where('isDeleted', 0)
 
@@ -1588,13 +2360,29 @@ $roundedTotal = max(0, round($preTdsTotal - $tdsAmount, 2));
 
         $this->applyFinancialYearFilter($query, $request->input('financial_year'), 'created_at');
 
-        if ($request->filled('customerId')) {
-            $query->where('user_id', $request->customerId);
+        $orderType = strtolower(trim((string) $request->input('order_type', '')));
+        if ($orderType !== '' && $orderType !== 'all') {
+            $query->whereRaw('LOWER(order_type) = ?', [$orderType]);
         }
 
-        // ✅ Apply order type filter
-        if ($request->filled('order_type') && $request->order_type !== 'all') {
-            $query->where('order_type', $request->order_type);
+        $orderSort = strtolower(trim((string) $request->input('order_sort', 'latest')));
+        switch ($orderSort) {
+            case 'oldest':
+                $query->orderBy('created_at', 'asc');
+                break;
+            case 'order_no_asc':
+                $query->orderBy('order_number', 'asc');
+                break;
+            case 'order_no_desc':
+                $query->orderBy('order_number', 'desc');
+                break;
+            default:
+                $query->orderBy('created_at', 'desc');
+                break;
+        }
+
+        if ($request->filled('customerId')) {
+            $query->where('user_id', $request->customerId);
         }
 
         if ($request->filled('search')) {
@@ -1616,22 +2404,7 @@ $roundedTotal = max(0, round($preTdsTotal - $tdsAmount, 2));
         }
 
         // ✅ Apply sorting
-        $sort = $request->input('sort', 'latest');
-        switch ($sort) {
-            case 'latest':
-                $query->orderBy('created_at', 'desc');
-                break;
-            case 'order_no_asc':
-                $query->orderByRaw('CAST(REGEXP_REPLACE(order_number, "[^0-9]", "") AS UNSIGNED) ASC, order_number ASC');
-                break;
-            case 'order_no_desc':
-                $query->orderByRaw('CAST(REGEXP_REPLACE(order_number, "[^0-9]", "") AS UNSIGNED) DESC, order_number DESC');
-                break;
-            case 'oldest':
-            default:
-                $query->orderBy('created_at', 'asc');
-                break;
-        }
+        $query->orderBy('created_at', 'desc');
 
         $summaryOrders = (clone $query)->get();
         $totalAmount = 0;
@@ -2248,211 +3021,226 @@ $roundedTotal = max(0, round($preTdsTotal - $tdsAmount, 2));
     //     }
     // }
 
-public function update_sale(Request $request)
-{
-    $userData = Auth::guard('api')->user();
-    $userRole = $userData->role ?? null;
+    public function update_sale(Request $request)
+    {
+        $userData = Auth::guard('api')->user();
+        $userRole = $userData->role ?? null;
 
-    if ($userRole == 'staff') {
-        $branchIdToUse = $userData->branch_id;
-    } elseif (!empty($request->selectedSubAdminId) && $userRole == 'admin') {
-        $branchIdToUse = $request->selectedSubAdminId ?? null;
-    } else {
-        $branchIdToUse = $userData->id ?? null;
-    }
+        if ($userRole == 'staff') {
+            $branchIdToUse = $userData->branch_id;
+        } elseif (!empty($request->selectedSubAdminId) && $userRole == 'admin') {
+            $branchIdToUse = $request->selectedSubAdminId ?? null;
+        } else {
+            $branchIdToUse = $userData->id ?? null;
+        }
 
-    $validator = Validator::make($request->all(), [
-        'update_id' => 'required|exists:orders,id',
-        'customer_id' => 'nullable',
-        'order_number' => [
-            'nullable',
-            'string',
-            Rule::unique('orders', 'order_number')
-                ->ignore($request->update_id)
-                ->where(function ($query) use ($branchIdToUse) {
-                    $query->where('isDeleted', 0);
+        $validator = Validator::make($request->all(), [
+            'update_id' => 'required|exists:orders,id',
+            'customer_id' => 'nullable',
+            'order_number' => [
+                'nullable',
+                'string',
+                Rule::unique('orders', 'order_number')
+                    ->ignore($request->update_id)
+                    ->where(function ($query) use ($branchIdToUse) {
+                        $query->where('isDeleted', 0);
 
-                    if (!empty($branchIdToUse)) {
-                        $query->where('branch_id', $branchIdToUse);
-                    }
+                        if (!empty($branchIdToUse)) {
+                            $query->where('branch_id', $branchIdToUse);
+                        }
 
-                    return $query;
-                }),
-        ],
-        'customer_phone' => 'nullable|string',
-        'order_date'     => 'nullable|date',
-        'product_ids'    => 'required|array',
-        'product_ids.*'  => 'exists:products,id',
-        'quantities'     => 'required|array',
-        'quantities.*'   => 'numeric|min:0',
-        'prices'         => 'nullable|array',
-        'prices.*'       => 'numeric|min:0',
-        'discount'       => 'numeric|min:0|max:100',
-        'grand_total'    => 'required|numeric|min:0',
-        'shipping'       => 'nullable|numeric|min:0',
-        'payment_method' => 'nullable|string',
-        'bank_id'        => 'nullable|required_if:payment_method,online,cash+online|integer|exists:bank_master,id',
-        'paid_type'      => 'nullable|in:full,partial',
-        'payment_amount' => 'nullable|numeric|min:0',
-        'pending_amount' => 'nullable|numeric|min:0',
-        'cash_amount'    => 'nullable|numeric|min:0',
-        'online_amount'  => 'nullable|numeric|min:0',
-        'labour_item_ids' => 'nullable|array',
-        'labour_qtys'     => 'nullable|array',
-        'labour_prices'   => 'nullable|array',
-        'tds_percentage'  => 'nullable|numeric|min:0|max:100',
-        'tds_amount'      => 'nullable|numeric|min:0',
-    ], [
-        'order_number.unique' => 'This order number already exists.',
-    ]);
+                        return $query;
+                    }),
+            ],
+            'customer_phone' => 'nullable|string',
+            'order_date'     => 'nullable|date',
+            'product_ids'    => 'required|array',
+            'product_ids.*'  => 'exists:products,id',
+            'quantities'     => 'required|array',
+            'quantities.*'   => 'numeric|min:0',
+            'prices'         => 'nullable|array',
+            'prices.*'       => 'numeric|min:0',
+            'discount'       => 'numeric|min:0|max:100',
+            'grand_total'    => 'required|numeric|min:0',
+            'shipping'       => 'nullable|numeric|min:0',
+            'payment_method' => 'nullable|string',
+            'bank_id'        => 'nullable|required_if:payment_method,online,cash+online,emi|integer|exists:bank_master,id',
+            'emi_bank_id'    => 'nullable|integer|exists:bank_master,id',
+            'emi_down_payment'  => 'nullable|numeric|min:0',
+            'emi_loan_amount'   => 'nullable|numeric|min:0',
+            'emi_interest_rate' => 'nullable|numeric|min:0',
+            'emi_tenure'        => 'nullable|string',
+            'emi_custom_tenure' => 'nullable|integer|min:1',
+            'emi_monthly_amount'=> 'nullable|numeric|min:0',
+            'emi_aadhar_number' => 'nullable|string|max:50',
+            'emi_do_id'         => 'nullable|string|max:50',
+            'emi_pan_number'    => 'nullable|string|max:50',
+            'emi_guarantor_name'=> 'nullable|string|max:255',
+            'paid_type'      => 'nullable|in:full,partial',
+            'payment_amount' => 'nullable|numeric|min:0',
+            'pending_amount' => 'nullable|numeric|min:0',
+            'cash_amount'    => 'nullable|numeric|min:0',
+            'online_amount'  => 'nullable|numeric|min:0',
+            'labour_item_ids' => 'nullable|array',
+            'labour_qtys'     => 'nullable|array',
+            'labour_prices'   => 'nullable|array',
+            'tds_percentage'  => 'nullable|numeric|min:0|max:100',
+            'tds_amount'      => 'nullable|numeric|min:0',
+        ], [
+            'order_number.unique' => 'This order number already exists.',
+        ]);
 
-    if ($validator->fails()) {
-        return response()->json([
-            'success' => false,
-            'message' => 'Validation errors',
-            'errors' => $validator->errors(),
-        ], 422);
-    }
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation errors',
+                'errors' => $validator->errors(),
+            ], 422);
+        }
 
-    try {
-        DB::beginTransaction();
+        try {
+            DB::beginTransaction();
 
-        $order = Order::findOrFail($request->update_id);
-        $products = Product::whereIn('id', $request->product_ids)->get();
-        $updatedQuotationStatus = $request->quotation_status ?? $order->quotation_status;
-        $isConvertingQuotationToSale = ($order->quotation_status ?? '') === 'quotation'
-            && $updatedQuotationStatus === 'sales';
-        $orderUpdatedAt = now('Asia/Kolkata');
-        $orderCreatedAt = $request->filled('order_date')
-            ? Carbon::createFromFormat('Y-m-d', $request->order_date, 'Asia/Kolkata')
+            $order = Order::findOrFail($request->update_id);
+            $products = Product::whereIn('id', $request->product_ids)->get();
+            $updatedQuotationStatus = $request->quotation_status ?? $order->quotation_status;
+            $isConvertingQuotationToSale = ($order->quotation_status ?? '') === 'quotation'
+                && $updatedQuotationStatus === 'sales';
+            $orderUpdatedAt = now('Asia/Kolkata');
+            $orderCreatedAt = $request->filled('order_date')
+                ? Carbon::createFromFormat('Y-m-d', $request->order_date, 'Asia/Kolkata')
                 ->setTime(
                     optional($order->created_at)->timezone('Asia/Kolkata')->hour ?? $orderUpdatedAt->hour,
                     optional($order->created_at)->timezone('Asia/Kolkata')->minute ?? $orderUpdatedAt->minute,
                     optional($order->created_at)->timezone('Asia/Kolkata')->second ?? $orderUpdatedAt->second
                 )
-            : $order->created_at;
+                : $order->created_at;
 
-        // Fetch old order items
-        $oldItems = OrderItem::where('order_id', $order->id)->get();
-        $oldQuantities = $oldItems->pluck('quantity', 'product_id')->toArray();
+            // Fetch old order items
+            $oldItems = OrderItem::where('order_id', $order->id)->get();
+            $oldQuantities = $oldItems->pluck('quantity', 'product_id')->toArray();
 
-        // Calculate subtotal & product-wise GST & adjust stock
-        $subtotal = 0;
-        $productWiseGstTotal = 0;
-        $hasProductSpecificGst = false;
+            // Calculate subtotal & product-wise GST & adjust stock
+            $subtotal = 0;
+            $productWiseGstTotal = 0;
+            $hasProductSpecificGst = false;
 
-        foreach ($request->product_ids as $productId) {
-            $product = $products->firstWhere('id', $productId);
-            if ($product) {
-                $quantity = $request->quantities[$productId] ?? 0;
-                $oldQty = $oldQuantities[$productId] ?? 0;
+            foreach ($request->product_ids as $productId) {
+                $product = $products->firstWhere('id', $productId);
+                if ($product) {
+                    $quantity = $request->quantities[$productId] ?? 0;
+                    $oldQty = $oldQuantities[$productId] ?? 0;
 
-                $difference = $quantity - $oldQty;
+                    $difference = $quantity - $oldQty;
 
-                // Stock adjustment (ONLY if NOT quotation)
-                if ($isConvertingQuotationToSale) {
-                    if ($quantity > 0 && $product->quantity < $quantity) {
-                        DB::rollBack();
-                        return response()->json([
-                            'success' => false,
-                            'message' => "Stock Quantity Exceeded. Only {$product->quantity} quantity are available for '{$product->name}'.",
-                        ], 422);
+                    // Stock adjustment (ONLY if NOT quotation)
+                    if ($isConvertingQuotationToSale) {
+                        if ($quantity > 0 && $product->quantity < $quantity) {
+                            DB::rollBack();
+                            return response()->json([
+                                'success' => false,
+                                'message' => "Stock Quantity Exceeded. Only {$product->quantity} quantity are available for '{$product->name}'.",
+                            ], 422);
+                        }
+
+                        if ($quantity > 0) {
+                            $product->decrement('quantity', $quantity);
+                        }
+                    } elseif ($order->quotation_status !== 'quotation') {
+                        // Check if stock is available for increment
+                        if ($difference > 0 && $product->quantity < $difference) {
+                            DB::rollBack();
+                            return response()->json([
+                                'success' => false,
+                                'message' => "Stock Quantity Exceeded. Only {$product->quantity} quantity are available for '{$product->name}'.",
+                            ], 422);
+                        }
+
+                        if ($difference > 0) {
+                            $product->decrement('quantity', $difference);
+                        } elseif ($difference < 0) {
+                            $product->increment('quantity', abs($difference));
+                        }
                     }
 
-                    if ($quantity > 0) {
-                        $product->decrement('quantity', $quantity);
-                    }
-                } elseif ($order->quotation_status !== 'quotation') {
-                    // Check if stock is available for increment
-                    if ($difference > 0 && $product->quantity < $difference) {
-                        DB::rollBack();
-                        return response()->json([
-                            'success' => false,
-                            'message' => "Stock Quantity Exceeded. Only {$product->quantity} quantity are available for '{$product->name}'.",
-                        ], 422);
+                    // Calculate product total
+                    $quantity = $request->quantities[$productId] ?? 0;
+                    $discountPercent = $request->discounts[$productId] ?? 0;
+
+                    $price = floatval($request->prices[$productId] ?? $product->price);
+                    $baseProductTotal = $price * $quantity;
+
+                    // Calculate product-wise GST if global option is with_gst
+                    $itemGstTotal = 0;
+                    if ($request->gst_option === 'with_gst' && $product->gst_option === 'with_gst' && $product->product_gst) {
+                        $hasProductSpecificGst = true;
+                        try {
+                            $gstData = json_decode($product->product_gst, true);
+                            if (is_array($gstData)) {
+                                foreach ($gstData as $tax) {
+                                    $taxRate = floatval($tax['tax_rate'] ?? 0) / 100;
+                                    $itemGstTotal += $baseProductTotal * $taxRate;
+                                }
+                            }
+                        } catch (\Exception $e) {
+                            Log::error('Error calculating product GST: ' . $e->getMessage());
+                        }
                     }
 
-                    if ($difference > 0) {
-                        $product->decrement('quantity', $difference);
-                    } elseif ($difference < 0) {
-                        $product->increment('quantity', abs($difference));
-                    }
+                    $itemDiscountAmount = ($baseProductTotal + $itemGstTotal) * ($discountPercent / 100);
+                    $productTotal = ($baseProductTotal + $itemGstTotal) - $itemDiscountAmount;
+
+                    $subtotal += $baseProductTotal;
+                    $productWiseGstTotal += $itemGstTotal;
                 }
+            }
 
-                // Calculate product total
-                $quantity = $request->quantities[$productId] ?? 0;
-                $discountPercent = $request->discounts[$productId] ?? 0;
+            // Tax & discount calculations
+            $totalProductsWithGstAndDiscount = 0;
+            $totalItemDiscounts = 0;
+            foreach ($request->product_ids as $productId) {
+                $product = $products->firstWhere('id', $productId);
+                if ($product) {
+                    $quantity = $request->quantities[$productId] ?? 0;
+                    $discountPercent = $request->discounts[$productId] ?? 0;
+                    $price = floatval($request->prices[$productId] ?? $product->price);
+                    $baseProductTotal = $price * $quantity;
 
-                $price = floatval($request->prices[$productId] ?? $product->price);
-                $baseProductTotal = $price * $quantity;
-
-                // Calculate product-wise GST if global option is with_gst
-                $itemGstTotal = 0;
-                if ($request->gst_option === 'with_gst' && $product->gst_option === 'with_gst' && $product->product_gst) {
-                    $hasProductSpecificGst = true;
-                    try {
+                    $itemGst = 0;
+                    if ($request->gst_option === 'with_gst' && $product->gst_option === 'with_gst' && $product->product_gst) {
                         $gstData = json_decode($product->product_gst, true);
                         if (is_array($gstData)) {
                             foreach ($gstData as $tax) {
-                                $taxRate = floatval($tax['tax_rate'] ?? 0) / 100;
-                                $itemGstTotal += $baseProductTotal * $taxRate;
+                                $itemGst += $baseProductTotal * (floatval($tax['tax_rate'] ?? 0) / 100);
                             }
                         }
-                    } catch (\Exception $e) {
-                        Log::error('Error calculating product GST: ' . $e->getMessage());
                     }
+                    $rowWithGst = $baseProductTotal + $itemGst;
+                    $rowDiscount = $rowWithGst * ($discountPercent / 100);
+                    $totalProductsWithGstAndDiscount += ($rowWithGst - $rowDiscount);
+                    $totalItemDiscounts += $rowDiscount;
                 }
-
-                $itemDiscountAmount = ($baseProductTotal + $itemGstTotal) * ($discountPercent / 100);
-                $productTotal = ($baseProductTotal + $itemGstTotal) - $itemDiscountAmount;
-
-                $subtotal += $baseProductTotal;
-                $productWiseGstTotal += $itemGstTotal;
             }
-        }
 
-        // Tax & discount calculations
-        $totalProductsWithGstAndDiscount = 0;
-        $totalItemDiscounts = 0;
-        foreach ($request->product_ids as $productId) {
-            $product = $products->firstWhere('id', $productId);
-            if ($product) {
-                $quantity = $request->quantities[$productId] ?? 0;
-                $discountPercent = $request->discounts[$productId] ?? 0;
-                $price = floatval($request->prices[$productId] ?? $product->price);
-                $baseProductTotal = $price * $quantity;
+            $discountAmount = $totalProductsWithGstAndDiscount * ($request->discount / 100);
 
-                $itemGst = 0;
-                if ($request->gst_option === 'with_gst' && $product->gst_option === 'with_gst' && $product->product_gst) {
-                    $gstData = json_decode($product->product_gst, true);
-                    if (is_array($gstData)) {
-                        foreach ($gstData as $tax) {
-                            $itemGst += $baseProductTotal * (floatval($tax['tax_rate'] ?? 0) / 100);
-                        }
-                    }
+            // Add labour subtotal
+            $labourSubtotal = 0;
+            if ($request->has('labour_item_ids')) {
+                foreach ($request->labour_item_ids as $index => $labourItemId) {
+                    $qty = floatval($request->labour_qtys[$index] ?? 0);
+                    $price = floatval($request->labour_prices[$index] ?? 0);
+                    $labourSubtotal += $qty * $price;
                 }
-                $rowWithGst = $baseProductTotal + $itemGst;
-                $rowDiscount = $rowWithGst * ($discountPercent / 100);
-                $totalProductsWithGstAndDiscount += ($rowWithGst - $rowDiscount);
-                $totalItemDiscounts += $rowDiscount;
             }
-        }
 
-        $discountAmount = $totalProductsWithGstAndDiscount * ($request->discount / 100);
-
-        // Add labour subtotal
-        $labourSubtotal = 0;
-        if ($request->has('labour_item_ids')) {
-            foreach ($request->labour_item_ids as $index => $labourItemId) {
-                $qty = floatval($request->labour_qtys[$index] ?? 0);
-                $price = floatval($request->labour_prices[$index] ?? 0);
-                $labourSubtotal += $qty * $price;
-            }
-        }
-        $preTdsGrandTotal = ($totalProductsWithGstAndDiscount - $discountAmount) + ($request->shipping ?? 0) + $labourSubtotal;
-        // TDS applies on gross product base price only (no GST, no discounts)
-        $tdsPercentage = max(0, min(100, (float) ($request->tds_percentage ?? 0)));
-        $tdsAmount = round(($subtotal * $tdsPercentage) / 100, 2);
+        // TDS is calculated only from the product base amount, excluding GST, shipping, and labour.
+        $tdsBaseAmount = max(0, $subtotal);
+        $preTdsGrandTotal = $totalProductsWithGstAndDiscount - $discountAmount + ($request->shipping ?? 0) + $labourSubtotal;
+        $settings = Setting::where('branch_id', $branchIdToUse)->first();
+        $isTdsEnabled = (bool) ($settings->tds_apply ?? false);
+        $tdsPercentage = $isTdsEnabled ? max(0, min(100, (float) ($request->tds_percentage ?? 0))) : 0;
+        $tdsAmount = $isTdsEnabled ? round(($tdsBaseAmount * $tdsPercentage) / 100, 2) : 0;
         $grandTotal = max(0, round($preTdsGrandTotal - $tdsAmount));
 
         $isQuotationOrder = $updatedQuotationStatus === 'quotation';
@@ -2552,8 +3340,6 @@ public function update_sale(Request $request)
             'user_id' => $request->customer_id,
             'user_phone' => $request->customer_phone,
             'payment_method' => $storedPaymentMethod,
-            'assigned_staff' => $request->assigned_staff ?: $order->assigned_staff,
-            'order_type' => $request->order_type ?: $order->order_type,
             'discount' => $request->discount,
             'discount_amount' => $totalItemDiscounts + $discountAmount,
             'gst_option' => $request->gst_option === 'with_gst' ? 'with_gst' : 'without_gst',
@@ -2569,185 +3355,191 @@ public function update_sale(Request $request)
             'tds_percentage'   => $tdsPercentage,
             'tds_amount'       => $tdsAmount,
             'remarks'          => $request->remarks ?? $order->remarks,
+            'order_type'       => $request->order_type ?? $order->order_type,
+            'staff_id'         => $request->filled('assign_staff') ? (int) $request->assign_staff : null,
+            'emi_down_payment' => $normalizedPaymentMethod === 'emi' ? (float) ($request->emi_down_payment ?? 0) : null,
+            'emi_loan_amount'  => $normalizedPaymentMethod === 'emi' ? (float) ($request->emi_loan_amount ?? 0) : null,
+            'emi_interest_rate'=> $normalizedPaymentMethod === 'emi' ? (float) ($request->emi_interest_rate ?? 0) : null,
+            'emi_tenure'       => $normalizedPaymentMethod === 'emi'
+                ? ($request->emi_tenure === 'custom' ? $request->emi_custom_tenure : $request->emi_tenure)
+                : null,
+            'emi_monthly_amount' => $normalizedPaymentMethod === 'emi' ? (float) ($request->emi_monthly_amount ?? 0) : null,
+            'emi_aadhar_number'  => $normalizedPaymentMethod === 'emi' ? ($request->emi_aadhar_number ?? null) : null,
+            'emi_do_id'          => $normalizedPaymentMethod === 'emi' ? ($request->emi_do_id ?? null) : null,
+            'emi_pan_number'     => $normalizedPaymentMethod === 'emi' ? ($request->emi_pan_number ?? null) : null,
+            'emi_guarantor_name' => $normalizedPaymentMethod === 'emi' ? ($request->emi_guarantor_name ?? null) : null,
+            'emi_bank_id'        => $normalizedPaymentMethod === 'emi' ? ($request->bank_id ?: null) : null,
             'created_at'       => $orderCreatedAt,
-            'emi_down_payment' => $request->emi_down_payment ?? null,
-            'emi_loan_amount'  => $request->emi_loan_amount ?? null,
-            'emi_interest_rate'=> $request->emi_interest_rate ?? null,
-            'emi_tenure'       => $request->emi_tenure ?? null,
-            'emi_monthly_amount' => $request->emi_monthly_amount ?? null,
-            'emi_aadhar_number' => $request->emi_aadhar_number ?? null,
-            'emi_pan_number'   => $request->emi_pan_number ?? null,
-            'emi_guarnator_name' => $request->emi_guarnator_name ?? null,
-            'emi_do_id'        => $request->emi_do_id ?? null,
-            'emi_bank_id'      => $request->emi_bank_id ?? null,
         ]);
 
-        if (!$isQuotationOrder && $paymentMethodForOrder !== 'pending' && $additionalPaidAmount > 0) {
-            $paymentTypeForStore = $paymentStatus === 'completed' ? 'fully' : 'partially';
-            $bankId = $paymentMethodForOrder === 'cash' ? null : ($request->bank_id ?: null);
 
-            if ($paymentMethodForOrder === 'cash_online') {
-                $cashToStore = min($cashAmountInput, $additionalPaidAmount);
-                $onlineToStore = min($onlineAmountInput, max($additionalPaidAmount - $cashToStore, 0));
 
-                if (($cashToStore + $onlineToStore) <= 0) {
-                    $onlineToStore = $additionalPaidAmount;
-                } elseif (($cashToStore + $onlineToStore) < $additionalPaidAmount) {
-                    $onlineToStore += ($additionalPaidAmount - ($cashToStore + $onlineToStore));
-                }
+            if (!$isQuotationOrder && $paymentMethodForOrder !== 'pending' && $additionalPaidAmount > 0) {
+                $paymentTypeForStore = $paymentStatus === 'completed' ? 'fully' : 'partially';
+                $bankId = $paymentMethodForOrder === 'cash' ? null : ($request->bank_id ?: null);
 
-                if ($cashToStore > 0) {
+                if ($paymentMethodForOrder === 'cash_online') {
+                    $cashToStore = min($cashAmountInput, $additionalPaidAmount);
+                    $onlineToStore = min($onlineAmountInput, max($additionalPaidAmount - $cashToStore, 0));
+
+                    if (($cashToStore + $onlineToStore) <= 0) {
+                        $onlineToStore = $additionalPaidAmount;
+                    } elseif (($cashToStore + $onlineToStore) < $additionalPaidAmount) {
+                        $onlineToStore += ($additionalPaidAmount - ($cashToStore + $onlineToStore));
+                    }
+
+                    if ($cashToStore > 0) {
+                        PaymentStore::create([
+                            'user_id' => $order->user_id,
+                            'order_id' => $order->id,
+                            'payment_amount' => $cashToStore,
+                            'payment_date' => now(),
+                            'payment_method' => 'cash',
+                            'payment_type' => $paymentTypeForStore,
+                            'cash_amount' => $cashToStore,
+                            'upi_amount' => 0,
+                            'remaining_amount' => $remainingAmount,
+                            'bank_id' => $bankId,
+                            'remarks' => $request->remarks,
+                        ]);
+                    }
+
+                    if ($onlineToStore > 0) {
+                        PaymentStore::create([
+                            'user_id' => $order->user_id,
+                            'order_id' => $order->id,
+                            'payment_amount' => $onlineToStore,
+                            'payment_date' => now(),
+                            'payment_method' => 'online',
+                            'payment_type' => $paymentTypeForStore,
+                            'cash_amount' => 0,
+                            'upi_amount' => $onlineToStore,
+                            'remaining_amount' => $remainingAmount,
+                            'bank_id' => $bankId,
+                            'remarks' => $request->remarks,
+                        ]);
+                    }
+                } else {
                     PaymentStore::create([
                         'user_id' => $order->user_id,
                         'order_id' => $order->id,
-                        'payment_amount' => $cashToStore,
+                        'payment_amount' => $additionalPaidAmount,
                         'payment_date' => now(),
-                        'payment_method' => 'cash',
+                        'payment_method' => $paymentMethodForOrder,
                         'payment_type' => $paymentTypeForStore,
-                        'cash_amount' => $cashToStore,
-                        'upi_amount' => 0,
+                        'cash_amount' => $paymentMethodForOrder === 'cash' ? $additionalPaidAmount : 0,
+                        'upi_amount' => $paymentMethodForOrder === 'online' ? $additionalPaidAmount : 0,
                         'remaining_amount' => $remainingAmount,
                         'bank_id' => $bankId,
                         'remarks' => $request->remarks,
                     ]);
                 }
-
-                if ($onlineToStore > 0) {
-                    PaymentStore::create([
-                        'user_id' => $order->user_id,
-                        'order_id' => $order->id,
-                        'payment_amount' => $onlineToStore,
-                        'payment_date' => now(),
-                        'payment_method' => 'online',
-                        'payment_type' => $paymentTypeForStore,
-                        'cash_amount' => 0,
-                        'upi_amount' => $onlineToStore,
-                        'remaining_amount' => $remainingAmount,
-                        'bank_id' => $bankId,
-                        'remarks' => $request->remarks,
-                    ]);
-                }
-            } else {
-                PaymentStore::create([
-                    'user_id' => $order->user_id,
-                    'order_id' => $order->id,
-                    'payment_amount' => $additionalPaidAmount,
-                    'payment_date' => now(),
-                    'payment_method' => $paymentMethodForOrder,
-                    'payment_type' => $paymentTypeForStore,
-                    'cash_amount' => $paymentMethodForOrder === 'cash' ? $additionalPaidAmount : 0,
-                    'upi_amount' => $paymentMethodForOrder === 'online' ? $additionalPaidAmount : 0,
-                    'remaining_amount' => $remainingAmount,
-                    'bank_id' => $bankId,
-                    'remarks' => $request->remarks,
-                ]);
             }
-        }
 
-        // Remove old items
-        OrderItem::where('order_id', $order->id)->delete();
-        Sales_Labour_Items::where('order_id', $order->id)->delete();
+            // Remove old items
+            OrderItem::where('order_id', $order->id)->delete();
+            Sales_Labour_Items::where('order_id', $order->id)->delete();
 
-        // Reinsert updated order items with GST details
-        foreach ($request->product_ids as $productId) {
-            $product = $products->firstWhere('id', $productId);
-            if ($product) {
-                $quantity     = $request->quantities[$productId] ?? 0;
-                $discountPercentage = $request->discounts[$productId] ?? 0;
-                $price        = floatval($request->prices[$productId] ?? $product->price);
+            // Reinsert updated order items with GST details
+            foreach ($request->product_ids as $productId) {
+                $product = $products->firstWhere('id', $productId);
+                if ($product) {
+                    $quantity     = $request->quantities[$productId] ?? 0;
+                    $discountPercentage = $request->discounts[$productId] ?? 0;
+                    $price        = floatval($request->prices[$productId] ?? $product->price);
 
-                $baseProductTotal = $price * $quantity;
+                    $baseProductTotal = $price * $quantity;
 
-                $productGstDetails = [];
-                $productGstTotal = 0;
+                    $productGstDetails = [];
+                    $productGstTotal = 0;
 
-                if ($request->gst_option === 'with_gst' && $product->gst_option === 'with_gst' && $product->product_gst) {
-                    try {
-                        $gstData = json_decode($product->product_gst, true);
-                        if (is_array($gstData)) {
-                            foreach ($gstData as $tax) {
-                                $taxRate = floatval($tax['tax_rate'] ?? 0) / 100;
-                                $taxAmount = $baseProductTotal * $taxRate;
-                                $productGstTotal += $taxAmount;
+                    if ($request->gst_option === 'with_gst' && $product->gst_option === 'with_gst' && $product->product_gst) {
+                        try {
+                            $gstData = json_decode($product->product_gst, true);
+                            if (is_array($gstData)) {
+                                foreach ($gstData as $tax) {
+                                    $taxRate = floatval($tax['tax_rate'] ?? 0) / 100;
+                                    $taxAmount = $baseProductTotal * $taxRate;
+                                    $productGstTotal += $taxAmount;
 
-                                $productGstDetails[] = [
-                                    'tax_name' => $tax['tax_name'] ?? 'GST',
-                                    'tax_rate' => $tax['tax_rate'] ?? 0,
-                                    'tax_amount' => $taxAmount,
-                                ];
+                                    $productGstDetails[] = [
+                                        'tax_name' => $tax['tax_name'] ?? 'GST',
+                                        'tax_rate' => $tax['tax_rate'] ?? 0,
+                                        'tax_amount' => $taxAmount,
+                                    ];
+                                }
                             }
+                        } catch (\Exception $e) {
+                            Log::error('Error parsing product GST: ' . $e->getMessage());
                         }
-                    } catch (\Exception $e) {
-                        Log::error('Error parsing product GST: ' . $e->getMessage());
+                    }
+
+                    $discountAmount = ($baseProductTotal + $productGstTotal) * ($discountPercentage / 100);
+                    $productTotal = ($baseProductTotal + $productGstTotal) - $discountAmount;
+
+                    OrderItem::create([
+                        'order_id'            => $order->id,
+                        'user_id'             => $order->user_id ?? null,
+                        'category_id'         => $product->category_id ?? null,
+                        'product_id'          => $productId,
+                        'quantity'            => $quantity,
+                        'price'               => $price,
+                        'discount_percentage' => $discountPercentage,
+                        'discount_amount'     => $discountAmount,
+                        'total_amount'        => $productTotal,
+                        'product_gst_details' => ! empty($productGstDetails) ? json_encode($productGstDetails) : null,
+                        'product_gst_total'   => $productGstTotal,
+                        'branch_id'           => $branchIdToUse,
+                        'created_by'          => $userData->id,
+                    ]);
+
+                    if ($order->quotation_status !== 'quotation') {
+                        $lastInventory = ProductInventory::where('product_id', $productId)
+                            ->orderBy('id', 'desc')
+                            ->first();
+
+                        ProductInventory::create([
+                            'product_id'    => $productId,
+                            'initial_stock' => $lastInventory->initial_stock ?? $product->quantity,
+                            'current_stock' => $product->quantity,
+                            'branch_id'     => $order->branch_id,
+                            'create_by'     => Auth::id(),
+                            'type'          => 'Update Sale',
+                            'date'          => now(),
+                        ]);
                     }
                 }
+            }
 
-                $discountAmount = ($baseProductTotal + $productGstTotal) * ($discountPercentage / 100);
-                $productTotal = ($baseProductTotal + $productGstTotal) - $discountAmount;
-
-                OrderItem::create([
-                    'order_id'            => $order->id,
-                    'user_id'             => $order->user_id ?? null,
-                    'category_id'         => $product->category_id ?? null,
-                    'product_id'          => $productId,
-                    'quantity'            => $quantity,
-                    'price'               => $price,
-                    'discount_percentage' => $discountPercentage,
-                    'discount_amount'     => $discountAmount,
-                    'total_amount'        => $productTotal,
-                    'product_gst_details' => ! empty($productGstDetails) ? json_encode($productGstDetails) : null,
-                    'product_gst_total'   => $productGstTotal,
-                    'branch_id'           => $branchIdToUse,
-                    'created_by'          => $userData->id,
-                ]);
-
-                if ($order->quotation_status !== 'quotation') {
-                    $lastInventory = ProductInventory::where('product_id', $productId)
-                        ->orderBy('id', 'desc')
-                        ->first();
-
-                    ProductInventory::create([
-                        'product_id'    => $productId,
-                        'initial_stock' => $lastInventory->initial_stock ?? $product->quantity,
-                        'current_stock' => $product->quantity,
-                        'branch_id'     => $order->branch_id,
-                        'create_by'     => Auth::id(),
-                        'type'          => 'Update Sale',
-                        'date'          => now(),
+            // Reinsert labour items
+            if ($request->has('labour_item_ids')) {
+                foreach ($request->labour_item_ids as $index => $labourItemId) {
+                    Sales_Labour_Items::create([
+                        'order_id' => $order->id,
+                        'user_id' => $order->user_id,
+                        'labour_item_id' => $labourItemId,
+                        'qty' => floatval($request->labour_qtys[$index] ?? 0),
+                        'price' => floatval($request->labour_prices[$index] ?? 0),
                     ]);
                 }
             }
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Order updated successfully',
+                'data' => $order,
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update order',
+                'error' => $e->getMessage(),
+            ], 500);
         }
-
-        // Reinsert labour items
-        if ($request->has('labour_item_ids')) {
-            foreach ($request->labour_item_ids as $index => $labourItemId) {
-                Sales_Labour_Items::create([
-                    'order_id' => $order->id,
-                    'user_id' => $order->user_id,
-                    'labour_item_id' => $labourItemId,
-                    'qty' => floatval($request->labour_qtys[$index] ?? 0),
-                    'price' => floatval($request->labour_prices[$index] ?? 0),
-                ]);
-            }
-        }
-
-        DB::commit();
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Order updated successfully',
-            'data' => $order,
-        ]);
-    } catch (\Exception $e) {
-        DB::rollBack();
-        return response()->json([
-            'success' => false,
-            'message' => 'Failed to update order',
-            'error' => $e->getMessage(),
-        ], 500);
     }
-}
 
 
     public function convertQuotationToSale($id)
@@ -2913,9 +3705,9 @@ public function update_sale(Request $request)
         $categoryId = $request->query('category_id');
         $search = $request->query('search'); // ✅ Add search parameter
 
-        $query = OrderItem::with(['product.category', 'product.brand', 'order.user.userDetail', 'order'])
+        $query = OrderItem::with(['product.category', 'product.brand', 'order'])
             ->whereHas('order', function ($q) use ($filter, $month, $year, $customerId, $role, $effectiveBranchId, $userId) {
-                $q->where('payment_status', 'completed')->where('isDeleted', 0);
+                $q->where('isDeleted', 0);
 
                 // ✅ Role-based filtering
                 if ($role === 'staff') {
@@ -2990,26 +3782,8 @@ public function update_sale(Request $request)
 
         $orderItems = collect($orderItemsPaginated->items())->map(function ($item) {
             $product = $item->product;
-            $order = $item->order;
-            $customer = $order?->user;
-            $customerDetail = $customer?->userDetail;
             $soldQty = $item->quantity;
             $soldAmount = $item->price * $soldQty;
-            $taxDetails = [];
-            if (!empty($item->product_gst_details)) {
-                $decodedTaxes = is_string($item->product_gst_details)
-                    ? json_decode($item->product_gst_details, true)
-                    : $item->product_gst_details;
-
-                if (is_array($decodedTaxes)) {
-                    foreach ($decodedTaxes as $tax) {
-                        $taxName = $tax['name'] ?? $tax['tax_name'] ?? 'Tax';
-                        $taxRate = $tax['rate'] ?? $tax['tax_rate'] ?? null;
-                        $taxAmount = (float) ($tax['amount'] ?? 0);
-                        $taxDetails[] = trim($taxName . ($taxRate !== null ? " ({$taxRate}%)" : '')) . ': ' . number_format($taxAmount, 2);
-                    }
-                }
-            }
 
             // Decode product images
             $decodedImages = json_decode($product->images, true);
@@ -3019,18 +3793,11 @@ public function update_sale(Request $request)
                 'id' => $item->id,
                 'product_id' => $product->id,
                 'name' => $product->name,
-                'order_number' => $order->order_number ?? 'N/A',
-                'customer_name' => $customer->name ?? 'N/A',
-                'gst_no' => $customer->gst_number ?? 'N/A',
-                'customer_address' => $customerDetail->address ?? 'N/A',
-                'taxes' => !empty($taxDetails) ? implode(', ', $taxDetails) : ($item->product_gst_total ? number_format((float) $item->product_gst_total, 2) : 'N/A'),
-                'amount' => number_format((float) ($item->total_amount ?? $soldAmount), 2),
                 'SKU' => $product->SKU,
                 'category' => $product->category->name ?? 'N/A',
                 'brand' => $product->brand->name ?? 'N/A',
                 'sold_qty' => $soldQty,
                 'sold_amount' => number_format($soldAmount, 2),
-                'qty' => $soldQty,
                 // Simple image path
                 'image' => 'storage/' . $firstImage,
                 // Uses accessor (returns full URLs)
@@ -3125,6 +3892,27 @@ public function update_sale(Request $request)
 
         $this->applyFinancialYearFilter($query, $request->input('financial_year'), 'created_at');
 
+        $orderType = strtolower(trim((string) $request->input('order_type', '')));
+        if ($orderType !== '' && $orderType !== 'all') {
+            $query->whereRaw('LOWER(order_type) = ?', [$orderType]);
+        }
+
+        $orderSort = strtolower(trim((string) $request->input('order_sort', 'latest')));
+        switch ($orderSort) {
+            case 'oldest':
+                $query->orderBy('created_at', 'asc');
+                break;
+            case 'order_no_asc':
+                $query->orderBy('order_number', 'asc');
+                break;
+            case 'order_no_desc':
+                $query->orderBy('order_number', 'desc');
+                break;
+            default:
+                $query->orderBy('created_at', 'desc');
+                break;
+        }
+
         // ✅ Apply customer filter if provided
         if ($request->filled('customerId')) {
             $query->where('user_id', $request->customerId);
@@ -3199,6 +3987,7 @@ public function update_sale(Request $request)
     public function getHistory1($order_id)
     {
         $history = PaymentStore::where('order_id', $order_id)
+            ->where('isDeleted', 0)
             ->orderBy('created_at', 'desc')
             ->get();
 
@@ -3255,10 +4044,7 @@ public function update_sale(Request $request)
         $currencyPosition = $settings->currency_position ?? 'left';
 
         try {
-            $query = Order::with([
-                'user:id,name,phone',
-                'assignedStaff:id,name',
-            ])
+            $query = Order::with(['user:id,name,phone'])
                 ->where('isDeleted', 0);
             // ->where('type', 'Sales');
 
@@ -3496,11 +4282,7 @@ public function update_sale(Request $request)
                 'name' => $user->name ?? 'walk-in-customer',
                 'email' => $user->email ?? '',
                 'phone' => $user->phone ?? '',
-                'address' => optional($user->userDetail)->address ?? '',
-                'delivery_address' => optional($user->userDetail)->delivery_address ?? '',
-                'company_name' => optional($user->userDetail)->company_name ?? '',
-                'gst_number' => optional($user->userDetail)->gst_number ?? '',
-                'pan_number' => optional($user->userDetail)->pan_number ?? '',
+                'address' => optional($user->userDetail)->address ?? 'arga',
             ],
             'subtotal' => $formattedSubtotal,
             'discountPercent' => $discountPercent,
@@ -3511,36 +4293,28 @@ public function update_sale(Request $request)
             'paidAmount' => $formattedPaidAmount,
             'pendingAmount' => $formattedPendingAmount,
             'taxDetails' => $taxDetails,
-            'emiPayments' => PaymentStore::where('order_id', $view_id)
-                ->where('isDeleted', 0)
-                ->whereRaw("LOWER(payment_method) = 'emi'")
-                ->orderBy('payment_date', 'asc')
-                ->orderBy('id', 'asc')
-                ->get(['id', 'emi_month', 'payment_amount', 'payment_date'])
-                ->toArray(),
         ];
 
         // ========== NEW PART: INVOICE SIZE SELECTION ==========
         // Determine which view to use based on the saved invoice size
-       // ========== INVOICE SIZE SELECTION ==========
-if ($setting && $setting->invoice_size === 'small') {
+        // ========== INVOICE SIZE SELECTION ==========
+        if ($setting && $setting->invoice_size === 'small') {
 
-    // 80mm Thermal Paper Size
-    // 1mm = 2.83465 points
-    // 80mm = 226.77 pt
+            // 80mm Thermal Paper Size
+            // 1mm = 2.83465 points
+            // 80mm = 226.77 pt
 
-    $customPaper = [0, 0, 226.77, 1000]; // width, height(auto large)
+            $customPaper = [0, 0, 226.77, 1000]; // width, height(auto large)
 
-    $pdf = PDF::loadView('sales.salse-invoice-small-pdf', $pdfData)
-        ->setPaper($customPaper, 'portrait');
+            $pdf = PDF::loadView('sales.salse-invoice-small-pdf', $pdfData)
+                ->setPaper($customPaper, 'portrait');
+        } else {
 
-} else {
-
-    // Normal A4 Invoice
-    $pdf = PDF::loadView('sales.salse-invoice-pdf', $pdfData)
-        ->setPaper('A4', 'portrait');
-}
-// ============================================
+            // Normal A4 Invoice
+            $pdf = PDF::loadView('sales.salse-invoice-pdf', $pdfData)
+                ->setPaper('A4', 'portrait');
+        }
+        // ============================================
         // =======================================================
 
 
@@ -3569,6 +4343,28 @@ if ($setting && $setting->invoice_size === 'small') {
             'file_url' => $fileUrl,
             'file_name' => $fileName,
         ]);
+    }
+
+    public function updateStaff(Request $request, $id)
+    {
+        $order = Order::find($id);
+        if (!$order) {
+            return response()->json(['status' => false, 'message' => 'Order not found.'], 404);
+        }
+        $order->staff_id = $request->staff_id ?: null;
+        $order->save();
+        return response()->json(['status' => true, 'message' => 'Staff assigned successfully.']);
+    }
+
+    public function updateOrderType(Request $request, $id)
+    {
+        $order = Order::find($id);
+        if (!$order) {
+            return response()->json(['status' => false, 'message' => 'Order not found.'], 404);
+        }
+        $order->order_type = $request->order_type;
+        $order->save();
+        return response()->json(['status' => true, 'message' => 'Order type updated successfully.']);
     }
 
     public function exportOrdersPDF(Request $request)
@@ -3603,10 +4399,7 @@ if ($setting && $setting->invoice_size === 'small') {
         $setting = Setting::where('branch_id', $branchIdToUse)->first();
 
         try {
-            $query = Order::with([
-                'user:id,name,phone',
-                'assignedStaff:id,name',
-            ])
+            $query = Order::with(['user:id,name,phone'])
                 ->where('isDeleted', 0);
 
             // 🔹 Apply filters
@@ -3985,7 +4778,7 @@ if ($setting && $setting->invoice_size === 'small') {
         ]);
     }
 
-       public function exportTdsOrderReportExcel(Request $request)
+    public function exportTdsOrderReportExcel(Request $request)
     {
         $user = Auth::guard('api')->user();
         if (!$user) {
@@ -4114,7 +4907,7 @@ if ($setting && $setting->invoice_size === 'small') {
         ]);
     }
 
-      private function transformTdsOrderRow($order): array
+    private function transformTdsOrderRow($order): array
     {
         $tdsPercentage = (float) ($order->tds_percentage ?? 0);
         $tdsAmount = (float) ($order->tds_amount ?? 0);
@@ -4190,7 +4983,7 @@ if ($setting && $setting->invoice_size === 'small') {
         return [$symbol, $position];
     }
 
-     private function buildTdsOrderReportQuery(Request $request, $user)
+    private function buildTdsOrderReportQuery(Request $request, $user)
     {
         $userId = $user->id;
         $role = $user->role;
@@ -4202,10 +4995,7 @@ if ($setting && $setting->invoice_size === 'small') {
         $selectedSubAdminId = $request->input('selectedSubAdminId');
         $branchIdForNonStaff = $this->resolveBranchIdForTdsReport($user, $selectedSubAdminId);
 
-        $query = Order::with([
-            'user:id,name,phone',
-            'assignedStaff:id,name',
-        ])
+        $query = Order::with(['user:id,name,phone'])
             ->where('isDeleted', 0)
             ->where(function ($q) {
                 $q->where('tds_amount', '>', 0)
@@ -4286,141 +5076,5 @@ if ($setting && $setting->invoice_size === 'small') {
             'total_tds_amount' => round((float) ($summary->total_tds_amount ?? 0), 2),
             'average_tds_percentage' => round((float) ($summary->average_tds_percentage ?? 0), 2),
         ];
-    }
-
-    public function updateOrderInline(Request $request)
-    {
-        $request->validate([
-            'order_id' => 'required|integer|exists:orders,id',
-            'assigned_staff' => 'nullable|integer|exists:users,id',
-            'order_type' => 'nullable|in:Self Pickup,Delivery',
-        ]);
-
-        $order = Order::findOrFail($request->order_id);
-        $updateData = [];
-
-        if ($request->has('assigned_staff')) {
-            $updateData['assigned_staff'] = $request->assigned_staff !== '' ? (int) $request->assigned_staff : null;
-        }
-
-        if ($request->has('order_type')) {
-            $updateData['order_type'] = $request->order_type ?: 'Self Pickup';
-        }
-
-        if (empty($updateData)) {
-            return response()->json([
-                'status' => false,
-                'message' => 'No changes to update.',
-            ], 422);
-        }
-
-        $order->update($updateData);
-
-        return response()->json([
-            'status' => true,
-            'message' => 'Order updated successfully.',
-            'data' => $order->fresh(['assignedStaff:id,name']),
-        ]);
-    }
-
-    /**
-     * Today Deliveries — orders with order_type = 'Delivery' created today
-     */
-    public function todayDeliveries(Request $request)
-    {
-        $user = Auth::guard('api')->user();
-        if (!$user) {
-            return response()->json(['status' => false, 'message' => 'Unauthenticated.'], 401);
-        }
-
-        $selectedSubAdminID = $request->input('selectedSubAdminId');
-
-        $query = Order::with(['user:id,name,phone', 'assignedStaff:id,name'])
-            ->where('isDeleted', 0)
-            ->where('order_type', 'Delivery')
-            ->whereDate('created_at', Carbon::today('Asia/Kolkata'));
-
-        if ($user->role === 'sub-admin') {
-            $query->where('branch_id', $user->id);
-        } elseif ($user->role === 'admin' && $selectedSubAdminID) {
-            $query->where('branch_id', $selectedSubAdminID);
-        } elseif ($user->role === 'staff') {
-            $query->where('created_by', $user->id);
-        } else {
-            $query->where('branch_id', $user->id);
-        }
-
-        $orders = $query->orderByDesc('id')->get()->map(function ($order) {
-            return [
-                'id'              => $order->id,
-                'order_number'    => $order->order_number,
-                'customer_name'   => $order->user?->name ?? 'N/A',
-                'customer_phone'  => $order->user?->phone ?? 'N/A',
-                'total_amount'    => number_format((float) $order->total_amount, 2),
-                'payment_status'  => $order->payment_status,
-                'assigned_staff'  => $order->assignedStaff?->name ?? 'Unassigned',
-                'created_at'      => $order->created_at?->format('d-m-Y'),
-            ];
-        });
-
-        return response()->json([
-            'status' => true,
-            'data'   => $orders,
-            'total'  => $orders->count(),
-        ]);
-    }
-
-    /**
-     * Pending EMIs — orders with payment_method = EMI and remaining_amount > 0
-     * optionally filtered by next_pending_date = today
-     */
-    public function pendingEmis(Request $request)
-    {
-        $user = Auth::guard('api')->user();
-        if (!$user) {
-            return response()->json(['status' => false, 'message' => 'Unauthenticated.'], 401);
-        }
-
-        $selectedSubAdminID = $request->input('selectedSubAdminId');
-
-        $query = Order::with(['user:id,name,phone'])
-            ->where('isDeleted', 0)
-            ->whereRaw("LOWER(payment_method) = 'emi'")
-            ->where('remaining_amount', '>', 0)
-            ->whereIn('payment_status', ['pending', 'partially']);
-
-        if ($user->role === 'sub-admin') {
-            $query->where('branch_id', $user->id);
-        } elseif ($user->role === 'admin' && $selectedSubAdminID) {
-            $query->where('branch_id', $selectedSubAdminID);
-        } elseif ($user->role === 'staff') {
-            $query->where('created_by', $user->id);
-        } else {
-            $query->where('branch_id', $user->id);
-        }
-
-        $orders = $query
-            ->orderByDesc('remaining_amount')
-            ->orderByDesc('id')
-            ->get()
-            ->map(function ($order) {
-            return [
-                'id'                => $order->id,
-                'order_number'      => $order->order_number,
-                'customer_name'     => $order->user?->name ?? 'N/A',
-                'customer_phone'    => $order->user?->phone ?? 'N/A',
-                'total_amount'      => number_format((float) $order->total_amount, 2),
-                'remaining_amount'  => number_format((float) $order->remaining_amount, 2),
-                'emi_monthly_amount'=> $order->emi_monthly_amount ? number_format((float) $order->emi_monthly_amount, 2) : 'N/A',
-                'next_pending_date' => 'N/A',
-                'payment_status'    => $order->payment_status,
-            ];
-        });
-
-        return response()->json([
-            'status' => true,
-            'data'   => $orders,
-            'total'  => $orders->count(),
-        ]);
     }
 }

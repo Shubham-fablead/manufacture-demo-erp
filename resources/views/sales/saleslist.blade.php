@@ -3,17 +3,6 @@
 @section('title', 'Sales List')
 
 @section('content')
-    @php
-        $currentBranchId = session('selectedSubAdminId') ?? auth()->user()->branch_id ?? auth()->user()->id;
-        $salesStaffUsers = \App\Models\User::where('role', 'staff')
-            ->where('isDeleted', 0)
-            ->when(!empty($currentBranchId), function ($query) use ($currentBranchId) {
-                $query->where('branch_id', $currentBranchId);
-            })
-            ->select('id', 'name')
-            ->orderBy('name')
-            ->get();
-    @endphp
     <style>
         /* Status Badge Styles */
         .status-badge {
@@ -100,186 +89,6 @@
             display: inline-block;
             min-width: 70px;
             text-align: center;
-        }
-
-        .payment-history-items {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .payment-history-card {
-            border: 1px solid #e6e6e6;
-            border-radius: 4px;
-            background: #fff;
-            padding: 12px 14px;
-        }
-
-        .payment-history-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            gap: 12px;
-        }
-
-        .payment-history-meta {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .payment-history-date {
-            font-size: 14px;
-            font-weight: 500;
-            color: #2b2b2b;
-            line-height: 1.3;
-        }
-
-        .payment-history-subtext {
-            margin-top: 4px;
-            font-size: 13px;
-            color: #6c757d;
-            line-height: 1.4;
-            word-break: break-word;
-        }
-
-        .payment-history-right {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            flex-shrink: 0;
-        }
-
-        .payment-history-amount {
-            font-size: 15px;
-            font-weight: 700;
-            color: #212529;
-            white-space: nowrap;
-        }
-
-        .payment-history-actions {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .payment-action-btn {
-            width: 32px;
-            height: 32px;
-            border-radius: 4px;
-            border: 1px solid;
-            background: #fff;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .payment-action-btn i {
-            font-size: 13px;
-        }
-
-        .payment-action-btn.edit-payment-history {
-            border-color: #ff9f43;
-            color: #ff9f43;
-        }
-
-        .payment-action-btn.edit-payment-history:hover {
-            background: #fff5eb;
-        }
-
-        .payment-action-btn.delete-payment-history {
-            border-color: #ea5455;
-            color: #ea5455;
-        }
-
-        .payment-action-btn.delete-payment-history:hover {
-            background: #fff1f1;
-        }
-
-        .payment-history-summary {
-            margin-top: 16px;
-            border: 1px solid #e6e6e6;
-            border-radius: 4px;
-            overflow: hidden;
-            background: #fff;
-        }
-
-        .payment-history-summary-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 16px;
-            font-size: 14px;
-            border-bottom: 1px solid #ececec;
-        }
-
-        .payment-history-summary-row:last-child {
-            border-bottom: 0;
-        }
-
-        .payment-history-summary-row strong {
-            color: #2b2b2b;
-        }
-
-        .payment-history-summary-row .summary-danger {
-            color: #ea5455;
-            font-weight: 700;
-        }
-
-        .payment-edit-group {
-            margin-bottom: 16px;
-        }
-
-        .payment-edit-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-size: 14px;
-            color: #2b2b2b;
-            font-weight: 500;
-        }
-
-        .payment-edit-actions {
-            display: flex;
-            gap: 12px;
-            justify-content: flex-start;
-            margin-top: 8px;
-        }
-
-        .payment-edit-actions .btn {
-            min-width: 132px;
-        }
-
-        #editPaymentHistoryModal .modal-dialog {
-            max-width: 520px;
-            margin: 0.75rem auto;
-        }
-
-        #editPaymentHistoryModal .modal-content {
-            max-height: calc(100vh - 24px);
-            display: flex;
-            flex-direction: column;
-        }
-
-        #editPaymentHistoryModal .modal-body {
-            overflow-y: auto;
-            flex: 1 1 auto;
-            padding-bottom: 120px;
-        }
-
-        #editPaymentHistoryModal #edit_payment_remarks {
-            min-height: 88px;
-        }
-
-        #editPaymentHistoryModal .modal-footer {
-            position: sticky;
-            bottom: 0;
-            background: #fff;
-            z-index: 2;
-            border-top: 1px solid #e9ecef;
-            margin-top: 0;
-            padding-top: 12px;
-            padding-bottom: 12px;
         }
 
         .table-scroll-top {
@@ -1047,15 +856,33 @@
             font-weight: 600;
         }
 
-        .sales-inline-select {
-            min-width: 120px;
-            max-width: 150px;
-            height: 30px;
-            padding: 3px 8px;
-            font-size: 12px;
-            border: 1px solid #cfd7e6;
-            border-radius: 4px;
-            background: #fff;
+        /* Modal: prevent number inputs from overflowing on large values */
+        #makePaymentModal .modal-body input[type="number"],
+        #makePaymentModal .modal-body input[type="text"] {
+            min-width: 0;
+            width: 100%;
+            max-width: 100%;
+        }
+
+        #makePaymentModal .border.bg-light span {
+            word-break: break-all;
+            overflow-wrap: anywhere;
+        }
+
+        /* Filter total box: no overflow on large amounts */
+        .filter-total-box {
+            min-width: 0;
+        }
+
+        .filter-total-box #filtered-total {
+            word-break: break-all;
+            overflow-wrap: anywhere;
+        }
+
+        /* Summary badges: ensure amounts wrap */
+        .summary-badge-box span:last-child {
+            word-break: break-all;
+            overflow-wrap: anywhere;
         }
 
 
@@ -1086,6 +913,7 @@
         }
 
         @media screen and (min-width: 992px) and (max-width: 1199.98px) {
+
             .content,
             .card,
             .card-body,
@@ -1126,6 +954,7 @@
         }
 
         @media screen and (min-width: 768px) and (max-width: 991.98px) {
+
             .content,
             .card,
             .card-body,
@@ -1163,6 +992,7 @@
 
 
         @media (max-width: 767.98px) {
+
             html,
             body {
                 overflow-x: hidden;
@@ -1214,7 +1044,7 @@
             /* Dark gray for other pages */
             color: #fff;
             border: none;
-              margin: 0 3px;
+            margin: 0 3px;
             padding: 4px 10px;
             border-radius: 6px;
             font-weight: bold;
@@ -1276,6 +1106,20 @@
             font-size: 14px;
             font-weight: 600;
             background: #fff;
+            word-break: break-all;
+            overflow-wrap: anywhere;
+            white-space: normal;
+            flex-wrap: wrap;
+        }
+
+        .summary-badge-box.total {
+            color: #1b2850;
+            border-color: #ffebd6;
+            background: #fff8f2;
+        }
+
+        .summary-badge-box.total span:last-child {
+            color: #ff9f43;
         }
 
         .summary-badge-box.pending {
@@ -1290,229 +1134,253 @@
             background: #effcf4;
         }
 
-        /* Inline summary boxes (single row with Excel/PDF) */
-        .summary-inline-box {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            height: 31px;
-            padding: 0 12px;
-            border-radius: 5px;
-            border: 1px solid;
-            font-size: 13px;
-            font-weight: 600;
-            white-space: nowrap;
-            background: #fff;
-        }
-        .summary-inline-box.pending-box {
-            color: #ea5455;
-            border-color: #f5c2c7;
-            background: #fff5f5;
-        }
-        .summary-inline-box.paid-box {
-            color: #28c76f;
-            border-color: #b7ebcd;
-            background: #effcf4;
-        }
-        .summary-inline-box.total-box {
-            color: #1b2850;
-            border-color: #ced4da;
-            background: #fff;
-        }
-        .summary-inline-box.total-box span:last-child {
-            color: #ff9f43;
-        }
-
-        /* ── Mobile filter layout (≤ 767px) ── */
-        @media (max-width: 767.98px) {
-            /* Search — full width */
-            .sales-filter-toolbar .filter-search {
-                width: 100% !important;
-                flex: 0 0 100% !important;
-                max-width: 100% !important;
-            }
-
-            /* Month + Year — 2 equal columns */
-            .sales-filter-toolbar .filter-month-col,
-            .sales-filter-toolbar .filter-year-col {
-                width: 50% !important;
-                flex: 0 0 50% !important;
-                max-width: 50% !important;
-            }
-
-            /* Date + Financial year — 2 equal columns */
-            .sales-filter-toolbar .filter-date-col,
-            .sales-filter-toolbar .filter-fy-col {
-                width: 50% !important;
-                flex: 0 0 50% !important;
-                max-width: 50% !important;
-            }
-
-            /* Excel + PDF — 2 equal full-width buttons */
-            .mobile-export-row {
-                display: flex !important;
+        @media screen and (max-width: 767.98px) {
+            .summary-badges-row {
+                flex-direction: column;
                 gap: 8px;
-                margin-top: 4px;
-            }
-            .mobile-export-row .btn {
-                flex: 1;
-                height: 42px;
-                font-size: 14px;
-                font-weight: 700;
-                border-radius: 6px;
-            }
-
-            /* Hide the desktop export group on mobile */
-            .desktop-export-group {
-                display: none !important;
-            }
-
-            /* Summary boxes — full width, tall rows */
-            .mobile-summary-box {
-                display: flex !important;
-                align-items: center;
-                justify-content: space-between;
                 width: 100%;
-                padding: 12px 16px;
-                border-radius: 8px;
-                border: 1px solid;
-                font-size: 15px;
-                font-weight: 700;
-                margin-top: 6px;
-            }
-            .mobile-summary-box.total-box {
-                color: #ff9f43;
-                border-color: #ffe0bc;
-                background: #fff8f0;
-            }
-            .mobile-summary-box.pending-box {
-                color: #ea5455;
-                border-color: #f5c2c7;
-                background: #fff5f5;
-            }
-            .mobile-summary-box.paid-box {
-                color: #28c76f;
-                border-color: #b7ebcd;
-                background: #effcf4;
             }
 
-            /* Hide desktop inline summary boxes on mobile */
-            .desktop-summary-row {
-                display: none !important;
+            .summary-badge-box {
+                display: flex;
+                justify-content: flex-start;
+                width: 100%;
+                max-width: 100%;
+                white-space: normal;
+                word-break: break-word;
             }
         }
 
-        /* On desktop — hide mobile-only elements */
-        @media (min-width: 768px) {
-            .mobile-export-row {
-                display: none !important;
-            }
-            .mobile-summary-box {
-                display: none !important;
-            }
+        /* ===== EMI Modal Redesign ===== */
+        #emiModal .modal-dialog {
+            max-width: 680px;
         }
 
-        /* ===== ACTION DROPDOWN MENU ===== */
-        .action-dropdown-wrap {
-            position: relative;
+        #emiModal .modal-content {
+            border-radius: 12px;
+            overflow: hidden;
+            border: none;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.18);
+        }
+
+        #emiModal .modal-header {
+            background: #fff;
+            border-bottom: 1px solid #eee;
+            padding: 14px 20px;
+        }
+
+        #emiModal .modal-title {
+            font-weight: 700;
+            font-size: 17px;
+            color: #1b2850;
+        }
+
+        .emi-account-card {
+            background: linear-gradient(135deg, #1b2850 0%, #2d3f6e 100%);
+            border-radius: 10px;
+            padding: 18px 20px;
+            color: #fff;
+            margin-bottom: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .emi-account-label {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            color: rgba(255,255,255,0.65);
+            margin-bottom: 3px;
+        }
+
+        .emi-account-number {
+            font-size: 22px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+        }
+
+        .emi-account-customer {
+            font-size: 12px;
+            color: rgba(255,255,255,0.75);
+            margin-top: 2px;
+        }
+
+        .emi-next-due-badge {
+            background: rgba(255,255,255,0.18);
+            border: 1px solid rgba(255,255,255,0.35);
+            border-radius: 20px;
+            padding: 5px 14px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #fff;
+            white-space: nowrap;
+        }
+
+        .emi-info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 18px;
+        }
+
+        .emi-info-card {
+            background: #fff;
+            border: 1px solid #e8ebf0;
+            border-radius: 8px;
+            padding: 12px 14px;
+            transition: box-shadow 0.2s;
+        }
+
+        .emi-info-card:hover {
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .emi-info-card-label {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: #8a94a6;
+            margin-bottom: 5px;
+        }
+
+        .emi-info-card-value {
+            font-size: 16px;
+            font-weight: 700;
+            color: #1b2850;
+        }
+
+        .emi-monthly-section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .emi-monthly-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: #1b2850;
+        }
+
+        .emi-filters {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 10px;
+            align-items: center;
+        }
+
+        .emi-filter-select {
+            border: 1px solid #dce0e7;
+            border-radius: 6px;
+            padding: 4px 10px;
+            font-size: 12px;
+            color: #1b2850;
+            background: #fff;
+            cursor: pointer;
+            height: 30px;
+        }
+
+        .emi-filter-search {
+            border: 1px solid #dce0e7;
+            border-radius: 6px;
+            padding: 4px 10px;
+            font-size: 12px;
+            color: #1b2850;
+            background: #fff;
+            height: 30px;
+            width: 140px;
+        }
+
+        .emi-filter-search::placeholder {
+            color: #aab;
+        }
+
+        .emi-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        .emi-table thead th {
+            background: #f4f6fb;
+            color: #8a94a6;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.7px;
+            padding: 8px 12px;
+            border-bottom: 2px solid #e8ebf0;
+            text-align: left;
+        }
+
+        .emi-table tbody tr {
+            border-bottom: 1px solid #f0f2f7;
+            transition: background 0.15s;
+        }
+
+        .emi-table tbody tr:hover {
+            background: #f8f9ff;
+        }
+
+        .emi-table tbody td {
+            padding: 10px 12px;
+            color: #2d3559;
+            font-weight: 500;
+        }
+
+        .emi-table tbody td.emi-td-dash {
+            color: #b0b8c9;
+        }
+
+        .emi-status-paid {
+            background: #28c76f;
+            color: #fff;
+            border-radius: 5px;
+            padding: 3px 10px;
+            font-size: 11px;
+            font-weight: 700;
             display: inline-block;
         }
 
-        /* Allow dropdown to escape table overflow */
-        .table-responsive {
-            overflow: visible !important;
+        .emi-status-pending {
+            background: #ea5455;
+            color: #fff;
+            border-radius: 5px;
+            padding: 3px 10px;
+            font-size: 11px;
+            font-weight: 700;
+            display: inline-block;
         }
 
-        .datanew,
-        .datanew tbody,
-        .datanew tr,
-        .datanew td:last-child {
-            overflow: visible !important;
-        }
-
-        .action-dots-btn {
-            width: 38px;
-            height: 38px;
-            border: 1px solid #dee2e6;
+        .emi-table-wrap {
+            max-height: 280px;
+            overflow-y: auto;
+            border: 1px solid #e8ebf0;
             border-radius: 8px;
-            background: #fff;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            font-size: 18px;
-            color: #1b2850;
-            letter-spacing: 2px;
-            line-height: 1;
-            transition: background 0.15s;
-            padding: 0;
         }
 
-        .action-dots-btn:hover {
-            background: #f1f3f5;
+        .emi-table-wrap::-webkit-scrollbar {
+            width: 5px;
         }
 
-        .action-dropdown-menu {
-            display: none;
-            position: absolute;
-            right: 0;
-            top: calc(100% + 4px);
-            z-index: 1055;
-            min-width: 180px;
-            background: #fff;
-            border-radius: 10px;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.14);
-            padding: 6px 0;
-            border: 1px solid #f0f0f0;
+        .emi-table-wrap::-webkit-scrollbar-thumb {
+            background: #c0c8da;
+            border-radius: 3px;
         }
 
-        .action-dropdown-menu.show {
-            display: block;
-        }
-
-        .action-dropdown-menu a,
-        .action-dropdown-menu button {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            width: 100%;
-            padding: 9px 16px;
-            font-size: 14px;
-            color: #333;
-            background: none;
-            border: none;
-            text-decoration: none;
-            cursor: pointer;
-            transition: background 0.12s;
-            box-sizing: border-box;
-            white-space: nowrap;
-        }
-
-        .action-dropdown-menu a:hover,
-        .action-dropdown-menu button:hover {
-            background: #f8f9fa;
-            color: #1b2850;
-        }
-
-        .action-dropdown-menu a i,
-        .action-dropdown-menu button i {
-            width: 18px;
+        .emi-no-rows {
             text-align: center;
-            font-size: 15px;
-            color: #555;
-            flex-shrink: 0;
-        }
-
-        .action-dropdown-menu .action-delete {
-            color: #dc3545;
-        }
-
-        .action-dropdown-menu .action-delete i {
-            color: #dc3545;
-        }
-
-        .action-dropdown-menu .action-delete:hover {
-            background: #fff5f5;
+            padding: 20px;
+            color: #b0b8c9;
+            font-size: 13px;
         }
     </style>
     @if (session('error'))
@@ -1529,7 +1397,6 @@
             .fade-out.hidden {
                 opacity: 0;
             }
-
         </style>
 
         <script>
@@ -1552,9 +1419,10 @@
                 <!-- <h6>Manage your sales</h6> -->
             </div>
             <div class="page-btn">
-                 @if (app('hasPermission')(2, 'add'))
+                @if (app('hasPermission')(2, 'add'))
                     <a href="{{ route('sales.add', ['new_bill' => 1]) }}" class="btn btn-sm btn-added"><img
-                            src="{{ env('ImagePath') . 'admin/assets/img/icons/plus.svg' }}" alt="img" class="me-1">New
+                            src="{{ env('ImagePath') . 'admin/assets/img/icons/plus.svg' }}" alt="img"
+                            class="me-1">New
                         Bill</a>
                 @endif
             </div>
@@ -1569,7 +1437,19 @@
                     <div class="row w-100 align-items-center">
                         <!-- Search -->
                         <div class="col-md-2 col-12 mb-1 mb-md-0 filter-field filter-search">
+                            {{-- <div class="search-set w-100">
+                                <div class="search-path"></div>
+                                <div class="search-input d-flex align-items-center" style="width:170px;">
+                                    <a class="btn btn-searchset">
+                                        <img src="{{ env('ImagePath') . 'admin/assets/img/icons/search-white.svg' }}"
+                                            alt="img">
+                                    </a>
+                                    <input type="text" id="sales-search-input" class="form-control mb-1"
+                                        style="height:30px" placeholder="Search...">
+                                </div>
+                            </div> --}}
                             <div class="search-set">
+                                <!-- Your existing filters -->
                                 <div class="search-input mb-2">
                                     <a class="btn btn-searchset">
                                         <img src="{{ env('ImagePath') . 'admin/assets/img/icons/search-white.svg' }}"
@@ -1581,9 +1461,25 @@
                             </div>
                         </div>
 
-                        <!-- Month Filter -->
-                        <div class="col-md-2 col-6 filter-field filter-month-col">
+
+
+                        <!-- Sort Filter -->
+                        <div class="col-md-2 col-6 filter-field">
                             <div class="mb-1 custom-select2">
+                                <select id="filter-sort" data-placeholder="Latest First"
+                                    class="form-control form-control-sm filter-select2">
+                                    <option value="latest">Latest First</option>
+                                    <option value="oldest">Oldest First</option>
+                                    <option value="order_no_asc">Order No. 1 to Last</option>
+                                    <option value="order_no_desc">Order No. Last to 1</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Month Filter -->
+                        <div class="col-md-2 col-6 filter-field">
+                            <div class="mb-1 custom-select2">
+                                <!-- <label for="filter-month" class="form-label">Month</label> -->
                                 <select id="filter-month" data-placeholder="All Months"
                                     class="form-control form-control-sm filter-select2">
                                     <option value="all">All Months</option>
@@ -1597,8 +1493,9 @@
                         </div>
 
                         <!-- Year Filter -->
-                        <div class="col-md-2 col-6 filter-field filter-year-col">
+                        <div class="col-md-2 col-6 filter-field">
                             <div class="mb-1 custom-select2">
+                                <!-- <label for="filter-year" class="form-label">Year</label> -->
                                 <select id="filter-year" data-placeholder="All Years"
                                     class="form-control form-control-sm filter-select2">
                                     <option value="all">All Years</option>
@@ -1609,7 +1506,7 @@
                             </div>
                         </div>
 
-                        <div class="col-md-2 col-6 filter-field filter-fy-col {{ ($financialYearEnabled ?? true) ? '' : 'd-none' }}"
+                        <div class="col-md-2 col-6 filter-field {{ $financialYearEnabled ?? true ? '' : 'd-none' }}"
                             id="sales-financial-year-filter">
                             <div class="mb-1">
                                 <select id="filter-financial-year" class="form-control form-control-sm">
@@ -1618,14 +1515,25 @@
                             </div>
                         </div>
 
+                        <!-- Date Filter -->
+                        <!-- <div class="col-md-2 col-6">
+                                                                                                                                            <div class="form-group mb-0">
+                                                                                                                                                <label for="filter-date" class="form-label">Date</label>
+                                                                                                                                                <input type="text" id="filter-date" placeholder="Choose Date"
+                                                                                                                                                    class="datetimepicker form-control form-control-sm">
+                                                                                                                                            </div>
+                                                                                                                                        </div> -->
                         <!-- Date -->
-                        <div class="col-md-2 col-6 filter-field filter-date-col">
+                        <div class="col-md-2 col-6 filter-field">
+                            <!-- <div class="form-group mb-0"> -->
+                            <!-- <label for="filter-date" class="form-label">Date</label> -->
                             <input type="text" id="filter-date" placeholder="Choose Date"
                                 class="datetimepicker form-control form-control-sm filter-date-input">
+                            <!-- </div> -->
                         </div>
 
                         <!-- Order Type Filter -->
-                        <div class="col-md-2 col-6 filter-field filter-order-type-col">
+                        <div class="col-md-2 col-6 filter-field">
                             <div class="mb-1 custom-select2">
                                 <select id="filter-order-type" data-placeholder="All Order Types"
                                     class="form-control form-control-sm filter-select2">
@@ -1636,70 +1544,13 @@
                             </div>
                         </div>
 
-                        <!-- Sort Filter -->
-                        <div class="col-md-2 col-6 filter-field filter-sort-col">
-                            <div class="mb-1 custom-select2">
-                                <select id="filter-sort" data-placeholder="Latest First"
-                                    class="form-control form-control-sm filter-select2">
-                                    <option value="latest">Latest First</option>
-                                    <option value="oldest">Oldest First</option>
-                                    <option value="order_no_asc">Order No. 1 to Last</option>
-                                    <option value="order_no_desc">Order No. Last to 1</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <!-- Mobile-only: Excel + PDF buttons (full width, 2 columns) -->
-                        <div class="col-12 px-2 mobile-export-row">
-                            <button id="exportAllChallan-mobile" class="btn btn-sm btn-success"
-                                onclick="$('#exportAllChallan').trigger('click');">
-                                <i class="fas fa-file-excel"></i> Excel
-                            </button>
-                            <button id="exportPdf-mobile" class="btn btn-sm btn-danger"
-                                onclick="$('#exportPdf').trigger('click');">
-                                <i class="fas fa-file-pdf"></i> PDF
-                            </button>
-                        </div>
-
-                        <!-- Mobile-only: Summary boxes (full width stacked) -->
-                        @if (in_array(auth()->user()->role, ['admin', 'sub-admin']))
-                        <div class="col-12 px-2 d-block d-md-none mt-1">
-                            <div class="mobile-summary-box total-box">
-                                <span>Total:</span>
-                                <span id="filtered-total-mobile">₹0.00</span>
-                            </div>
-                            <div class="mobile-summary-box pending-box">
-                                <span>Total Pending:</span>
-                                <span id="filtered-pending-total-mobile">₹0.00</span>
-                            </div>
-                            <div class="mobile-summary-box paid-box">
-                                <span>Total Paid:</span>
-                                <span id="filtered-paid-total-mobile">₹0.00</span>
-                            </div>
-                        </div>
-                        @endif
-
-                        <!-- Desktop: Summary + Export row -->
-                        <div class="col-12 filter-field mt-2 desktop-summary-row">
-                            <div class="d-flex flex-wrap align-items-center gap-2">
-                                @if (in_array(auth()->user()->role, ['admin', 'sub-admin']))
-                                    <div class="summary-inline-box pending-box">
-                                        <span>Total Pending:</span>
-                                        <span id="filtered-pending-total">₹0.00</span>
-                                    </div>
-                                    <div class="summary-inline-box paid-box">
-                                        <span>Total Paid:</span>
-                                        <span id="filtered-paid-total">₹0.00</span>
-                                    </div>
-                                    <div class="summary-inline-box total-box">
-                                        <span>Total:</span>
-                                        <span id="filtered-total">₹0.00</span>
-                                    </div>
-                                @endif
-                                <button id="exportAllChallan" class="btn btn-sm btn-success ms-auto desktop-export-group">
+                        <!-- Export Buttons -->
+                        <div class="col-md-2 col-12 mb-1 filter-field filter-export">
+                            <div class="filter-export-group mt-1">
+                                <button id="exportAllChallan" class="btn btn-sm btn-success flex-fill">
                                     <i class="fas fa-file-excel"></i> Excel
                                 </button>
-                                <button id="exportPdf" class="btn btn-sm btn-danger desktop-export-group">
+                                <button id="exportPdf" class="btn btn-sm btn-danger flex-fill">
                                     <i class="fas fa-file-pdf"></i> PDF
                                 </button>
                             </div>
@@ -1707,7 +1558,22 @@
                     </div>
                 </div>
 
-
+                @if (in_array(auth()->user()->role, ['admin', 'sub-admin']))
+                    <div class="summary-badges-row">
+                        <div class="summary-badge-box total">
+                            <span>Total:</span>
+                            <span id="filtered-total">₹0.00</span>
+                        </div>
+                        <div class="summary-badge-box pending">
+                            <span>Total Pending:</span>
+                            <span id="filtered-pending-total">₹0.00</span>
+                        </div>
+                        <div class="summary-badge-box paid">
+                            <span>Total Paid:</span>
+                            <span id="filtered-paid-total">₹0.00</span>
+                        </div>
+                    </div>
+                @endif
 
                 <!-- Filter Inputs Card -->
                 {{-- <div class="card" id="filter_inputs">
@@ -1830,15 +1696,19 @@
 
 
 
-                        <div class="border p-2 rounded bg-light">
-                            <strong>Total Amount:</strong> ₹<span id="emiTotal"></span><br>
-                            <div id="tdsSummarySection" class="d-none">
-                                <strong>TDS (<span id="modalTdsPercentage">0.00</span>%):</strong> ₹<span id="modalTdsAmount">0.00</span><br>
+                        <div class="border p-2 rounded bg-light"
+                            style="word-break: break-all; overflow-wrap: anywhere; font-size: 14px;">
+                            <strong>Total Amount:</strong> ₹<span id="emiTotal"
+                                style="word-break: break-all;"></span><br>
+                            <div id="tdsAmountSection" class="d-none">
+                                <strong>TDS (<span id="tdsPercentageDisplay">0</span>%):</strong>
+                                ₹<span id="tdsAmountDisplay">0.00</span><br>
                             </div>
                             <div id="returnAmountSection" class="d-none">
                                 <strong>Return Amount:</strong> ₹<span id="returnAmountDisplay">0.00</span><br>
                             </div>
                             <strong>Remaining Amount:</strong> ₹<span id="remainingAmountDisplay">0.00</span>
+
                         </div>
 
                         <!-- ✅ View Payment History Button -->
@@ -1856,7 +1726,6 @@
                                 <option value="online">Online</option>
                                 <option value="cash_online">Cash + Online</option>
                                 <option value="emi">EMI</option>
-
                             </select>
                             <div class="text-danger" id="paymentMethodError"></div>
                         </div>
@@ -1969,17 +1838,17 @@
                             <div class="text-danger" id="bankError"></div>
                         </div>
 
-                        <div class="mb-3 d-none" id="emi_container">
+                        <div class="mb-3 d-none" id="emiFields">
                             <label for="emiMonthSelect" class="form-label">EMI Month</label>
                             <select class="form-select" id="emiMonthSelect" name="emi_month">
                                 <option value="" selected disabled>Select EMI Month</option>
                             </select>
                             <div class="text-danger" id="emiMonthError"></div>
 
-                            <label for="emiMonthlyAmount" class="form-label mt-3">Monthly EMI</label>
-                            <input type="text" class="form-control" id="emiMonthlyAmount" readonly disabled>
-                            <input type="hidden" id="emiMonthCountHidden" value="0">
-                            <input type="hidden" id="emiNextMonthHidden" value="1">
+                            <label for="emiMonthlyAmount" class="form-label mt-2">Monthly EMI</label>
+                            <input type="number" class="form-control" id="emiMonthlyAmount" name="emi_monthly"
+                                readonly>
+                            <div class="text-danger" id="emiMonthlyAmountError"></div>
                         </div>
 
                         <!-- Fully Paid Fields -->
@@ -1991,8 +1860,9 @@
                         </div>
 
                         <div class="mb-3">
-                            <label for="paymentDate" class="form-label">Payment Date</label>
-                            <input type="text" class="form-control datetimepicker" id="paymentDate" name="payment_date" autocomplete="off" placeholder="DD-MM-YYYY">
+                            <label for="paymentDateInput" class="form-label">Payment Date</label>
+                            <input type="text" class="form-control datetimepicker" id="paymentDateInput"
+                                name="payment_date" placeholder="Choose Payment Date" autocomplete="off">
                             <div class="text-danger" id="paymentDateError"></div>
                         </div>
 
@@ -2019,7 +1889,6 @@
                         <input type="hidden" id="paymentJobCardId" name="order_id">
                         <input type="hidden" id="remainingAmountHidden" name="remaining_amount">
                         <input type="hidden" id="paymentMethodHidden" name="payment_type">
-                        <input type="hidden" id="paymentDateHidden" name="payment_date_value">
 
 
 
@@ -2035,8 +1904,7 @@
             </div>
         </div>
     </form>
-    <div class="modal fade" id="addBankModal" tabindex="-1" aria-labelledby="addBankModalLabel"
-        aria-hidden="true">
+    <div class="modal fade" id="addBankModal" tabindex="-1" aria-labelledby="addBankModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <form id="addBankForm">
@@ -2053,7 +1921,8 @@
                             </div>
                             <div class="col-6 mb-3">
                                 <label for="add_account_number" class="form-label">Account Number</label>
-                                <input type="text" class="form-control" id="add_account_number" name="account_number">
+                                <input type="text" class="form-control" id="add_account_number"
+                                    name="account_number">
                                 <div class="text-danger small" id="addAccountNumberError"></div>
                             </div>
                             <div class="col-6 mb-3">
@@ -2102,7 +1971,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">x</button>
                 </div>
                 <div class="modal-body">
-                    <div id="globalPaymentHistoryList"></div>
+                    <ul id="globalPaymentHistoryList" class="list-group"></ul>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-cancel" data-bs-dismiss="modal">Close</button>
@@ -2110,130 +1979,60 @@
             </div>
         </div>
     </div>
-    <div class="modal fade" id="emiDetailsModal" tabindex="-1" aria-labelledby="emiDetailsModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-scrollable modal-xl" style="max-width: 820px;">
-            <div class="modal-content">
-                <div class="modal-header" style="border-bottom:1px solid #e9ecef;padding:16px 20px;">
-                    <h5 class="modal-title" id="emiDetailsModalLabel">EMI Details</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">x</button>
-                </div>
-                <div class="modal-body" style="padding:18px 18px 20px;background:#f8f9fc;">
-                    <div id="emiDetailsModalBody" class="text-center text-muted py-4">Loading EMI details...</div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-cancel" data-bs-dismiss="modal">Close</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="modal fade" id="editPaymentHistoryModal" tabindex="-1" aria-labelledby="editPaymentHistoryLabel"
-        aria-hidden="true">
-        <div class="modal-dialog modal-dialog-scrollable">
+
+    <div class="modal fade" id="editPaymentModal" tabindex="-1" aria-labelledby="editPaymentLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="editPaymentHistoryLabel">Edit Payment</h5>
+                    <h5 class="modal-title" id="editPaymentLabel">Edit Payment</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">x</button>
                 </div>
-                <form id="editPaymentHistoryForm">
-                    <div class="modal-body">
-                        <input type="hidden" id="edit_payment_id" name="payment_id">
-                        <input type="hidden" id="edit_order_id" name="order_id">
-                        <input type="hidden" id="edit_current_payment_amount" name="current_payment_amount">
-
-                        <div class="payment-edit-group">
-                            <label for="edit_payment_method">Select Payment Method</label>
-                            <select class="form-select" id="edit_payment_method" name="payment_method">
-                                <option value="cash">Cash</option>
-                                <option value="online">Online</option>
-                                <option value="cash_online">Cash + Online</option>
-                            </select>
-                        </div>
-
-                        <div class="payment-edit-group" id="edit_paid_type_group">
-                            <label for="edit_paid_type">Paid Type</label>
-                            <select class="form-select" id="edit_paid_type" name="paid_type">
-                                <option value="cash_fully">Cash Fully</option>
-                                <option value="cash_partially">Cash Partially</option>
-                            </select>
-                        </div>
-
-                        <div class="payment-edit-group d-none" id="edit_online_type_group">
-                            <label for="edit_online_type">Select Online Type</label>
-                            <select class="form-select" id="edit_online_type" name="online_type">
-                                <option value="online_fully">Online Fully</option>
-                                <option value="online_partially">Online Partially</option>
-                            </select>
-                        </div>
-
-                        <div class="payment-edit-group d-none" id="edit_cash_online_type_group">
-                            <label for="edit_cash_online_type">Paid Type</label>
-                            <select class="form-select" id="edit_cash_online_type" name="cash_online_type">
-                                <option value="cash_online_fully">Cash + Online Fully</option>
-                                <option value="cash_online_partially">Cash + Online Partially</option>
-                            </select>
-                        </div>
-
-                        <div class="payment-edit-group d-none" id="edit_partial_amount_group">
-                            <label for="edit_partial_amount">Enter Amount</label>
-                            <input type="number" class="form-control" id="edit_partial_amount" name="payment_amount"
-                                min="0" step="0.01">
-                        </div>
-
-                        <div class="payment-edit-group d-none" id="edit_pending_amount_group">
-                            <label for="edit_pending_amount">Pending Amount</label>
-                            <input type="number" class="form-control" id="edit_pending_amount" readonly>
-                        </div>
-
-                        <div class="payment-edit-group" id="edit_cash_amount_group">
-                            <label for="edit_cash_amount">Cash Amount</label>
-                            <input type="number" class="form-control" id="edit_cash_amount" name="cash_amount"
-                                min="0" step="0.01">
-                        </div>
-
-                        <div class="payment-edit-group d-none" id="edit_online_amount_group">
-                            <label for="edit_online_amount">Online Amount</label>
-                            <input type="number" class="form-control" id="edit_online_amount" name="upi_amount"
-                                min="0" step="0.01">
-                        </div>
-
-                        <div class="payment-edit-group d-none" id="edit_bank_group">
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                <label for="edit_bank_id" class="mb-0">Select Bank</label>
-                                <button type="button" class="btn btn-sm btn-outline-warning" id="editOpenAddBankModal">
-                                    Add Bank
-                                </button>
-                            </div>
-                            <select class="form-select" id="edit_bank_id" name="bank_id">
-                                <option value="">Select Bank</option>
-                                @foreach ($banks as $bank)
-                                    <option value="{{ $bank->id }}">{{ $bank->bank_name }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-
-                        <div class="payment-edit-group d-none" id="edit_reference_group">
-                            <label for="edit_reference_number">Reference Number</label>
-                            <input type="text" class="form-control" id="edit_reference_number" name="reference_number"
-                                placeholder="Enter reference number">
-                        </div>
-
-                        <div class="payment-edit-group">
-                            <label for="edit_payment_remarks">Remarks</label>
-                            <textarea class="form-control" id="edit_payment_remarks" name="remarks" rows="4"
-                                placeholder="Enter remarks"></textarea>
-                        </div>
-
-                        <div class="payment-edit-group">
-                            <label for="edit_payment_date">Payment Date</label>
-                            <input type="date" class="form-control" id="edit_payment_date" name="payment_date">
-                        </div>
+                <div class="modal-body">
+                    <input type="hidden" id="editPaymentId">
+                    <input type="hidden" id="editPaymentOrderId">
+                    <div class="mb-3">
+                        <label for="editPaymentMethod" class="form-label">Select Payment Method</label>
+                        <select class="form-select" id="editPaymentMethod">
+                            <option value="cash">Cash</option>
+                            <option value="online">Online</option>
+                            {{-- <option value="emi">EMI</option> --}}
+                        </select>
                     </div>
-                    <div class="modal-footer payment-edit-actions">
-                        <button type="button" class="btn btn-cancel" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-submit text-white" style="background-color: #ff9f43;">Save
-                            Changes</button>
+                    <div class="mb-3">
+                        <label for="editPaymentType" class="form-label">Payment Type</label>
+                        <select class="form-select" id="editPaymentType">
+                            <option value="fully">Fully</option>
+                            <option value="partially">Partially</option>
+                            {{-- <option value="emi">EMI</option> --}}
+                        </select>
                     </div>
-                </form>
+                    <div class="mb-3">
+                        <label for="editPaymentAmount" class="form-label">Amount</label>
+                        <input type="number" class="form-control" id="editPaymentAmount" min="0"
+                            step="0.01">
+                    </div>
+                    <div class="mb-3" id="editPaymentBankWrap">
+                        <label for="editPaymentBank" class="form-label">Select Bank</label>
+                        <select class="form-select" id="editPaymentBank">
+                            <option value="">Select Bank</option>
+                            @foreach ($banks as $bank)
+                                <option value="{{ $bank->id }}">{{ $bank->bank_name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editPaymentDate" class="form-label">Payment Date</label>
+                        <input type="date" class="form-control" id="editPaymentDate">
+                    </div>
+                    <div class="mb-3">
+                        <label for="editPaymentRemarks" class="form-label">Remarks</label>
+                        <textarea class="form-control" id="editPaymentRemarks" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-cancel" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-warning" id="saveEditPaymentBtn">Save Changes</button>
+                </div>
             </div>
         </div>
     </div>
@@ -2244,11 +2043,111 @@
             <div class="spinner-border text-primary" role="status" aria-hidden="true"></div>
         </div>
     </div>
+
+    <!-- Redesigned EMI Details Modal -->
+    <div class="modal fade" id="emiModal" tabindex="-1" aria-labelledby="emiModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-scrollable" style="max-width:680px;">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title" id="emiModalLabel">EMI Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">x</button>
+                </div>
+
+                <div class="modal-body" style="padding: 20px;">
+
+                    <!-- Account Header Card -->
+                    <div class="emi-account-card">
+                        <div>
+                            <div class="emi-account-label">EMI Account</div>
+                            <div class="emi-account-number" id="emiOrderNumber">—</div>
+                            <div class="emi-account-customer">Customer: <span id="emiCustomerName">—</span></div>
+                        </div>
+                        <div class="emi-next-due-badge" id="emiNextDueBadge">Next due: —</div>
+                    </div>
+
+                    <!-- Info Cards Grid -->
+                    <div class="emi-info-grid">
+                        <div class="emi-info-card">
+                            <div class="emi-info-card-label">EMI Tenure</div>
+                            <div class="emi-info-card-value" id="emiTenureDisplay">—</div>
+                        </div>
+                        <div class="emi-info-card">
+                            <div class="emi-info-card-label">Monthly EMI</div>
+                            <div class="emi-info-card-value" id="emiMonthlyDisplay">—</div>
+                        </div>
+                        <div class="emi-info-card">
+                            <div class="emi-info-card-label">Down Payment</div>
+                            <div class="emi-info-card-value" id="emiDownPaymentDisplay">—</div>
+                        </div>
+                        <div class="emi-info-card">
+                            <div class="emi-info-card-label">Loan Amount</div>
+                            <div class="emi-info-card-value" id="emiLoanAmountDisplay">—</div>
+                        </div>
+                        <div class="emi-info-card">
+                            <div class="emi-info-card-label">Interest Rate</div>
+                            <div class="emi-info-card-value" id="emiInterestDisplay">—</div>
+                        </div>
+                        <div class="emi-info-card">
+                            <div class="emi-info-card-label">Guarantor Name</div>
+                            <div class="emi-info-card-value" id="emiGuarantorDisplay" style="font-size:14px;">—</div>
+                        </div>
+                        <div class="emi-info-card">
+                            <div class="emi-info-card-label">Aadhar Number</div>
+                            <div class="emi-info-card-value" id="emiAadharDisplay" style="font-size:14px;">—</div>
+                        </div>
+                        <div class="emi-info-card">
+                            <div class="emi-info-card-label">PAN Number</div>
+                            <div class="emi-info-card-value" id="emiPanDisplay" style="font-size:14px;">—</div>
+                        </div>
+                    </div>
+
+                    <!-- Month Wise Section -->
+                    <div class="emi-monthly-section-header">
+                        <div class="emi-monthly-title">Month Wise EMI Details</div>
+                        <div class="emi-next-due-badge" id="emiNextDueBadge2" style="background:#1b2850;border-color:#3a4f8c;">Next due: —</div>
+                    </div>
+
+                    <!-- Filters -->
+                    <div class="emi-filters">
+                        <select id="emiStatusFilter" class="emi-filter-select">
+                            <option value="all">All Status</option>
+                            <option value="paid">Paid</option>
+                            <option value="pending">Pending</option>
+                        </select>
+                        <input type="text" id="emiMonthSearch" class="emi-filter-search" placeholder="Search month...">
+                    </div>
+
+                    <!-- Month Table -->
+                    <div class="emi-table-wrap">
+                        <table class="emi-table">
+                            <thead>
+                                <tr>
+                                    <th>Month</th>
+                                    <th>Status</th>
+                                    <th>Amount</th>
+                                    <th>Paid On</th>
+                                    <th>Remark</th>
+                                </tr>
+                            </thead>
+                            <tbody id="emiMonthTableBody">
+                                <tr><td colspan="5" class="emi-no-rows">Loading...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
 @endsection
 
 @push('js')
     <script>
-        const userRole = "{{ auth()->user()->role }}";
+        var userRole = "{{ auth()->check() ? auth()->user()->role : 'guest' }}";
+        window.staffOptions = @json($staffs ?? []);
+        var currencySymbol = "{{ $currencySymbol ?? '₹' }}";
     </script>
 
     <script>
@@ -2256,7 +2155,105 @@
         // Helper function to get status badge HTML
         // In your JavaScript code, update the getStatusBadge and getMobileStatusBadge functions:
 
-        // Helper function to get status badge HTML
+        // ===== EMI Details Modal Logic =====
+        var emiAllMonths = []; // store all month rows for filtering
+
+        function renderEmiTable(rows) {
+            if (!rows || rows.length === 0) {
+                $('#emiMonthTableBody').html('<tr><td colspan="5" class="emi-no-rows">No records found.</td></tr>');
+                return;
+            }
+            var html = '';
+            rows.forEach(function(row) {
+                var statusBadge = row.status && row.status.toLowerCase() === 'paid'
+                    ? '<span class="emi-status-paid">Paid</span>'
+                    : '<span class="emi-status-pending">Pending</span>';
+                var paidOn = (row.paid_on && row.paid_on !== '-') ? row.paid_on : '<span class="emi-td-dash">-</span>';
+                var remark = (row.remark && row.remark !== '-') ? row.remark : '<span class="emi-td-dash">-</span>';
+                var amt = '₹' + Number(row.amount).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                html += '<tr>';
+                html += '<td>' + (row.label || '') + '</td>';
+                html += '<td>' + statusBadge + '</td>';
+                html += '<td>' + amt + '</td>';
+                html += '<td>' + paidOn + '</td>';
+                html += '<td>' + remark + '</td>';
+                html += '</tr>';
+            });
+            $('#emiMonthTableBody').html(html);
+        }
+
+        function filterEmiTable() {
+            var status = $('#emiStatusFilter').val();
+            var search = ($('#emiMonthSearch').val() || '').toLowerCase().trim();
+            var filtered = emiAllMonths.filter(function(row) {
+                var matchStatus = (status === 'all') || (row.status && row.status.toLowerCase() === status);
+                var matchSearch = !search || (row.label && row.label.toLowerCase().indexOf(search) !== -1);
+                return matchStatus && matchSearch;
+            });
+            renderEmiTable(filtered);
+        }
+
+        $('#emiStatusFilter').on('change', filterEmiTable);
+        $('#emiMonthSearch').on('input', filterEmiTable);
+
+        function openEmiDetails(id) {
+            // Reset filters
+            $('#emiStatusFilter').val('all');
+            $('#emiMonthSearch').val('');
+
+            // Reset modal fields
+            $('#emiOrderNumber').text('—');
+            $('#emiCustomerName').text('—');
+            $('#emiNextDueBadge').text('Next due: —');
+            $('#emiNextDueBadge2').text('Next due: —');
+            $('#emiTenureDisplay').text('—');
+            $('#emiMonthlyDisplay').text('—');
+            $('#emiDownPaymentDisplay').text('—');
+            $('#emiLoanAmountDisplay').text('—');
+            $('#emiInterestDisplay').text('—');
+            $('#emiGuarantorDisplay').text('—');
+            $('#emiAadharDisplay').text('—');
+            $('#emiPanDisplay').text('—');
+            $('#emiMonthTableBody').html('<tr><td colspan="5" class="emi-no-rows">Loading...</td></tr>');
+            emiAllMonths = [];
+
+            // Open Modal
+            $('#emiModal').modal('show');
+
+            $.ajax({
+                url: "{{ route('sales.emi.details', ':id') }}".replace(':id', id),
+                type: "GET",
+                dataType: "json",
+                success: function(res) {
+                    var fmt = function(n) {
+                        return '₹' + Number(n || 0).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                    };
+                    var nextDueLabel = res.next_due_label || 'Completed';
+                    var nextDueText = 'Next due: ' + nextDueLabel;
+
+                    $('#emiOrderNumber').text(res.order_number || '—');
+                    $('#emiCustomerName').text(res.customer_name || '—');
+                    $('#emiNextDueBadge').text(nextDueText);
+                    $('#emiNextDueBadge2').text(nextDueText);
+                    $('#emiTenureDisplay').text((res.months || 0) + ' Months');
+                    $('#emiMonthlyDisplay').text(fmt(res.emi_amount));
+                    $('#emiDownPaymentDisplay').text(fmt(res.down_payment));
+                    $('#emiLoanAmountDisplay').text(fmt(res.loan_amount));
+                    $('#emiInterestDisplay').text(Number(res.interest_rate || 0).toFixed(2) + '%');
+                    $('#emiGuarantorDisplay').text(res.guarantor_name || 'N/A');
+                    $('#emiAadharDisplay').text(res.aadhar_number || 'N/A');
+                    $('#emiPanDisplay').text(res.pan_number || 'N/A');
+
+                    emiAllMonths = Array.isArray(res.month_details) ? res.month_details : [];
+                    renderEmiTable(emiAllMonths);
+                },
+                error: function(xhr) {
+                    console.log(xhr.responseText);
+                    $('#emiMonthTableBody').html('<tr><td colspan="5" class="emi-no-rows">Unable to load EMI Details.</td></tr>');
+                }
+            });
+        }
+
         function formatPaymentHistoryDate(value) {
             if (!value) return 'N/A';
 
@@ -2278,471 +2275,54 @@
             return value;
         }
 
-        function escapePaymentHistoryText(value) {
-            return String(value ?? 'N/A')
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;')
-                .replace(/'/g, '&#039;');
-        }
-
-        function formatPaymentHistoryAmount(value) {
-            return parseFloat(value || 0).toLocaleString(undefined, {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2
-            });
-        }
-
-        function formatCurrencyPlain(value) {
-            return parseFloat(value || 0).toLocaleString(undefined, {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2
-            });
-        }
-
-        function buildEmiMonthOptions(totalMonths, paidCount, monthlyAmount) {
-            const total = Math.max(parseInt(totalMonths || 0, 10) || 0, 1);
-            const paid = Math.max(parseInt(paidCount || 0, 10) || 0, 0);
-            const safeMonthlyAmount = formatCurrencyPlain(monthlyAmount);
-            let html = '<option value="" selected disabled>Select EMI Month</option>';
-
-            for (let month = 1; month <= total; month++) {
-                let label = `${month}${month % 100 >= 11 && month % 100 <= 13 ? 'th' : month % 10 === 1 ? 'st' : month % 10 === 2 ? 'nd' : month % 10 === 3 ? 'rd' : 'th'} Month - ₹${safeMonthlyAmount}`;
-                if (month <= paid) {
-                    label += ' (Paid)';
-                } else if (month === paid + 1) {
-                    label += ' (Pay now)';
-                } else {
-                    label += ' (Upcoming)';
-                }
-                html += `<option value="${month}" ${month === paid + 1 ? 'selected' : ''}>${label}</option>`;
-            }
-
-            return html;
-        }
-
-        function getPaymentHistoryReference(payment) {
-            return payment.reference_number || payment.transaction_id || payment.receipt_number || payment.ref_no || 'N/A';
-        }
-
-        let editPaymentModalInstance = null;
-        let paymentHistoryModalInstance = null;
-        let emiDetailsModalInstance = null;
-        let currentPaymentHistorySummary = {};
-
-        function toPaymentInputDate(value) {
+        function formatDateForInput(value) {
             if (!value) return '';
-            const datePart = String(value).split(' ')[0];
 
+            const datePart = String(value).split(' ')[0];
             if (/^\d{4}-\d{2}-\d{2}$/.test(datePart)) {
                 return datePart;
             }
 
-            if (/^\d{2}-\d{2}-\d{4}$/.test(datePart)) {
-                const [day, month, year] = datePart.split('-');
-                return `${year}-${month}-${day}`;
-            }
-
             const parsedDate = new Date(value);
             if (!isNaN(parsedDate.getTime())) {
-                const day = String(parsedDate.getDate()).padStart(2, '0');
-                const month = String(parsedDate.getMonth() + 1).padStart(2, '0');
-                const year = parsedDate.getFullYear();
-                return `${year}-${month}-${day}`;
+                return parsedDate.toISOString().slice(0, 10);
             }
 
             return '';
         }
 
-        function showEditPaymentSections() {
-            const method = $('#edit_payment_method').val();
-            const paidType = $('#edit_paid_type').val();
-            const onlineType = $('#edit_online_type').val();
-            const cashOnlineType = $('#edit_cash_online_type').val();
+        function formatPaymentMethodLabel(value) {
+            const method = String(value || '').toLowerCase();
 
-            $('#edit_paid_type_group, #edit_online_type_group, #edit_cash_online_type_group, #edit_partial_amount_group, #edit_pending_amount_group, #edit_cash_amount_group, #edit_online_amount_group, #edit_bank_group, #edit_reference_group')
-                .addClass('d-none');
-
-            if (method === 'cash') {
-                $('#edit_paid_type_group, #edit_cash_amount_group').removeClass('d-none');
-                if (paidType === 'cash_partially') {
-                    $('#edit_partial_amount_group, #edit_pending_amount_group').removeClass('d-none');
-                    $('#edit_cash_amount_group').addClass('d-none');
-                }
-            } else if (method === 'online') {
-                $('#edit_online_type_group, #edit_bank_group, #edit_reference_group').removeClass('d-none');
-                if (onlineType === 'online_partially') {
-                    $('#edit_partial_amount_group, #edit_pending_amount_group').removeClass('d-none');
-                }
-            } else if (method === 'cash_online') {
-                $('#edit_cash_online_type_group, #edit_cash_amount_group, #edit_online_amount_group').removeClass('d-none');
-                if (cashOnlineType === 'cash_online_partially') {
-                    $('#edit_pending_amount_group').removeClass('d-none');
-                }
+            switch (method) {
+                case 'cash':
+                    return 'Cash';
+                case 'online':
+                case 'upi':
+                    return 'Online';
+                case 'emi':
+                    return 'EMI';
+                case 'cash_online':
+                    return 'Cash + Online';
+                default:
+                    return value || 'N/A';
             }
         }
 
-        function recalculateEditPendingAmount() {
-            const orderTotal = parseFloat(currentPaymentHistorySummary.order_total || 0);
-            const returnAmount = parseFloat(currentPaymentHistorySummary.return_amount || 0);
-            const currentPaymentAmount = parseFloat($('#edit_current_payment_amount').val() || 0);
-            const enteredAmount = parseFloat($('#edit_partial_amount').val() || 0);
-            const totalPaid = parseFloat(currentPaymentHistorySummary.total_paid || 0) - currentPaymentAmount + enteredAmount;
-            const pendingAmount = Math.max(0, (orderTotal - returnAmount) - totalPaid);
-            $('#edit_pending_amount').val(pendingAmount.toFixed(2));
-        }
+        function formatPaymentTypeLabel(value) {
+            const type = String(value || '').toLowerCase();
 
-        function populateEditPaymentModal(payment) {
-            const method = payment.payment_method || 'cash';
-            const type = payment.payment_type || 'fully';
-            const amount = parseFloat(payment.payment_amount || 0);
-            const cashAmount = parseFloat(payment.cash_amount || 0);
-            const upiAmount = parseFloat(payment.upi_amount || 0);
-
-            $('#edit_payment_id').val(payment.id || '');
-            $('#edit_order_id').val(payment.order_id || '');
-            $('#edit_payment_method').val(method);
-            $('#edit_payment_remarks').val(payment.remarks || '');
-            $('#edit_payment_date').val(toPaymentInputDate(payment.payment_date || payment.created_at));
-            $('#edit_partial_amount').val(amount.toFixed(2));
-            $('#edit_cash_amount').val((cashAmount > 0 ? cashAmount : amount).toFixed(2));
-            $('#edit_online_amount').val((upiAmount > 0 ? upiAmount : amount).toFixed(2));
-            $('#edit_bank_id').val(payment.bank_id || '');
-            $('#edit_reference_number').val(payment.reference_number || '');
-
-            if (method === 'cash') {
-                $('#edit_paid_type').val(type === 'partially' ? 'cash_partially' : 'cash_fully');
-            } else if (method === 'online') {
-                $('#edit_online_type').val(type === 'partially' ? 'online_partially' : 'online_fully');
-            } else {
-                $('#edit_cash_online_type').val(type === 'partially' ? 'cash_online_partially' : 'cash_online_fully');
+            switch (type) {
+                case 'fully':
+                    return 'Fully';
+                case 'partially':
+                case 'partial':
+                    return 'Partially';
+                case 'emi':
+                    return 'EMI';
+                default:
+                    return value || 'N/A';
             }
-
-            $('#edit_current_payment_amount').val(amount.toFixed(2));
-            showEditPaymentSections();
-            recalculateEditPendingAmount();
-        }
-
-        function formatEmiMonthLabel(index) {
-            const monthNumber = index + 1;
-            const suffix = monthNumber % 100 >= 11 && monthNumber % 100 <= 13
-                ? 'th'
-                : monthNumber % 10 === 1
-                    ? 'st'
-                    : monthNumber % 10 === 2
-                        ? 'nd'
-                        : monthNumber % 10 === 3
-                            ? 'rd'
-                            : 'th';
-            return `${monthNumber}${suffix} Month`;
-        }
-
-        function renderEmiDetailsContent(order, payments) {
-            const sale = order || {};
-            const totalInstallments = Math.max(
-                parseInt(sale.emi_months || sale.emi_duration || sale.emi_tenure || sale.remaining_emi_months || 0, 10) || 0,
-                1
-            );
-            const monthlyAmount = parseFloat(sale.emi_monthly_amount || 0);
-            const loanAmount = parseFloat(sale.emi_loan_amount || 0);
-            const downPayment = parseFloat(sale.emi_down_payment || 0);
-            const interestRate = sale.emi_interest_rate ?? '0.00';
-            const guarantorName = sale.emi_guarnator_name || 'N/A';
-            const aadharNumber = sale.emi_aadhar_number || 'N/A';
-            const panNumber = sale.emi_pan_number || 'N/A';
-            const customerName = sale.user_name || sale.customer_name || 'N/A';
-            const orderNumber = sale.order_number || 'N/A';
-            const currencySymbol = '₹';
-
-            const emiPayments = (payments || [])
-                .filter(payment => String(payment.payment_type || '').toLowerCase() === 'emi')
-                .sort((a, b) => new Date(a.payment_date || a.created_at || 0) - new Date(b.payment_date || b.created_at || 0));
-
-            const paidCount = emiPayments.length;
-            const nextDueLabel = paidCount < totalInstallments
-                ? formatEmiMonthLabel(paidCount)
-                : 'Completed';
-
-            const monthRows = Array.from({ length: totalInstallments }, (_, index) => {
-                const payment = emiPayments[index];
-                const isPaid = Boolean(payment);
-                const remark = payment ? (payment.remarks || '-') : '-';
-                const rowAmount = monthlyAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-                return `
-                    <tr>
-                        <td>${formatEmiMonthLabel(index)}</td>
-                        <td>
-                            <span class="badge ${isPaid ? 'bg-success' : 'bg-danger'}" style="min-width:92px;padding:8px 14px;border-radius:6px;">
-                                ${isPaid ? 'Paid' : 'Pending'}
-                            </span>
-                        </td>
-                        <td>${currencySymbol}${rowAmount}</td>
-                        <td>${isPaid ? escapePaymentHistoryText(formatPaymentHistoryDate(payment.payment_date || payment.created_at)) : '-'}</td>
-                        <td>${escapePaymentHistoryText(String(remark))}</td>
-                    </tr>
-                `;
-            }).join('');
-
-            return `
-                <div style="background:#f8f9fc;">
-                    <div class="p-3 mb-3" style="background:linear-gradient(135deg,#202b63 0%, #2a3774 100%);border-radius:20px;color:#fff;">
-                    <div class="d-flex justify-content-between align-items-start gap-3 flex-wrap mb-2">
-                        <div>
-                            <div class="text-uppercase small fw-semibold" style="letter-spacing:.6px;opacity:.78;">EMI Account</div>
-                            <div style="font-size:24px;line-height:1.1;font-weight:700;margin-top:2px;">${escapePaymentHistoryText(orderNumber)}</div>
-                            <div style="opacity:.96;margin-top:4px;">Customer: ${escapePaymentHistoryText(customerName)}</div>
-                        </div>
-                        <div class="badge rounded-pill px-3 py-2" style="background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18);font-size:14px;">
-                            Next due: ${escapePaymentHistoryText(nextDueLabel)}
-                        </div>
-                    </div>
-                    <div class="row g-3">
-                        <div class="col-md-6"><div class="bg-white text-dark rounded-4 p-3 h-100" style="min-height:72px;"><div class="text-uppercase small fw-semibold" style="color:#7d8aa8;">EMI Tenure</div><div style="font-size:16px;font-weight:700;color:#1f295f;">${totalInstallments} Months</div></div></div>
-                        <div class="col-md-6"><div class="bg-white text-dark rounded-4 p-3 h-100" style="min-height:72px;"><div class="text-uppercase small fw-semibold" style="color:#7d8aa8;">Monthly EMI</div><div style="font-size:16px;font-weight:700;color:#1f295f;">${currencySymbol}${monthlyAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div></div></div>
-                        <div class="col-md-6"><div class="bg-white text-dark rounded-4 p-3 h-100" style="min-height:72px;"><div class="text-uppercase small fw-semibold" style="color:#7d8aa8;">Down Payment</div><div style="font-size:16px;font-weight:700;color:#1f295f;">${currencySymbol}${downPayment.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div></div></div>
-                        <div class="col-md-6"><div class="bg-white text-dark rounded-4 p-3 h-100" style="min-height:72px;"><div class="text-uppercase small fw-semibold" style="color:#7d8aa8;">Loan Amount</div><div style="font-size:16px;font-weight:700;color:#1f295f;">${currencySymbol}${loanAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div></div></div>
-                        <div class="col-md-6"><div class="bg-white text-dark rounded-4 p-3 h-100" style="min-height:72px;"><div class="text-uppercase small fw-semibold" style="color:#7d8aa8;">Interest Rate</div><div style="font-size:16px;font-weight:700;color:#1f295f;">${escapePaymentHistoryText(String(interestRate))}%</div></div></div>
-                        <div class="col-md-6"><div class="bg-white text-dark rounded-4 p-3 h-100" style="min-height:72px;"><div class="text-uppercase small fw-semibold" style="color:#7d8aa8;">Guarantor Name</div><div style="font-size:16px;font-weight:700;color:#1f295f;">${escapePaymentHistoryText(guarantorName)}</div></div></div>
-                        <div class="col-md-6"><div class="bg-white text-dark rounded-4 p-3 h-100" style="min-height:72px;"><div class="text-uppercase small fw-semibold" style="color:#7d8aa8;">Aadhar Number</div><div style="font-size:16px;font-weight:700;color:#1f295f;">${escapePaymentHistoryText(aadharNumber)}</div></div></div>
-                        <div class="col-md-6"><div class="bg-white text-dark rounded-4 p-3 h-100" style="min-height:72px;"><div class="text-uppercase small fw-semibold" style="color:#7d8aa8;">PAN Number</div><div style="font-size:16px;font-weight:700;color:#1f295f;">${escapePaymentHistoryText(panNumber)}</div></div></div>
-                    </div>
-                </div>
-
-                <div class="rounded-4 border p-3" style="background:#fff;box-shadow:0 1px 10px rgba(31,41,95,.06);">
-                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
-                        <h5 class="mb-0 fw-bold" style="color:#1f295f;">Month Wise EMI Details</h5>
-                        <span class="badge rounded-pill px-3 py-2 bg-light text-dark border" style="font-size:13px;">Next due: ${escapePaymentHistoryText(nextDueLabel)}</span>
-                    </div>
-                    <div class="table-responsive">
-                        <table class="table align-middle mb-0" style="border-collapse:separate;border-spacing:0;">
-                            <thead>
-                                <tr>
-                                    <th style="background:#eef3fa;color:#5d6b88;font-size:12px;text-transform:uppercase;font-weight:700;border:none;">Month</th>
-                                    <th style="background:#eef3fa;color:#5d6b88;font-size:12px;text-transform:uppercase;font-weight:700;border:none;">Status</th>
-                                    <th style="background:#eef3fa;color:#5d6b88;font-size:12px;text-transform:uppercase;font-weight:700;border:none;">Amount</th>
-                                    <th style="background:#eef3fa;color:#5d6b88;font-size:12px;text-transform:uppercase;font-weight:700;border:none;">Paid On</th>
-                                    <th style="background:#eef3fa;color:#5d6b88;font-size:12px;text-transform:uppercase;font-weight:700;border:none;">Remark</th>
-                                </tr>
-                            </thead>
-                            <tbody style="background:#fff;">
-                                ${monthRows || '<tr><td colspan="5" class="text-center text-muted">No EMI details found.</td></tr>'}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                </div>
-            `;
-        }
-
-        function buildEditPaymentPayload() {
-            const method = $('#edit_payment_method').val();
-            const paymentDate = $('#edit_payment_date').val();
-            const remarks = $('#edit_payment_remarks').val();
-            const payload = {
-                payment_date: paymentDate,
-                remarks: remarks,
-                payment_method: method
-            };
-
-            if (method === 'cash') {
-                const paidType = $('#edit_paid_type').val();
-                payload.payment_type = paidType === 'cash_partially' ? 'partially' : 'fully';
-                payload.payment_amount = paidType === 'cash_partially' ? $('#edit_partial_amount').val() : $('#edit_cash_amount').val();
-                payload.cash_amount = payload.payment_amount;
-                payload.upi_amount = 0;
-            } else if (method === 'online') {
-                const onlineType = $('#edit_online_type').val();
-                payload.payment_type = onlineType === 'online_partially' ? 'partially' : 'fully';
-                payload.payment_amount = onlineType === 'online_partially' ? $('#edit_partial_amount').val() : $('#edit_current_payment_amount').val();
-                payload.cash_amount = 0;
-                payload.upi_amount = payload.payment_amount;
-                payload.bank_id = $('#edit_bank_id').val();
-                payload.reference_number = $('#edit_reference_number').val();
-            } else {
-                const cashOnlineType = $('#edit_cash_online_type').val();
-                const cashAmount = parseFloat($('#edit_cash_amount').val() || 0);
-                const onlineAmount = parseFloat($('#edit_online_amount').val() || 0);
-                payload.payment_type = cashOnlineType === 'cash_online_partially' ? 'partially' : 'fully';
-                payload.payment_amount = (cashAmount + onlineAmount).toFixed(2);
-                payload.cash_amount = cashAmount.toFixed(2);
-                payload.upi_amount = onlineAmount.toFixed(2);
-            }
-
-            return payload;
-        }
-
-        function getEmiMonthLabel(index) {
-            const monthNumber = index + 1;
-            const suffix = monthNumber % 100 >= 11 && monthNumber % 100 <= 13
-                ? 'th'
-                : monthNumber % 10 === 1
-                    ? 'st'
-                    : monthNumber % 10 === 2
-                        ? 'nd'
-                        : monthNumber % 10 === 3
-                            ? 'rd'
-                            : 'th';
-            return `${monthNumber}${suffix} Month`;
-        }
-
-        function renderEmiPaymentHistoryTable(sale, history, summary) {
-            const totalMonths = parseInt(sale.emi_months || sale.emi_duration || sale.emi_tenure || 0, 10) || 0;
-            if (!totalMonths) {
-                return '<div class="payment-history-card">No EMI details found.</div>';
-            }
-
-            const emiPayments = (history || [])
-                .filter(payment => String(payment.payment_method || payment.payment_type || '').toLowerCase() === 'emi')
-                .map(payment => ({
-                    ...payment,
-                    amount: parseFloat(payment.payment_amount || payment.emi_monthly_amount || sale.emi_monthly_amount || 0),
-                }));
-
-            const paidMonths = emiPayments.length;
-            const nextDueMonth = Math.min(paidMonths + 1, totalMonths);
-
-            const rowsHtml = Array.from({ length: totalMonths }, (_, index) => {
-                const payment = emiPayments[index] || null;
-                const isPaid = !!payment;
-                const status = isPaid ? 'Paid' : 'Pending';
-                const statusClass = isPaid ? 'bg-lightgreen' : 'bg-lightred';
-                const amount = payment ? payment.amount : parseFloat(sale.emi_monthly_amount || sale.remaining_amount || 0);
-                const paidDate = payment ? formatPaymentHistoryDate(payment.payment_date || payment.created_at) : '-';
-                const remark = payment?.remarks && String(payment.remarks).trim() !== '' ? payment.remarks : '-';
-
-                return `
-                    <tr>
-                        <td>${escapePaymentHistoryText(getEmiMonthLabel(index))}</td>
-                        <td><span class="badges ${statusClass}" style="font-size:11px;">${status}</span></td>
-                        <td>₹${formatPaymentHistoryAmount(amount)}</td>
-                        <td>${escapePaymentHistoryText(paidDate)}</td>
-                        <td>${escapePaymentHistoryText(remark)}</td>
-                    </tr>
-                `;
-            }).join('');
-
-            return `
-                <div class="payment-history-summary" style="margin-bottom:12px;">
-                    <div class="payment-history-summary-row">
-                        <strong>Order Total</strong>
-                        <span>Rs.${formatPaymentHistoryAmount(summary.order_total)}</span>
-                    </div>
-                    <div class="payment-history-summary-row">
-                        <strong>Total Paid</strong>
-                        <span>Rs.${formatPaymentHistoryAmount(summary.total_paid)}</span>
-                    </div>
-                    <div class="payment-history-summary-row">
-                        <strong>Remaining</strong>
-                        <span class="${parseFloat(summary.remaining || 0) > 0 ? 'summary-danger' : ''}">Rs.${formatPaymentHistoryAmount(summary.remaining)}</span>
-                    </div>
-                </div>
-                <div style="margin-bottom:10px;font-size:13px;color:#666;">
-                    Showing EMI month-wise history. Next due: ${escapePaymentHistoryText(getEmiMonthLabel(nextDueMonth - 1))}
-                </div>
-                <div class="table-responsive">
-                    <table class="today-alert-table">
-                        <thead>
-                            <tr>
-                                <th>Month</th>
-                                <th>Status</th>
-                                <th>Amount</th>
-                                <th>Paid On</th>
-                                <th>Remark</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${rowsHtml}
-                        </tbody>
-                    </table>
-                </div>
-            `;
-        }
-
-        function renderPaymentHistoryCards(history, summary, sale = {}) {
-            const isEmiSale = String(sale.payment_method || '').toLowerCase() === 'emi';
-            if (isEmiSale) {
-                return renderEmiPaymentHistoryTable(sale, history, summary);
-            }
-
-            if (!history.length) {
-                return '<div class="payment-history-card">No payment history found.</div>';
-            }
-
-            const itemsHtml = history.map(payment => {
-                const rawMethod = String(payment.payment_method || '').trim().toLowerCase();
-                const rawType = String(payment.payment_type || '').trim().toLowerCase();
-                const method = rawMethod
-                    ? rawMethod.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
-                    : 'N/A';
-                const type = rawType
-                    ? rawType.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
-                    : 'N/A';
-            const reference = getPaymentHistoryReference(payment);
-            const amount = formatPaymentHistoryAmount(payment.payment_amount || payment.emi_monthly_amount || 0);
-                const remarks = payment.remarks && String(payment.remarks).trim() !== ''
-                    ? payment.remarks
-                    : 'N/A';
-                const dateText = formatPaymentHistoryDate(payment.payment_date || payment.created_at);
-                const isEmi = rawMethod === 'emi' || rawType === 'emi';
-                const badgeText = rawType === 'partially' ? 'Partially' : rawType === 'fully' ? 'Fully' : type;
-
-                return `
-                    <div class="payment-history-card" style="padding:14px 16px;">
-                        <div class="d-flex justify-content-between align-items-start gap-3">
-                            <div>
-                                <div class="payment-history-date" style="font-size:14px;font-weight:400;color:#3a3f4b;">${escapePaymentHistoryText(dateText)}</div>
-                                <div class="payment-history-subtext" style="margin-top:4px;color:#6b7280;">
-                                    Method: ${escapePaymentHistoryText(method)} | Type: ${escapePaymentHistoryText(badgeText)}
-                                </div>
-                                <div class="payment-history-subtext" style="margin-top:4px;color:#6b7280;">
-                                    Remarks: ${escapePaymentHistoryText(remarks)}
-                                </div>
-                                ${isEmi ? `<div class="payment-history-subtext" style="margin-top:4px;color:#6b7280;">Ref: ${escapePaymentHistoryText(reference)}</div>` : ''}
-                            </div>
-                            <div class="payment-history-actions" style="flex-shrink:0;">
-                                <button type="button" class="payment-action-btn edit-payment-history" data-payment-id="${payment.id}" title="Edit payment">
-                                    <i class="fas fa-pen"></i>
-                                </button>
-                                <button type="button" class="payment-action-btn delete-payment-history" data-payment-id="${payment.id}" data-order-id="${payment.order_id || ''}" title="Delete payment">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <div style="margin-top:12px;font-weight:700;color:#2b2f3a;font-size:16px;">
-                            ₹${amount}
-                        </div>
-                    </div>
-                `;
-            }).join('');
-
-            const extraPaid = parseFloat(summary.extra_paid || 0);
-            const remainingValue = extraPaid > 0 ? extraPaid : parseFloat(summary.remaining || 0);
-            const remainingLabel = extraPaid > 0 ? 'Extra Paid' : 'Remaining';
-            const remainingClass = remainingValue > 0 ? 'summary-danger' : '';
-
-            const summaryHtml = `
-                <div class="payment-history-summary">
-                    <div class="payment-history-summary-row">
-                        <strong>Order Total</strong>
-                        <span>Rs.${formatPaymentHistoryAmount(summary.order_total)}</span>
-                    </div>
-                    <div class="payment-history-summary-row">
-                        <strong>Total Paid</strong>
-                        <span>Rs.${formatPaymentHistoryAmount(summary.total_paid)}</span>
-                    </div>
-                    <div class="payment-history-summary-row">
-                        <strong>Return Amount</strong>
-                        <span>Rs.${formatPaymentHistoryAmount(summary.return_amount || 0)}</span>
-                    </div>
-                    <div class="payment-history-summary-row">
-                        <strong>${remainingLabel}</strong>
-                        <span class="${remainingClass}">Rs.${formatPaymentHistoryAmount(remainingValue)}</span>
-                    </div>
-                </div>
-            `;
-
-            return `<div class="payment-history-items">${itemsHtml}</div>${summaryHtml}`;
         }
 
         function getStatusBadge(status, type = 'payment', extraPaid = 0) {
@@ -2794,8 +2374,7 @@
                         return `<span class="status-badge status-cash">Cash</span>`; // Teal
                     case 'online':
                         return `<span class="status-badge status-online">Online</span>`; // Green
-                    case 'emi':
-                        return `<span class="status-badge status-emi">EMI</span>`; // Red
+
                     case 'cash_online':
                     case 'cash + online':
                         return `<span class="status-badge status-cash_online">Cash+Online</span>`; // Green
@@ -2852,8 +2431,7 @@
                         return `<span class="mobile-badge status-cash">Cash</span>`; // Teal
                     case 'online':
                         return `<span class="mobile-badge status-online">Online</span>`; // Green
-                    case 'emi':
-                        return `<span class="mobile-badge status-emi">EMI</span>`; // Red
+
                     case 'cash_online':
                     case 'cash + online':
                         return `<span class="mobile-badge status-cash_online">Cash+Online</span>`; // Green
@@ -2895,9 +2473,9 @@
                 // Build action buttons HTML
                 let actionBtns = '';
                 @if (app('hasPermission')(2, 'view'))
-                // if (status === 'sales') {
-                if (parseFloat(order.remaining_amount || 0) > 0 && status === 'sales') {
-                    actionBtns += `<a href="javascript:void(0);" class="btn btn-sm btn-primary make-payment-btn"
+                    // if (status === 'sales') {
+                    if (parseFloat(order.remaining_amount || 0) > 0 && status === 'sales') {
+                        actionBtns += `<a href="javascript:void(0);" class="btn btn-sm btn-primary make-payment-btn"
                         data-bs-toggle="modal" data-bs-target="#makePaymentModal"
                         data-id="${order.id}" data-amount="${order.remaining_amount}"
                         data-method="${order.payment_method || ''}"
@@ -2907,14 +2485,18 @@
                         data-remaining-amount="${order.remaining_amount}"
                         data-return-amount="${order.total_return || 0}"
                         data-remaining-emi-months="${order.remaining_emi_months}"
+                        data-tds-percentage="${order.tds_percentage || 0}"
+                        data-tds-amount="${order.tds_amount || 0}"
+                        data-emi-tenure="${order.emi_tenure || 0}"
+                        data-emi-monthly="${order.emi_monthly_amount || 0}"
                         title="Make Payment">
                         <i class="fas fa-money-bill"></i> Pay
                     </a>`;
-                }
+                    }
                 @endif
 
                 @if (app('hasPermission')(2, 'view'))
-                actionBtns += `<button class="btn btn-sm btn-secondary open-history" data-id="${order.id}" title="Payment History">
+                    actionBtns += `<button class="btn btn-sm btn-secondary open-history" data-id="${order.id}" title="Payment History">
                     <i class="fas fa-history"></i> History
                 </button>`;
                 @endif
@@ -2995,14 +2577,22 @@
                                     ${getMobileStatusBadge(parseFloat(order.total_return || 0) > 0 ? 'returned' : '', 'return')}
                                 </span>
                             </div>
+                            ${parseFloat(order.tds_amount || 0) > 0 ? `
+                                                                <div class="mobile-detail-row">
+                                                                    <span class="mobile-detail-label" style="color: #6f42c1;">TDS (${parseFloat(order.tds_percentage || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}%):</span>
+                                                                    <span class="mobile-detail-value" style="color: #6f42c1; font-weight: bold;">
+                                                                        ${currencySymbol}${parseFloat(order.tds_amount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                                                    </span>
+                                                                </div>
+                                                            ` : ''}
                             ${order.extra_paid > 0 ? `
-                                <div class="mobile-detail-row">
-                                    <span class="mobile-detail-label" style="color: #dc3545;">Extra Paid:</span>
-                                    <span class="mobile-detail-value" style="color: #dc3545; font-weight: bold;">
-                                        ${currencySymbol}${parseFloat(order.extra_paid || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                                    </span>
-                                </div>
-                            ` : ''}
+                                                                <div class="mobile-detail-row">
+                                                                    <span class="mobile-detail-label" style="color: #dc3545;">Extra Paid:</span>
+                                                                    <span class="mobile-detail-value" style="color: #dc3545; font-weight: bold;">
+                                                                        ${currencySymbol}${parseFloat(order.extra_paid || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                                                    </span>
+                                                                </div>
+                                                            ` : ''}
                             <div class="mobile-detail-row">
                                 <span class="mobile-detail-label">Payment Method:</span>
                                 <span class="mobile-detail-value">
@@ -3014,26 +2604,18 @@
                                 <span class="mobile-detail-value" style="font-weight: bold; color: #ff9f43;">${displayAmount}</span>
                             </div>
                             <div class="mobile-detail-row">
-                                <span class="mobile-detail-label">Assigned Staff:</span>
-                                <span class="mobile-detail-value">${order.assignedStaff?.name || 'N/A'}</span>
-                            </div>
-                            <div class="mobile-detail-row">
-                                <span class="mobile-detail-label">Order Type:</span>
-                                <span class="mobile-detail-value">${order.order_type || 'N/A'}</span>
-                            </div>
-                            <div class="mobile-detail-row">
                                 <span class="mobile-detail-label">Biller:</span>
                                 <span class="mobile-detail-value">${order.biller || 'Admin'}</span>
                             </div>
                             ${parseFloat(order.remaining_amount || 0) > 0 &&
                             (order.quotation_status || 'sales').toLowerCase() === 'sales' ? `
-                                <div class="mobile-detail-row">
-                                    <span class="mobile-detail-label">Remaining:</span>
-                                    <span class="mobile-detail-value" style="color: #dc3545; font-weight: bold;">
-                                        ${currencySymbol}${parseFloat(order.remaining_amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                                    </span>
-                                </div>
-                            ` : ''}
+                                                                <div class="mobile-detail-row">
+                                                                    <span class="mobile-detail-label">Remaining:</span>
+                                                                    <span class="mobile-detail-value" style="color: #dc3545; font-weight: bold;">
+                                                                        ${currencySymbol}${parseFloat(order.remaining_amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                                                    </span>
+                                                                </div>
+                                                            ` : ''}
                             <div class="mobile-action-buttons">
                                 ${actionBtns}
                             </div>
@@ -3133,6 +2715,10 @@
                     data-remaining-amount="${order.remaining_amount}"
                     data-return-amount="${order.total_return || 0}"
                     data-remaining-emi-months="${order.remaining_emi_months}"
+                    data-tds-percentage="${order.tds_percentage || 0}"
+                    data-tds-amount="${order.tds_amount || 0}"
+                    data-emi-tenure="${order.emi_tenure || 0}"
+                    data-emi-monthly="${order.emi_monthly_amount || 0}"
                     title="Make Payment">
                     <i class="fas fa-money-bill-wave"></i>
                 </a>`;
@@ -3171,14 +2757,22 @@
                         ${getStatusBadge(parseFloat(order.total_return || 0) > 0 ? 'returned' : '', 'return')}
                     </span>
                 </div>
+                ${parseFloat(order.tds_amount || 0) > 0 ? `
+                                                    <div class="order-detail-row-simple">
+                                                        <span class="order-detail-label-simple" style="color: #6f42c1;">TDS (${parseFloat(order.tds_percentage || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}%):</span>
+                                                        <span class="order-detail-value-simple" style="color: #6f42c1; font-weight: bold;">
+                                                            ${currencySymbol}${parseFloat(order.tds_amount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                                        </span>
+                                                    </div>
+                                                ` : ''}
                 ${(order.extra_paid || 0) > 0 ? `
-                    <div class="order-detail-row-simple">
-                        <span class="order-detail-label-simple" style="color: #dc3545;">Extra Paid:</span>
-                        <span class="order-detail-value-simple" style="color: #dc3545; font-weight: bold;">
-                            ${currencySymbol}${parseFloat(order.extra_paid).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} (Advance/Refund)
-                        </span>
-                    </div>
-                ` : ''}
+                                                    <div class="order-detail-row-simple">
+                                                        <span class="order-detail-label-simple" style="color: #dc3545;">Extra Paid:</span>
+                                                        <span class="order-detail-value-simple" style="color: #dc3545; font-weight: bold;">
+                                                            ${currencySymbol}${parseFloat(order.extra_paid).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} (Advance/Refund)
+                                                        </span>
+                                                    </div>
+                                                ` : ''}
                 <div class="order-detail-row-simple">
                     <span class="order-detail-label-simple">Payment Method:</span>
                     <span class="order-detail-value-simple">
@@ -3190,26 +2784,18 @@
                     <span class="order-detail-value-simple" style="font-weight: bold; color: #ff9f43;">${displayAmount}</span>
                 </div>
                 <div class="order-detail-row-simple">
-                    <span class="order-detail-label-simple">Assigned Staff:</span>
-                    <span class="order-detail-value-simple">${order.assignedStaff?.name || 'N/A'}</span>
-                </div>
-                <div class="order-detail-row-simple">
-                    <span class="order-detail-label-simple">Order Type:</span>
-                    <span class="order-detail-value-simple">${order.order_type || 'N/A'}</span>
-                </div>
-                <div class="order-detail-row-simple">
                     <span class="order-detail-label-simple">Biller:</span>
                     <span class="order-detail-value-simple">${order.biller || 'Admin'}</span>
                 </div>
                 ${parseFloat(order.remaining_amount || 0) > 0 &&
 (order.quotation_status || 'sales').toLowerCase() === 'sales' ? `
-                    <div class="order-detail-row-simple">
-                        <span class="order-detail-label-simple">Remaining:</span>
-                        <span class="order-detail-value-simple" style="color: #dc3545; font-weight: bold;">
-                            ${currencySymbol}${parseFloat(order.remaining_amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                        </span>
-                    </div>
-                ` : ''}
+                                                    <div class="order-detail-row-simple">
+                                                        <span class="order-detail-label-simple">Remaining:</span>
+                                                        <span class="order-detail-value-simple" style="color: #dc3545; font-weight: bold;">
+                                                            ${currencySymbol}${parseFloat(order.remaining_amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                                        </span>
+                                                    </div>
+                                                ` : ''}
             </div>
             <div class="mobile-action-buttons-simple">
                 ${actionBtns}
@@ -3337,10 +2923,6 @@
                 currencyPosition));
             $('#filtered-paid-total').text(formatSummaryAmount(totalPaidAmount, currencySymbol,
                 currencyPosition));
-            // Sync mobile summary boxes
-            $('#filtered-total-mobile').text(formatSummaryAmount(totalAmount, currencySymbol, currencyPosition));
-            $('#filtered-pending-total-mobile').text(formatSummaryAmount(totalPendingAmount, currencySymbol, currencyPosition));
-            $('#filtered-paid-total-mobile').text(formatSummaryAmount(totalPaidAmount, currencySymbol, currencyPosition));
         }
 
         const salesCalendarYears = @json($years ?? []);
@@ -3471,7 +3053,8 @@
             }
 
             function toggleSalesFinancialYearFilter(enabled) {
-                isFinancialYearEnabled = Boolean(Number(enabled));
+                isFinancialYearEnabled = (enabled === true || enabled === 1 || String(enabled).toLowerCase() ===
+                    'true' || String(enabled).toLowerCase() === 'on' || String(enabled) === '1');
                 const $financialYearWrapper = $('#sales-financial-year-filter');
                 if (isFinancialYearEnabled) {
                     $financialYearWrapper.removeClass('d-none');
@@ -3493,16 +3076,20 @@
             });
 
             $(document).on('click', '.make-payment-btn', function() {
-                $('.action-dropdown-menu.show').removeClass('show');
                 let jobCardId = $(this).data('id');
                 let totalAmount = $(this).data('total-amount');
                 let remainingAmount = $(this).data('remaining-amount');
                 let returnAmount = parseFloat($(this).data('return-amount')) || 0;
                 let method = $(this).data('method') || '';
-                let tdsPct = parseFloat($(this).data('tds-percentage') || 0);
-                let tdsAmt = parseFloat($(this).data('tds-amount') || 0);
+                let tdsPercentage = parseFloat($(this).data('tds-percentage')) || 0;
+                let tdsAmount = parseFloat($(this).data('tds-amount')) || 0;
+                let emiTenure = parseInt($(this).data('emi-tenure')) || 0;
+                let emiMonthly = parseFloat($(this).data('emi-monthly')) || 0;
 
                 // ✅ Fill modal hidden inputs + text spans
+                $('#paymentMethodSelect').data('emi-tenure', emiTenure);
+                $('#paymentMethodSelect').data('emi-monthly', emiMonthly);
+                $('#paymentMethodSelect').data('order-id', jobCardId);
                 $('#paymentJobCardId').val(jobCardId);
                 $('#emiTotal').text(parseFloat(totalAmount).toLocaleString(undefined, {
                     minimumFractionDigits: 2,
@@ -3512,6 +3099,21 @@
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2
                 }));
+
+                // ✅ Show TDS row only when TDS is applied
+                if (tdsAmount > 0) {
+                    $('#tdsPercentageDisplay').text(tdsPercentage.toLocaleString(undefined, {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    }));
+                    $('#tdsAmountDisplay').text(tdsAmount.toLocaleString(undefined, {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    }));
+                    $('#tdsAmountSection').removeClass('d-none');
+                } else {
+                    $('#tdsAmountSection').addClass('d-none');
+                }
 
                 if (returnAmount > 0) {
                     $('#returnAmountDisplay').text(returnAmount.toLocaleString(undefined, {
@@ -3523,121 +3125,21 @@
                     $('#returnAmountSection').addClass('d-none');
                 }
 
-                // ✅ Show TDS if available
-                if (tdsPct > 0 || tdsAmt > 0) {
-                    $('#modalTdsPercentage').text(tdsPct.toFixed(2));
-                    $('#modalTdsAmount').text(tdsAmt.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
-                    $('#tdsSummarySection').removeClass('d-none');
-                } else {
-                    // Try fetching TDS from order details via AJAX
-                    $.ajax({
-                        url: '/api/sales/order-tds/' + jobCardId,
-                        method: 'GET',
-                        headers: { "Authorization": "Bearer " + authToken },
-                        success: function(res) {
-                            if (res.status && (parseFloat(res.tds_percentage) > 0 || parseFloat(res.tds_amount) > 0)) {
-                                $('#modalTdsPercentage').text(parseFloat(res.tds_percentage).toFixed(2));
-                                $('#modalTdsAmount').text(parseFloat(res.tds_amount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
-                                $('#tdsSummarySection').removeClass('d-none');
-                            } else {
-                                $('#tdsSummarySection').addClass('d-none');
-                            }
-                        },
-                        error: function() {
-                            $('#tdsSummarySection').addClass('d-none');
-                        }
-                    });
-                }
-
                 $('#remainingAmountHidden').val(remainingAmount);
                 $('#paymentMethodHidden').val(method);
 
-                // ✅ Set today's date in payment date field
-                const today = moment().format('DD-MM-YYYY');
-                $('#paymentDate').val(today);
-                $('#paymentDateHidden').val(moment().format('YYYY-MM-DD'));
-
-                // Init datetimepicker on paymentDate if not already done
-                if (!$('#paymentDate').data('DateTimePicker')) {
-                    $('#paymentDate').datetimepicker({
-                        format: 'DD-MM-YYYY',
-                        useCurrent: true,
-                        showTodayButton: true,
-                        icons: {
-                            date: 'fa fa-calendar',
-                            previous: 'fa fa-chevron-left',
-                            next: 'fa fa-chevron-right',
-                            today: 'fa fa-crosshairs',
-                            clear: 'fa fa-trash',
-                            close: 'fa fa-times'
-                        }
-                    });
-                    $('#paymentDate').on('dp.change', function(e) {
-                        const val = e.date ? e.date.format('YYYY-MM-DD') : '';
-                        $('#paymentDateHidden').val(val);
-                    });
-                } else {
-                    $('#paymentDate').data('DateTimePicker').date(moment());
-                }
+                // ✅ Set payment date to today's date by default
+                const today = new Date();
+                const dd = String(today.getDate()).padStart(2, '0');
+                const mm = String(today.getMonth() + 1).padStart(2, '0');
+                const yyyy = today.getFullYear();
+                const todayFormatted = `${dd}-${mm}-${yyyy}`;
+                $('#paymentDateInput').val(todayFormatted);
 
                 // ✅ Reset payment method dropdown to default
                 $('#paymentMethodSelect').val('');
-                $('#paymentMethodSelect option').prop('disabled', false);
-                $('#emi_container').addClass('d-none');
-                $('#emiMonthSelect').html('<option value="" selected disabled>Select EMI Month</option>');
-                $('#emiMonthlyAmount').val('');
-                $('#emiMonthCountHidden').val('0');
-                $('#emiNextMonthHidden').val('1');
 
                 // ✅ Hide history box initially
-                if (String(method).toLowerCase() === 'emi') {
-                    $('#paymentMethodSelect option[value="cash"], #paymentMethodSelect option[value="online"], #paymentMethodSelect option[value="cash_online"]').prop('disabled', true);
-                    $('#cashOnlineTypeDiv, #onlineTypeDiv, #paidTypeDiv, #fullyCashOnlineFields, #partialCashOnlineFields, #fullyPaidFields, #partialPaidFields, #upiAmountDiv, #bank_container').addClass('d-none');
-                    $('#cashOnlineTypeSelect, #onlineTypeSelect, #paidTypeSelect, #cashAmount, #cashOnlineFullAmount, #cashOnlinePartialAmount, #upiAmountInput').val('');
-                    $('#bank_id').val('');
-                    $.when(
-                        $.ajax({
-                            url: '/api/getsalseById/' + jobCardId,
-                            method: 'GET',
-                            headers: { "Authorization": "Bearer " + authToken }
-                        }),
-                        $.ajax({
-                            url: '/api/order/payment-history/' + jobCardId,
-                            method: 'GET',
-                            headers: { "Authorization": "Bearer " + authToken }
-                        })
-                    ).done(function(orderResponse, historyResponse) {
-                        const sale = orderResponse[0]?.sales || {};
-                        const payments = historyResponse[0]?.data || [];
-                        const totalMonths = parseInt(sale.emi_months || sale.emi_duration || sale.emi_tenure || 0, 10) || 0;
-                        const emiPayments = payments.filter(p => {
-                            const method = String(p.payment_method || '').toLowerCase();
-                            const type = String(p.payment_type || '').toLowerCase();
-                            return method === 'emi' || type === 'emi';
-                        });
-                        const paidCount = emiPayments.length;
-                        const nextMonth = Math.min(paidCount + 1, Math.max(totalMonths, 1));
-                        const monthlyAmount = parseFloat(sale.emi_monthly_amount || sale.remaining_amount || 0);
-
-                        $('#emi_container').removeClass('d-none');
-                        $('#emiMonthCountHidden').val(totalMonths || 0);
-                        $('#emiNextMonthHidden').val(nextMonth);
-                        $('#emiMonthlyAmount').val(monthlyAmount.toLocaleString(undefined, {
-                            minimumFractionDigits: 2,
-                            maximumFractionDigits: 2
-                        }));
-                        $('#emiMonthSelect').html(buildEmiMonthOptions(totalMonths, paidCount, monthlyAmount));
-                        $('#emiMonthSelect').val(String(nextMonth));
-                        $('#bank_container').removeClass('d-none');
-                    }).fail(function() {
-                        $('#emi_container').removeClass('d-none');
-                        $('#emiMonthSelect').html('<option value="" selected disabled>Select EMI Month</option>');
-                        $('#emiMonthlyAmount').val('');
-                    });
-                } else {
-                    $('#paymentMethodSelect option[value="cash"], #paymentMethodSelect option[value="online"], #paymentMethodSelect option[value="cash_online"]').prop('disabled', false);
-                }
-
                 $('#paymentHistoryBox').addClass('d-none');
                 $('#paymentHistoryList').html('');
 
@@ -3656,23 +3158,29 @@
                                 $('#paymentHistoryList').html(
                                     '<li>No payment history found.</li>');
                             } else {
-                            historyHtml = '';
+                                historyHtml = '';
 
-history.forEach(function(payment) {
+                                history.forEach(function(payment) {
 
-    const paymentMethod = payment.payment_method
-        ? payment.payment_method.charAt(0).toUpperCase() + payment.payment_method.slice(1).toLowerCase()
-        : 'N/A';
+                                    const paymentMethod = payment
+                                        .payment_method ?
+                                        payment.payment_method.charAt(0)
+                                        .toUpperCase() + payment.payment_method
+                                        .slice(1).toLowerCase() :
+                                        'N/A';
 
-    const paymentType = payment.payment_type
-        ? payment.payment_type.charAt(0).toUpperCase() + payment.payment_type.slice(1).toLowerCase()
-        : 'N/A';
+                                    const paymentType = payment.payment_type ?
+                                        payment.payment_type.charAt(0)
+                                        .toUpperCase() + payment.payment_type
+                                        .slice(1).toLowerCase() :
+                                        'N/A';
 
-    const paymentRemark = payment.remarks && String(payment.remarks).trim() !== ''
-        ? payment.remarks
-        : 'N/A';
+                                    const paymentRemark = payment.remarks &&
+                                        String(payment.remarks).trim() !== '' ?
+                                        payment.remarks :
+                                        'N/A';
 
-    historyHtml += `
+                                    historyHtml += `
         <li class="mb-2">
             <strong>Amount:</strong> ₹${parseFloat(payment.payment_amount).toLocaleString(undefined, {
                 minimumFractionDigits: 2,
@@ -3687,16 +3195,16 @@ history.forEach(function(payment) {
 
             <strong>Remark:</strong> ${paymentRemark}<br>
 
-            ${String(payment.payment_method || '').toLowerCase() === 'emi' || String(payment.payment_type || '').toLowerCase() === 'emi'
+            ${payment.payment_method === 'emi'
                 ? `<strong>EMI Months:</strong> ${payment.emi_month || 0}<br>`
                 : ''}
         </li>
 
         <hr class="my-1"/>
     `;
-});
+                                });
 
-$('#paymentHistoryList').html(historyHtml);
+                                $('#paymentHistoryList').html(historyHtml);
                                 // Add Summary
                                 if (response.summary) {
                                     let summaryHtml = `
@@ -3731,21 +3239,10 @@ $('#paymentHistoryList').html(historyHtml);
                 let method = $(this).val();
 
                 // Hide all optional sections first
-                $('#cashOnlineTypeDiv, #fullyCashOnlineFields, #partialCashOnlineFields, #onlineTypeDiv, #paidTypeDiv, #upiAmountDiv, #partialPaidFields, #fullyPaidFields, #bank_container, #emi_container')
+                $('#cashOnlineTypeDiv, #fullyCashOnlineFields, #partialCashOnlineFields, #onlineTypeDiv, #paidTypeDiv, #upiAmountDiv, #partialPaidFields, #fullyPaidFields, #bank_container, #emiFields')
                     .addClass('d-none');
                 $('#bank_id').val('');
                 $("#bankError").text("");
-
-                const emiSelected = method === 'emi';
-                $('#paymentMethodSelect option[value="cash"], #paymentMethodSelect option[value="online"], #paymentMethodSelect option[value="cash_online"]')
-                    .prop('disabled', emiSelected);
-
-                if (emiSelected) {
-                    $('#paymentMethodSelect').val('emi');
-                    $('#paidTypeSelect, #onlineTypeSelect, #cashOnlineTypeSelect').val('');
-                    $('#cashAmount, #upiAmountInput, #partialAmount, #cashOnlineFullAmount, #upiOnlineFullAmount, #cashOnlinePartialAmount, #upiOnlinePartialAmount')
-                        .val('');
-                }
 
                 if (method === 'cash') {
                     $('#paidTypeDiv').removeClass('d-none'); // Show paid type options
@@ -3758,9 +3255,62 @@ $('#paymentHistoryList').html(historyHtml);
                     $('#cashOnlineTypeDiv').removeClass('d-none'); // Show Cash + Online type dropdown
                     $('#bank_container').removeClass('d-none');
                 } else if (method === 'emi') {
-                    $('#emi_container, #bank_container').removeClass('d-none');
-                    $('#paidTypeDiv, #partialPaidFields, #upiAmountDiv, #fullyPaidFields').addClass('d-none');
-                    $('#paymentMethodError').text('');
+                    $('#bank_container').removeClass('d-none');
+                    $('#emiFields').removeClass('d-none');
+
+                    let emiTenure = parseInt($(this).data('emi-tenure')) || 0;
+                    let emiMonthly = parseFloat($(this).data('emi-monthly')) || 0;
+                    let orderId = $(this).data('order-id');
+
+                    $('#emiMonthlyAmount').val(emiMonthly);
+
+                    if (orderId && emiTenure > 0) {
+                        $.ajax({
+                            url: '/api/sales/payment-history/' + orderId,
+                            method: 'GET',
+                            headers: {
+                                "Authorization": "Bearer " + authToken
+                            },
+                            success: function(response) {
+                                let history = response.data || [];
+                                let paidCount = history.filter(p => p.payment_type === 'emi' ||
+                                    p.payment_method === 'emi').length;
+
+                                let options =
+                                    '<option value="" selected disabled>Select EMI Month</option>';
+                                for (let i = 1; i <= emiTenure; i++) {
+                                    let suffix = 'th';
+                                    if (![11, 12, 13].includes(i % 100)) {
+                                        switch (i % 10) {
+                                            case 1:
+                                                suffix = 'st';
+                                                break;
+                                            case 2:
+                                                suffix = 'nd';
+                                                break;
+                                            case 3:
+                                                suffix = 'rd';
+                                                break;
+                                        }
+                                    }
+                                    let label = i + suffix + ' Month - ₹' + emiMonthly;
+                                    if (i <= paidCount) {
+                                        options +=
+                                            `<option value="${i}" disabled>${label} (Paid)</option>`;
+                                    } else if (i === paidCount + 1) {
+                                        options +=
+                                            `<option value="${i}">${label} (Pay now)</option>`;
+                                    } else {
+                                        options += `<option value="${i}">${label}</option>`;
+                                    }
+                                }
+                                $('#emiMonthSelect').html(options);
+                                if (paidCount < emiTenure) {
+                                    $('#emiMonthSelect').val(paidCount + 1);
+                                }
+                            }
+                        });
+                    }
                 }
             });
 
@@ -3824,18 +3374,24 @@ $('#paymentHistoryList').html(historyHtml);
                     error: function(xhr) {
                         const errors = xhr.responseJSON?.errors || {};
 
-                        $('#addBankNameError').text(errors.bank_name ? errors.bank_name[0] : '');
-                        $('#addAccountNumberError').text(errors.account_number ? errors.account_number[0] : '');
-                        $('#addIfscCodeError').text(errors.ifsc_code ? errors.ifsc_code[0] : '');
-                        $('#addBranchNameError').text(errors.branch_name ? errors.branch_name[0] : '');
-                        $('#addOpeningBalanceError').text(errors.opening_balance ? errors.opening_balance[0] : '');
+                        $('#addBankNameError').text(errors.bank_name ? errors.bank_name[0] :
+                            '');
+                        $('#addAccountNumberError').text(errors.account_number ? errors
+                            .account_number[0] : '');
+                        $('#addIfscCodeError').text(errors.ifsc_code ? errors.ifsc_code[0] :
+                            '');
+                        $('#addBranchNameError').text(errors.branch_name ? errors.branch_name[
+                            0] : '');
+                        $('#addOpeningBalanceError').text(errors.opening_balance ? errors
+                            .opening_balance[0] : '');
                         $('#addBankStatusError').text(errors.status ? errors.status[0] : '');
 
                         if (!Object.keys(errors).length) {
                             Swal.fire({
                                 icon: 'error',
                                 title: 'Error',
-                                text: xhr.responseJSON?.message || 'Failed to add bank.',
+                                text: xhr.responseJSON?.message ||
+                                    'Failed to add bank.',
                                 confirmButtonText: 'OK'
                             });
                         }
@@ -4023,28 +3579,6 @@ $('#paymentHistoryList').html(historyHtml);
                     return false;
                 } else {
                     console.log("Payment method selected:", paymentMethod);
-                }
-
-                // Payment Date validation
-                const paymentDateVal = $('#paymentDate').val().trim();
-                if (!paymentDateVal) {
-                    isValid = false;
-                    $('#paymentDateError').text("Please select a payment date.");
-                    return false;
-                }
-
-                if (paymentMethod === 'emi') {
-                    if (!$('#emiMonthSelect').val()) {
-                        isValid = false;
-                        $('#emiMonthError').text("Please select EMI month.");
-                        return false;
-                    }
-
-                    if (!$("#bank_id").val()) {
-                        isValid = false;
-                        $("#bankError").text("Please select a bank");
-                        return false;
-                    }
                 }
 
 
@@ -4276,34 +3810,16 @@ $('#paymentHistoryList').html(historyHtml);
                 let formElement = $(this)[0];
                 let formData = new FormData(formElement);
 
-                // Append formatted payment date (YYYY-MM-DD) for backend
-                const pdHidden = $('#paymentDateHidden').val();
-                if (pdHidden) {
-                    formData.set('payment_date', pdHidden);
-                } else {
-                    // fallback: parse from display field
-                    const pdDisplay = $('#paymentDate').val().trim();
-                    if (pdDisplay) {
-                        const parts = pdDisplay.split('-');
-                        if (parts.length === 3) {
-                            formData.set('payment_date', `${parts[2]}-${parts[1]}-${parts[0]}`);
-                        }
-                    }
-                }
-
                 let submitButton = $(this).find('button[type="submit"]');
                 submitButton.prop('disabled', true).text('Processing...');
                 if (paymentMethodSelect === 'emi') {
                     let emiTotal = $('#emiMonthlyAmount').val();
-                    let emiMonth = $('#emiMonthSelect').val();
-                    formData.append('emi_paid_value', emiTotal.replace(/[,]/g, ''));
-                    formData.append('emi_month', emiMonth);
-                    formData.append('amount', emiTotal.replace(/[,]/g, ''));
+                    formData.append('emi_paid_value', emiTotal);
                 }
 
                 if (selectedPaymentType === 'emi') {
                     let emi_val = $('#emiMonthlyAmount').val();
-                    formData.append('amount', emi_val.replace(/[,]/g, ''));
+                    formData.append('amount', emi_val);
                 }
 
                 $.ajax({
@@ -4372,220 +3888,16 @@ $('#paymentHistoryList').html(historyHtml);
                 $('#paymentJobCardId').val('');
                 $('#remainingAmountHidden').val('');
                 $('#paymentMethodHidden').val('');
-
-                // Reset TDS and date fields
-                $('#tdsSummarySection').addClass('d-none');
-                $('#modalTdsPercentage').text('0.00');
-                $('#modalTdsAmount').text('0.00');
-                $('#paymentDate').val('');
-                $('#paymentDateHidden').val('');
+                $('#paymentDateInput').val('');
                 $('#paymentDateError').text('');
-            });
-
-            function buildActionDropdown(order, displayAmount, currencySymbol, currencyPosition) {
-                const status = String(order.quotation_status || 'sales').toLowerCase();
-                let items = '';
-
-                // Pay
-                if (parseFloat(order.remaining_amount || 0) > 0 && status === 'sales') {
-                    items += `<a href="javascript:void(0);" class="make-payment-btn"
-                        data-bs-toggle="modal" data-bs-target="#makePaymentModal"
-                        data-id="${order.id}" data-amount="${order.remaining_amount}"
-                        data-method="${order.payment_method || ''}"
-                        data-emi-months="${order.remaining_emi_months || 0}"
-                        data-emi-duration="${order.emi_duration || 0}"
-                        data-total-amount="${order.total_amount || 0}"
-                        data-remaining-amount="${order.remaining_amount}"
-                        data-return-amount="${order.total_return || 0}"
-                        data-remaining-emi-months="${order.remaining_emi_months || 0}"
-                        data-tds-percentage="${order.tds_percentage || 0}"
-                        data-tds-amount="${order.tds_amount || 0}">
-                        <i class="fas fa-money-bill-wave"></i> Pay
-                    </a>`;
-                }
-
-                // History
-                items += `<button class="open-history" data-id="${order.id}">
-                    <i class="fas fa-history"></i> History
-                </button>`;
-
-                // EMI Details
-                if (String(order.payment_method || '').toLowerCase() === 'emi') {
-                    items += `<a href="javascript:void(0);" class="open-emi-details" data-id="${order.id}">
-                        <i class="fas fa-calendar-alt"></i> EMI Details
-                    </a>`;
-                }
-
-                // Convert to Sales
-                if (status === 'quotation') {
-                    items += `<a href="javascript:void(0);" class="convert-to-sales" data-id="${order.id}">
-                        <i class="fas fa-exchange-alt"></i> Convert to Sales
-                    </a>`;
-                }
-
-                @if (app('hasPermission')(2, 'view'))
-                // View
-                items += `<a href="/sales-details/${order.id}">
-                    <i class="fas fa-eye"></i> View
-                </a>`;
-                @endif
-
-                @if (app('hasPermission')(2, 'edit'))
-                // Edit
-                if (parseFloat(order.total_return || 0) === 0) {
-                    items += `<a href="/edit-sales/${order.id}">
-                        <i class="fas fa-edit"></i> Edit
-                    </a>`;
-                }
-                @endif
-
-                @if (app('hasPermission')(2, 'view'))
-                // Invoice
-                items += `<a href="/sales-invoice/${order.id}">
-                    <i class="fas fa-file-invoice"></i> Invoice
-                </a>`;
-
-                // Print Invoice
-                items += `<a href="javascript:void(0);" onclick="window.open('/sales/invoice/pdf/${order.id}');">
-                    <i class="fas fa-print"></i> Print Invoice
-                </a>`;
-                @endif
-
-                @if (app('hasPermission')(2, 'delete'))
-                // Delete
-                if (userRole !== 'sales-manager' && userRole !== 'purchase-manager' && userRole !== 'inventory-manager') {
-                    items += `<a href="javascript:void(0);" class="action-delete delete-order" data-id="${order.id}">
-                        <i class="fas fa-trash"></i> Delete
-                    </a>`;
-                }
-                @endif
-
-                return `<div class="action-dropdown-wrap">
-                    <button class="action-dots-btn" title="Actions">•••</button>
-                    <div class="action-dropdown-menu">${items}</div>
-                </div>`;
-            }
-
-            function buildAssignedStaffSelect(order) {
-                const assignedStaffId = order.assigned_staff?.id ?? order.assigned_staff ?? order.assignedStaff?.id ?? order.assigned_staff_id ?? '';
-                const currentId = String(assignedStaffId || '');
-                let options = '<option value="">-- Unassigned --</option>';
-                @foreach ($salesStaffUsers as $staff)
-                    options += `<option value="{{ $staff->id }}" ${currentId === '{{ $staff->id }}' ? 'selected' : ''}>{{ $staff->name }}</option>`;
-                @endforeach
-                return `<select class="sales-inline-select assigned-staff-select" data-order-id="${order.id}" title="Assigned Staff">
-                    ${options}
-                </select>`;
-            }
-
-            function getAssignedStaffName(order) {
-                return order.assigned_staff?.name || order.assignedStaff?.name || order.assigned_staff_name || 'Unassigned';
-            }
-
-            function buildOrderTypeSelect(order) {
-                const currentType = String(order.order_type || 'Self Pickup');
-                const options = ['Self Pickup', 'Delivery']
-                    .map(type => `<option value="${type}" ${currentType === type ? 'selected' : ''}>${type}</option>`)
-                    .join('');
-                return `<select class="sales-inline-select order-type-select" data-order-id="${order.id}">
-                    ${options}
-                </select>`;
-            }
-
-            function updateInlineOrderField(orderId, payload, $select, previousValue) {
-                $.ajax({
-                    url: '/api/update-order-inline',
-                    method: 'POST',
-                    data: {
-                        order_id: orderId,
-                        ...payload,
-                        selectedSubAdminId: selectedSubAdminId || ''
-                    },
-                    headers: {
-                        'X-CSRF-TOKEN': "{{ csrf_token() }}",
-                        'Authorization': 'Bearer ' + authToken,
-                    },
-                    success: function(response) {
-                        if (response.status) {
-                            if (window.orderDataMap && window.orderDataMap[orderId]) {
-                                window.orderDataMap[orderId] = {
-                                    ...window.orderDataMap[orderId],
-                                    ...response.data
-                                };
-                            }
-                        } else {
-                            $select.val(previousValue);
-                            Swal.fire('Error', response.message || 'Update failed.', 'error');
-                        }
-                    },
-                    error: function(xhr) {
-                        $select.val(previousValue);
-                        const message = xhr.responseJSON?.message || 'Update failed.';
-                        Swal.fire('Error', message, 'error');
-                    }
-                });
-            }
-
-            let isRevertingAssignedStaffSelection = false;
-
-            $(document).on('change', '.assigned-staff-select', function() {
-                if (isRevertingAssignedStaffSelection) {
-                    return;
-                }
-
-                const $select = $(this);
-                const orderId = $select.data('order-id');
-                const previousValue = $select.data('previous-value') ?? '';
-                const assignedStaff = $select.val();
-
-                if (assignedStaff === previousValue) {
-                    return;
-                }
-
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Are you sure?',
-                    text: 'Are you sure you want to assign this staff?',
-                    showCancelButton: true,
-                    confirmButtonText: 'Yes, assign!',
-                    cancelButtonText: 'Cancel',
-                    confirmButtonColor: '#ff9f43',
-                    cancelButtonColor: '#dc3545'
-                }).then((result) => {
-                    if (!result.isConfirmed) {
-                        isRevertingAssignedStaffSelection = true;
-                        $select.val(previousValue);
-                        $select.data('previous-value', previousValue);
-                        isRevertingAssignedStaffSelection = false;
-                        return;
-                    }
-
-                    updateInlineOrderField(orderId, {
-                        assigned_staff: assignedStaff
-                    }, $select, previousValue);
-                    $select.data('previous-value', assignedStaff);
-                });
-            });
-
-            $(document).on('change', '.order-type-select', function() {
-                const $select = $(this);
-                const orderId = $select.data('order-id');
-                const previousValue = $select.data('previous-value') ?? '';
-                const orderType = $select.val();
-
-                updateInlineOrderField(orderId, {
-                    order_type: orderType
-                }, $select, previousValue);
-            });
-
-            $(document).on('focusin', '.assigned-staff-select, .order-type-select', function() {
-                $(this).data('previous-value', $(this).val());
             });
 
             function loadOrders(page = 1) {
                 currentPage = page;
                 const selectedMonth = normalizeFilterValue($('#filter-month').val() || '');
                 const selectedYear = normalizeFilterValue($('#filter-year').val() || '');
+                const selectedSort = $('#filter-sort').val() || 'latest';
+                const selectedOrderType = $('#filter-order-type').val() || 'all';
                 let selectedDate = ($('#filter-date').val() || '').trim();
                 if (selectedDate && selectedDate.includes('-')) {
                     const parts = selectedDate.split('-');
@@ -4603,10 +3915,10 @@ $('#paymentHistoryList').html(historyHtml);
                         search: searchQuery,
                         month: selectedMonth,
                         year: selectedYear,
+                        order_sort: selectedSort,
+                        order_type: selectedOrderType,
                         date: selectedDate,
                         financial_year: normalizeFilterValue($('#filter-financial-year').val() || ''),
-                        order_type: normalizeFilterValue($('#filter-order-type').val() || ''),
-                        sort: normalizeFilterValue($('#filter-sort').val() || ''),
                         selectedSubAdminId: selectedSubAdminId || ''
                     },
                     headers: {
@@ -4661,8 +3973,82 @@ $('#paymentHistoryList').html(historyHtml);
                                     currencySymbol + amount;
 
 
-                                let actionBtns = buildActionDropdown(order, displayAmount, currencySymbol, currencyPosition);
+                                let actionBtns = `<div class="dropdown">
+                                    <button class="btn btn-sm  p-0 text-muted" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i class="fas fa-ellipsis-h" style="font-size: 18px;"></i>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-end shadow" style="min-width: 150px;">`;
 
+                                if (parseFloat(order.remaining_amount || 0) > 0 && status ===
+                                    'sales') {
+                                    actionBtns += `<li><a href="javascript:void(0);" class="dropdown-item make-payment-btn" data-bs-toggle="modal" data-bs-target="#makePaymentModal"
+                                        data-id="${order.id}" data-amount="${order.remaining_amount}" data-method="${order.payment_method || ''}"
+                                        data-emi-months="${order.remaining_emi_months}" data-emi-duration="${order.emi_duration || 0}"
+                                        data-total-amount="${order.total_amount || 0}" data-remaining-amount="${order.remaining_amount}"
+                                        data-return-amount="${order.total_return || 0}"
+                                        data-remaining-emi-months="${order.remaining_emi_months}"
+                                        data-tds-percentage="${order.tds_percentage || 0}"
+                                        data-tds-amount="${order.tds_amount || 0}"
+                                        data-emi-tenure="${order.emi_tenure || 0}"
+                                        data-emi-monthly="${order.emi_monthly_amount || 0}" 
+                                        title="Make Payment">
+                                        <i class="fas fa-money-bill-wave me-2 text-secondary"></i> Pay
+                                    </a></li>`;
+
+                                }
+                                actionBtns += `<li><button class="dropdown-item open-history" data-id="${order.id}" title="Payment History">
+                                    <i class="fas fa-history me-2 text-secondary"></i> History
+                               </button></li>`;
+
+                                if ((order.payment_method || '').toLowerCase() === 'emi') {
+                                    actionBtns += `<li><a class="dropdown-item" href="javascript:void(0);" onclick="openEmiDetails(${order.id})" title="EMI Details">
+                                       <i class="fas fa-calendar-alt me-2 text-secondary"></i> EMI Details
+                                   </a></li>`;
+                                }
+
+                                if ((order.quotation_status || '').toLowerCase() ===
+                                    'quotation') {
+                                    actionBtns += `<li><a class="dropdown-item convert-to-sales" href="javascript:void(0);" data-id="${order.id}" title="Convert to Sales">
+                                        <i class="fas fa-exchange-alt me-2 text-success"></i> Convert to Sales
+                                    </a></li>`;
+                                }
+
+                                @if (app('hasPermission')(2, 'view'))
+                                    actionBtns += `<li><a class="dropdown-item" href="/sales-details/${order.id}">
+                                        <i class="fas fa-eye me-2 text-secondary"></i> View
+                                   </a></li>`;
+                                @endif
+
+                                actionBtns += `<li><a class="dropdown-item" href="/tickets/create?order_id=${order.id}">
+                                   <i class="fas fa-ticket-alt me-2 text-secondary"></i> Raise Ticket
+                               </a></li>`;
+
+                                @if (app('hasPermission')(2, 'edit'))
+                                    if (parseFloat(order.total_return || 0) === 0) {
+                                        actionBtns += `<li><a class="dropdown-item" href="/edit-sales/${order.id}">
+                                            <i class="fas fa-edit me-2 text-secondary"></i> Edit
+                                        </a></li>`;
+                                    }
+                                @endif
+                                @if (app('hasPermission')(2, 'view'))
+                                    actionBtns += `<li><a class="dropdown-item" href="/sales-invoice/${order.id}">
+                                        <i class="fas fa-file-invoice me-2 text-secondary"></i> Invoice
+                                    </a></li>`;
+                                    actionBtns += `<li><a class="dropdown-item" href="javascript:void(0);" onclick="window.open('/sales/invoice/pdf/' + ${order.id});"  title="Print Invoice">
+                                        <i class="fas fa-print me-2 text-secondary"></i> Print Invoice
+                                    </a></li>`;
+                                @endif
+
+                                if (!['sales-manager', 'purchase-manager', 'inventory-manager']
+                                    .includes(userRole)) {
+                                    @if (app('hasPermission')(2, 'delete'))
+                                        actionBtns += `<li><a class="dropdown-item text-danger delete-order" href="javascript:void(0);" data-id="${order.id}">
+                                            <i class="fas fa-trash-alt me-2 text-danger"></i> Delete
+                                        </a></li>`;
+                                    @endif
+                                }
+
+                                actionBtns += `</ul></div>`;
                                 // Store order data for expandable row
                                 const orderData = {
                                     ...order,
@@ -4688,8 +4074,14 @@ $('#paymentHistoryList').html(historyHtml);
                                         order
                                         .extra_paid || 0),
                                     displayAmount || '0.00',
-                                    buildAssignedStaffSelect(order),
-                                    buildOrderTypeSelect(order),
+                                    `<select class="form-select form-select-sm assigned-staff-select" data-order-id="${order.id}" style="width: 140px;">
+                                        <option value="">— Unassigned —</option>
+                                        ${window.staffOptions ? window.staffOptions.map(staff => `<option value="${staff.id}" ${order.staff_id == staff.id ? 'selected' : ''}>${staff.name}</option>`).join('') : ''}
+                                     </select>`,
+                                    `<select class="form-select form-select-sm order-type-select" data-order-id="${order.id}" style="width: 140px;">
+                                        <option value="Self Pickup" ${order.order_type === 'Self Pickup' ? 'selected' : ''}>Self Pickup</option>
+                                        <option value="Delivery" ${order.order_type === 'Delivery' ? 'selected' : ''}>Delivery</option>
+                                       </select>`,
                                     `<span class="biller-wrap">${order.biller || 'Admin'}</span>`,
                                     actionBtns
                                 ]);
@@ -4767,7 +4159,7 @@ $('#paymentHistoryList').html(historyHtml);
                             }, 100);
                         } else {
                             table.clear().draw();
-                            $(".datanew tbody").html('<tr><td colspan="11">No order found</td></tr>');
+                            $(".datanew tbody").html('<tr><td colspan="9">No order found</td></tr>');
                             updateSalesSummaryTotals(0, 0, 0, '₹', 'left');
                             window.salesSummaryTotals = {
                                 total_amount: 0,
@@ -4884,25 +4276,9 @@ $('#paymentHistoryList').html(historyHtml);
 
             loadOrders(currentPage);
 
-            // Close action dropdowns when clicking outside
-            $(document).on('click', function(e) {
-                if (!$(e.target).closest('.action-dropdown-wrap').length) {
-                    $('.action-dropdown-menu.show').removeClass('show');
-                }
+            $('#filter-sort, #filter-order-type').on('change select2:select', function() {
+                loadOrders(1);
             });
-
-            // Toggle action dropdown
-            $(document).on('click', '.action-dots-btn', function(e) {
-                e.stopPropagation();
-                const $menu = $(this).next('.action-dropdown-menu');
-                const isOpen = $menu.hasClass('show');
-                // Close all others
-                $('.action-dropdown-menu.show').removeClass('show');
-                if (!isOpen) {
-                    $menu.addClass('show');
-                }
-            });
-
             // Function to calculate the total for visible (filtered) rows
 
             // Month short names
@@ -4956,7 +4332,8 @@ $('#paymentHistoryList').html(historyHtml);
                     method: 'GET',
                     data: {
                         date: selectedDate,
-                        financial_year: normalizeFilterValue($('#filter-financial-year').val() || ''),
+                        financial_year: normalizeFilterValue($('#filter-financial-year').val() ||
+                            ''),
                         selectedSubAdminId: selectedSubAdminId
                     },
                     headers: {
@@ -5018,7 +4395,8 @@ $('#paymentHistoryList').html(historyHtml);
                         data: {
                             month: selectedMonth,
                             year: selectedYear,
-                            financial_year: normalizeFilterValue($('#filter-financial-year').val() || ''),
+                            financial_year: normalizeFilterValue($('#filter-financial-year').val() ||
+                                ''),
                             selectedSubAdminId: selectedSubAdminId
                         },
                         success: function(response) {
@@ -5056,22 +4434,6 @@ $('#paymentHistoryList').html(historyHtml);
                     calculateFilteredTotal();
                 }, 200);
             });
-
-            // Order Type filter
-            $('#filter-order-type').off('change select2:select select2:unselect').on(
-                'change select2:select select2:unselect',
-                function() {
-                    loadOrders(1);
-                }
-            );
-
-            // Sort filter
-            $('#filter-sort').off('change select2:select select2:unselect').on(
-                'change select2:select select2:unselect',
-                function() {
-                    loadOrders(1);
-                }
-            );
 
             function fetchAllOrders() {
                 loadOrders(1);
@@ -5209,8 +4571,79 @@ $('#paymentHistoryList').html(historyHtml);
                 const status = String(order.quotation_status || 'sales').toLowerCase();
                 const remaining = parseFloat(order.remaining_amount || 0);
 
-                const actionBtns = buildActionDropdown(order, displayAmount, currencySymbol, currencyPosition);
+                let actionBtns = `<div class="dropdown">
+                                    <button class="btn btn-sm  p-0 text-muted" type="button" data-bs-toggle="dropdown" aria-expanded="false" >
+                                        <i class="fas fa-ellipsis-h" style="font-size: 18px;"></i>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-end shadow" style="min-width: 150px;">`;
 
+                if (parseFloat(order.remaining_amount || 0) > 0 && status === 'sales') {
+                    actionBtns += `<li><a href="javascript:void(0);" class="dropdown-item make-payment-btn" data-bs-toggle="modal" data-bs-target="#makePaymentModal"
+                                        data-id="${order.id}" data-amount="${order.remaining_amount}" data-method="${order.payment_method || ''}"
+                                        data-emi-months="${order.remaining_emi_months}" data-emi-duration="${order.emi_duration || 0}"
+                                        data-total-amount="${order.total_amount || 0}" data-remaining-amount="${order.remaining_amount}"
+                                        data-return-amount="${order.total_return || 0}"
+                                        data-remaining-emi-months="${order.remaining_emi_months}"
+                                        data-tds-percentage="${order.tds_percentage || 0}"
+                                        data-tds-amount="${order.tds_amount || 0}"
+                                        data-emi-tenure="${order.emi_tenure || 0}"
+                                        data-emi-monthly="${order.emi_monthly_amount || 0}" 
+                                        title="Make Payment">
+                                        <i class="fas fa-money-bill-wave me-2 text-secondary"></i> Pay
+                                    </a></li>`;
+
+                }
+                actionBtns += `<li><button class="dropdown-item open-history" data-id="${order.id}" title="Payment History">
+                                    <i class="fas fa-history me-2 text-secondary"></i> History
+                               </button></li>`;
+
+                if ((order.payment_method || '').toLowerCase() === 'emi') {
+                    actionBtns += `<li><a class="dropdown-item" href="javascript:void(0);" onclick="openEmiDetails(${order.id})" title="EMI Details">
+                                       <i class="fas fa-calendar-alt me-2 text-secondary"></i> EMI Details
+                                   </a></li>`;
+                }
+
+                if ((order.quotation_status || '').toLowerCase() === 'quotation') {
+                    actionBtns += `<li><a class="dropdown-item convert-to-sales" href="javascript:void(0);" data-id="${order.id}" title="Convert to Sales">
+                        <i class="fas fa-exchange-alt me-2 text-success"></i> Convert to Sales
+                    </a></li>`;
+                }
+
+                @if (app('hasPermission')(2, 'view'))
+                    actionBtns += `<li><a class="dropdown-item" href="/sales-details/${order.id}">
+                                        <i class="fas fa-eye me-2 text-secondary"></i> View
+                                   </a></li>`;
+                @endif
+
+                actionBtns += `<li><a class="dropdown-item" href="/tickets/create?order_id=${order.id}">
+                                   <i class="fas fa-ticket-alt me-2 text-secondary"></i> Raise Ticket
+                               </a></li>`;
+
+                @if (app('hasPermission')(2, 'edit'))
+                    if (parseFloat(order.total_return || 0) === 0) {
+                        actionBtns += `<li><a class="dropdown-item" href="/edit-sales/${order.id}">
+                                            <i class="fas fa-edit me-2 text-secondary"></i> Edit
+                                        </a></li>`;
+                    }
+                @endif
+                @if (app('hasPermission')(2, 'view'))
+                    actionBtns += `<li><a class="dropdown-item" href="/sales-invoice/${order.id}">
+                                        <i class="fas fa-file-invoice me-2 text-secondary"></i> Invoice
+                                    </a></li>`;
+                    actionBtns += `<li><a class="dropdown-item" href="javascript:void(0);" onclick="window.open('/sales/invoice/pdf/' + ${order.id});"  title="Print Invoice">
+                                        <i class="fas fa-print me-2 text-secondary"></i> Print Invoice
+                                    </a></li>`;
+                @endif
+
+                if (!['sales-manager', 'purchase-manager', 'inventory-manager'].includes(userRole)) {
+                    @if (app('hasPermission')(2, 'delete'))
+                        actionBtns += `<li><a class="dropdown-item text-danger delete-order" href="javascript:void(0);" data-id="${order.id}">
+                                            <i class="fas fa-trash-alt me-2 text-danger"></i> Delete
+                                        </a></li>`;
+                    @endif
+                }
+
+                actionBtns += `</ul></div>`;
                 // Your existing HTML table rendering here...
                 const orderData = {
                     ...order,
@@ -5326,7 +4759,79 @@ $('#paymentHistoryList').html(historyHtml);
                 const formattedDate = `${day}-${month}-${year} ${hours}:${minutes} ${ampm}`;
 
                 // 🔹 Build action buttons properly
-                const actionBtns = buildActionDropdown(order, displayAmount, currencySymbol, currencyPosition);
+                let actionBtns = `<div class="dropdown">
+                                    <button class="btn btn-sm  p-0 text-muted" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i class="fas fa-ellipsis-h" style="font-size: 18px;"></i>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-end shadow" style="min-width: 150px;">`;
+
+                if (parseFloat(order.remaining_amount || 0) > 0 && status === 'sales') {
+                    actionBtns += `<li><a href="javascript:void(0);" class="dropdown-item make-payment-btn" data-bs-toggle="modal" data-bs-target="#makePaymentModal"
+                                        data-id="${order.id}" data-amount="${order.remaining_amount}" data-method="${order.payment_method || ''}"
+                                        data-emi-months="${order.remaining_emi_months}" data-emi-duration="${order.emi_duration || 0}"
+                                        data-total-amount="${order.total_amount || 0}" data-remaining-amount="${order.remaining_amount}"
+                                        data-return-amount="${order.total_return || 0}"
+                                        data-remaining-emi-months="${order.remaining_emi_months}"
+                                        data-tds-percentage="${order.tds_percentage || 0}"
+                                        data-tds-amount="${order.tds_amount || 0}"
+                                        data-emi-tenure="${order.emi_tenure || 0}"
+                                        data-emi-monthly="${order.emi_monthly_amount || 0}" 
+                                        title="Make Payment">
+                                        <i class="fas fa-money-bill-wave me-2 text-secondary"></i> Pay
+                                    </a></li>`;
+
+                }
+                actionBtns += `<li><button class="dropdown-item open-history" data-id="${order.id}" title="Payment History">
+                                    <i class="fas fa-history me-2 text-secondary"></i> History
+                               </button></li>`;
+
+                if ((order.payment_method || '').toLowerCase() === 'emi') {
+                    actionBtns += `<li><a class="dropdown-item" href="javascript:void(0);" onclick="openEmiDetails(${order.id})" title="EMI Details">
+                                       <i class="fas fa-calendar-alt me-2 text-secondary"></i> EMI Details
+                                   </a></li>`;
+                }
+
+                if ((order.quotation_status || '').toLowerCase() === 'quotation') {
+                    actionBtns += `<li><a class="dropdown-item convert-to-sales" href="javascript:void(0);" data-id="${order.id}" title="Convert to Sales">
+                        <i class="fas fa-exchange-alt me-2 text-success"></i> Convert to Sales
+                    </a></li>`;
+                }
+
+                @if (app('hasPermission')(2, 'view'))
+                    actionBtns += `<li><a class="dropdown-item" href="/sales-details/${order.id}">
+                                        <i class="fas fa-eye me-2 text-secondary"></i> View
+                                   </a></li>`;
+                @endif
+
+                actionBtns += `<li><a class="dropdown-item" href="/tickets/create?order_id=${order.id}">
+                                   <i class="fas fa-ticket-alt me-2 text-secondary"></i> Raise Ticket
+                               </a></li>`;
+
+                @if (app('hasPermission')(2, 'edit'))
+                    if (parseFloat(order.total_return || 0) === 0) {
+                        actionBtns += `<li><a class="dropdown-item" href="/edit-sales/${order.id}">
+                                            <i class="fas fa-edit me-2 text-secondary"></i> Edit
+                                        </a></li>`;
+                    }
+                @endif
+                @if (app('hasPermission')(2, 'view'))
+                    actionBtns += `<li><a class="dropdown-item" href="/sales-invoice/${order.id}">
+                                        <i class="fas fa-file-invoice me-2 text-secondary"></i> Invoice
+                                    </a></li>`;
+                    actionBtns += `<li><a class="dropdown-item" href="javascript:void(0);" onclick="window.open('/sales/invoice/pdf/' + ${order.id});"  title="Print Invoice">
+                                        <i class="fas fa-print me-2 text-secondary"></i> Print Invoice
+                                    </a></li>`;
+                @endif
+
+                if (!['sales-manager', 'purchase-manager', 'inventory-manager'].includes(userRole)) {
+                    @if (app('hasPermission')(2, 'delete'))
+                        actionBtns += `<li><a class="dropdown-item text-danger delete-order" href="javascript:void(0);" data-id="${order.id}">
+                                            <i class="fas fa-trash-alt me-2 text-danger"></i> Delete
+                                        </a></li>`;
+                    @endif
+                }
+
+                actionBtns += `</ul></div>`;
 
                 const orderData = {
                     ...order,
@@ -5408,6 +4913,242 @@ $('#paymentHistoryList').html(historyHtml);
                 calculateFilteredTotal();
             }, 200);
         }
+
+        function renderSalesPaymentHistory(history, summary) {
+            let html = '';
+
+            if (!history || history.length === 0) {
+                html = '<li class="list-group-item">No payment history found.</li>';
+            } else {
+                html = history.map(function(payment) {
+                    return `
+                        <li class="list-group-item">
+                            <div class="d-flex justify-content-between gap-3">
+                                <div class="flex-grow-1">
+                                    <div class="fw-semibold">${formatPaymentHistoryDate(payment.payment_date || payment.created_at)}</div>
+                                    <div class="small text-muted">
+                                        Method: ${formatPaymentMethodLabel(payment.payment_method)} |
+                                        Type: ${formatPaymentTypeLabel(payment.payment_type)}
+                                    </div>
+                                    <div class="small">Remarks: ${payment.remarks ? payment.remarks : 'N/A'}</div>
+                                </div>
+                                <div class="d-flex gap-2 flex-shrink-0 align-items-start">
+                                    <button type="button" class="btn btn-sm btn-outline-primary edit-payment-btn"
+                                        data-payment-id="${payment.id}" data-order-id="${payment.order_id || ''}">
+                                        <i class="fas fa-pen"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-outline-danger delete-payment-btn"
+                                        data-payment-id="${payment.id}" data-order-id="${payment.order_id || ''}">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="mt-2 fw-semibold">
+                                ₹${parseFloat(payment.payment_amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                            </div>
+                        </li>
+                    `;
+                }).join('');
+            }
+
+            html += `
+                <li class="list-group-item mt-2 bg-light">
+                    <strong>Order Total:</strong> ₹${parseFloat(summary.order_total || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </li>
+                <li class="list-group-item bg-light">
+                    <strong>Total Paid:</strong> ₹${parseFloat(summary.total_paid || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </li>
+                <li class="list-group-item bg-light">
+                    <strong>Return Amount:</strong> ₹${parseFloat(summary.return_amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </li>
+            `;
+
+            if (summary.extra_paid > 0) {
+                html += `
+                    <li class="list-group-item bg-warning">
+                        <strong>Extra Paid:</strong>
+                        ₹${parseFloat(summary.extra_paid).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        <span class="text-danger">(Advance / Refund)</span>
+                    </li>
+                `;
+            } else {
+                html += `
+                    <li class="list-group-item bg-light">
+                        <strong>Remaining:</strong> ₹${parseFloat(summary.remaining || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </li>
+                `;
+            }
+
+            $('#globalPaymentHistoryList').html(html);
+        }
+
+        function loadSalesPaymentHistory(orderId) {
+            const authToken = localStorage.getItem("authToken");
+
+            $('#globalPaymentHistoryList').html('<li class="list-group-item">Loading...</li>');
+            $.ajax({
+                url: '/api/order/payment-history/' + orderId,
+                method: 'GET',
+                headers: {
+                    "Authorization": "Bearer " + authToken
+                },
+                success: function(response) {
+                    renderSalesPaymentHistory(response.data || [], response.summary || {});
+                    new bootstrap.Modal(document.getElementById('paymentHistoryModal')).show();
+                },
+                error: function() {
+                    $('#globalPaymentHistoryList').html(
+                        '<li class="list-group-item text-danger">Failed to load payment history.</li>');
+                    new bootstrap.Modal(document.getElementById('paymentHistoryModal')).show();
+                }
+            });
+        }
+
+        $(document).on('click', '.open-history', function(event) {
+            event.preventDefault();
+            event.stopImmediatePropagation();
+            loadSalesPaymentHistory($(this).data('id'));
+        });
+
+        $(document).on('click', '.edit-payment-btn', function(event) {
+            event.preventDefault();
+            event.stopImmediatePropagation();
+
+            const paymentId = $(this).data('payment-id');
+            const authToken = localStorage.getItem("authToken");
+
+            $.ajax({
+                url: '/api/sales/payment/' + paymentId,
+                method: 'GET',
+                headers: {
+                    "Authorization": "Bearer " + authToken
+                },
+                success: function(response) {
+                    const payment = response.data || {};
+                    $('#editPaymentId').val(payment.id || '');
+                    $('#editPaymentOrderId').val(payment.order_id || '');
+                    $('#editPaymentMethod').val((payment.payment_method || 'cash').toLowerCase());
+                    $('#editPaymentType').val((payment.payment_type || 'fully').toLowerCase());
+                    $('#editPaymentAmount').val(payment.payment_amount || 0);
+                    $('#editPaymentBank').val(payment.bank_id || '');
+                    $('#editPaymentDate').val(formatDateForInput(payment.payment_date || payment
+                        .created_at));
+                    $('#editPaymentRemarks').val(payment.remarks || '');
+                    $('#editPaymentBankWrap').toggle((payment.payment_method || '').toLowerCase() !==
+                        'cash');
+
+                    new bootstrap.Modal(document.getElementById('editPaymentModal')).show();
+                }
+            });
+        });
+
+        $(document).on('click', '.delete-payment-btn', function(event) {
+            event.preventDefault();
+            event.stopImmediatePropagation();
+
+            const paymentId = $(this).data('payment-id');
+            const orderId = $(this).data('order-id');
+            const authToken = localStorage.getItem("authToken");
+
+            Swal.fire({
+                title: 'Delete payment?',
+                text: 'This will remove the payment from history.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Delete',
+                confirmButtonColor: '#dc3545',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (!result.isConfirmed) return;
+
+                $.ajax({
+                    url: '/api/sales/payment/' + paymentId + '/delete',
+                    method: 'POST',
+                    headers: {
+                        "Authorization": "Bearer " + authToken,
+                        "X-CSRF-TOKEN": "{{ csrf_token() }}"
+                    },
+                    success: function(response) {
+                        if (response.status) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Deleted',
+                                text: response.message ||
+                                    'Payment deleted successfully.'
+                            });
+                            loadSalesPaymentHistory(orderId);
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: response.message || 'Unable to delete payment.'
+                            });
+                        }
+                    },
+                    error: function(xhr) {
+                        const message = xhr.responseJSON?.message ||
+                            'Unable to delete payment.';
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: message
+                        });
+                    }
+                });
+            });
+        });
+
+        $(document).on('change', '#editPaymentMethod', function() {
+            $('#editPaymentBankWrap').toggle($(this).val() !== 'cash');
+        });
+
+        $('#saveEditPaymentBtn').on('click', function() {
+            const paymentId = $('#editPaymentId').val();
+            const authToken = localStorage.getItem("authToken");
+
+            $.ajax({
+                url: '/api/sales/payment/' + paymentId + '/update',
+                method: 'POST',
+                headers: {
+                    "Authorization": "Bearer " + authToken,
+                    "X-CSRF-TOKEN": "{{ csrf_token() }}"
+                },
+                data: {
+                    payment_amount: $('#editPaymentAmount').val(),
+                    payment_date: $('#editPaymentDate').val(),
+                    payment_method: $('#editPaymentMethod').val(),
+                    payment_type: $('#editPaymentType').val(),
+                    bank_id: $('#editPaymentBank').val(),
+                    remarks: $('#editPaymentRemarks').val()
+                },
+                success: function(response) {
+                    if (response.status) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Updated',
+                            text: response.message || 'Payment updated successfully.'
+                        });
+                        bootstrap.Modal.getInstance(document.getElementById('editPaymentModal')).hide();
+                        loadSalesPaymentHistory($('#editPaymentOrderId').val());
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: response.message || 'Unable to update payment.'
+                        });
+                    }
+                },
+                error: function(xhr) {
+                    const message = xhr.responseJSON?.message || 'Unable to update payment.';
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: message
+                    });
+                }
+            });
+        });
+
         // Global history modal open
         $(document).on('click', '.open-history', function() {
             var authToken = localStorage.getItem("authToken");
@@ -5471,9 +5212,6 @@ $('#paymentHistoryList').html(historyHtml);
                     }
 
                     $('#globalPaymentHistoryList').html(html);
-                    $('#globalPaymentHistoryList').html(
-                        renderPaymentHistoryCards(response.data || [], response.summary || {}, response.sales || {})
-                    );
 
                     new bootstrap.Modal(document.getElementById('paymentHistoryModal'))
                         .show();
@@ -5489,251 +5227,6 @@ $('#paymentHistoryList').html(historyHtml);
                 }
             });
         });
-        $(document).off('click', '.open-history').on('click', '.open-history', function() {
-            const authToken = localStorage.getItem("authToken");
-            const jobCardId = $(this).data('id');
-
-            $('#globalPaymentHistoryList')
-                .data('order-id', jobCardId)
-                .html('<div class="payment-history-card">Loading...</div>');
-
-            $.ajax({
-                url: '/api/order/payment-history/' + jobCardId,
-                method: 'GET',
-                headers: {
-                    "Authorization": "Bearer " + authToken
-                },
-                success: function(response) {
-                    currentPaymentHistorySummary = response.summary || {};
-                    $('#globalPaymentHistoryList').html(
-                        renderPaymentHistoryCards(response.data || [], currentPaymentHistorySummary, response.sales || {})
-                    );
-
-                    if (!paymentHistoryModalInstance) {
-                        paymentHistoryModalInstance = new bootstrap.Modal(document.getElementById('paymentHistoryModal'));
-                    }
-                    paymentHistoryModalInstance.show();
-                },
-                error: function() {
-                    $('#globalPaymentHistoryList').html(
-                        '<div class="payment-history-card text-danger">Failed to load payment history.</div>'
-                    );
-
-                    if (!paymentHistoryModalInstance) {
-                        paymentHistoryModalInstance = new bootstrap.Modal(document.getElementById('paymentHistoryModal'));
-                    }
-                    paymentHistoryModalInstance.show();
-                }
-            });
-        });
-
-        $(document).off('click', '.open-emi-details').on('click', '.open-emi-details', function() {
-            $('.action-dropdown-menu.show').removeClass('show');
-            const authToken = localStorage.getItem("authToken");
-            const orderId = $(this).data('id');
-
-            if (!emiDetailsModalInstance) {
-                emiDetailsModalInstance = new bootstrap.Modal(document.getElementById('emiDetailsModal'));
-            }
-
-            $('#emiDetailsModalBody').html('<div class="text-center text-muted py-4">Loading EMI details...</div>');
-            emiDetailsModalInstance.show();
-
-            $.ajax({
-                url: '/api/getsalseById/' + orderId,
-                method: 'GET',
-                headers: {
-                    "Authorization": "Bearer " + authToken
-                },
-                success: function(orderResponse) {
-                    $.ajax({
-                        url: '/api/order/payment-history/' + orderId,
-                        method: 'GET',
-                        headers: {
-                            "Authorization": "Bearer " + authToken
-                        },
-                        success: function(historyResponse) {
-                            const order = orderResponse.sales || {};
-                            const payments = historyResponse.data || [];
-                            $('#emiDetailsModalBody').html(renderEmiDetailsContent(order, payments));
-                        },
-                        error: function() {
-                            const order = orderResponse.sales || {};
-                            $('#emiDetailsModalBody').html(renderEmiDetailsContent(order, []));
-                        }
-                    });
-                },
-                error: function() {
-                    $('#emiDetailsModalBody').html('<div class="text-danger text-center py-4">Failed to load EMI details.</div>');
-                }
-            });
-        });
-
-        $(document).off('click', '.edit-payment-history').on('click', '.edit-payment-history', function() {
-            const paymentId = $(this).data('payment-id');
-            const authToken = localStorage.getItem("authToken");
-
-            $.ajax({
-                url: '/api/payment-store/' + paymentId,
-                method: 'GET',
-                headers: {
-                    "Authorization": "Bearer " + authToken
-                },
-                success: function(response) {
-                    if (!response.status || !response.data) {
-                        Swal.fire({
-                            title: 'Error',
-                            text: 'Unable to load payment details.',
-                            icon: 'error',
-                            confirmButtonColor: '#ff9f43'
-                        });
-                        return;
-                    }
-
-                    populateEditPaymentModal(response.data);
-
-                    if (paymentHistoryModalInstance) {
-                        paymentHistoryModalInstance.hide();
-                    }
-
-                    if (!editPaymentModalInstance) {
-                        editPaymentModalInstance = new bootstrap.Modal(document.getElementById('editPaymentHistoryModal'));
-                    }
-                    editPaymentModalInstance.show();
-                },
-                error: function() {
-                    Swal.fire({
-                        title: 'Error',
-                        text: 'Unable to load payment details.',
-                        icon: 'error',
-                        confirmButtonColor: '#ff9f43'
-                    });
-                }
-            });
-        });
-
-        $(document).off('click', '.delete-payment-history').on('click', '.delete-payment-history', function() {
-            const paymentId = $(this).data('payment-id');
-            const orderId = $('#globalPaymentHistoryList').data('order-id');
-            const authToken = localStorage.getItem("authToken");
-
-            Swal.fire({
-                title: 'Delete payment?',
-                text: 'This will remove the selected payment history row.',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#ea5455',
-                cancelButtonColor: '#6c757d',
-                confirmButtonText: 'Delete'
-            }).then((result) => {
-                if (!result.isConfirmed) {
-                    return;
-                }
-
-                $.ajax({
-                    url: '/sales-receipt-payment/transaction/' + paymentId,
-                    method: 'POST',
-                    data: {
-                        _method: 'DELETE',
-                        _token: "{{ csrf_token() }}"
-                    },
-                    headers: {
-                        "Authorization": "Bearer " + authToken
-                    },
-                    success: function(response) {
-                        Swal.fire({
-                            title: 'Deleted',
-                            text: response.message || 'Payment deleted successfully.',
-                            icon: 'success',
-                            confirmButtonColor: '#ff9f43'
-                        });
-
-                        if (orderId) {
-                            $('.open-history[data-id="' + orderId + '"]').first().trigger('click');
-                        }
-                    },
-                    error: function(xhr) {
-                        const message = xhr.responseJSON && xhr.responseJSON.message ?
-                            xhr.responseJSON.message :
-                            'Failed to delete payment history.';
-
-                        Swal.fire({
-                            title: 'Error',
-                            text: message,
-                            icon: 'error',
-                            confirmButtonColor: '#ff9f43'
-                        });
-                    }
-                });
-            });
-        });
-
-        $('#edit_payment_method, #edit_paid_type, #edit_online_type, #edit_cash_online_type').on('change', function() {
-            showEditPaymentSections();
-            recalculateEditPendingAmount();
-        });
-
-        $('#editOpenAddBankModal').on('click', function() {
-            resetAddBankForm();
-            if (editPaymentModalInstance) {
-                editPaymentModalInstance.hide();
-            }
-            if (addBankModal) {
-                addBankModal.show();
-            }
-        });
-
-        $('#edit_partial_amount, #edit_cash_amount, #edit_online_amount').on('input', function() {
-            recalculateEditPendingAmount();
-        });
-
-        $('#editPaymentHistoryForm').on('submit', function(e) {
-            e.preventDefault();
-
-            const paymentId = $('#edit_payment_id').val();
-            const orderId = $('#edit_order_id').val();
-            const authToken = localStorage.getItem("authToken");
-            const payload = buildEditPaymentPayload();
-
-            $.ajax({
-                url: '/api/payment-store/' + paymentId + '/update',
-                method: 'POST',
-                data: payload,
-                headers: {
-                    'X-CSRF-TOKEN': "{{ csrf_token() }}",
-                    "Authorization": "Bearer " + authToken
-                },
-                success: function(response) {
-                    if (editPaymentModalInstance) {
-                        editPaymentModalInstance.hide();
-                    }
-
-                    Swal.fire({
-                        title: 'Success',
-                        text: response.message || 'Payment updated successfully.',
-                        icon: 'success',
-                        confirmButtonColor: '#ff9f43'
-                    }).then(() => {
-                        if (orderId) {
-                            $('.open-history[data-id="' + orderId + '"]').first().trigger('click');
-                        }
-                    });
-                },
-                error: function(xhr) {
-                    const message = xhr.responseJSON && xhr.responseJSON.message ?
-                        xhr.responseJSON.message :
-                        'Failed to update payment.';
-
-                    Swal.fire({
-                        title: 'Error',
-                        text: message,
-                        icon: 'error',
-                        confirmButtonColor: '#ff9f43'
-                    });
-                }
-            });
-        });
-
         $(document).on('click', '.delete-order', function() {
             var orderId = $(this).data('id'); // ✅ Correct usage
             var authToken = localStorage.getItem("authToken");
@@ -5792,6 +5285,118 @@ $('#paymentHistoryList').html(historyHtml);
                         }
 
                     });
+                }
+            });
+        });
+
+        $(document).on('mousedown focus', '.assigned-staff-select, .order-type-select', function() {
+            $(this).data('prev', $(this).val());
+        });
+
+        $(document).on('change', '.assigned-staff-select', function() {
+            const $select = $(this);
+            const orderId = $select.data('order-id');
+            const staffId = $select.val();
+            const prevStaffId = $select.data('prev') !== undefined ? $select.data('prev') : '';
+            const authToken = localStorage.getItem("authToken");
+
+            Swal.fire({
+                title: "Are you sure?",
+                text: "Do you want to update the assigned staff?",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#ff9f43",
+                cancelButtonColor: "#6c757d",
+                confirmButtonText: "Yes, update it!",
+                cancelButtonText: "Cancel"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: '/api/sales/' + orderId + '/update-staff',
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': "{{ csrf_token() }}",
+                            "Authorization": "Bearer " + authToken,
+                        },
+                        data: {
+                            staff_id: staffId
+                        },
+                        success: function(response) {
+                            if (response.status === true) {
+                                Swal.fire({
+                                    title: "Updated!",
+                                    text: response.message || 'Staff assigned successfully.',
+                                    icon: "success",
+                                    confirmButtonColor: '#ff9f43',
+                                    confirmButtonText: 'OK'
+                                });
+                                $select.data('prev', staffId);
+                            } else {
+                                Swal.fire('Error', response.message || 'Something went wrong', 'error');
+                                $select.val(prevStaffId);
+                            }
+                        },
+                        error: function(xhr) {
+                            Swal.fire('Error', xhr.responseJSON?.message || 'Something went wrong', 'error');
+                            $select.val(prevStaffId);
+                        }
+                    });
+                } else {
+                    $select.val(prevStaffId);
+                }
+            });
+        });
+
+        $(document).on('change', '.order-type-select', function() {
+            const $select = $(this);
+            const orderId = $select.data('order-id');
+            const orderType = $select.val();
+            const prevOrderType = $select.data('prev') !== undefined ? $select.data('prev') : 'Self Pickup';
+            const authToken = localStorage.getItem("authToken");
+
+            Swal.fire({
+                title: "Are you sure?",
+                text: "Do you want to update the order type?",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#ff9f43",
+                cancelButtonColor: "#6c757d",
+                confirmButtonText: "Yes, update it!",
+                cancelButtonText: "Cancel"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: '/api/sales/' + orderId + '/update-order-type',
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': "{{ csrf_token() }}",
+                            "Authorization": "Bearer " + authToken,
+                        },
+                        data: {
+                            order_type: orderType
+                        },
+                        success: function(response) {
+                            if (response.status === true) {
+                                Swal.fire({
+                                    title: "Updated!",
+                                    text: response.message || 'Order type updated successfully.',
+                                    icon: "success",
+                                    confirmButtonColor: '#ff9f43',
+                                    confirmButtonText: 'OK'
+                                });
+                                $select.data('prev', orderType);
+                            } else {
+                                Swal.fire('Error', response.message || 'Something went wrong', 'error');
+                                $select.val(prevOrderType);
+                            }
+                        },
+                        error: function(xhr) {
+                            Swal.fire('Error', xhr.responseJSON?.message || 'Something went wrong', 'error');
+                            $select.val(prevOrderType);
+                        }
+                    });
+                } else {
+                    $select.val(prevOrderType);
                 }
             });
         });

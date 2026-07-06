@@ -340,45 +340,14 @@
                                             </h5>
                                         </li>
 
-                                        @php
-                                            $emiTenureValue = $sales->emi_tenure ?? $sales->emi_month ?? null;
-                                            $emiTenureLabel = $emiTenureValue ? (str_contains((string) $emiTenureValue, 'Month') ? $emiTenureValue : $emiTenureValue . ' months') : null;
-                                            $emiMonthly = isset($sales->emi_monthly_amount) && $sales->emi_monthly_amount !== null ? (float) $sales->emi_monthly_amount : null;
-                                            $emiLoanAmount = isset($sales->emi_loan_amount) && $sales->emi_loan_amount !== null ? (float) $sales->emi_loan_amount : null;
-                                            $emiTenureNumber = is_numeric($emiTenureValue) ? (float) $emiTenureValue : (float) preg_replace('/[^0-9.]/', '', (string) $emiTenureValue);
-                                        @endphp
-
-                                        @if (strtolower((string) ($sales->payment_method ?? '')) === 'emi')
-                                            @if ($emiTenureLabel || $emiMonthly || $emiLoanAmount)
-                                                <li style="border-top:1px solid #eef0f4; padding-top:12px;">
-                                                    <div style="display:grid; grid-template-columns: 1fr auto; gap:18px; align-items:start; width:100%;">
-                                                        <div>
-                                                            <h4 style="color:#556; margin-bottom:4px;">EMI Plan</h4>
-                                                        </div>
-                                                        <div style="text-align:right;">
-                                                            <div style="font-weight:600; color:#1f2a44; white-space:nowrap;">
-                                                                @if($emiMonthly !== null && $emiTenureLabel && $emiTenureNumber > 0)
-                                                                    {{ formatCurrency($emiMonthly, $setting->currency_symbol ?? '₹', $setting->currency_position ?? 'left') }} x {{ $emiTenureLabel }} = {{ formatCurrency($emiMonthly * $emiTenureNumber, $setting->currency_symbol ?? '₹', $setting->currency_position ?? 'left') }}
-                                                                @elseif($emiMonthly !== null && $emiTenureLabel)
-                                                                    {{ formatCurrency($emiMonthly, $setting->currency_symbol ?? '₹', $setting->currency_position ?? 'left') }} x {{ $emiTenureLabel }}
-                                                                @else
-                                                                    EMI selected
-                                                                @endif
-                                                            </div>
-                                                            <div style="font-size:12px; color:#6c757d; margin-top:4px; white-space:nowrap;">
-                                                                Loan amount: {{ $emiLoanAmount !== null ? formatCurrency($emiLoanAmount, $setting->currency_symbol ?? '₹', $setting->currency_position ?? 'left') : '₹0.00' }}
-                                                                @if($emiTenureLabel)
-                                                                    | Tenure: {{ $emiTenureLabel }}
-                                                                @endif
-                                                            </div>
-                                                            <div style="font-size:11px; color:#8b92a2; margin-top:3px; white-space:nowrap;">
-                                                                Installment total shown separately from down payment.
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </li>
-                                            @endif
-                                        @endif
+                                        <li id="emiPlanRow" style="display: none; border-top: 1px dashed #ddd; padding-top: 10px; flex-wrap: wrap;">
+                                            <h4 style="color:#5E5873;">EMI Plan</h4>
+                                            <div style="text-align: right; flex-grow: 1;">
+                                                <h5 id="emiPlanText" style="color:#5E5873; font-weight:600; margin-bottom: 2px; white-space: nowrap;padding-left: 30px;"></h5>
+                                                <div id="emiDetailsText" style="font-size: 11px; color: #6E6B7B;"></div>
+                                                <div style="font-size: 10px; color: #999;">Installment total shown separately from down payment.</div>
+                                            </div>
+                                        </li>
 
                                         <li id="extraPaidRow" style="display: none;">
                                             <h4 style="color:#dc3545;">Extra Paid</h4>
@@ -411,7 +380,7 @@
 @push('js')
     <script>
         const userAddress = @json($userAddress);
-        const userDeliveryAddress = @json($userDeliveryAddress ?? '');
+        const userDeliveryAddress = @json($userDeliveryAddress);
     </script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -625,6 +594,37 @@
                             $("#extraPaidRow").hide();
                         }
 
+                        if ((sale.payment_method || '').toLowerCase() === 'emi' && sale.emi_tenure > 0) {
+                            const emiMonthly = formatCurrency(
+                                sale.emi_monthly_amount || 0,
+                                response.currency_symbol,
+                                response.currency_position
+                            );
+                            
+                            const loanAmount = formatCurrency(
+                                (sale.total_amount || 0) - (sale.paid_amount || 0) + (sale.pending_amount || 0), // Base loan approx, but total_amount might be the best unless paid downpayment
+                                response.currency_symbol,
+                                response.currency_position
+                            );
+                            
+                            const actualLoanAmount = formatCurrency(
+                                sale.total_amount || 0, // In your screenshot it says 25,424.00 which matches total amount
+                                response.currency_symbol,
+                                response.currency_position
+                            );
+
+                            const emiTotal = formatCurrency(
+                                (sale.emi_monthly_amount || 0) * (sale.emi_tenure || 0),
+                                response.currency_symbol,
+                                response.currency_position
+                            );
+
+                            $("#emiPlanText").html(`${emiMonthly} x ${sale.emi_tenure} months = ${emiTotal}`);
+                            $("#emiDetailsText").html(`Loan amount: ${actualLoanAmount} | Tenure: ${sale.emi_tenure} months`);
+                            $("#emiPlanRow").show();
+                        } else {
+                            $("#emiPlanRow").hide();
+                        }
 
                         const items = response.order_items;
                         // const isQuotation = sale.quotation_status === 'quotation';
@@ -697,15 +697,16 @@
                                                                     ${userAddress ? `
                                                                                                                                                                         <font style="vertical-align: inherit;">
                                                                                                                                                                             <font style="vertical-align: inherit; font-size: 14px; font-weight: 400;" class="customer-address">
-                                                                                                                                                                                ${userAddress}
+                                                                                                                                                                                <strong>Address: </strong>${userAddress}
                                                                                                                                                                             </font>
                                                                                                                                                                         </font><br>` : ''
                                                                     }
 
+                                                                    <!-- Delivery Address (show only if exists) -->
                                                                     ${userDeliveryAddress ? `
                                                                                                                                                                         <font style="vertical-align: inherit;">
                                                                                                                                                                             <font style="vertical-align: inherit; font-size: 14px; font-weight: 400;" class="customer-delivery-address">
-                                                                                                                                                                                Delivery Address: ${userDeliveryAddress}
+                                                                                                                                                                                <strong>Delivery Address: </strong>${userDeliveryAddress}
                                                                                                                                                                             </font>
                                                                                                                                                                         </font><br>` : ''
                                                                     }

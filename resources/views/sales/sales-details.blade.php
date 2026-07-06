@@ -300,43 +300,14 @@
                                             <h5 id="pendingAmountText" style="color:#C62828;font-weight:600;">₹0.00</h5>
                                         </li>
 
-                                        @php
-                                            $emiTenureValue = $sales->emi_tenure ?? $sales->emi_month ?? null;
-                                            $emiTenureLabel = $emiTenureValue ? (str_contains((string) $emiTenureValue, 'Month') ? $emiTenureValue : $emiTenureValue . ' months') : null;
-                                            $emiMonthly = isset($sales->emi_monthly_amount) && $sales->emi_monthly_amount !== null ? (float) $sales->emi_monthly_amount : null;
-                                            $emiLoanAmount = isset($sales->emi_loan_amount) && $sales->emi_loan_amount !== null ? (float) $sales->emi_loan_amount : null;
-                                            $emiTenureNumber = is_numeric($emiTenureValue) ? (float) $emiTenureValue : (float) preg_replace('/[^0-9.]/', '', (string) $emiTenureValue);
-                                        @endphp
-
-                                        @if (($sales->payment_method ?? '') === 'emi' && ($emiTenureLabel || $emiMonthly || $emiLoanAmount))
-                                            <li style="border-top:1px solid #eef0f4; padding-top:12px;">
-                                                <div style="display:grid; grid-template-columns: 1fr auto; gap:18px; align-items:start; width:100%;">
-                                                    <div>
-                                                        <h4 style="color:#556; margin-bottom:4px;">EMI Plan</h4>
-                                                    </div>
-                                                    <div style="text-align:right;">
-                                                        <div style="font-weight:600; color:#1f2a44; white-space:nowrap;">
-                                                            @if($emiMonthly !== null && $emiTenureLabel && $emiTenureNumber > 0)
-                                                                {{ formatCurrency($emiMonthly, $setting->currency_symbol ?? 'â‚¹', $setting->currency_position ?? 'left') }} x {{ $emiTenureLabel }} = {{ formatCurrency($emiMonthly * $emiTenureNumber, $setting->currency_symbol ?? 'â‚¹', $setting->currency_position ?? 'left') }}
-                                                            @elseif($emiMonthly !== null && $emiTenureLabel)
-                                                                {{ formatCurrency($emiMonthly, $setting->currency_symbol ?? 'â‚¹', $setting->currency_position ?? 'left') }} x {{ $emiTenureLabel }}
-                                                            @else
-                                                                EMI selected
-                                                            @endif
-                                                        </div>
-                                                        <div style="font-size:12px; color:#6c757d; margin-top:4px; white-space:nowrap;">
-                                                            Loan amount: {{ $emiLoanAmount !== null ? formatCurrency($emiLoanAmount, $setting->currency_symbol ?? 'â‚¹', $setting->currency_position ?? 'left') : 'â‚¹0.00' }}
-                                                            @if($emiTenureLabel)
-                                                                | Tenure: {{ $emiTenureLabel }}
-                                                            @endif
-                                                        </div>
-                                                        <div style="font-size:11px; color:#8b92a2; margin-top:3px; white-space:nowrap;">
-                                                            Installment total shown separately from down payment.
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </li>
-                                        @endif
+                                        <li id="emiPlanRow" style="display: none; border-top: 1px dashed #ddd; padding-top: 10px; flex-wrap: wrap;">
+                                            <h4 style="color:#5E5873;">EMI Plan</h4>
+                                            <div style="text-align: right; flex-grow: 1;">
+                                                <h5 id="emiPlanText" style="color:#5E5873; font-weight:600; margin-bottom: 2px; white-space: nowrap;padding-left: 30px;"></h5>
+                                                <div id="emiDetailsText" style="font-size: 11px; color: #6E6B7B;"></div>
+                                                <div style="font-size: 10px; color: #999;">Installment total shown separately from down payment.</div>
+                                            </div>
+                                        </li>
 
                                         <li id="extraPaidRow" style="display: none;">
                                             <h4 style="color:#dc3545;">Extra Paid</h4>
@@ -362,6 +333,7 @@
 @push('js')
     <script>
         const userAddress = @json($userAddress);
+        const userDeliveryAddress = @json($userDeliveryAddress);
     </script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -437,6 +409,32 @@
                             $("#extraPaidRow").show();
                         } else {
                             $("#extraPaidRow").hide();
+                        }
+
+                        if ((sale.payment_method || '').toLowerCase() === 'emi' && sale.emi_tenure > 0) {
+                            const emiMonthly = formatCurrency(
+                                sale.emi_monthly_amount || 0,
+                                currSym,
+                                currPos
+                            );
+                            
+                            const actualLoanAmount = formatCurrency(
+                                sale.total_amount || 0, 
+                                currSym,
+                                currPos
+                            );
+
+                            const emiTotal = formatCurrency(
+                                (sale.emi_monthly_amount || 0) * (sale.emi_tenure || 0),
+                                currSym,
+                                currPos
+                            );
+
+                            $("#emiPlanText").html(`${emiMonthly} x ${sale.emi_tenure} months = ${emiTotal}`);
+                            $("#emiDetailsText").html(`Loan amount: ${actualLoanAmount} | Tenure: ${sale.emi_tenure} months`);
+                            $("#emiPlanRow").show();
+                        } else {
+                            $("#emiPlanRow").hide();
                         }
 
                         // ── Return Amount & Return Status ────────────────────
@@ -595,7 +593,8 @@
                                                         <font style="vertical-align: inherit; font-size: 14px; font-weight: 400;" class="customer-name">${sale.user_name || "walk-in-customer"}</font>
                                                     </font><br>
                                                     ${sale.user_email ? `<font style="vertical-align: inherit;"><font style="vertical-align: inherit; font-size: 14px; font-weight: 400;" class="customer-email">${sale.user_email}</font></font><br>` : ''}
-                                                    ${userAddress ? `<font style="vertical-align: inherit;"><font style="vertical-align: inherit; font-size: 14px; font-weight: 400;" class="customer-address">${userAddress}</font></font><br>` : ''}
+                                                     ${userAddress ? `<font style="vertical-align: inherit;"><font style="vertical-align: inherit; font-size: 14px; font-weight: 400;" class="customer-address"><strong>Address: </strong>${userAddress}</font></font><br>` : ''}
+                                                     ${userDeliveryAddress ? `<font style="vertical-align: inherit;"><font style="vertical-align: inherit; font-size: 14px; font-weight: 400;" class="customer-delivery-address"><strong>Delivery Address: </strong>${userDeliveryAddress}</font></font><br>` : ''}
                                                     ${sale.user_phone ? `<font style="vertical-align: inherit;"><font style="vertical-align: inherit; font-size: 14px; font-weight: 400;" class="customer-phone">${sale.user_phone}</font></font><br>` : ''}
                                                     ${sale.user_gst_number ? `<font style="vertical-align: inherit;"><font style="vertical-align: inherit; font-size: 14px; font-weight: 400;">GST: ${sale.user_gst_number}</font></font><br>` : ''}
                                                     ${sale.user_pan_number ? `<font style="vertical-align: inherit;"><font style="vertical-align: inherit; font-size: 14px; font-weight: 400;">PAN: ${sale.user_pan_number}</font></font><br>` : ''}

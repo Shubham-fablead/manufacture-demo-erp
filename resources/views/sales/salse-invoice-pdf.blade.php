@@ -178,22 +178,59 @@
             word-break: keep-all;
             width: 58px;
         }
+
+        .watermark {
+            position: absolute;
+            top: 35%;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            opacity: 0.09;
+            z-index: -1000;
+        }
+
+        .watermark img {
+            width: 400px;
+            height: auto;
+            display: inline-block;
+        }
     </style>
 </head>
 
 <body>
+    @php
+        $logoBase64 = null;
+        $logoMime = null;
+        $logoSource = trim((string) ($setting->logo ?? ''));
+
+        if ($logoSource !== '') {
+            $logoCandidates = [
+                storage_path('app/public/' . ltrim($logoSource, '/')),
+                public_path(ltrim($logoSource, '/')),
+            ];
+
+            foreach ($logoCandidates as $candidate) {
+                if (file_exists($candidate)) {
+                    $logoBase64 = base64_encode(file_get_contents($candidate));
+                    $logoMime = mime_content_type($candidate);
+                    break;
+                }
+            }
+        }
+    @endphp
 
     <div class="card-body">
+        @if ($logoBase64)
+            <div class="watermark">
+                <img src="data:{{ $logoMime }};base64,{{ $logoBase64 }}" alt="Watermark logo">
+            </div>
+        @endif
+
         <table style="width:100%; margin-bottom: 10px; border-collapse: collapse;">
             <tr>
                 <td style="width: 150px; vertical-align: top;">
-                    @if (isset($setting->logo) && file_exists(storage_path('app/public/' . $setting->logo)))
-                        @php
-                            $logoPath = storage_path('app/public/' . $setting->logo);
-                            $logoData = base64_encode(file_get_contents($logoPath));
-                            $logoMime = mime_content_type($logoPath);
-                        @endphp
-                        <img src="data:{{ $logoMime }};base64,{{ $logoData }}" alt="Company Logo"
+                    @if ($logoBase64)
+                        <img src="data:{{ $logoMime }};base64,{{ $logoBase64 }}" alt="Company Logo"
                             style="height: 60px; width: auto;"> {{-- adjust height as needed --}}
                     @endif
                 </td>
@@ -581,90 +618,104 @@
 
                 @endif
 
-                @php
-                    $paymentMethod = strtolower((string) ($sales->payment_method ?? ''));
-                    $isEmiInvoice = $paymentMethod === 'emi';
-                    $emiTenure = (int) ($sales->emi_months ?? $sales->emi_duration ?? $sales->emi_tenure ?? 0);
-                    $emiMonthlyAmount = (float) ($sales->emi_monthly_amount ?? 0);
-                    $emiLoanAmount = (float) ($sales->emi_loan_amount ?? 0);
-                    $emiMonthLabel = $emiTenure > 0 ? $emiTenure . ' Months' : 'EMI';
-                    $emiDistributionRows = [];
+                {{-- EMI DISTRIBUTION BLOCK --}}
+                @if(strtolower($sales->payment_method) === 'emi')
+                    @php
+                        $emiTenureRaw = (int)$sales->emi_tenure;
+                        $emiTenure = $emiTenureRaw > 0 ? $emiTenureRaw : 1;
+                        $monthlyAmount = (float)($sales->emi_monthly_amount ?? 0);
+                        $loanAmount = (float)($sales->emi_loan_amount ?? 0);
+                        $downPayment = (float)($sales->emi_down_payment ?? 0);
 
-                    if ($isEmiInvoice && $emiTenure > 0) {
-                        // Build a map: month_number => payment record
-                        // emi_month stores which installment (1,2,3...) was paid.
-                        // If emi_month is null/0, use sequential position by payment order.
-                        $emiPaymentsSorted = collect($emiPayments ?? [])
-                            ->sortBy(['payment_date', 'id'])
-                            ->values();
+                        // Fetch all payments for this order
+                        $allPayments = isset($sales->payments) ? $sales->payments->sortBy('id')->values() : collect();
+                        $totalPaid = $allPayments->sum('payment_amount');
+                        
+                        $paidEmiMonthsTotal = $totalPaid - $downPayment;
+                        $paidMonthsCount = $monthlyAmount > 0 ? floor($paidEmiMonthsTotal / $monthlyAmount) : 0;
+                        if ($paidMonthsCount < 0) $paidMonthsCount = 0;
 
-                        // Build lookup: installment index (1-based) => payment
-                        $paidMap = [];
-                        foreach ($emiPaymentsSorted as $idx => $pay) {
-                            $installment = !empty($pay['emi_month']) ? (int)$pay['emi_month'] : ($idx + 1);
-                            $paidMap[$installment] = $pay;
-                        }
-
-                        for ($month = 1; $month <= $emiTenure; $month++) {
-                            $isPaid = isset($paidMap[$month]);
-                            $paidDate = '-';
-                            if ($isPaid && !empty($paidMap[$month]['payment_date'])) {
-                                try {
-                                    $paidDate = \Carbon\Carbon::parse($paidMap[$month]['payment_date'])->format('d-m-Y');
-                                } catch (\Exception $e) {
-                                    $paidDate = '-';
-                                }
+                        // Try to gather dates for paid months
+                        $emiDates = [];
+                        $accumulated = 0;
+                        foreach($allPayments as $p) {
+                            $accumulated += $p->payment_amount;
+                            if ($accumulated > $downPayment) {
+                                // This payment contributed to an EMI month
+                                $emiDates[] = \Carbon\Carbon::parse($p->payment_date)->format('d-m-Y');
                             }
-                            $emiDistributionRows[] = [
-                                'month'     => $month,
-                                'amount'    => $emiMonthlyAmount,
-                                'status'    => $isPaid ? 'Paid' : 'Pending',
-                                'paid_date' => $paidDate,
-                            ];
                         }
-                    }
-                @endphp
+                    @endphp
+                    
+                    <div style="margin: 15px 0;">
+                        <table style="width: 100%; border-collapse: collapse; font-family: DejaVu Sans, sans-serif; font-size: 10px; border: 1px solid #1a2c4e;">
+                            <thead>
+                                <tr style="background-color: #1a2c4e; color: #fff;">
+                                    <th colspan="2" style="padding: 8px; text-align: left; font-size: 11px; text-transform: uppercase;">EMI DISTRIBUTION</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td style="width: 40%; vertical-align: top; padding: 12px; border-right: 1px solid #dee2e6; border-bottom: 1px solid #dee2e6;">
+                                        <h4 style="margin: 0 0 6px 0; color: #000; font-size: 12px;">
+                                            {{ $setting->currency_symbol }}{{ number_format($monthlyAmount, 2) }} x {{ $emiTenure }} Months = {{ $setting->currency_symbol }}{{ number_format($loanAmount, 2) }}
+                                        </h4>
+                                        <div style="margin-bottom: 4px; color: #555; font-size: 10px;">Loan Amount: {{ $setting->currency_symbol }}{{ number_format($loanAmount, 2) }}</div>
+                                        <div style="margin-bottom: 12px; color: #555; font-size: 10px;">Tenure: {{ $emiTenure }} Months</div>
 
-                @if ($isEmiInvoice && !empty($emiDistributionRows))
-                    <div style="margin-top:12px; border:1px solid #d9e1f2; page-break-inside: avoid;">
-                        <div style="background:#1f2f5f; color:#fff; padding:8px 10px; font-weight:700; text-transform:uppercase; font-size:12px;">
-                            EMI Distribution
-                        </div>
-                        <table style="width:100%; border-collapse:collapse; font-size:11px;">
-                            <tr>
-                                <td style="width:38%; vertical-align:top; padding:10px; border-right:1px solid #d9e1f2;">
-                                    <div style="font-weight:700; font-size:14px; margin-bottom:8px;">
-                                        {{ $setting->currency_symbol }}{{ number_format($emiMonthlyAmount, 2) }} x {{ $emiMonthLabel }} = {{ $setting->currency_symbol }}{{ number_format($emiMonthlyAmount * max($emiTenure, 1), 2) }}
-                                    </div>
-                                    <div style="margin-bottom:4px;">Loan Amount: {{ $setting->currency_symbol }}{{ number_format($emiLoanAmount, 2) }}</div>
-                                    <div style="margin-bottom:8px;">Tenure: {{ $emiMonthLabel }}</div>
-                                    <div style="font-size:10px; color:#c67a00; border:1px solid #f5c36a; background:#fff8e8; padding:8px; border-radius:3px; line-height:1.5;">
-                                        Note: EMI distribution is shown month-wise. Paid months are marked as Paid and remaining months are pending as per the selected EMI tenure.
-                                    </div>
-                                </td>
-                                <td style="width:62%; vertical-align:top;">
-                                    <table style="width:100%; border-collapse:collapse;">
-                                        <thead>
-                                            <tr style="background:#edf2fa;">
-                                                <th style="padding:7px; text-align:left; border:1px solid #d9e1f2;">Month</th>
-                                                <th style="padding:7px; text-align:right; border:1px solid #d9e1f2;">Amount</th>
-                                                <th style="padding:7px; text-align:center; border:1px solid #d9e1f2;">Status</th>
-                                                <th style="padding:7px; text-align:center; border:1px solid #d9e1f2;">Paid Date</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @foreach ($emiDistributionRows as $row)
-                                                <tr>
-                                                    <td style="padding:7px; border:1px solid #d9e1f2;">{{ $loop->iteration }}{{ $loop->iteration === 1 ? 'st' : ($loop->iteration === 2 ? 'nd' : ($loop->iteration === 3 ? 'rd' : 'th')) }} Month</td>
-                                                    <td style="padding:7px; border:1px solid #d9e1f2; text-align:right;">{{ $setting->currency_symbol }}{{ number_format($row['amount'], 2) }}</td>
-                                                    <td style="padding:7px; border:1px solid #d9e1f2; text-align:center; color:{{ $row['status'] === 'Paid' ? '#28a745' : '#ff4d4f' }}; font-weight:700;">{{ $row['status'] }}</td>
-                                                    <td style="padding:7px; border:1px solid #d9e1f2; text-align:center;">{{ $row['paid_date'] }}</td>
+                                        <div style="border: 1px solid #ffd89c; background-color: #fffaf0; padding: 8px; border-radius: 4px; color: #d08f2a; font-size: 9px; line-height: 1.4;">
+                                            Note: EMI distribution is shown month-wise. Paid months are marked as Paid and remaining months are pending as per the selected EMI tenure.
+                                        </div>
+                                    </td>
+                                    <td style="width: 60%; vertical-align: top; padding: 0; border-bottom: 1px solid #dee2e6;">
+                                        <table style="width: 100%; border-collapse: collapse;">
+                                            <thead>
+                                                <tr style="background-color: #f1f4f8; color: #1a2c4e; border-bottom: 1px solid #dee2e6;">
+                                                    <th style="padding: 8px; text-align: left; border-right: 1px solid #dee2e6; font-weight: bold;">Month</th>
+                                                    <th style="padding: 8px; text-align: right; border-right: 1px solid #dee2e6; font-weight: bold;">Amount</th>
+                                                    <th style="padding: 8px; text-align: center; border-right: 1px solid #dee2e6; font-weight: bold;">Status</th>
+                                                    <th style="padding: 8px; text-align: center; font-weight: bold;">Paid Date</th>
                                                 </tr>
-                                            @endforeach
-                                        </tbody>
-                                    </table>
-                                </td>
-                            </tr>
+                                            </thead>
+                                            <tbody >
+                                                @for($i = 1; $i <= $emiTenure; $i++)
+                                                    @php
+                                                        // Ordinal suffix
+                                                        $suffix = 'th';
+                                                        if (!in_array(($i % 100), [11,12,13])) {
+                                                            switch ($i % 10) {
+                                                                case 1:  $suffix = 'st'; break;
+                                                                case 2:  $suffix = 'nd'; break;
+                                                                case 3:  $suffix = 'rd'; break;
+                                                            }
+                                                        }
+                                                        $monthLabel = $i . $suffix . ' Month';
+
+                                                        $isPaid = $i <= $paidMonthsCount;
+                                                        $paidDate = '-';
+                                                        if ($isPaid) {
+                                                            $dateIndex = $i - 1;
+                                                            if (isset($emiDates[$dateIndex])) {
+                                                                $paidDate = $emiDates[$dateIndex];
+                                                            } else {
+                                                                $paidDate = \Carbon\Carbon::parse($sales->created_at ?? now())->addMonths($i)->format('d-m-Y');
+                                                            }
+                                                        }
+                                                    @endphp
+                                                    <tr style="border-bottom: 1px solid #dee2e6;">
+                                                        <td style="padding: 8px; border-right: 1px solid #dee2e6;">{{ $monthLabel }}</td>
+                                                        <td style="padding: 8px; text-align: right; border-right: 1px solid #dee2e6;">{{ $setting->currency_symbol }}{{ number_format($monthlyAmount, 2) }}</td>
+                                                        <td style="padding: 8px; text-align: center; font-weight: bold; border-right: 1px solid #dee2e6; color: {{ $isPaid ? '#28c76f' : '#ea5455' }};">
+                                                            {{ $isPaid ? 'Paid' : 'Pending' }}
+                                                        </td>
+                                                        <td style="padding: 8px; text-align: center;">{{ $paidDate }}</td>
+                                                    </tr>
+                                                @endfor
+                                            </tbody>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </tbody>
                         </table>
                     </div>
                 @endif
@@ -789,26 +840,35 @@
                         <strong style="display: block; margin-bottom: 6px; text-transform: uppercase;">Bank
                             Details:</strong>
                         <table style="width:100%; border-collapse: collapse; font-size: 10px; color: inherit;">
+                            @php
+                                $bankDetails = null;
+                                // If payment is EMI and order has a bank, show order bank details
+                                if (($sales->payment_method === 'emi') && !empty($sales->bank)) {
+                                    $bankDetails = $sales->bank;
+                                } else {
+                                    $bankDetails = $setting;
+                                }
+                            @endphp
                             <tr>
                                 <td style="padding: 0 0 3px 0;">Bank Name :</td>
                                 <td style="text-align: right; padding: 0 0 2px 0;">
-                                    {{ $setting->bank_name ?? 'N/A' }}
+                                    {{ $bankDetails->bank_name ?? 'N/A' }}
                                 </td>
                             </tr>
                             <tr>
                                 <td style="padding: 0 0 3px 0;">Branch :</td>
-                                <td style="text-align: right; padding: 0 0 3px 0;">{{ $setting->branch ?? 'N/A' }}
+                                <td style="text-align: right; padding: 0 0 3px 0;">{{ $bankDetails->branch_name ?? $bankDetails->branch ?? 'N/A' }}
                                 </td>
                             </tr>
                             <tr>
                                 <td style="padding: 0 0 3px 0;">A/C No :</td>
-                                <td style="text-align: right; padding: 0 0 3px 0;">{{ $setting->ac_no ?? 'N/A' }}
+                                <td style="text-align: right; padding: 0 0 3px 0;">{{ $bankDetails->account_number ?? $bankDetails->ac_no ?? 'N/A' }}
                                 </td>
                             </tr>
                             <tr>
                                 <td style="padding: 0;">IFSC Code :</td>
                                 <td style="text-align: right; padding: 0;">
-                                    {{ $setting->ifsc_code ?? 'N/A' }}
+                                    {{ $bankDetails->ifsc_code ?? 'N/A' }}
                                 </td>
                             </tr>
                         </table>

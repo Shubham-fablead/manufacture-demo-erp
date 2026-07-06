@@ -18,11 +18,6 @@ use App\Models\User;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use PhpOffice\PhpSpreadsheet\Style\Alignment;
-use PhpOffice\PhpSpreadsheet\Style\Border;
-use PhpOffice\PhpSpreadsheet\Style\Fill;
-use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class SalesController extends Controller
 {
@@ -68,7 +63,18 @@ class SalesController extends Controller
         $setting = $this->fallbackSetting($branchIdToUse);
         $financialYearEnabled = (bool) ($setting->financial_year ?? true);
 
-        return view('sales/saleslist', compact('years', 'banks', 'financialYearEnabled'));
+        $staffs = \App\Models\User::where('role', 'staff')
+            ->where('branch_id', $branchIdToUse)
+            ->where('isDeleted', 0)
+            ->get();
+
+        return view('sales/saleslist', [
+            'years' => $years,
+            'banks' => $banks,
+            'financialYearEnabled' => $financialYearEnabled,
+            'financial_year_enabled' => $financialYearEnabled,
+            'staffs' => $staffs,
+        ]);
     }
 
     public function add_sales(Request $request)
@@ -76,6 +82,111 @@ class SalesController extends Controller
 
         return view('sales/add-sales');
     }
+public function emiDetails($id)
+{
+    $order = Order::with('user')->findOrFail($id);
+
+    $totalAmount = round((float) ($order->total_amount ?? 0), 2);
+    $downPayment = round((float) ($order->emi_down_payment ?? 0), 2);
+    $interestRate = round((float) ($order->emi_interest_rate ?? 0), 2);
+    $tenure = max(0, (int) ($order->emi_tenure ?? 0));
+    $loanAmount = round((float) ($order->emi_loan_amount ?? 0), 2);
+    $monthlyEmi = round((float) ($order->emi_monthly_amount ?? 0), 2);
+
+    if ($loanAmount <= 0) {
+        $loanAmount = max($totalAmount - $downPayment, 0);
+    }
+
+    if ($monthlyEmi <= 0 && $tenure > 0) {
+        $totalRepayment = $loanAmount + (($loanAmount * $interestRate) / 100);
+        $monthlyEmi = round($totalRepayment / $tenure, 2);
+    }
+
+    if ($tenure <= 0 && $monthlyEmi > 0 && $loanAmount > 0) {
+        $tenure = (int) ceil($loanAmount / $monthlyEmi);
+    }
+
+    $installmentTotal = round($monthlyEmi * $tenure, 2);
+
+    $payments = PaymentStore::where('order_id', $order->id)
+        ->where(function ($query) {
+            $query->where('isDeleted', 0)->orWhereNull('isDeleted');
+        })
+        ->whereNotNull('emi_month')
+        ->where(function ($query) {
+            $query->where('payment_method', 'emi')
+                ->orWhere('payment_type', 'emi');
+        })
+        ->orderBy('emi_month')
+        ->get()
+        ->keyBy(fn ($payment) => (int) $payment->emi_month);
+
+    $months = [];
+    $paidMonths = 0;
+    $paidInstallmentTotal = 0;
+    $nextDueMonth = null;
+
+    for ($month = 1; $month <= $tenure; $month++) {
+        $payment = $payments->get($month);
+        $isPaid = (bool) $payment;
+
+        if ($isPaid) {
+            $paidMonths++;
+            $paidInstallmentTotal += (float) $payment->payment_amount;
+        } elseif ($nextDueMonth === null) {
+            $nextDueMonth = $month;
+        }
+
+        $months[] = [
+            'month' => $month,
+            'label' => $this->ordinalMonth($month) . ' Month',
+            'status' => $isPaid ? 'Paid' : 'Pending',
+            'amount' => $isPaid ? (float) $payment->payment_amount : $monthlyEmi,
+            'paid_on' => $payment && $payment->payment_date
+                ? \Carbon\Carbon::parse($payment->payment_date)->format('d-m-Y')
+                : '-',
+            'remark' => $payment && $payment->remarks ? $payment->remarks : '-',
+        ];
+    }
+
+    return response()->json([
+        'order_number' => $order->order_number,
+        'customer_name' => $order->user->name ?? 'N/A',
+        'loan_amount' => $loanAmount,
+        'emi_amount' => $monthlyEmi,
+        'months' => $tenure,
+        'total' => $installmentTotal,
+        'total_amount' => $totalAmount,
+        'down_payment' => $downPayment,
+        'interest_rate' => $interestRate,
+        'guarantor_name' => $order->emi_guarantor_name ?: 'N/A',
+        'do_id' => $order->emi_do_id ?: 'N/A',
+        'aadhar_number' => $order->emi_aadhar_number ?: 'N/A',
+        'pan_number' => $order->emi_pan_number ?: 'N/A',
+        'paid_months' => $paidMonths,
+        'pending_months' => max($tenure - $paidMonths, 0),
+        'paid_installment_total' => round($paidInstallmentTotal, 2),
+        'pending_installment_total' => max(round($installmentTotal - $paidInstallmentTotal, 2), 0),
+        'remaining_amount' => round((float) ($order->remaining_amount ?? 0), 2),
+        'next_due_month' => $nextDueMonth,
+        'next_due_label' => $nextDueMonth ? $this->ordinalMonth($nextDueMonth) . ' Month' : 'Completed',
+        'month_details' => $months,
+    ]);
+}
+
+private function ordinalMonth(int $month): string
+{
+    if (in_array($month % 100, [11, 12, 13], true)) {
+        return $month . 'th';
+    }
+
+    return match ($month % 10) {
+        1 => $month . 'st',
+        2 => $month . 'nd',
+        3 => $month . 'rd',
+        default => $month . 'th',
+    };
+}
     public function edit_sales($id)
     {
         $user       = auth()->user();
@@ -131,11 +242,6 @@ class SalesController extends Controller
             ->where('branch_id', $branchIdToUse)
             ->get();
 
-        $staffUsers = User::where('role', 'staff')
-            ->where('branch_id', $branchIdToUse)
-            ->where('isDeleted', 0)
-            ->get();
-
         $setting = $this->fallbackSetting($branchIdToUse);
         $labourItems = LabourItem::where('created_by', $branchIdToUse)
             ->where('isDeleted', false)
@@ -144,8 +250,13 @@ class SalesController extends Controller
             ->where('status', 1)
             ->where('isDeleted', 0)
             ->get();
+            
+        $staffs = User::where('role', 'staff')
+            ->where('branch_id', $branchIdToUse)
+            ->where('isDeleted', 0)
+            ->get();
 
-        return view('sales/edit-sales', compact('sales', 'TaxRate', 'category', 'usernames', 'products', 'staffUsers', 'update_id', 'setting', 'labourItems', 'banks'));
+        return view('sales/edit-sales', compact('sales', 'TaxRate', 'category', 'usernames', 'products', 'update_id', 'setting', 'labourItems', 'banks', 'staffs'));
     }
 
     public function sales_details($id)
@@ -220,6 +331,7 @@ class SalesController extends Controller
         $view_id = $id; // define view_id for blade
         $user    = $sales->user_id ? User::with('userDetail')->find($sales->user_id) : null;
         $userAddress = $user && $user->userDetail ? $user->userDetail->address : null;
+        $userDeliveryAddress = $user && $user->userDetail ? $user->userDetail->delivery_address : null;
 
         if ($user) {
             $sales->customer_role       = ucfirst($user->role ?? 'Customer');
@@ -259,6 +371,7 @@ class SalesController extends Controller
             'compenyinfo',
             'setting',
             'userAddress',
+            'userDeliveryAddress',
             'orderItems',
             'currencySymbol',
             'currencyPosition',
@@ -1181,125 +1294,6 @@ class SalesController extends Controller
             ]);
 
         return $pdf->download('sales_report.pdf');
-    }
-
-    public function export_sales_report_excel($ids)
-    {
-        $authUser   = auth()->user();
-        $subAdminId = session('selectedSubAdminId');
-
-        if ($authUser->role === 'staff' && $authUser->branch_id) {
-            $branchIdToUse = $authUser->branch_id;
-        } elseif ($authUser->role === 'admin' && ! empty($subAdminId)) {
-            $branchIdToUse = $subAdminId;
-        } else {
-            $branchIdToUse = $authUser->id;
-        }
-
-        $idsArray = explode(',', $ids);
-        $sales = OrderItem::with('product.category', 'invoice', 'user.userDetail')
-            ->whereIn('id', $idsArray)
-            ->get();
-
-        if ($sales->isEmpty()) {
-            return redirect()->route('sales.index')->with('error', 'No sales data found.');
-        }
-
-        $setting = Setting::where('branch_id', $branchIdToUse)->first();
-        $currencySymbol = $setting->currency_symbol ?? '₹';
-        $currencyPosition = $setting->currency_position ?? 'left';
-
-        $spreadsheet = new Spreadsheet();
-        $sheet = $spreadsheet->getActiveSheet();
-        $sheet->setTitle('Sales Report');
-
-        $sheet->setCellValue('A1', 'Sales Report');
-        $sheet->mergeCells('A1:N1');
-        $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(14);
-        $sheet->getStyle('A1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-
-        $headers = ['Sr. No.', 'Order Number', 'Sale Date', 'Product', 'Customer', 'GST NO', 'Address', 'Category', 'Price', 'Discount', 'Final Price', 'Qty', 'Taxes', 'Total'];
-        $col = 'A';
-        foreach ($headers as $header) {
-            $sheet->setCellValue($col . '3', $header);
-            $col++;
-        }
-
-        $sheet->getStyle('A3:N3')->getFont()->setBold(true);
-        $sheet->getStyle('A3:N3')->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('FF9F43');
-        $sheet->getStyle('A3:N3')->getFont()->getColor()->setRGB('FFFFFF');
-        $sheet->getStyle('A3:N3')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-        $sheet->getStyle('A3:N3')->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
-
-        foreach (range('A', 'N') as $column) {
-            $sheet->getColumnDimension($column)->setAutoSize(true);
-        }
-
-        $rowNum = 4;
-        foreach ($sales as $index => $sale) {
-            $discountPercent = $sale->invoice->discount ?? 0;
-            $originalUnitPrice = $sale->quantity ? $sale->total_amount / $sale->quantity : 0;
-            $discountPerUnit = ($originalUnitPrice * $discountPercent) / 100;
-            $finalUnitPrice = $originalUnitPrice - $discountPerUnit;
-            $finalTotal = $sale->rowFinalTotal ?? $finalUnitPrice * $sale->quantity;
-            $orderNumber = $sale->invoice->order_number ?? 'N/A';
-            $saleDate = optional($sale->created_at)->format('d M Y') ?? 'N/A';
-            $customerName = $sale->user->name ?? 'N/A';
-            $gstNo = $sale->user->gst_number ?? 'N/A';
-            $customerAddress = optional($sale->user->userDetail)->address ?? 'N/A';
-            $category = $sale->product->category->name ?? 'N/A';
-
-            $taxText = 'N/A';
-            if ($sale->rowGSTOption === 'with_gst' && ! empty($sale->rowTaxes)) {
-                $taxText = collect($sale->rowTaxes)->map(function ($t) use ($currencySymbol, $currencyPosition) {
-                    $amount = $currencyPosition === 'left'
-                        ? $currencySymbol . number_format($t['amount'], 2)
-                        : number_format($t['amount'], 2) . $currencySymbol;
-
-                    return ($t['name'] ?? 'Tax') . ' (' . ($t['rate'] ?? '0') . '%): ' . $amount;
-                })->implode("\n");
-            }
-
-            $sheet->fromArray([
-                $index + 1,
-                $orderNumber,
-                $saleDate,
-                $sale->product->name ?? '-',
-                $customerName,
-                $gstNo,
-                $customerAddress,
-                $category,
-                $currencyPosition === 'left' ? $currencySymbol . number_format($originalUnitPrice, 2) : number_format($originalUnitPrice, 2) . $currencySymbol,
-                number_format($discountPercent, 2) . '%',
-                $currencyPosition === 'left' ? $currencySymbol . number_format($finalUnitPrice, 2) : number_format($finalUnitPrice, 2) . $currencySymbol,
-                number_format($sale->quantity, 2),
-                $taxText,
-                $currencyPosition === 'left' ? $currencySymbol . number_format($finalTotal, 2) : number_format($finalTotal, 2) . $currencySymbol,
-            ], null, 'A' . $rowNum);
-
-            $sheet->getStyle('A' . $rowNum . ':N' . $rowNum)->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
-            $sheet->getStyle('M' . $rowNum)->getAlignment()->setWrapText(true);
-            $rowNum++;
-        }
-
-        $sheet->setCellValue('M' . $rowNum, 'Total Amount');
-        $sheet->setCellValue('N' . $rowNum, $currencyPosition === 'left'
-            ? $currencySymbol . number_format($sales->sum('rowFinalTotal'), 2)
-            : number_format($sales->sum('rowFinalTotal'), 2) . $currencySymbol);
-        $sheet->getStyle('M' . $rowNum . ':N' . $rowNum)->getFont()->setBold(true);
-        $sheet->getStyle('M' . $rowNum . ':N' . $rowNum)->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
-        $sheet->getStyle('M' . $rowNum . ':N' . $rowNum)->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('FFF6E8');
-
-        $sheet->getStyle('A3:N' . $rowNum)->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
-
-        $fileName = 'sales_report_' . now()->format('Ymd_His') . '.xlsx';
-        $writer = new Xlsx($spreadsheet);
-
-        return response()->streamDownload(function () use ($writer) {
-            $writer->save('php://output');
-        }, $fileName, [
-            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        ]);
     }
 
     public function show_sales_report_page(Request $request)

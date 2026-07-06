@@ -91,47 +91,6 @@
             color: #fff;
         }
 
-        .customer-label-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 8px;
-            margin-bottom: 8px;
-        }
-
-        .customer-action-group {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .customer-action-btn {
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            border: 0;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0;
-            color: #fff;
-            font-size: 12px;
-            line-height: 1;
-        }
-
-        .customer-add-btn {
-            background: #ff9f43;
-        }
-
-        .customer-edit-btn {
-            background: #1f3c88;
-        }
-
-        .customer-edit-btn:disabled {
-            opacity: 0.55;
-            cursor: not-allowed;
-        }
-
         .page-header {
             display: flex;
             align-items: center;
@@ -199,32 +158,6 @@
             line-height: 1;
         }
 
-        #emiBox {
-            margin-top: 10px;
-            padding-top: 10px;
-        }
-
-        #emiBox .form-group {
-            margin-bottom: 18px;
-        }
-
-        #emiBox label {
-            margin-bottom: 8px;
-            font-weight: 500;
-        }
-
-        @media (min-width: 992px) {
-            #emiBox .row.g-2 > .col-md-6 {
-                flex: 0 0 25%;
-                max-width: 25%;
-            }
-
-            #emiBox .row.g-2 > .col-md-6.w-100-lg {
-                flex: 0 0 100%;
-                max-width: 100%;
-            }
-        }
-
         @media (max-width: 767.98px) {
             .page-header {
                 flex-wrap: wrap;
@@ -287,49 +220,6 @@
                 font-size: 11px;
                 white-space: nowrap;
             }
-
-            .content > .row > .col-lg-3.col-sm-6.col-6 {
-                flex: 0 0 100%;
-                max-width: 100%;
-            }
-
-            .content > .row > .col-lg-12 > .row > .col-lg-3.col-sm-6.col-6 {
-                flex: 0 0 50%;
-                max-width: 50%;
-            }
-
-            .content .form-group label {
-                font-size: 12px;
-                line-height: 1.2;
-                margin-bottom: 6px;
-            }
-
-            .content .form-control,
-            .content .select2-container--default .select2-selection--single {
-                min-height: 38px;
-                height: 38px;
-            }
-
-            .content .select2-container {
-                width: 100% !important;
-            }
-
-            .content .customer-label-row {
-                margin-bottom: 6px;
-            }
-
-            .content .customer-action-group {
-                gap: 6px;
-            }
-
-            .content .customer-action-btn {
-                width: 28px;
-                height: 28px;
-            }
-
-            .content .input-groupicon .addonset {
-                right: 10px;
-            }
         }
 
         @media (max-width: 991.98px) {
@@ -380,8 +270,6 @@
                 align-items: start;
                 padding-right: 36px;
                 margin-bottom: 12px;
-                min-width: 0;
-                overflow: hidden;
             }
 
             #product-table-body tr[data-product-id]>td:nth-child(2) .product-img {
@@ -406,12 +294,6 @@
                 font-weight: 600;
                 line-height: 1.35;
                 margin-bottom: 4px;
-                min-width: 0;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                display: -webkit-box;
-                -webkit-line-clamp: 2;
-                -webkit-box-orient: vertical;
                 word-break: break-word;
             }
 
@@ -589,13 +471,7 @@
                             default => $prefillPaymentMethod,
                         };
 
-                        if (strtolower((string) ($sales->payment_method ?? '')) === 'emi') {
-                            $prefillPaymentMethod = 'emi';
-                        }
-
-                        if ($prefillPaymentMethod === 'emi') {
-                            // Keep EMI as saved on the order, even if payment rows contain bank/online amounts.
-                        } elseif ($prefillCashAmount > 0 && $prefillOnlineAmount > 0) {
+                        if ($prefillCashAmount > 0 && $prefillOnlineAmount > 0) {
                             $prefillPaymentMethod = 'cash+online';
                         } elseif ($prefillOnlineAmount > 0 || !empty($prefillBankId)) {
                             $prefillPaymentMethod = 'online';
@@ -625,7 +501,7 @@
                             ? 'completed'
                             : ($prefillTotalPaid > 0 ? 'partially' : 'pending');
 
-                        if ($prefillPendingAmount > 0 && $prefillPaymentMethod !== 'emi') {
+                        if ($prefillPendingAmount > 0) {
                             $prefillPaymentMethod = 'pending';
                         }
 
@@ -635,19 +511,7 @@
                     <div class="col-lg-3 col-sm-6 col-6">
                         <input type="hidden" name="update_selse_id" id="update_selse_id" value="{{ $update_id }}">
                         <div class="form-group">
-                            <div class="customer-label-row">
-                                <label class="mb-0">Customer</label>
-                                <div class="customer-action-group">
-                                    <button type="button" id="openAddCustomerModal"
-                                        class="customer-action-btn customer-add-btn" title="Add Customer">
-                                        <i class="fa-solid fa-plus"></i>
-                                    </button>
-                                    <button type="button" id="openEditCustomerModal"
-                                        class="customer-action-btn customer-edit-btn" title="Edit Customer">
-                                        <i class="fa-solid fa-pen"></i>
-                                    </button>
-                                </div>
-                            </div>
+                            <label>Customer</label>
                             <select name="customer_id" id="customer_id" class="form-control select2">
                                 <option value="">Select Customer</option>
                                 @foreach ($usernames as $user)
@@ -691,36 +555,32 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-12 col-sm-12 col-12">
-                        <div class="row">
-                            <div class="col-lg-3 col-sm-6 col-6">
-                                <div class="form-group">
-                                    <label>Assign Staff</label>
-                                    <select name="assigned_staff" id="assigned_staff" class="form-control select2">
-                                        <option value="">Select Staff</option>
-                                        @foreach ($staffUsers as $staff)
-                                            <option value="{{ $staff->id }}"
-                                                {{ (string) ($sales->assigned_staff ?? '') === (string) $staff->id ? 'selected' : '' }}>
-                                                {{ $staff->name }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-lg-3 col-sm-6 col-6">
-                                <div class="form-group">
-                                    <label>Order Type</label>
-                                    <select name="order_type" id="order_type" class="form-control">
-                                        <option value="Self Pickup" {{ ($sales->order_type ?? 'Self Pickup') === 'Self Pickup' ? 'selected' : '' }}>
-                                            Self Pickup
-                                        </option>
-                                        <option value="Delivery" {{ ($sales->order_type ?? 'Self Pickup') === 'Delivery' ? 'selected' : '' }}>
-                                            Delivery
-                                        </option>
-                                    </select>
-                                </div>
-                            </div>
+
+                    <div class="col-lg-3 col-sm-6 col-6" id="assign_staff_col">
+                        <div class="form-group">
+                            <label>Assign Staff</label>
+                            <select class="select form-control" name="assign_staff" id="assign_staff">
+                                <option value="">— Unassigned —</option>
+                                @foreach($staffs as $staff)
+                                    <option value="{{ $staff->id }}" {{ ($sales->staff_id ?? '') == $staff->id ? 'selected' : '' }}>
+                                        {{ $staff->name }}
+                                    </option>
+                                @endforeach
+                            </select>
                         </div>
+                    </div>
+
+                    <div class="col-lg-3 col-sm-6 col-6" id="order_type_col">
+                        <div class="form-group">
+                            <label>Order Type</label>
+                            <select id="order_type" name="order_type" class="form-control select2">
+                                <option value="Self Pickup" {{ ($sales->order_type ?? '') == 'Self Pickup' ? 'selected' : '' }}>Self Pickup</option>
+                                <option value="Delivery" {{ ($sales->order_type ?? '') == 'Delivery' ? 'selected' : '' }}>Delivery</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-12 col-sm-12 col-12">
                         <div class="form-group">
                             <label>Product Name</label>
                             <div class="input-groupicon">
@@ -1015,7 +875,8 @@ $gstDataForAttribute = '[]';
                         </div>
                     </div>
 
-                    <div class="col-lg-3 col-sm-6 col-6">
+                    @if ((bool) ($setting->tds_apply ?? false))
+                        <div class="col-lg-3 col-sm-6 col-6">
                             <div class="form-group">
                                 <label>TDS Percentage (%)</label>
                                 <input type="number" class="form-control" name="tds_percentage"
@@ -1030,9 +891,10 @@ $gstDataForAttribute = '[]';
                                 <label>TDS Amount</label>
                                 <input type="number" class="form-control" name="tds_amount" id="tds-amount-input"
                                     value="{{ number_format((float) ($sales->tds_amount ?? 0), 2, '.', '') }}"
-                                    min="0" step="0.01" readonly>
+                                    min="0" step="0.01">
                             </div>
                         </div>
+                    @endif
 
                     <div class="col-lg-3 col-sm-6 col-6" id="payment_method_col">
                         <div class="form-group">
@@ -1048,12 +910,13 @@ $gstDataForAttribute = '[]';
                                 <option value="cash+online" {{ $prefillPaymentMethod === 'cash+online' ? 'selected' : '' }}>
                                     Cash+Online
                                 </option>
-                                <option value="emi" {{ $prefillPaymentMethod === 'emi' ? 'selected' : '' }}>
-                                    EMI
+                                <option value="emi" {{ $prefillPaymentMethod === 'emi' ? 'selected' : '' }}>EMI
                                 </option>
                             </select>
                         </div>
                     </div>
+
+                    
 
                     <div class="col-lg-3 col-sm-6 col-6 d-none" id="payment_status_col">
                         <div class="form-group">
@@ -1136,120 +999,97 @@ $gstDataForAttribute = '[]';
                     </div>
                 </div>
 
-                @php
-                    $emiTenureValue = old('emi_tenure', $sales->emi_tenure ?? '');
-                    $emiCustomTenureValue = old('emi_custom_tenure', $sales->emi_custom_tenure ?? '');
-                    $emiLoanAmountValue = old('emi_loan_amount', $sales->emi_loan_amount ?? '');
-                    $emiDownPaymentValue = old('emi_down_payment', $sales->emi_down_payment ?? '');
-                    $emiInterestRateValue = old('emi_interest_rate', $sales->emi_interest_rate ?? '');
-                    $emiMonthlyAmountValue = old('emi_monthly_amount', $sales->emi_monthly_amount ?? '');
-                    $emiAadharNumberValue = old('emi_aadhar_number', $sales->emi_aadhar_number ?? '');
-                    $emiDoIdValue = old('emi_do_id', $sales->emi_do_id ?? '');
-                    $emiPanNumberValue = old('emi_pan_number', $sales->emi_pan_number ?? '');
-                    $emiGuarantorNameValue = old('emi_guarnator_name', $sales->emi_guarnator_name ?? '');
-                    $emiBankIdValue = old('emi_bank_id', $sales->emi_bank_id ?? '');
-                @endphp
-                <div id="emiBox" style="display:{{ $prefillPaymentMethod === 'emi' ? 'block' : 'none' }}; margin-top:10px;">
-                    <div class="row g-2">
-                        <div class="col-md-6 col-12">
+                <div id="emiBox" style="display:none; margin-bottom:15px; border:1px solid #eee; padding:15px; border-radius:5px;">
+                    <h5 class="mb-3">EMI Details</h5>
+                    <div class="row">
+                        <div class="col-lg-3 col-sm-6 col-6">
                             <div class="form-group">
-                                <label for="emiDownPayment">Down Payment (Optional)</label>
-                                <input type="number" class="form-control" id="emiDownPayment"
-                                    placeholder="₹ Amount" min="0" step="0.01"
-                                    value="{{ $emiDownPaymentValue }}">
+                                <label>Down Payment (Optional)</label>
+                                <input type="number" class="form-control" id="emiDownPayment" placeholder="₹ Amount" min="0" step="0.01" value="{{ $sales->emi_down_payment ?? '' }}">
                             </div>
                         </div>
-                        <div class="col-md-6 col-12">
+                        <div class="col-lg-3 col-sm-6 col-6">
                             <div class="form-group">
-                                <label for="emiLoanAmount">Loan Amount</label>
-                                <input type="number" class="form-control" id="emiLoanAmount"
-                                    placeholder="0.00" min="0" step="0.01" readonly
-                                    value="{{ $emiLoanAmountValue }}">
+                                <label>Loan Amount</label>
+                                <input type="number" class="form-control" id="emiLoanAmount" placeholder="Auto Calculate" min="0" step="0.01" value="{{ $sales->emi_loan_amount ?? '' }}" readonly>
                             </div>
                         </div>
-                        <div class="col-md-6 col-12">
+                        <div class="col-lg-3 col-sm-6 col-6">
+                            @php
+                                $savedTenure = $sales->emi_tenure ?? '';
+                                $isCustomTenure = !in_array($savedTenure, ['3', '6', '9', '12', '', null]);
+                            @endphp
                             <div class="form-group">
-                                <label for="emiTenure">EMI Tenure</label>
-                                <select id="emiTenure" class="form-control" required>
+                                <label>EMI Tenure</label>
+                                <select class="form-control" id="emiTenure">
                                     <option value="">Select Tenure</option>
-                                    <option value="3" {{ (string) $emiTenureValue === '3' ? 'selected' : '' }}>3 Months</option>
-                                    <option value="6" {{ (string) $emiTenureValue === '6' ? 'selected' : '' }}>6 Months</option>
-                                    <option value="9" {{ (string) $emiTenureValue === '9' ? 'selected' : '' }}>9 Months</option>
-                                    <option value="12" {{ (string) $emiTenureValue === '12' ? 'selected' : '' }}>12 Months</option>
-                                    <option value="18" {{ (string) $emiTenureValue === '18' ? 'selected' : '' }}>18 Months</option>
-                                    <option value="24" {{ (string) $emiTenureValue === '24' ? 'selected' : '' }}>24 Months</option>
-                                    <option value="custom" {{ $emiTenureValue === 'custom' ? 'selected' : '' }}>Custom</option>
+                                    <option value="3" {{ $savedTenure == '3' ? 'selected' : '' }}>3 Months</option>
+                                    <option value="6" {{ $savedTenure == '6' ? 'selected' : '' }}>6 Months</option>
+                                    <option value="9" {{ $savedTenure == '9' ? 'selected' : '' }}>9 Months</option>
+                                    <option value="12" {{ $savedTenure == '12' ? 'selected' : '' }}>12 Months</option>
+                                    <option value="custom" {{ $isCustomTenure ? 'selected' : '' }}>Custom</option>
                                 </select>
-                                <span class="error_emi_tenure text-danger"></span>
+                                <small class="text-danger d-none" id="emiTenureError"></small>
                             </div>
                         </div>
-                        <div class="col-md-6 col-12" id="emiCustomTenureWrap" style="display:{{ $emiTenureValue === 'custom' ? 'block' : 'none' }};">
+                        <div class="col-lg-3 col-sm-6 col-6 {{ $isCustomTenure ? '' : 'd-none' }}" id="emiCustomTenureCol">
                             <div class="form-group">
-                                <label for="emiCustomTenure">Custom Tenure (Months)</label>
-                                <input type="number" class="form-control" id="emiCustomTenure"
-                                    placeholder="Enter months" min="1" step="1"
-                                    value="{{ $emiCustomTenureValue }}">
+                                <label>Custom Tenure (Months)</label>
+                                <input type="number" class="form-control" id="emiCustomTenure" min="1" max="120" step="1" placeholder="Enter months" value="{{ $isCustomTenure ? $savedTenure : '' }}">
+                                <small class="text-danger d-none" id="emiCustomTenureError"></small>
                             </div>
                         </div>
-                        <div class="col-md-6 col-12">
+                        <div class="col-lg-3 col-sm-6 col-6">
                             <div class="form-group">
-                                <label for="emiInterestRate">Interest Rate (%) Optional</label>
-                                <input type="number" class="form-control" id="emiInterestRate"
-                                    placeholder="0" min="0" step="0.01"
-                                    value="{{ $emiInterestRateValue }}">
+                                <label>Interest Rate (%) <small class="text-muted">Optional</small></label>
+                                <input type="number" class="form-control" id="emiInterestRate" value="{{ $sales->emi_interest_rate ?? '0' }}" min="0" step="0.01">
                             </div>
                         </div>
-                        <div class="col-md-6 col-12">
+                        <div class="col-lg-3 col-sm-6 col-6">
                             <div class="form-group">
-                                <label for="emiMonthlyValue">Monthly EMI</label>
-                                <input type="number" class="form-control" id="emiMonthlyValue"
-                                    placeholder="0.00" min="0" step="0.01" readonly
-                                    value="{{ $emiMonthlyAmountValue }}">
+                                <label>Monthly EMI</label>
+                                <input type="number" class="form-control" id="emiMonthlyAmount" placeholder="Auto Calculate" min="0" step="0.01" value="{{ $sales->emi_monthly_amount ?? '' }}" readonly>
                             </div>
                         </div>
-                        <div class="col-md-6 col-12">
+                        <div class="col-lg-3 col-sm-6 col-6">
                             <div class="form-group">
-                                <label for="emiAadharNumber">Aadhar Number</label>
-                                <input type="text" class="form-control" id="emiAadharNumber"
-                                    placeholder="Enter Aadhar number" value="{{ $emiAadharNumberValue }}">
+                                <label>Aadhar Number</label>
+                                <input type="text" class="form-control" id="emiAadharNumber" placeholder="Customer Aadhar Number" value="{{ $sales->emi_aadhar_number ?? '' }}">
                             </div>
                         </div>
-                        <div class="col-md-6 col-12">
+                        <div class="col-lg-3 col-sm-6 col-6">
                             <div class="form-group">
-                                <label for="emiDoId">DO ID</label>
-                                <input type="number" class="form-control" id="emiDoId" placeholder="DO ID"
-                                    value="{{ $emiDoIdValue }}">
+                                <label>DO ID</label>
+                                <input type="text" class="form-control" id="emiDoId" placeholder="DO ID" value="{{ $sales->emi_do_id ?? '' }}">
                             </div>
                         </div>
-                        <div class="col-md-6 col-12">
+                        <div class="col-lg-3 col-sm-6 col-6">
                             <div class="form-group">
-                                <label for="emiPanNumber">PAN Number Optional</label>
-                                <input type="text" class="form-control" id="emiPanNumber"
-                                    placeholder="PAN Number" value="{{ $emiPanNumberValue }}">
+                                <label>PAN Number <small class="text-muted">Optional</small></label>
+                                <input type="text" class="form-control" id="emiPanNumber" placeholder="PAN Number" value="{{ $sales->emi_pan_number ?? '' }}">
                             </div>
                         </div>
-                        <div class="col-md-6 col-12">
+                        <div class="col-lg-3 col-sm-6 col-6">
                             <div class="form-group">
-                                <label for="emiGuarantorName">Guarantor Name Optional</label>
-                                <input type="text" class="form-control" id="emiGuarantorName"
-                                    placeholder="Guarantor Name" value="{{ $emiGuarantorNameValue }}">
+                                <label>Guarantor Name <small class="text-muted">Optional</small></label>
+                                <input type="text" class="form-control" id="emiGuarantorName" placeholder="Guarantor Name" value="{{ $sales->emi_guarantor_name ?? '' }}">
                             </div>
                         </div>
-                        <div class="col-md-6 col-12">
+                        <div class="col-lg-6 col-sm-12 col-12">
                             <div class="form-group">
                                 <div class="bank-label-row">
-                                    <label>Select Bank Optional</label>
-                                    <button type="button" id="openAddBankModal" class="bank-add-btn">Add Bank</button>
+                                    <label class="mb-0">Select Bank</label>
+                                    <button type="button" class="bank-add-btn" id="openAddBankModalEmi">Add Bank</button>
                                 </div>
-                                <select name="emi_bank_id" id="emi_bank_id" class="form-control">
+                                <select class="form-control" id="emiBankId">
                                     <option value="">Select Bank</option>
                                     @foreach ($banks as $bank)
-                                        <option value="{{ $bank->id }}" {{ (int) $emiBankIdValue === (int) $bank->id ? 'selected' : '' }}>
+                                        <option value="{{ $bank->id }}" {{ (($sales->emi_bank_id ?? $sales->bank_id ?? '') == $bank->id) ? 'selected' : '' }}>
                                             {{ $bank->bank_name }}{{ $bank->account_number ? ' (' . $bank->account_number . ')' : '' }}
                                         </option>
                                     @endforeach
                                 </select>
-                                <span class="error_bank text-danger"></span>
+                                <small class="text-danger d-none" id="emiBankError"></small>
                             </div>
                         </div>
                     </div>
@@ -1296,8 +1136,8 @@ $gstDataForAttribute = '[]';
                                 $shippingCost = $sales->shipping ?? 0;
 
                                 // 5.1 Calculate TDS
-                                $isTdsEnabled = true;
-                                $tdsPercentage = (float) ($sales->tds_percentage ?? 0);
+                                $isTdsEnabled = (bool) ($setting->tds_apply ?? false);
+                                $tdsPercentage = $isTdsEnabled ? (float) ($sales->tds_percentage ?? 0) : 0;
                                 $storedTdsAmount = (float) ($sales->tds_amount ?? 0);
 
                                 // 6. Calculate Taxes on (Products After Discount) only
@@ -1316,12 +1156,17 @@ $gstDataForAttribute = '[]';
                                 }
 
                                 // 7. Grand Total
-                                $preTdsTotal =
-                                    $productsAfterDiscount + $labourSubtotal + $shippingCost + $totalTaxAmount;
-                                $tdsAmount = $storedTdsAmount > 0
-                                    ? $storedTdsAmount
-                                    : ($preTdsTotal * $tdsPercentage) / 100;
-                                $grandTotal = $preTdsTotal - $tdsAmount;
+                            // Subtotal = product amount + GST - discount.
+                            $subtotalAmount = $productsAfterDiscount;
+                            // TDS base stays on raw product base amount.
+                            $preTdsTotal =
+                                $subtotalAmount + $labourSubtotal + $shippingCost;
+                            $tdsAmount = $isTdsEnabled
+                                ? ($storedTdsAmount > 0
+                                        ? $storedTdsAmount
+                                        : ($productsSubtotal * $tdsPercentage) / 100)
+                                    : 0;
+                            $grandTotal = $preTdsTotal - $tdsAmount;
                                 $roundedGrandTotal = round($grandTotal);
                                 $roundOffAmount = $roundedGrandTotal - $grandTotal;
                             @endphp
@@ -1538,7 +1383,8 @@ $gstDataForAttribute = '[]';
                                         </h5>
                                     </li>
 
-                                    <li class="tds-summary">
+                                    <li class="tds-summary"
+                                        @if (!$isTdsEnabled) style="display:none;" @endif>
                                         <h4>TDS (<span
                                                 id="tds-percentage-display">{{ number_format($tdsPercentage, 2) }}</span>%)
                                         </h4>
@@ -1659,261 +1505,6 @@ $gstDataForAttribute = '[]';
                         </div>
                     </div>
                 </div>
-                <div class="modal fade" id="addCustomerModal" tabindex="-1" aria-labelledby="addCustomerModalLabel"
-                    aria-hidden="true">
-                    <div class="modal-dialog modal-lg modal-dialog-centered customer-modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="addCustomerModalLabel">Add New Customer</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">x</button>
-                            </div>
-                            <div class="modal-body">
-                                <form id="salesCustomerForm" enctype="multipart/form-data">
-                                    @csrf
-                                    <div class="row">
-                                        <div class="col-lg-3 col-sm-6 col-12">
-                                            <div class="form-group mb-3">
-                                                <label>Customer Name <span class="text-danger">*</span></label>
-                                                <input type="text" name="customer_name" id="sales_customer_name"
-                                                    class="form-control" placeholder="Customer Name">
-                                                <small class="text-danger error-customer_name"></small>
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-3 col-sm-6 col-12">
-                                            <div class="form-group mb-3">
-                                                <label>Company Name</label>
-                                                <input type="text" name="company_name" id="sales_company_name"
-                                                    class="form-control" placeholder="Company Name">
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-3 col-sm-6 col-12">
-                                            <div class="form-group mb-3">
-                                                <label>Phone <span class="text-danger">*</span></label>
-                                                <input type="text" maxlength="10" name="phone" id="sales_phone"
-                                                    class="form-control" placeholder="10-digit phone">
-                                                <small class="text-danger error-phone"></small>
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-3 col-sm-6 col-12">
-                                            <div class="form-group mb-3">
-                                                <label>Alternate Phone</label>
-                                                <input type="text" maxlength="10" name="alternate_phone"
-                                                    id="sales_alternate_phone" class="form-control"
-                                                    placeholder="10-digit phone (optional)">
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-3 col-sm-6 col-12">
-                                            <div class="form-group mb-3">
-                                                <label>Email</label>
-                                                <input type="email" name="email" id="sales_email" class="form-control"
-                                                    placeholder="Email">
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-3 col-sm-6 col-12">
-                                            <div class="form-group mb-3">
-                                                <label>GST Number</label>
-                                                <input type="text" name="gst_number" maxlength="15" id="sales_gst_number"
-                                                    class="form-control" placeholder="GST Number">
-                                                <small class="text-danger error-gst_number"></small>
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-3 col-sm-6 col-12">
-                                            <div class="form-group mb-3">
-                                                <label>PAN Number</label>
-                                                <input type="text" name="pan_number" maxlength="10" id="sales_pan_number"
-                                                    class="form-control" placeholder="PAN Number">
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-3 col-sm-6 col-12">
-                                            <div class="form-group mb-3">
-                                                <label>State Code</label>
-                                                <input type="text" name="state_code" id="sales_state_code"
-                                                    class="form-control" placeholder="e.g. 27">
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-3 col-sm-6 col-12">
-                                            <div class="form-group mb-3">
-                                                <label>State Name</label>
-                                                <input type="text" name="state_name" id="sales_state_name"
-                                                    class="form-control" placeholder="Auto-filled from state" readonly>
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-3 col-sm-6 col-12">
-                                            <div class="form-group mb-3">
-                                                <label>Country</label>
-                                                <input type="text" name="country" id="sales_country"
-                                                    class="form-control" placeholder="Country">
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-3 col-sm-6 col-12">
-                                            <div class="form-group mb-3">
-                                                <label>City</label>
-                                                <input type="text" name="city" id="sales_city" class="form-control"
-                                                    placeholder="City">
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-6 col-12">
-                                            <div class="form-group mb-3">
-                                                <div class="d-flex align-items-center justify-content-between mb-1">
-                                                    <label class="mb-0">Address</label>
-                                                </div>
-                                                <textarea name="address" id="sales_address" class="form-control" rows="3" placeholder="Address"></textarea>
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-6 col-12">
-                                            <div class="form-group mb-3">
-                                                <div class="d-flex align-items-center justify-content-between mb-1">
-                                                    <label class="mb-0">Delivery Address</label>
-                                                    <div class="form-check m-0">
-                                                        <input class="form-check-input" type="checkbox" id="sales_use_address"
-                                                            checked>
-                                                        <label class="form-check-label" for="sales_use_address">
-                                                            Use Address
-                                                        </label>
-                                                    </div>
-                                                </div>
-                                                <textarea name="delivery_address" id="sales_delivery_address" class="form-control" rows="3"
-                                                    placeholder="Delivery Address"></textarea>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </form>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                <button type="button" id="saveSalesCustomerBtn" class="btn btn-warning">Save Customer</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal fade" id="editCustomerModal" tabindex="-1" aria-labelledby="editCustomerModalLabel"
-                    aria-hidden="true">
-                    <div class="modal-dialog modal-lg modal-dialog-centered customer-modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="editCustomerModalLabel">Edit Customer</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">x</button>
-                            </div>
-                            <div class="modal-body">
-                                <form id="salesEditCustomerForm" enctype="multipart/form-data">
-                                    @csrf
-                                    <input type="hidden" id="sales_edit_customer_id">
-                                    <div class="row">
-                                        <div class="col-lg-3 col-sm-6 col-12">
-                                            <div class="form-group mb-3">
-                                                <label>Customer Name <span class="text-danger">*</span></label>
-                                                <input type="text" name="customer_name" id="sales_edit_customer_name"
-                                                    class="form-control" placeholder="Customer Name">
-                                                <small class="text-danger error-customer_name"></small>
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-3 col-sm-6 col-12">
-                                            <div class="form-group mb-3">
-                                                <label>Company Name</label>
-                                                <input type="text" name="company_name" id="sales_edit_company_name"
-                                                    class="form-control" placeholder="Company Name">
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-3 col-sm-6 col-12">
-                                            <div class="form-group mb-3">
-                                                <label>Phone <span class="text-danger">*</span></label>
-                                                <input type="text" maxlength="10" name="phone" id="sales_edit_phone"
-                                                    class="form-control" placeholder="10-digit phone">
-                                                <small class="text-danger error-phone"></small>
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-3 col-sm-6 col-12">
-                                            <div class="form-group mb-3">
-                                                <label>Alternate Phone</label>
-                                                <input type="text" maxlength="10" name="alternate_phone"
-                                                    id="sales_edit_alternate_phone" class="form-control"
-                                                    placeholder="10-digit phone (optional)">
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-3 col-sm-6 col-12">
-                                            <div class="form-group mb-3">
-                                                <label>Email</label>
-                                                <input type="email" name="email" id="sales_edit_email"
-                                                    class="form-control" placeholder="Email">
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-3 col-sm-6 col-12">
-                                            <div class="form-group mb-3">
-                                                <label>GST Number</label>
-                                                <input type="text" name="gst_number" maxlength="15"
-                                                    id="sales_edit_gst_number" class="form-control" placeholder="GST Number">
-                                                <small class="text-danger error-gst_number"></small>
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-3 col-sm-6 col-12">
-                                            <div class="form-group mb-3">
-                                                <label>PAN Number</label>
-                                                <input type="text" name="pan_number" maxlength="10"
-                                                    id="sales_edit_pan_number" class="form-control" placeholder="PAN Number">
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-3 col-sm-6 col-12">
-                                            <div class="form-group mb-3">
-                                                <label>State Code</label>
-                                                <input type="text" name="state_code" id="sales_edit_state_code"
-                                                    class="form-control" placeholder="e.g. 27">
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-3 col-sm-6 col-12">
-                                            <div class="form-group mb-3">
-                                                <label>State Name</label>
-                                                <input type="text" name="state_name" id="sales_edit_state_name"
-                                                    class="form-control" placeholder="Auto-filled from state" readonly>
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-3 col-sm-6 col-12">
-                                            <div class="form-group mb-3">
-                                                <label>Country</label>
-                                                <input type="text" name="country" id="sales_edit_country"
-                                                    class="form-control" placeholder="Country">
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-3 col-sm-6 col-12">
-                                            <div class="form-group mb-3">
-                                                <label>City</label>
-                                                <input type="text" name="city" id="sales_edit_city"
-                                                    class="form-control" placeholder="City">
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-6 col-12">
-                                            <div class="form-group mb-3">
-                                                <div class="d-flex align-items-center justify-content-between mb-1">
-                                                    <label class="mb-0">Address</label>
-                                                </div>
-                                                <textarea name="address" id="sales_edit_address" class="form-control" rows="3" placeholder="Address"></textarea>
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-6 col-12">
-                                            <div class="form-group mb-3">
-                                                <div class="d-flex align-items-center justify-content-between mb-1">
-                                                    <label class="mb-0">Delivery Address</label>
-                                                    <div class="form-check m-0">
-                                                        <input class="form-check-input" type="checkbox"
-                                                            id="sales_edit_use_address" checked>
-                                                        <label class="form-check-label" for="sales_edit_use_address">
-                                                            Use Address
-                                                        </label>
-                                                    </div>
-                                                </div>
-                                                <textarea name="delivery_address" id="sales_edit_delivery_address" class="form-control" rows="3"
-                                                    placeholder="Delivery Address"></textarea>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </form>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                <button type="button" id="updateSalesCustomerBtn" class="btn btn-warning">Update Customer</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
                 <div class="modal fade" id="addBankModal" tabindex="-1" aria-labelledby="addBankModalLabel"
                     aria-hidden="true">
                     <div class="modal-dialog">
@@ -1978,7 +1569,7 @@ $gstDataForAttribute = '[]';
                     $(document).ready(function() {
                         const currencySymbol = '{{ $setting->currency_symbol ?? '₹' }}';
                         const currencyPosition = '{{ $setting->currency_position ?? 'left' }}';
-                        const isTdsEnabled = true;
+                        const isTdsEnabled = @json((bool) ($setting->tds_apply ?? false));
                         const selectedSubAdminId = localStorage.getItem("selectedSubAdminId");
                         const addBankModalElement = document.getElementById('addBankModal');
                         const addBankModal = addBankModalElement && typeof bootstrap !== 'undefined' ?
@@ -2027,7 +1618,6 @@ $gstDataForAttribute = '[]';
                             if (normalized === 'cash') {
                                 return 'cash';
                             }
-
                             if (normalized === 'emi') {
                                 return 'emi';
                             }
@@ -2120,33 +1710,34 @@ $(document).on('blur', '#tds-percentage-input', function() {
                         function togglePaymentInputLayout() {
                             const isQuotation = $('#quotationToggle').is(':checked');
                             const method = normalizePaymentMethod($('#payment_method').val());
+                            const rawMethod = $('#payment_method').val();
                             const $paymentColumns = $('#payment_details_row > .col-lg-12 > .row').children();
-                            const shouldShowPaymentRow = !isQuotation && method !== 'pending';
+                            const shouldShowPaymentRow = !isQuotation && method !== 'pending' && method !== 'emi';
 
                             $('#payment_method_col').toggle(!isQuotation);
                             $('#payment_status_col').show();
                             $('#payment_details_row').toggle(shouldShowPaymentRow);
-                            $('#paid_type_col').toggle(shouldShowPaymentRow && method !== 'emi');
+                            $('#paid_type_col').toggle(shouldShowPaymentRow);
                             $('#bank_container').toggle(shouldShowPaymentRow && (method === 'online' || method === 'cash+online'));
                             $('#cash_amount_col').toggle(shouldShowPaymentRow && (method === 'cash' || method === 'cash+online'));
                             $('#online_amount_col').toggle(shouldShowPaymentRow && (method === 'online' || method === 'cash+online'));
-                            $('#pending_amount_col').toggle(shouldShowPaymentRow && method !== 'emi');
-                            $('#emiBox').toggle(shouldShowPaymentRow && method === 'emi');
+                            $('#pending_amount_col').toggle(shouldShowPaymentRow);
 
                             $('#cash_amount_label').text(method === 'cash' ? 'Payment Amount' : 'Cash Amount');
                             $('#online_amount_label').text(method === 'online' ? 'Payment Amount' : 'Bank Amount');
 
                             $('#bank_id').prop('disabled', isQuotation || !(method === 'online' || method === 'cash+online'));
+                            
+                            if (!isQuotation && method === 'emi') {
+                                $('#emiBox').show();
+                                calculateEmi();
+                            } else {
+                                $('#emiBox').hide();
+                            }
                             $('#cash_amount').prop('disabled', isQuotation || !(method === 'cash' || method === 'cash+online'));
                             $('#online_amount').prop('disabled', isQuotation || !(method === 'online' || method === 'cash+online'));
                             $('#pending_amount').prop('disabled', true);
                             $('#paid_type').prop('disabled', !shouldShowPaymentRow);
-                            $('#emiDownPayment, #emiLoanAmount, #emiTenure, #emiCustomTenure, #emiInterestRate, #emiMonthlyValue, #emiAadharNumber, #emiDoId, #emiPanNumber, #emiGuarantorName, #emi_bank_id')
-                                .prop('disabled', !(shouldShowPaymentRow && method === 'emi'));
-                            $('#emiBox .row.g-2 > .col-md-6').removeClass('w-100-lg');
-                            if (shouldShowPaymentRow && method === 'emi') {
-                                $('#emiBox .row.g-2 > .col-md-6:last').addClass('w-100-lg');
-                            }
 
                             $paymentColumns.removeClass('col-lg-3 col-lg-4 col-lg-6 col-lg-12 d-none');
 
@@ -2218,6 +1809,39 @@ $(document).on('blur', '#tds-percentage-input', function() {
 
                                 pendingAmount = Math.max(outstandingAmount - additionalPaidAmount, 0);
                                 paidAmount = Math.min(historicalPaidAmount + additionalPaidAmount, grandTotal);
+                            }
+
+                            if (!isQuotation && method !== 'pending' && outstandingAmount <= 0) {
+                                const prefillCash = parseMoney($('#cash_amount').data('prefill'));
+                                const prefillOnline = parseMoney($('#online_amount').data('prefill'));
+
+                                if (prefillCash > 0 && prefillOnline > 0) {
+                                    const totalPrefill = prefillCash + prefillOnline;
+                                    if (totalPrefill > grandTotal) {
+                                        cashAmount = (prefillCash / totalPrefill) * grandTotal;
+                                        onlineAmount = (prefillOnline / totalPrefill) * grandTotal;
+                                    } else {
+                                        cashAmount = prefillCash;
+                                        onlineAmount = prefillOnline;
+                                    }
+                                } else if (prefillCash > 0) {
+                                    cashAmount = Math.min(prefillCash, grandTotal);
+                                    onlineAmount = 0;
+                                } else if (prefillOnline > 0) {
+                                    cashAmount = 0;
+                                    onlineAmount = Math.min(prefillOnline, grandTotal);
+                                } else {
+                                    if (method === 'cash') {
+                                        cashAmount = grandTotal;
+                                        onlineAmount = 0;
+                                    } else if (method === 'online') {
+                                        cashAmount = 0;
+                                        onlineAmount = grandTotal;
+                                    } else {
+                                        cashAmount = 0;
+                                        onlineAmount = 0;
+                                    }
+                                }
                             }
 
                             $('#cash_amount').val(formatPaymentAmountInput(cashAmount));
@@ -2399,39 +2023,8 @@ $(document).on('blur', '#tds-percentage-input', function() {
                             allowClear: true
                         });
 
-                        const $addCustomerModalEl = document.getElementById('addCustomerModal');
-                        const addCustomerModal = $addCustomerModalEl ? new bootstrap.Modal($addCustomerModalEl, {
-                            backdrop: 'static',
-                            keyboard: false
-                        }) : null;
-                        const $editCustomerModalEl = document.getElementById('editCustomerModal');
-                        const editCustomerModal = $editCustomerModalEl ? new bootstrap.Modal($editCustomerModalEl, {
-                            backdrop: 'static',
-                            keyboard: false
-                        }) : null;
-                        const initialCustomerId = $('#customer_id').val();
-
-                        function syncCustomerAddressFields(addressSelector, deliverySelector, useCheckboxSelector) {
-                            const $address = $(addressSelector);
-                            const $delivery = $(deliverySelector);
-                            const $useAddress = $(useCheckboxSelector);
-
-                            if ($useAddress.is(':checked')) {
-                                $delivery.val($address.val());
-                            }
-                        }
-
-                        $('#openAddCustomerModal').on('click', function() {
-                            $('#salesCustomerForm')[0].reset();
-                            $('#salesCustomerForm .text-danger').text('');
-                            $('#sales_use_address').prop('checked', true).trigger('change');
-                            if (addCustomerModal) {
-                                addCustomerModal.show();
-                            }
-                        });
-
                         if ($.fn.select2) {
-                            $('#payment_method, #payment_status, #paid_type, #bank_id').select2({
+                            $('#payment_method, #payment_status, #paid_type, #bank_id, #assign_staff, #order_type').select2({
                                 width: '100%'
                             });
                         }
@@ -2440,258 +2033,6 @@ $(document).on('blur', '#tds-percentage-input', function() {
                         $('#customer_id').on('change', function() {
                             var phone = $(this).find(':selected').data('phone');
                             $('#customer_phone').val(phone || '');
-                            const customerId = $(this).val();
-                            const isRealCustomer = !!customerId;
-                            $('#openEditCustomerModal').prop('disabled', !isRealCustomer);
-                        });
-
-                        $('#openEditCustomerModal').prop('disabled', true);
-
-                        $('#openEditCustomerModal').on('click', function() {
-                            const customerId = $('#customer_id').val();
-                            if (!customerId) {
-                                return;
-                            }
-
-                            $('#salesEditCustomerForm .text-danger').text('');
-
-                            $.ajax({
-                                url: `/api/getCustomer/${customerId}`,
-                                method: 'GET',
-                                headers: {
-                                    'X-CSRF-TOKEN': "{{ csrf_token() }}",
-                                    'Authorization': 'Bearer ' + localStorage.getItem("authToken")
-                                },
-                                success: function(response) {
-                                    const customer = response?.customer || {};
-                                    const details = customer?.details || {};
-
-                                    $('#sales_edit_customer_id').val(customer.id || '');
-                                    $('#sales_edit_customer_name').val(customer.name || '');
-                                    $('#sales_edit_company_name').val(customer.company_name || '');
-                                    $('#sales_edit_phone').val(customer.phone || '');
-                                    $('#sales_edit_alternate_phone').val(customer.alternate_phone || '');
-                                    $('#sales_edit_email').val(customer.email || '');
-                                    $('#sales_edit_gst_number').val(customer.gst_number || '');
-                                    $('#sales_edit_pan_number').val(customer.pan_number || '');
-                                    $('#sales_edit_state_code').val(customer.state_code || '');
-                                    $('#sales_edit_state_name').val(customer.state_name || '');
-                                    $('#sales_edit_country').val(details.country || '');
-                                    $('#sales_edit_city').val(details.city || '');
-                                    $('#sales_edit_address').val(details.address || '');
-                                    $('#sales_edit_delivery_address').val(details.delivery_address || details.address || '');
-                                    $('#sales_edit_use_address').prop('checked', true);
-                                    syncCustomerAddressFields('#sales_edit_address', '#sales_edit_delivery_address', '#sales_edit_use_address');
-
-                                    if (editCustomerModal) {
-                                        editCustomerModal.show();
-                                    }
-                                },
-                                error: function(xhr) {
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: 'Error',
-                                        text: xhr.responseJSON?.error || 'Failed to fetch customer.'
-                                    });
-                                }
-                            });
-                        });
-
-                        $('#sales_use_address').on('change', function() {
-                            if ($(this).is(':checked')) {
-                                $('#sales_delivery_address').val($('#sales_address').val());
-                            }
-                        });
-
-                        $('#sales_address').on('input', function() {
-                            if ($('#sales_use_address').is(':checked')) {
-                                $('#sales_delivery_address').val($(this).val());
-                            }
-                        });
-
-                        $('#sales_edit_use_address').on('change', function() {
-                            if ($(this).is(':checked')) {
-                                $('#sales_edit_delivery_address').val($('#sales_edit_address').val());
-                            }
-                        });
-
-                        $('#sales_edit_address').on('input', function() {
-                            if ($('#sales_edit_use_address').is(':checked')) {
-                                $('#sales_edit_delivery_address').val($(this).val());
-                            }
-                        });
-
-                        $('#sales_phone, #sales_alternate_phone, #sales_edit_phone, #sales_edit_alternate_phone').on('input', function() {
-                            let value = $(this).val().replace(/\D/g, '').slice(0, 10);
-                            $(this).val(value);
-                        });
-
-                        $('#sales_gst_number, #sales_edit_gst_number').on('input', function() {
-                            $(this).val($(this).val().toUpperCase().slice(0, 15));
-                        });
-
-                        $('#sales_state_code, #sales_edit_state_code').on('input', function() {
-                            let code = $(this).val().replace(/\D/g, '').slice(0, 2);
-                            $(this).val(code);
-                            const mapped = {
-                                "01": "Jammu and Kashmir",
-                                "02": "Himachal Pradesh",
-                                "03": "Punjab",
-                                "04": "Chandigarh",
-                                "05": "Uttarakhand",
-                                "06": "Haryana",
-                                "07": "Delhi",
-                                "08": "Rajasthan",
-                                "09": "Uttar Pradesh",
-                                "10": "Bihar",
-                                "11": "Sikkim",
-                                "12": "Arunachal Pradesh",
-                                "13": "Nagaland",
-                                "14": "Manipur",
-                                "15": "Mizoram",
-                                "16": "Tripura",
-                                "17": "Meghalaya",
-                                "18": "Assam",
-                                "19": "West Bengal",
-                                "20": "Jharkhand",
-                                "21": "Odisha",
-                                "22": "Chhattisgarh",
-                                "23": "Madhya Pradesh",
-                                "24": "Gujarat",
-                                "25": "Daman and Diu",
-                                "26": "Dadra and Nagar Haveli",
-                                "27": "Maharashtra",
-                                "28": "Andhra Pradesh",
-                                "29": "Karnataka",
-                                "30": "Goa",
-                                "31": "Lakshadweep",
-                                "32": "Kerala",
-                                "33": "Tamil Nadu",
-                                "34": "Puducherry",
-                                "35": "Andaman and Nicobar Islands",
-                                "36": "Telangana",
-                                "37": "Andhra Pradesh (New)"
-                            };
-                            const stateName = mapped[code.padStart(2, '0')] || '';
-                            if (this.id === 'sales_state_code') {
-                                $('#sales_state_name').val(stateName);
-                            } else {
-                                $('#sales_edit_state_name').val(stateName);
-                            }
-                        });
-
-                        $('#saveSalesCustomerBtn').on('click', function() {
-                            const $btn = $(this);
-                            const formData = new FormData(document.getElementById('salesCustomerForm'));
-                            $('#salesCustomerForm .text-danger').text('');
-                            $btn.prop('disabled', true).text('Saving...');
-
-                            $.ajax({
-                                url: '/api/createCustomer',
-                                method: 'POST',
-                                data: formData,
-                                processData: false,
-                                contentType: false,
-                                headers: {
-                                    'X-CSRF-TOKEN': "{{ csrf_token() }}",
-                                    'Authorization': 'Bearer ' + localStorage.getItem("authToken")
-                                },
-                                success: function(response) {
-                                    const customerName = $('#sales_customer_name').val().trim();
-                                    const customerPhone = $('#sales_phone').val().trim();
-                                    const createdCustomer = response?.customer || null;
-                                    const newId = createdCustomer?.id;
-
-                                    if (newId && $('#customer_id option[value="' + newId + '"]').length === 0) {
-                                        $('#customer_id').append(
-                                            $('<option>', {
-                                                value: newId,
-                                                text: customerName,
-                                                'data-phone': customerPhone
-                                            })
-                                        );
-                                    }
-
-                                    if (newId) {
-                                        $('#customer_id').val(String(newId)).trigger('change');
-                                    }
-                                    $('#customer_phone').val(customerPhone);
-
-                                    if (addCustomerModal) {
-                                        addCustomerModal.hide();
-                                    }
-
-                                    Swal.fire({
-                                        icon: 'success',
-                                        title: 'Success',
-                                        text: response.message || 'Customer created successfully.'
-                                    });
-                                },
-                                error: function(xhr) {
-                                    const errors = xhr.responseJSON?.errors || {};
-                                    $('#salesCustomerForm .error-customer_name').text(errors.customer_name ? errors.customer_name[0] : '');
-                                    $('#salesCustomerForm .error-phone').text(errors.phone ? errors.phone[0] : '');
-                                    $('#salesCustomerForm .error-gst_number').text(errors.gst_number ? errors.gst_number[0] : '');
-                                },
-                                complete: function() {
-                                    $btn.prop('disabled', false).text('Save Customer');
-                                }
-                            });
-                        });
-
-                        $('#updateSalesCustomerBtn').on('click', function() {
-                            const $btn = $(this);
-                            const customerId = $('#sales_edit_customer_id').val();
-                            const formData = new FormData(document.getElementById('salesEditCustomerForm'));
-                            $('#salesEditCustomerForm .text-danger').text('');
-                            $btn.prop('disabled', true).text('Updating...');
-
-                            $.ajax({
-                                url: `/api/updateCustomer/${customerId}`,
-                                method: 'POST',
-                                data: formData,
-                                processData: false,
-                                contentType: false,
-                                headers: {
-                                    'X-CSRF-TOKEN': "{{ csrf_token() }}",
-                                    'Authorization': 'Bearer ' + localStorage.getItem("authToken")
-                                },
-                                success: function(response) {
-                                    const updatedName = $('#sales_edit_customer_name').val().trim();
-                                    const updatedPhone = $('#sales_edit_phone').val().trim();
-
-                                    if (customerId) {
-                                        let $option = $('#customer_id option[value="' + customerId + '"]');
-                                        if ($option.length === 0) {
-                                            $('#customer_id').append($('<option>', { value: customerId }));
-                                            $option = $('#customer_id option[value="' + customerId + '"]');
-                                        }
-                                        $option.text(updatedName).attr('data-phone', updatedPhone);
-                                        $('#customer_id').trigger('change');
-                                    }
-
-                                    $('#customer_phone').val(updatedPhone);
-
-                                    if (editCustomerModal) {
-                                        editCustomerModal.hide();
-                                    }
-
-                                    Swal.fire({
-                                        icon: 'success',
-                                        title: 'Success',
-                                        text: response.message || 'Customer updated successfully.'
-                                    });
-                                },
-                                error: function(xhr) {
-                                    const errors = xhr.responseJSON?.errors || {};
-                                    $('#salesEditCustomerForm .error-customer_name').text(errors.customer_name ? errors.customer_name[0] : '');
-                                    $('#salesEditCustomerForm .error-phone').text(errors.phone ? errors.phone[0] : '');
-                                    $('#salesEditCustomerForm .error-gst_number').text(errors.gst_number ? errors.gst_number[0] : '');
-                                },
-                                complete: function() {
-                                    $btn.prop('disabled', false).text('Update Customer');
-                                }
-                            });
                         });
 
 
@@ -2824,7 +2165,6 @@ $(document).on('blur', '#tds-percentage-input', function() {
                         }
 
                         // Calculate all totals including product-wise GST
-                        let _isInitialLoad = true;
                         function calculateAllTotals() {
                             let grossSubtotal = 0;
                             let totalPerItemDiscount = 0;
@@ -2940,8 +2280,7 @@ $(document).on('blur', '#tds-percentage-input', function() {
 
                             // After discount (Total with GST - Discount)
                             const afterDiscount = (grossSubtotal + totalGst) - totalPerItemDiscount;
-                            const subtotalFormulaText =
-                                `${formatCurrency(afterDiscount)}`;
+                            const subtotalFormulaText = `${formatCurrency(afterDiscount)}`;
                             $('#after-discount-display').text(subtotalFormulaText);
 
                             // Calculate labour cost
@@ -2966,24 +2305,18 @@ $(document).on('blur', '#tds-percentage-input', function() {
                             //     $('#tds-percentage-input').val(tdsPercentage.toFixed(2));
                             // }
 
+                            // TDS should apply only to the product base amount.
+                            const tdsBaseAmount = Math.max(0, grossSubtotal);
                             const preTdsGrandTotal = afterDiscount + labourSubtotal + shippingCost;
-
-                            // TDS basis: original base product price only (no GST, no discount adjustment)
-                            const tdsBasis = grossSubtotal;
-
-                            // On initial load, recalculate TDS from grossSubtotal (base price only).
-                            // Do NOT use the stored tds_amount from DB — it may have been calculated
-                            // on GST-inclusive totals before the fix was applied.
-                            let tdsAmount;
-                            tdsAmount = isTdsEnabled ? (tdsBasis * tdsPercentage) / 100 : 0;
+                            const tdsAmount = isTdsEnabled ? (tdsBaseAmount * tdsPercentage) / 100 : 0;
 
                             if (isTdsEnabled) {
                                 $('#tds-percentage-display').text(formatNumber(tdsPercentage));
                                 $('#tds-amount-display').text(`-${formatNumber(tdsAmount)}`);
-                                // Always keep tds-amount-input in sync (used by form submission)
                                 $('#tds-amount-input').val(tdsAmount.toFixed(2));
-                                // Always show TDS row
                                 $('.tds-summary').show();
+                            } else {
+                                $('.tds-summary').hide();
                             }
 
                             // Show/hide GST total
@@ -3023,7 +2356,27 @@ $(document).on('blur', '#tds-percentage-input', calculateAllTotals);
 $(document).on('input', '#tds-percentage-input', function() {
     const rawVal = parseFloat($(this).val()) || 0;
     const tdsPercentage = Math.max(0, Math.min(100, rawVal));
-    // Re-run full recalculation so TDS is computed against the correct pre-TDS total
+    const productSubtotalBeforeTds = parseFloat($('#after-discount-display').text().replace(/[^0-9.]/g, '')) || 0;
+    const tdsAmount = (productSubtotalBeforeTds * tdsPercentage) / 100;
+    $('#tds-percentage-display').text(tdsPercentage.toFixed(2));
+    $('#tds-amount-display').text(`-${tdsAmount.toFixed(2)}`);
+    $('#tds-amount-input').val(tdsAmount.toFixed(2));
+});
+
+$(document).on('input', '#tds-amount-input', function() {
+    const rawAmount = parseFloat($(this).val()) || 0;
+    const productSubtotalBeforeTds = parseFloat($('#after-discount-display').text().replace(/[^0-9.]/g, '')) || 0;
+    const tdsPercentage = productSubtotalBeforeTds > 0 ? (rawAmount / productSubtotalBeforeTds) * 100 : 0;
+    const normalizedPercentage = Math.max(0, tdsPercentage);
+
+    $('#tds-percentage-input').val(normalizedPercentage.toFixed(2));
+    $('#tds-percentage-display').text(normalizedPercentage.toFixed(2));
+    $('#tds-amount-display').text(`-${rawAmount.toFixed(2)}`);
+});
+
+$(document).on('blur', '#tds-amount-input', function() {
+    const normalizedAmount = Math.max(0, parseFloat($(this).val()) || 0);
+    $(this).val(normalizedAmount.toFixed(2));
     calculateAllTotals();
 });
 
@@ -3113,60 +2466,72 @@ $(document).on('input', '.quantity-input', function() {
                             calculateAllTotals();
                         });
 
-                        // Handle Quotation Toggle
                         function togglePaymentFields() {
                             togglePaymentInputLayout();
                             calculatePaymentBreakdown();
-                        }
-
-                        function prefillEmiFields() {
-                            const emiValues = {
-                                downPayment: @json($emiDownPaymentValue),
-                                loanAmount: @json($emiLoanAmountValue),
-                                tenure: @json((string) $emiTenureValue),
-                                customTenure: @json($emiCustomTenureValue),
-                                interestRate: @json($emiInterestRateValue),
-                                monthlyAmount: @json($emiMonthlyAmountValue),
-                                aadharNumber: @json($emiAadharNumberValue),
-                                doId: @json($emiDoIdValue),
-                                panNumber: @json($emiPanNumberValue),
-                                guarantorName: @json($emiGuarantorNameValue),
-                                bankId: @json((string) $emiBankIdValue),
-                            };
-
-                            $('#emiDownPayment').val(emiValues.downPayment);
-                            $('#emiLoanAmount').val(emiValues.loanAmount);
-                            $('#emiTenure').val(emiValues.tenure);
-                            $('#emiCustomTenure').val(emiValues.customTenure);
-                            $('#emiInterestRate').val(emiValues.interestRate);
-                            $('#emiMonthlyValue').val(emiValues.monthlyAmount);
-                            $('#emiAadharNumber').val(emiValues.aadharNumber);
-                            $('#emiDoId').val(emiValues.doId);
-                            $('#emiPanNumber').val(emiValues.panNumber);
-                            $('#emiGuarantorName').val(emiValues.guarantorName);
-
-                            if (emiValues.bankId) {
-                                $('#emi_bank_id').val(emiValues.bankId).trigger('change.select2');
-                            }
-
-                            if (emiValues.tenure === 'custom') {
-                                $('#emiCustomTenureWrap').show();
+                            if (normalizePaymentMethod($('#payment_method').val()) === 'emi') {
+                                calculateEmi();
                             }
                         }
 
                         $('#quotationToggle').on('change', togglePaymentFields);
-                        prefillEmiFields();
                         togglePaymentFields(); // Initial call
+                        
+                        function calculateEmi() {
+                            const totalAmount = getGrandTotalValue();
+                            let downPayment = parseFloat($('#emiDownPayment').val()) || 0;
+                            
+                            if (downPayment > totalAmount) {
+                                downPayment = totalAmount;
+                                $('#emiDownPayment').val(downPayment);
+                            }
+
+                            const loanAmount = Math.max(0, totalAmount - downPayment);
+                            $('#emiLoanAmount').val(loanAmount.toFixed(2));
+
+                            let tenureStr = $('#emiTenure').val();
+                            let tenureMonths = 0;
+                            
+                            if (tenureStr === 'custom') {
+                                $('#emiCustomTenureCol').removeClass('d-none');
+                                tenureMonths = parseInt($('#emiCustomTenure').val()) || 0;
+                            } else {
+                                $('#emiCustomTenureCol').addClass('d-none');
+                                tenureMonths = parseInt(tenureStr) || 0;
+                            }
+
+                            let interestRate = parseFloat($('#emiInterestRate').val()) || 0;
+                            
+                            if (tenureMonths > 0 && loanAmount > 0) {
+                                let totalInterest = (loanAmount * interestRate) / 100;
+                                let totalRepayment = loanAmount + totalInterest;
+                                let monthlyAmount = totalRepayment / tenureMonths;
+                                $('#emiMonthlyAmount').val(monthlyAmount.toFixed(2));
+                            } else {
+                                $('#emiMonthlyAmount').val('');
+                            }
+                        }
+
+                        $('#emiDownPayment, #emiInterestRate, #emiCustomTenure').on('input', function() {
+                            calculateEmi();
+                        });
+
+                        $('#emiTenure').on('change', function() {
+                            calculateEmi();
+                        });
+                        
+                        $('#openAddBankModalEmi').on('click', function() {
+                            resetAddBankForm();
+                            if (addBankModal) {
+                                addBankModal.show();
+                            }
+                        });
 
                         $('#payment_method').on('change', function() {
                             setSelect2Value('#paid_type', '');
                             $('#cash_amount').val('');
                             $('#online_amount').val('');
                             $('#pending_amount').val(parseMoney($('#pending_amount').data('prefill')).toFixed(2));
-                            calculatePaymentBreakdown();
-                        });
-
-                        $('#payment_method').on('select2:select', function() {
                             calculatePaymentBreakdown();
                         });
 
@@ -3642,6 +3007,7 @@ addProductToTable(
 
                             e.preventDefault();
                             clearOrderNumberError();
+                            $('#emiTenureError, #emiCustomTenureError, #emiBankError').text('').addClass('d-none');
 
                             // Collect all form data
                             const formData = {
@@ -3658,10 +3024,12 @@ addProductToTable(
                                 gst_option: $('input[name="gst_option"]:checked').val(),
                                 selectedSubAdminId: selectedSubAdminId || null,
                                 remarks: $('#remarks').val(),
+                                assign_staff: $('#assign_staff').val(),
+                                order_type: $('#order_type').val(),
                                 payment_method: $('#payment_method').val(),
                                 status: $('#payment_status').val(),
                                 paid_type: $('#paid_type').val(),
-                                bank_id: $('#bank_id').val(),
+                                bank_id: $('#payment_method').val() === 'emi' ? $('#emiBankId').val() : $('#bank_id').val(),
                                 cash_amount: $('#cash_amount').val() || 0,
                                 online_amount: $('#online_amount').val() || 0,
                                 pending_amount: $('#pending_amount').val() || 0,
@@ -3675,22 +3043,20 @@ addProductToTable(
                                 shipping: $('#shipping-input').val(),
                                 tds_percentage: $('#tds-percentage-input').val() || 0,
                                 tds_amount: $('#tds-amount-input').val() || 0,
+                                emi_down_payment: $('#emiDownPayment').val() || 0,
+                                emi_loan_amount: $('#emiLoanAmount').val() || 0,
+                                emi_interest_rate: $('#emiInterestRate').val() || 0,
+                                emi_tenure: $('#emiTenure').val() || "",
+                                emi_custom_tenure: $('#emiCustomTenure').val() || "",
+                                emi_monthly_amount: $('#emiMonthlyAmount').val() || 0,
+                                emi_aadhar_number: $('#emiAadharNumber').val() || "",
+                                emi_do_id: $('#emiDoId').val() || "",
+                                emi_pan_number: $('#emiPanNumber').val() || "",
+                                emi_guarantor_name: $('#emiGuarantorName').val() || "",
                                 quotation_status: $('#quotationToggle').is(':checked') ? 'quotation' : 'sales',
                                 labour_item_ids: [],
                                 labour_qtys: [],
-                                labour_prices: [],
-                                emi_down_payment: $('#emiDownPayment').val() || null,
-                                emi_loan_amount: $('#emiLoanAmount').val() || null,
-                                emi_tenure: $('#emiTenure').val() === 'custom' ? $('#emiCustomTenure').val() : $('#emiTenure').val() || null,
-                                emi_interest_rate: $('#emiInterestRate').val() || null,
-                                emi_monthly_amount: $('#emiMonthlyValue').val() || null,
-                                emi_aadhar_number: $('#emiAadharNumber').val() || null,
-                                emi_do_id: $('#emiDoId').val() || null,
-                                emi_pan_number: $('#emiPanNumber').val() || null,
-                                emi_guarnator_name: $('#emiGuarantorName').val() || null,
-                                emi_bank_id: $('#emi_bank_id').val() || null,
-                                assigned_staff: $('#assigned_staff').val(),
-                                order_type: $('#order_type').val()
+                                labour_prices: []
                             };
 
                             // Collect labour items
@@ -3756,7 +3122,32 @@ addProductToTable(
                                 return;
                             }
 
-                            if (formData.quotation_status !== 'quotation' && normalizedPaymentMethod !== 'pending' && paymentAmount <= 0) {
+                            if (formData.quotation_status !== 'quotation' && normalizedPaymentMethod === 'emi') {
+                                if (!formData.emi_tenure) {
+                                    $('#emiTenureError').text('Please select EMI tenure.').removeClass('d-none');
+                                    $('#emiTenure')[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                    return;
+                                }
+                                if (formData.emi_tenure === 'custom' && !formData.emi_custom_tenure) {
+                                    $('#emiCustomTenureError').text('Please enter custom EMI tenure.').removeClass('d-none');
+                                    $('#emiCustomTenure')[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                    return;
+                                }
+                                if (!formData.bank_id) {
+                                    $('#emiBankError').text('Please select a bank for EMI.').removeClass('d-none');
+                                    $('#emiBankId')[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                    return;
+                                }
+                            }
+
+                            const grandTotalForValidation = getGrandTotalValue();
+                            const historicalPaidForValidation = Math.min(
+                                grandTotalForValidation,
+                                parseMoney($('#pending_amount').data('paid-total'))
+                            );
+                            const outstandingForValidation = Math.max(0, grandTotalForValidation - historicalPaidForValidation);
+
+                            if (formData.quotation_status !== 'quotation' && normalizedPaymentMethod !== 'pending' && normalizedPaymentMethod !== 'emi' && outstandingForValidation > 0 && paymentAmount <= 0) {
                                 Swal.fire({
                                     title: "Error",
                                     text: "Please enter a valid payment amount.",
@@ -3804,13 +3195,11 @@ addProductToTable(
 
                         // Initial calculation
                         calculateAllTotals();
-                        _isInitialLoad = false; // From now on, TDS amount is recalculated from percentage
 
                         // Initialize customer phone on page load
                         const selectedCustomer = $('#customer_id').find(':selected');
                         if (selectedCustomer.length) {
                             $('#customer_phone').val(selectedCustomer.data('phone') || '');
-                            $('#openEditCustomerModal').prop('disabled', !$('#customer_id').val());
                         }
 
                         $('#order_number').on('input', function() {

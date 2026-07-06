@@ -349,6 +349,9 @@ Route::middleware(['auth.api'])->group(function () {
     Route::get('/pdf-orders', [SalesController::class, 'exportOrdersPDF'])->name('pdf.export');
     Route::get('/export-order', [SalesController::class, 'exportOrders']);
     Route::get('/product-by-barcode/{barcode}', [SalesController::class, 'getByBarcode'])->name('getByBarcode');
+        Route::post('/sales/{id}/update-staff', [SalesController::class, 'updateStaff']);
+    Route::post('/sales/{id}/update-order-type', [SalesController::class, 'updateOrderType']);
+
 
     Route::get('/purchase-product-chart', [PurchaseController::class, 'purchaseProductChart']);
 

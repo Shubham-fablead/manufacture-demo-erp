@@ -13,13 +13,11 @@ class Order extends Model
     protected $table = 'orders';
     protected $fillable = [
         'order_number',
-        'order_date',
         'shipping',
         'tds_percentage',
         'tds_amount',
         'user_id',
-        'assigned_staff',
-        'order_type',
+        'staff_id',
         'discount',
         'tax_id',
         'gst_option',
@@ -30,16 +28,6 @@ class Order extends Model
         'payment_status',
         'delivery_status',
         'payment_method',
-        'emi_down_payment',
-        'emi_loan_amount',
-        'emi_interest_rate',
-        'emi_tenure',
-        'emi_monthly_amount',
-        'emi_aadhar_number',
-        'emi_pan_number',
-        'emi_guarnator_name',
-        'emi_do_id',
-        'emi_bank_id',
         'order_invoice',
         'quotation_status',
         'approved_status',
@@ -47,7 +35,18 @@ class Order extends Model
         'isDeleted',
         'created_at',
         'updated_at',
-    ];  
+        'emi_down_payment',
+        'emi_loan_amount',
+        'emi_interest_rate',
+        'emi_tenure',
+        'emi_monthly_amount',
+        'emi_aadhar_number',
+        'emi_do_id',
+        'emi_pan_number',
+        'emi_guarantor_name',
+        'emi_bank_id',
+        'order_type',
+    ];
 
     protected $casts = [
         'tax_id' => 'array',
@@ -63,6 +62,10 @@ class Order extends Model
     {
         return $this->belongsTo(User::class, 'user_id');
     }
+    public function staff()
+    {
+        return $this->belongsTo(User::class, 'staff_id');
+    }
     public function orderItems()
     {
         return $this->hasMany(OrderItem::class, 'order_id', 'id');
@@ -70,10 +73,6 @@ class Order extends Model
     public function creator()
     {
         return $this->belongsTo(User::class, 'created_by');
-    }
-    public function assignedStaff()
-    {
-        return $this->belongsTo(User::class, 'assigned_staff');
     }
     public function items()
     {
@@ -90,6 +89,10 @@ class Order extends Model
    public function labour_items()
     {
         return $this->hasMany(Sales_Labour_Items::class, 'order_id', 'id');
+    }
+    public function bank()
+    {
+        return $this->belongsTo(BankMaster::class, 'emi_bank_id');
     }
     protected static function boot()
     {
