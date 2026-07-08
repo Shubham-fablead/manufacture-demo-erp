@@ -179,9 +179,22 @@ class SalesController extends Controller
             ->where('isDeleted', 0)
             ->firstOrFail();
 
+        $order = Order::where('id', $payment->order_id)->first();
+        $returnAmount = (float) SalesReturn::where('order_id', $payment->order_id)->sum('total_amount');
+        $totalPaid = (float) PaymentStore::where('order_id', $payment->order_id)
+            ->where('isDeleted', 0)
+            ->sum('payment_amount');
+        $orderTotal = (float) ($order->total_amount ?? 0);
+        $netTotal = max(0, $orderTotal - $returnAmount);
+        $remaining = max(0, $netTotal - $totalPaid);
+
         return response()->json([
             'status' => true,
-            'data' => $payment,
+            'data' => array_merge($payment->toArray(), [
+                'order_total' => $orderTotal,
+                'remaining_amount' => $remaining,
+                'return_amount' => $returnAmount,
+            ]),
         ]);
     }
 

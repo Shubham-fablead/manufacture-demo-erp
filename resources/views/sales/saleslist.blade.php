@@ -618,6 +618,54 @@
             font-size: 16px;
         }
 
+        .sales-action-wrap {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .sales-action-toggle {
+            width: 34px;
+            height: 34px;
+            border: 1px solid #cfd7e3;
+            border-radius: 6px;
+            background: #fff;
+            color: #344054;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            transition: all 0.2s ease;
+            box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
+        }
+
+        .sales-action-toggle:hover {
+            background: #f8fafc;
+            border-color: #b8c4d6;
+            color: #111827;
+        }
+
+        .sales-action-toggle:focus {
+            outline: none;
+            box-shadow: 0 0 0 0.2rem rgba(27, 40, 80, 0.15);
+        }
+
+        .sales-action-toggle i {
+            font-size: 18px;
+            line-height: 1;
+        }
+
+        .sales-action-menu {
+            min-width: 170px;
+        }
+
+        .sales-action-menu .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
         /* Additional responsive adjustments for larger screens */
         @media screen and (min-width: 992px) {
             .order-details-content {
@@ -1981,57 +2029,65 @@
     </div>
 
     <div class="modal fade" id="editPaymentModal" tabindex="-1" aria-labelledby="editPaymentLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" style="max-width: 520px;">
             <div class="modal-content">
-                <div class="modal-header">
+                <div class="modal-header" style="padding: 16px 18px 14px;">
                     <h5 class="modal-title" id="editPaymentLabel">Edit Payment</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">x</button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body" style="padding: 18px;">
                     <input type="hidden" id="editPaymentId">
                     <input type="hidden" id="editPaymentOrderId">
+                    <input type="hidden" id="editPaymentTotalValue" value="0">
+                    <input type="hidden" id="editPaymentBaseRemaining" value="0">
+                    <input type="hidden" id="editPaymentOriginalAmount" value="0">
+                    <div class="border rounded-2 p-3 mb-3" style="background:#f8f9fc; border-color:#d9dfeb !important;">
+                        <div class="fw-semibold" style="font-size:14px; color:#1f2937;">
+                            Total Amount: <span id="editPaymentTotalAmount">₹0.00</span>
+                        </div>
+                        <div class="fw-semibold" style="font-size:14px; color:#1f2937;">
+                            Remaining Amount: <span id="editPaymentRemainingAmount">₹0.00</span>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editPaymentDate" class="form-label">Payment Date</label>
+                        <input type="date" class="form-control" id="editPaymentDate" style="height:44px;">
+                    </div>
                     <div class="mb-3">
                         <label for="editPaymentMethod" class="form-label">Select Payment Method</label>
-                        <select class="form-select" id="editPaymentMethod">
+                        <select class="form-select" id="editPaymentMethod" style="height:44px;">
                             <option value="cash">Cash</option>
                             <option value="online">Online</option>
                             {{-- <option value="emi">EMI</option> --}}
                         </select>
                     </div>
                     <div class="mb-3">
-                        <label for="editPaymentType" class="form-label">Payment Type</label>
-                        <select class="form-select" id="editPaymentType">
-                            <option value="fully">Fully</option>
-                            <option value="partially">Partially</option>
+                        <label for="editPaymentType" class="form-label">Paid Type</label>
+                        <select class="form-select" id="editPaymentType" style="height:44px;">
+                            <option value="fully">Cash Fully</option>
+                            <option value="partially">Cash Partially</option>
                             {{-- <option value="emi">EMI</option> --}}
                         </select>
                     </div>
                     <div class="mb-3">
-                        <label for="editPaymentAmount" class="form-label">Amount</label>
+                        <label for="editPaymentAmount" class="form-label">Enter Amount</label>
                         <input type="number" class="form-control" id="editPaymentAmount" min="0"
-                            step="0.01">
-                    </div>
-                    <div class="mb-3" id="editPaymentBankWrap">
-                        <label for="editPaymentBank" class="form-label">Select Bank</label>
-                        <select class="form-select" id="editPaymentBank">
-                            <option value="">Select Bank</option>
-                            @foreach ($banks as $bank)
-                                <option value="{{ $bank->id }}">{{ $bank->bank_name }}</option>
-                            @endforeach
-                        </select>
+                            step="0.01" style="height:44px;">
                     </div>
                     <div class="mb-3">
-                        <label for="editPaymentDate" class="form-label">Payment Date</label>
-                        <input type="date" class="form-control" id="editPaymentDate">
+                        <label for="editPaymentBank" class="form-label">Pending Amount</label>
+                        <input type="text" class="form-control" id="editPaymentPendingAmount" readonly
+                            style="height:44px; background:#e9edf2;">
+                        <div id="editPaymentBankWrap" class="d-none"></div>
                     </div>
                     <div class="mb-3">
-                        <label for="editPaymentRemarks" class="form-label">Remarks</label>
-                        <textarea class="form-control" id="editPaymentRemarks" rows="3"></textarea>
+                        <label for="editPaymentRemarks" class="form-label">Remark</label>
+                        <textarea class="form-control" id="editPaymentRemarks" rows="4" style="resize:none;"></textarea>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-cancel" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-warning" id="saveEditPaymentBtn">Save Changes</button>
+                <div class="modal-footer" style="justify-content:flex-start; gap:8px; padding: 0 18px 18px;">
+                    <button type="button" class="btn btn-warning" id="saveEditPaymentBtn" style="min-width: 140px; height: 48px;">Update Payment</button>
+                    <button type="button" class="btn btn-dark" data-bs-dismiss="modal" style="min-width: 120px; height: 48px;">Cancel</button>
                 </div>
             </div>
         </div>
@@ -3973,11 +4029,11 @@
                                     currencySymbol + amount;
 
 
-                                let actionBtns = `<div class="dropdown">
-                                    <button class="btn btn-sm  p-0 text-muted" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                        <i class="fas fa-ellipsis-h" style="font-size: 18px;"></i>
+                                let actionBtns = `<div class="dropdown sales-action-wrap">
+                                    <button type="button" class="sales-action-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Actions">
+                                        <i class="fas fa-ellipsis-h"></i>
                                     </button>
-                                    <ul class="dropdown-menu dropdown-menu-end shadow" style="min-width: 150px;">`;
+                                    <ul class="dropdown-menu dropdown-menu-end shadow sales-action-menu">`;
 
                                 if (parseFloat(order.remaining_amount || 0) > 0 && status ===
                                     'sales') {
@@ -4571,11 +4627,11 @@
                 const status = String(order.quotation_status || 'sales').toLowerCase();
                 const remaining = parseFloat(order.remaining_amount || 0);
 
-                let actionBtns = `<div class="dropdown">
-                                    <button class="btn btn-sm  p-0 text-muted" type="button" data-bs-toggle="dropdown" aria-expanded="false" >
-                                        <i class="fas fa-ellipsis-h" style="font-size: 18px;"></i>
+                let actionBtns = `<div class="dropdown sales-action-wrap">
+                                    <button type="button" class="sales-action-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Actions">
+                                        <i class="fas fa-ellipsis-h"></i>
                                     </button>
-                                    <ul class="dropdown-menu dropdown-menu-end shadow" style="min-width: 150px;">`;
+                                    <ul class="dropdown-menu dropdown-menu-end shadow sales-action-menu">`;
 
                 if (parseFloat(order.remaining_amount || 0) > 0 && status === 'sales') {
                     actionBtns += `<li><a href="javascript:void(0);" class="dropdown-item make-payment-btn" data-bs-toggle="modal" data-bs-target="#makePaymentModal"
@@ -4759,11 +4815,11 @@
                 const formattedDate = `${day}-${month}-${year} ${hours}:${minutes} ${ampm}`;
 
                 // 🔹 Build action buttons properly
-                let actionBtns = `<div class="dropdown">
-                                    <button class="btn btn-sm  p-0 text-muted" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                        <i class="fas fa-ellipsis-h" style="font-size: 18px;"></i>
+                let actionBtns = `<div class="dropdown sales-action-wrap">
+                                    <button type="button" class="sales-action-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Actions">
+                                        <i class="fas fa-ellipsis-h"></i>
                                     </button>
-                                    <ul class="dropdown-menu dropdown-menu-end shadow" style="min-width: 150px;">`;
+                                    <ul class="dropdown-menu dropdown-menu-end shadow sales-action-menu">`;
 
                 if (parseFloat(order.remaining_amount || 0) > 0 && status === 'sales') {
                     actionBtns += `<li><a href="javascript:void(0);" class="dropdown-item make-payment-btn" data-bs-toggle="modal" data-bs-target="#makePaymentModal"
@@ -4933,7 +4989,8 @@
                                     <div class="small">Remarks: ${payment.remarks ? payment.remarks : 'N/A'}</div>
                                 </div>
                                 <div class="d-flex gap-2 flex-shrink-0 align-items-start">
-                                    <button type="button" class="btn btn-sm btn-outline-primary edit-payment-btn"
+                                    <button type="button" class="btn btn-sm btn-outline-warning edit-payment-btn"
+                                        data-bs-toggle="modal" data-bs-target="#editPaymentModal"
                                         data-payment-id="${payment.id}" data-order-id="${payment.order_id || ''}">
                                         <i class="fas fa-pen"></i>
                                     </button>
@@ -5025,17 +5082,26 @@
                 },
                 success: function(response) {
                     const payment = response.data || {};
+                    const totalAmount = parseFloat(payment.total_amount || payment.order_total || 0);
+                    const remainingAmount = parseFloat(payment.remaining_amount || 0);
+                    const originalAmount = parseFloat(payment.payment_amount || 0);
                     $('#editPaymentId').val(payment.id || '');
                     $('#editPaymentOrderId').val(payment.order_id || '');
+                    $('#editPaymentTotalValue').val(totalAmount || 0);
+                    $('#editPaymentBaseRemaining').val(remainingAmount + originalAmount);
+                    $('#editPaymentOriginalAmount').val(originalAmount || 0);
+                    $('#editPaymentTotalAmount').text(`₹${totalAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`);
+                    $('#editPaymentRemainingAmount').text(`₹${remainingAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`);
                     $('#editPaymentMethod').val((payment.payment_method || 'cash').toLowerCase());
                     $('#editPaymentType').val((payment.payment_type || 'fully').toLowerCase());
-                    $('#editPaymentAmount').val(payment.payment_amount || 0);
+                    $('#editPaymentAmount').val(originalAmount.toFixed(2));
                     $('#editPaymentBank').val(payment.bank_id || '');
                     $('#editPaymentDate').val(formatDateForInput(payment.payment_date || payment
                         .created_at));
                     $('#editPaymentRemarks').val(payment.remarks || '');
                     $('#editPaymentBankWrap').toggle((payment.payment_method || '').toLowerCase() !==
                         'cash');
+                    $('#editPaymentPendingAmount').val(remainingAmount.toFixed(2));
 
                     new bootstrap.Modal(document.getElementById('editPaymentModal')).show();
                 }
@@ -5062,7 +5128,7 @@
                 if (!result.isConfirmed) return;
 
                 $.ajax({
-                    url: '/api/sales/payment/' + paymentId + '/delete',
+                    url: '/api/payment-store/' + paymentId + '/delete',
                     method: 'POST',
                     headers: {
                         "Authorization": "Bearer " + authToken,
@@ -5098,8 +5164,26 @@
             });
         });
 
+        function updateEditPaymentPendingAmount() {
+            const baseRemaining = parseFloat($('#editPaymentBaseRemaining').val() || 0);
+            const originalAmount = parseFloat($('#editPaymentOriginalAmount').val() || 0);
+            const enteredAmount = parseFloat($('#editPaymentAmount').val() || 0);
+            const updatedRemaining = Math.max(baseRemaining - enteredAmount, 0);
+
+            $('#editPaymentPendingAmount').val(updatedRemaining.toFixed(2));
+            $('#editPaymentRemainingAmount').text(`₹${updatedRemaining.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`);
+        }
+
+        $(document).on('change input', '#editPaymentAmount', function() {
+            updateEditPaymentPendingAmount();
+        });
+
         $(document).on('change', '#editPaymentMethod', function() {
             $('#editPaymentBankWrap').toggle($(this).val() !== 'cash');
+        });
+
+        $(document).on('change', '#editPaymentType', function() {
+            updateEditPaymentPendingAmount();
         });
 
         $('#saveEditPaymentBtn').on('click', function() {
