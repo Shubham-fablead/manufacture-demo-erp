@@ -454,6 +454,9 @@ Route::middleware(['auth.api'])->group(function () {
     Route::delete('/manufacturing/productions/{id}', [ManufacturingController::class, 'deleteProduction']);
 
     Route::get('/sales/payment-history/{id}', [SalesController::class, 'getHistory'])->name('sales.payment_history');
+    Route::get('/sales/payment/{id}', [SalesController::class, 'getPayment'])->name('sales.payment.get');
+    Route::post('/sales/payment/{id}/update', [SalesController::class, 'updatePayment'])->name('sales.payment.update');
+    Route::post('/sales/payment/{id}/delete', [SalesController::class, 'deletePayment'])->name('sales.payment.delete');
     Route::post('/sales/make-payment', [SalesController::class, 'makePaymentSubmit'])->name('sales.make_payment_submit');
     // Salary
     Route::get('/salaries', [SalaryController::class, 'index']);
