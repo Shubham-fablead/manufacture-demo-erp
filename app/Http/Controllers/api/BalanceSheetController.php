@@ -36,7 +36,7 @@ class BalanceSheetController extends Controller
         $cash = DB::table('payment_store')
             ->join('orders', 'orders.id', '=', 'payment_store.order_id')
             ->where('payment_store.isDeleted', 0)
-            ->where('payment_store.payment_method', 'cash')
+            ->where('payment_store.payment_method', ['cash', 'Cash'])
             ->where(function ($q) {
                 $q->whereNotNull('payment_store.order_id')
                     ->where('payment_store.order_id', '<>', '')
@@ -59,7 +59,7 @@ class BalanceSheetController extends Controller
         $bank = DB::table('payment_store')
             ->join('orders', 'orders.id', '=', 'payment_store.order_id')
             ->where('payment_store.isDeleted', 0)
-            ->whereIn('payment_store.payment_method', ['upi', 'bank', 'online'])
+            ->whereIn('payment_store.payment_method', ['upi', 'bank', 'online','Online', 'debit card', 'Debit Card', 'Debit card', 'scan', 'Scan'])
             ->where(function ($q) {
                 $q->whereNotNull('payment_store.order_id')
                     ->where('payment_store.order_id', '<>', '')
@@ -98,6 +98,8 @@ class BalanceSheetController extends Controller
         $accountsPayable = DB::table('purchase_invoice')
             ->where('isDeleted', 0)
             ->when($branchId, fn($q) => $q->where('branch_id', $branchId))
+            ->when($request->start_date, fn($q) => $q->whereDate('created_at', '>=', $request->start_date))
+            ->when($request->end_date, fn($q) => $q->whereDate('created_at', '<=', $request->end_date))
             ->sum('remaining_amount');
 
         $gstPayable = DB::table('orders')
@@ -125,6 +127,8 @@ class BalanceSheetController extends Controller
         $totalPurchases = DB::table('purchase_invoice')
             ->where('isDeleted', 0)
             ->when($branchId, fn($q) => $q->where('branch_id', $branchId))
+            ->when($request->start_date, fn($q) => $q->whereDate('created_at', '>=', $request->start_date))
+            ->when($request->end_date, fn($q) => $q->whereDate('created_at', '<=', $request->end_date))
             ->sum('grand_total');
 
         $totalExpenses = DB::table('expenses')

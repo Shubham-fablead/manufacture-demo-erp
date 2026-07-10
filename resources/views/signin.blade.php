@@ -76,7 +76,7 @@
             padding: clamp(10px, 2.4vh, 24px) 20px clamp(8px, 1.7vh, 16px);
             overflow: hidden;
             color: var(--auth-secondary);
-            font-family: Inter, "Segoe UI", Roboto, Arial, sans-serif;
+            font-family: 'Outfit', system-ui, -apple-system, sans-serif;
             background:
                 radial-gradient(circle at 0% 68%, rgba(247, 147, 58, .10) 0 0, transparent 168px),
                 radial-gradient(circle at 100% 78%, rgba(247, 147, 58, .12) 0 0, transparent 198px),
@@ -642,13 +642,13 @@
         </div>
     </div>
     {{-- <footer style="position: fixed; bottom: 0; left: 0; right: 0; text-align: center; padding: 10px 0; background-color: #f4f4f4; height: 50px; z-index: 1000; box-shadow: 0 -2px 5px rgba(0,0,0,0.1);">
-        <h1 style="font-size: 14px; font-weight: 600; margin: 0;">© <?= date('Y') ?> <a href="https://fableadtechnolabs.com" target="_blank" style="color: inherit; text-decoration: none;">Copyright - Fablead Developers Technolab</a></h1>
+        <h1 style="font-size: 14px; font-weight: 600; margin: 0;">© <?= date('Y') ?> <a href="https://www.fableadtech.com/" target="_blank" rel="noopener noreferrer" style="color: inherit; text-decoration: none;">Copyright - Fablead Developers Technolab</a></h1>
     </footer> --}}
 
     <footer style="position: fixed; bottom: 0; left: 0; right: 0; text-align: center; padding: 10px 0;  z-index: 1000; box-shadow: none;">
     <h1 style="font-size: 14px; font-weight: 600; margin: 0;">
         © <?= date('Y') ?>
-        <a href="https://fableadtechnolabs.com" target="_blank" style="color: inherit; text-decoration: none;">
+        <a href="https://www.fableadtech.com/" target="_blank" rel="noopener noreferrer" style="color: inherit; text-decoration: none;">
             Copyright - Fablead Developers Technolab
         </a>
     </h1>

@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
+
 .css-equal-content,
 .css-equal-heights {
     display: flex;
@@ -624,7 +626,7 @@ h6 {
 }
 
 body {
-    font-family: nunito, sans-serif;
+    font-family: 'Outfit', system-ui, -apple-system, sans-serif;
     font-size: 14px;
     color: #212b36;
     line-height: 1.5;
