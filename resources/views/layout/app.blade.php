@@ -55,7 +55,7 @@
 
     <!-- Footer with copyright -->
     <footer style="text-align: center; padding: 10px 0; background-color: #f4f4f4; height: 50px;">
-        <h1 style="font-size: 14px; font-weight: 600;">© <?= date('Y') ?> Copyright - Fablead Developers Technolab</h1>
+        <h1 style="font-size: 14px; font-weight: 600;">© <?= date('Y') ?> <a href="https://www.fableadtech.com/" target="_blank" rel="noopener noreferrer" style="color: inherit; text-decoration: none;">Copyright - Fablead Developers Technolab</a></h1>
     </footer>
 
     @include('layout.footer')
