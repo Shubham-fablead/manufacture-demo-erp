@@ -177,6 +177,45 @@
             display: block;
         }
 
+        .product-card-wrap {
+            position: relative;
+        }
+
+        .productsetimg {
+            position: relative;
+        }
+
+        .product-edit-link {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 28px;
+            height: 28px;
+            border: 1px solid #ff9f43;
+            border-radius: 6px;
+            background: #fff;
+            color: #ff9f43;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 6;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+            transition: transform 0.15s ease, background-color 0.15s ease, color 0.15s ease;
+            text-decoration: none;
+        }
+
+        .product-edit-link:hover {
+            background: #ff9f43;
+            color: #fff;
+            transform: translateY(-1px);
+        }
+
+        .product-edit-link svg {
+            width: 14px;
+            height: 14px;
+            display: block;
+        }
+
         .productsetbtn button {
             display: none;
         }
@@ -1803,6 +1842,38 @@
                                 style="background-color: #ff9f43;">Save Bank</button>
                             <button type="button" class="btn btn-secondary btn-cancel"
                                 data-bs-dismiss="modal">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="labourItemModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <form id="labourItemForm">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="labourItemModalLabel">Add Labour Item</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">x</button>
+                        </div>
+                        <div class="modal-body">
+                            <input type="hidden" id="labour_item_id">
+                            <div class="form-group mb-3">
+                                <label>Item Name <span class="text-danger">*</span></label>
+                                <input type="text" name="item_name" id="item_name" class="form-control"
+                                    placeholder="Enter item name">
+                                <span class="text-danger" id="item_name_error"></span>
+                            </div>
+                            <div class="form-group mb-3">
+                                <label>Price <span class="text-danger">*</span></label>
+                                <input type="number" name="price" id="price" class="form-control"
+                                    placeholder="Enter price" step="0.01">
+                                <span class="text-danger" id="price_error"></span>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-primary btn-sm">Save</button>
                         </div>
                     </form>
                 </div>
@@ -3566,7 +3637,7 @@
             deviceScanRequestInFlight = true;
 
             $.ajax({
-                url: '/pull-device-scans',
+                url: '/api/pull-device-scans',
                 type: 'GET',
                 data: {
                     limit: 15
@@ -4009,7 +4080,40 @@
             let $row = $(row);
             $("#labour-items-container").append($row);
             $row.find(".select2-labour").select2();
+            $row.find(".select2-labour")
+                .on('select2:open', function() {
+                    activeLabourRow = $(this).closest('.labour-row');
+                })
+                .on('select2:close', function() {
+                    activeLabourRow = null;
+                })
+                .on('focus click', function() {
+                    activeLabourRow = $(this).closest('.labour-row');
+                });
             updateLabourButtons();
+        }
+
+        function openLabourItemModal(itemName = '') {
+            $('#labour_item_id').val('');
+            $('#labourItemModalLabel').text('Add Labour Item');
+            $('#item_name').val(itemName);
+            $('#price').val('');
+            $('#item_name_error, #price_error').text('');
+
+            const modalElement = document.getElementById('labourItemModal');
+            if (modalElement) {
+                bootstrap.Modal.getOrCreateInstance(modalElement).show();
+            }
+
+            setTimeout(function() {
+                $('#item_name').trigger('focus');
+            }, 150);
+        }
+
+        function resetLabourItemModal() {
+            $('#labour_item_id').val('');
+            $('#labourItemForm')[0]?.reset();
+            $('#item_name_error, #price_error').text('');
         }
 
         function updateLabourButtons() {
@@ -4081,11 +4185,109 @@
 
             addLabourRow();
         });
+
+        $(document).on('keydown', '.select2-container--open .select2-search__field', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+
+                const term = $(this).val().trim();
+                const $row = activeLabourRow && activeLabourRow.length ? activeLabourRow : $('.labour-row').last();
+                const exactMatch = labourItemsList.find(function(item) {
+                    return String(item.item_name || '').toLowerCase() === term.toLowerCase();
+                });
+
+                if (exactMatch) {
+                    const $select = $row.find('.labour-select');
+                    $select.val(String(exactMatch.id)).trigger('change');
+                    $select.select2('close');
+                    return;
+                }
+
+                if (term) {
+                    openLabourItemModal(term);
+                }
+            }
+        });
+
+        $(document).on('submit', '#labourItemForm', function(e) {
+            e.preventDefault();
+
+            const itemName = $('#item_name').val().trim();
+            const price = $('#price').val().trim();
+
+            $('#item_name_error, #price_error').text('');
+
+            if (!itemName || !price) {
+                if (!itemName) {
+                    $('#item_name_error').text('Item name is required.');
+                }
+                if (!price) {
+                    $('#price_error').text('Price is required.');
+                }
+                return;
+            }
+
+            const $submitBtn = $(this).find('button[type="submit"]');
+            const defaultText = $submitBtn.data('default-text') || $submitBtn.text();
+            $submitBtn.data('default-text', defaultText).prop('disabled', true).text('Saving...');
+
+            $.ajax({
+                url: '/api/add-labour-item',
+                type: 'POST',
+                dataType: 'json',
+                headers: {
+                    "Authorization": "Bearer " + authToken,
+                    "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr('content')
+                },
+                data: {
+                    item_name: itemName,
+                    price: price,
+                    sub_admin_id: selectedSubAdminId || ''
+                },
+                success: function(response) {
+                    if (response.status) {
+                        const modalElement = document.getElementById('labourItemModal');
+                        if (modalElement) {
+                            bootstrap.Modal.getOrCreateInstance(modalElement).hide();
+                        }
+
+                        resetLabourItemModal();
+                        loadLabourItems();
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success',
+                            text: response.message || 'Labour item added successfully.'
+                        });
+                    }
+                },
+                error: function(xhr) {
+                    if (xhr.status === 422 && xhr.responseJSON && xhr.responseJSON.errors) {
+                        const errors = xhr.responseJSON.errors;
+                        $('#item_name_error').text(errors.item_name ? errors.item_name[0] : '');
+                        $('#price_error').text(errors.price ? errors.price[0] : '');
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: xhr.responseJSON?.message || 'Failed to add labour item.'
+                        });
+                    }
+                },
+                complete: function() {
+                    $submitBtn.prop('disabled', false).text(defaultText);
+                }
+            });
+        });
+
+        $('#labourItemModal').on('hidden.bs.modal', function() {
+            resetLabourItemModal();
+        });
         loadLabourItems();
     </script>
     <script>
         let selectedItems = new Map();
         const isTdsEnabled = @json((bool) ($setting->tds_apply ?? false));
+        let activeLabourRow = null;
 
         function updatePosPageTitle(isQuotationMode) {
             const titleText = isQuotationMode ? 'Add Quotation' : 'Add Sale';
@@ -5202,6 +5404,10 @@
                 updateTotalItems();
             });
 
+            $(document).on("click", ".product-edit-link", function(e) {
+                e.stopPropagation();
+            });
+
             function getItemBaseAmount(item) {
 
                 let price = parseItemPriceValue(item.price);
@@ -5979,6 +6185,15 @@
                         // Format price
                         let displayPrice = formatCurrency(product.price || 0, currencySymbol,
                             currencyPosition);
+                        let editProductUrl = `/edit-product/${product.id}`;
+                        let editProductIcon = `
+                            <a href="${editProductUrl}" class="product-edit-link" title="Edit Product" aria-label="Edit Product">
+                                <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M11.854 1.854a.5.5 0 0 1 .707 0l1.585 1.585a.5.5 0 0 1 0 .707l-7.9 7.9-2.65.45.45-2.65 7.808-7.992Z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/>
+                                    <path d="M2 11.5V14h2.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </a>
+                        `;
 
                         // Check if product is out of stock
                         let outOfStockBadge = '';
@@ -6007,7 +6222,7 @@
 
                         //  ADD data-gst-option and data-product-gst ATTRIBUTES HERE
                         productsHtml += `
-                <div class="col-lg-3 col-sm-6 d-flex position-relative">
+                <div class="col-lg-3 col-sm-6 d-flex position-relative product-card-wrap">
                     <div class="productset flex-fill text-center ${disabledClass}"
                          data-id="${product.id}"
                          data-stock="${product.quantity}"
@@ -6016,6 +6231,7 @@
                          style="position: relative;">
                         ${outOfStockBadge}
                         <div class="productsetimg">
+                            ${editProductIcon}
                             <img src="${productImage}" alt="${product.name}" class="productsetimgin">
                             <h6>Qty: ${product.quantity || '0'}</h6>
                             ${gstBadge}

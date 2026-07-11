@@ -7,6 +7,7 @@ use App\Models\LabourItem;
 use App\Models\Sales_Labour_Items;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
@@ -133,7 +134,10 @@ class LabourItemController extends Controller
             ], 422);
         }
 
+        $nextId = ((int) DB::table('labour_items')->max('id')) + 1;
+
         $item = LabourItem::create([
+            'id'         => $nextId,
             'item_name'  => $request->item_name,
             'price'      => $request->price,
             'created_by' => $targetUserId,
