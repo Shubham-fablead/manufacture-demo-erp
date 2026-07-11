@@ -12,6 +12,7 @@ class LabourItem extends Model
     protected $table = 'labour_items';
 
     protected $fillable = [
+        'id',
         'item_name',
         'price',
         'created_by',
