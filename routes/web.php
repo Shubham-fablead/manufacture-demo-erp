@@ -65,6 +65,8 @@ use App\Http\Controllers\SalesGSTR9CController;
 use App\Http\Controllers\SalesGSTR9Controller;
 use App\Http\Controllers\SmtpSettingController;
 use App\Http\Controllers\UnitController;
+use App\Http\Controllers\ReportController;
+use App\Http\Controllers\api\ProductController as ApiProductController;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
@@ -149,6 +151,16 @@ Route::middleware(['auth:web', 'auto.permission'])->group(function () {
     Route::get('/categories', [CategoryController::class, 'category_list'])->name('category.list');
     Route::get('/add-category', [CategoryController::class, 'add_category'])->name('category.add');
     Route::get('/edit-category/{id}', [CategoryController::class, 'edit_category'])->name('category.edit');
+
+    // Profit Loss Report
+    Route::get('/profit-loss-report', [ProductController::class, 'profitLossReportIndex'])->name('profit-loss-report.index');
+    Route::get('/profit-loss-report/data', [ApiProductController::class, 'getProfitLossData'])->name('profit-loss-report.data');
+    Route::get('/profit-loss-report/pdf', [ApiProductController::class, 'profitLossPdf'])->name('profit-loss-report.pdf');
+    Route::get('/profit-loss-statement', [ReportController::class, 'profitLossStatementIndex'])->name('profit-loss-statement.index');
+    Route::get('/profit-loss-statement/data', [ReportController::class, 'profitLossStatementData'])->name('profit-loss-statement.data');
+    Route::get('/profit-loss-statement/pdf', [ReportController::class, 'profitLossStatementPdf'])->name('profit-loss-statement.pdf');
+    Route::get('/profit-loss-statement/excel', [ReportController::class, 'profitLossStatementExcel'])->name('profit-loss-statement.excel');
+
     // Product
     Route::get('/products', [ProductController::class, 'product_list'])->name('product.list');
     Route::get('/add-product', [ProductController::class, 'add_product'])->name('product.add');
@@ -157,7 +169,7 @@ Route::middleware(['auth:web', 'auto.permission'])->group(function () {
     Route::get('/product-detail/{id}', [ProductController::class, 'product_detail'])->name('product.detail');
     Route::get('/import-product', [ProductController::class, 'product_import'])->name('product.import');
     Route::get('/product-view/{id}', [ProductController::class, 'product_view'])->name('product.view');
-  Route::get('/product/import/sample-file', function () {
+    Route::get('/product/import/sample-file', function () {
         $filePath = public_path('admin/assets/csvfile/Productimportfile.csv');
 
         if (! file_exists($filePath)) {
@@ -258,13 +270,13 @@ Route::middleware(['auth:web', 'auto.permission'])->group(function () {
 
 
 
-     //plans
-    Route::get('/plans', [PlanController::class,'index'])->name('plans.planlist');
-    Route::get('/add-plan', [PlanController::class,'create'])->name('plans.addplan');
-    Route::post('/add-plan', [PlanController::class,'store'])->name('plans.store');
-    Route::get('/edit-plan/{plan}', [PlanController::class,'edit'])->name('plans.edit');
-    Route::put('/edit-plan/{plan}', [PlanController::class,'update'])->name('plans.update');
-    Route::delete('/delete-plan/{plan}', [PlanController::class,'destroy'])->name('plans.destroy');
+    //plans
+    Route::get('/plans', [PlanController::class, 'index'])->name('plans.planlist');
+    Route::get('/add-plan', [PlanController::class, 'create'])->name('plans.addplan');
+    Route::post('/add-plan', [PlanController::class, 'store'])->name('plans.store');
+    Route::get('/edit-plan/{plan}', [PlanController::class, 'edit'])->name('plans.edit');
+    Route::put('/edit-plan/{plan}', [PlanController::class, 'update'])->name('plans.update');
+    Route::delete('/delete-plan/{plan}', [PlanController::class, 'destroy'])->name('plans.destroy');
 
     // Follow Up
     Route::get('/follow-ups', [FollowUpController::class, 'follow_up_list'])->name('followup.list');
@@ -285,7 +297,7 @@ Route::middleware(['auth:web', 'auto.permission'])->group(function () {
     Route::get('/edit-lead/{id}', [LeadController::class, 'edit_lead'])->name('lead.edit');
     Route::get('/lead-view/{id}', [LeadController::class, 'view_lead'])->name('lead.view');
 
-       // Meeting
+    // Meeting
     Route::get('/meetings', [MeetingController::class, 'meeting_list'])->name('meeting.list');
     Route::get('/add-meeting', [MeetingController::class, 'add_meeting'])->name('meeting.add');
     Route::get('/edit-meeting/{id}', [MeetingController::class, 'edit_meeting'])->name('meeting.edit');
@@ -311,7 +323,7 @@ Route::middleware(['auth:web', 'auto.permission'])->group(function () {
     Route::post('/submit-device-scan', [ConnectedDevicesController::class, 'submitScan']);
     Route::get('/pull-device-scans', [ConnectedDevicesController::class, 'pullScans']);
     Route::get('/settings/smtp', [SmtpSettingController::class, 'index'])
-    ->name('setting.smtpsettings');
+        ->name('setting.smtpsettings');
     Route::get('/notifications', [NotificationController::class, 'getNotifications'])->name('notifications');
 
     Route::get('/notifications/view', [NotificationController::class, 'getAllNotifications'])->name('notifications.index');
@@ -410,7 +422,7 @@ Route::middleware(['auth:web', 'auto.permission'])->group(function () {
     Route::get('/sales/report/{ids}/export-pdf', [SalesController::class, 'export_sales_report_pdf'])->name('sale.report.exportPdf');
     Route::get('/sales/report/{ids}/export-pdf', [SalesController::class, 'export_sales_report_pdf'])->name('sale.report.exportPdf');
     Route::get('/sales/report/{ids}/export-excel', [SalesController::class, 'export_sales_report_excel'])->name('sale.report.exportExcel');
-// TDS page (UI)
+    // TDS page (UI)
     Route::get('/tds', function () {
         return view('tds.index');
     });
@@ -458,7 +470,7 @@ Route::middleware(['auth:web', 'auto.permission'])->group(function () {
     // Route::get('/expense-type/edit/{id}', [ExpenseTypeController::class, 'edit'])->name('expensetype.edit');
     // Route::get('/edit-expense-type/{num}', [ExpenseTypeController::class, 'edit_expense_type'])->name('expensetype.edit');
 
-     Route::get('/create-expense-type', [ExpenseTypeController::class, 'create_expense_type'])->name('expensetype.add');
+    Route::get('/create-expense-type', [ExpenseTypeController::class, 'create_expense_type'])->name('expensetype.add');
     Route::get('/expense-type-list', [ExpenseTypeController::class, 'expense_type_list'])->name('expensetype.list');
     Route::get('/expense-type/edit/{id}', [ExpenseTypeController::class, 'edit'])->name('expensetype.edit');
     Route::get('/edit-expense-type/{num}', [ExpenseTypeController::class, 'edit_expense_type'])->name('expensetype.edit');
@@ -651,5 +663,4 @@ Route::middleware(['auth:web', 'auto.permission'])->group(function () {
         Route::get('/details/{id}', [ApiPayrollController::class, 'getProfile'])->whereNumber('id')->name('details');
         Route::get('/download-slip/{id}', [ApiPayrollController::class, 'downloadSlip'])->whereNumber('id')->name('download-slip');
     });
-    
 });

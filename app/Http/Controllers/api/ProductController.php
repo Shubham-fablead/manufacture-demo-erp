@@ -452,6 +452,8 @@ class ProductController extends Controller
             'name'          => 'required|string|max:255',
             'description'   => 'nullable|string',
             'price'         => 'required|numeric|gt:0',
+            'landing_cost'  => 'nullable|numeric|min:0',
+            'cost_price'    => 'nullable|numeric|min:0',
             'SKU'           => 'nullable|string|max:255',
             'hsn_code'      => 'nullable',
             'barcode'       => 'nullable|string|max:255',
@@ -550,6 +552,8 @@ class ProductController extends Controller
             'name'          => $validated['name'],
             'description'   => $validated['description'] ?? null,
             'price'         => $validated['price'],
+            'landing_cost'  => $validated['landing_cost'] ?? null,
+            'cost_price'    => $validated['cost_price'] ?? null,
             'SKU'           => $validated['SKU'],
             'hsn_code'      => $validated['hsn_code'],
             'barcode'       => $validated['barcode'] ?? null,
@@ -610,6 +614,8 @@ class ProductController extends Controller
             'name'          => 'required|string|max:255',
             'description'   => 'nullable|string',
             'price'         => 'required|numeric|gt:0',
+            'landing_cost'  => 'nullable|numeric|min:0',
+            'cost_price'    => 'nullable|numeric|min:0',
             'SKU'           => 'nullable|string|max:255',
             'hsn_code'      => 'nullable',
             'barcode'       => 'nullable|string|max:255',
@@ -712,6 +718,8 @@ class ProductController extends Controller
             'name'          => $validated['name'],
             'description'   => $validated['description'] ?? null,
             'price'         => $validated['price'],
+            'landing_cost'  => $validated['landing_cost'] ?? null,
+            'cost_price'    => $validated['cost_price'] ?? null,
             'SKU'           => $validated['SKU'],
             'hsn_code'      => $validated['hsn_code'],
             'barcode'       => $validated['barcode'] ?? null,
@@ -1111,6 +1119,64 @@ class ProductController extends Controller
             'data'   => $categories,
         ], 200);
     }
+      public function getProfitLossData(Request $request)
+    {
+        $user = Auth::guard('api')->user() ?? Auth::user();
+        $branchId = $this->resolveBranchId();
+
+        $productId = $request->get('product_id');
+        $vendorId = $request->get('vendor_id');
+        $customerId = $request->get('customer_id');
+        $timePeriod = $request->get('time_period', 'all_time');
+        $year = $request->get('year');
+        $month = $request->get('month');
+
+        [$startDate, $endDate] = $this->resolveProfitLossDateRange($timePeriod);
+
+        return response()->json(
+            $this->getProfitLossReportData($branchId, $productId, $vendorId, $customerId, $startDate, $endDate, $year, $month, $timePeriod, $user)
+        );
+    }
+
+
+      public function profitLossPdf(Request $request)
+    {
+        $user = Auth::guard('api')->user() ?? Auth::user();
+        $branchId = $this->resolveBranchId();
+
+        $productId = $request->get('product_id');
+        $vendorId = $request->get('vendor_id');
+        $customerId = $request->get('customer_id');
+        $timePeriod = $request->get('time_period', 'all_time');
+        $year = $request->get('year');
+        $month = $request->get('month');
+
+        [$startDate, $endDate] = $this->resolveProfitLossDateRange($timePeriod);
+        $reportData = $this->getProfitLossReportData($branchId, $productId, $vendorId, $customerId, $startDate, $endDate, $year, $month, $timePeriod, $user);
+        $items = $reportData['pdf_items'];
+
+        $settings = DB::table('settings')->where('branch_id', $branchId)->first();
+        $selectedProduct = $productId ? Product::find($productId) : null;
+        $selectedVendor = $vendorId ? User::find($vendorId) : null;
+        $selectedCustomer = $customerId ? User::find($customerId) : null;
+
+        $pdf = Pdf::loadView('reports.profit-loss-report-pdf', [
+            'items' => $items,
+            'startDate' => $startDate,
+            'endDate' => $endDate,
+            'year' => $year,
+            'month' => $month,
+            'settings' => $settings,
+            'selectedProduct' => $selectedProduct,
+            'selectedVendor' => $selectedVendor,
+            'selectedCustomer' => $selectedCustomer,
+        ]);
+
+        return $pdf->download('Profit_Loss_Report.pdf');
+    }
+
+
+
 
     public function getBrand(Request $request)
     {

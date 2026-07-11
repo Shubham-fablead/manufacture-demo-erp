@@ -68,7 +68,7 @@ class ReportController extends Controller
             ->where('orders.isDeleted', 0)
             ->where('products.isDeleted', 0)
             ->where('orders.payment_status', 'completed')
-            ->where('orders.branch_id', $branchId);
+            ->where('products.branch_id', $branchId);
 
         if ($from) {
             $salesQuery->whereDate('orders.created_at', '>=', $from);
@@ -92,7 +92,6 @@ class ReportController extends Controller
             ->where('products.isDeleted', 0);
 
         if ($from) {
-            // purchase_invoice has no purchase_date column in this app; use created_at instead.
             $purchaseQuery->whereDate('purchase_invoice.created_at', '>=', $from);
         }
         if ($to) {

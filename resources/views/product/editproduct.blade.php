@@ -204,6 +204,24 @@
 
                         <div class="col-lg-3 col-sm-6 col-6">
                             <div class="form-group">
+                                <label class="form-label-icon"><i class="fa-solid fa-indian-rupee-sign"></i> Landing Cost</label>
+                                <input type="number" name="landing_cost" id="landing_cost" class="form-control" step="0.01"
+                                    min="0">
+                                <span class="error_landing_cost text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-3 col-sm-6 col-6">
+                            <div class="form-group">
+                                <label class="form-label-icon"><i class="fa-solid fa-indian-rupee-sign"></i> Cost Price</label>
+                                <input type="number" name="cost_price" id="cost_price" class="form-control" step="0.01"
+                                    min="0">
+                                <span class="error_cost_price text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-3 col-sm-6 col-6">
+                            <div class="form-group">
                                 <label class="form-label-icon"><i class="fa-solid fa-toggle-on"></i> Status</label>
                                 <select class="select" name="status" id="status">
                                     <option value="active">Active</option>
@@ -482,7 +500,7 @@
                     if (gstOption !== 'with_gst') {
                         formData.delete('product_gst[]');
                     }
-                    $('.error_name, .error_category_id, .error_brand_id, .error_SKU, .error_hsn_code, .error_gst_option, .error_product_gst, .error_quantity, .error_unit_id, .error_price, .error_status, .error_barcode, .error_description, .error_availablility, .error_images')
+                    $('.error_name, .error_category_id, .error_brand_id, .error_SKU, .error_hsn_code, .error_gst_option, .error_product_gst, .error_quantity, .error_unit_id, .error_price, .error_landing_cost, .error_status, .error_barcode, .error_description, .error_availablility, .error_images')
                         .text('');
 
                     $.ajax({
@@ -675,6 +693,8 @@
                         $('#hsn_code').val(product.hsn_code);
                         $('#quantity').val(product.quantity);
                         $('#price').val(product.price);
+                        $('#landing_cost').val(product.landing_cost);
+                        $('#cost_price').val(product.cost_price);
                         $('#barcode').val(product.barcode);
                         $('#description').val(product.description);
                         $('#availablility').val(product.availablility).trigger('change');

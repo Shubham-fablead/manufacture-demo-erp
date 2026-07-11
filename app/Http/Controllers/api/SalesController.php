@@ -5090,4 +5090,104 @@ class SalesController extends Controller
             'average_tds_percentage' => round((float) ($summary->average_tds_percentage ?? 0), 2),
         ];
     }
+
+    public function todayDeliveries(Request $request)
+    {
+        $user = Auth::guard('api')->user();
+
+        if (!$user) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Unauthenticated access',
+                'data' => [],
+            ], 401);
+        }
+
+        $selectedSubAdminId = $request->query('selectedSubAdminId');
+        $branchId = $this->resolveSalesSettingsBranchId($user, $selectedSubAdminId);
+        $today = Carbon::today('Asia/Kolkata');
+
+        $query = Order::with(['user:id,name,phone', 'creator:id,name'])
+            ->where('isDeleted', 0)
+            ->whereDate('created_at', $today);
+
+        if ($user->role === 'staff') {
+            $query->where('created_by', $user->id);
+        } else {
+            $query->where('branch_id', $branchId);
+        }
+
+        $orders = $query->orderBy('created_at', 'desc')->get()->map(function ($order) {
+            return [
+                'id' => $order->id,
+                'order_number' => $order->order_number,
+                'customer_name' => optional($order->user)->name ?? 'N/A',
+                'customer_phone' => optional($order->user)->phone ?? 'N/A',
+                'total_amount' => number_format((float) ($order->total_amount ?? 0), 2, '.', ''),
+                'payment_status' => $order->payment_status ?? 'N/A',
+                'assigned_staff' => optional($order->creator)->name ?? 'Unassigned',
+            ];
+        })->values();
+
+        return response()->json([
+            'status' => true,
+            'data' => $orders,
+        ]);
+    }
+
+    public function pendingEmis(Request $request)
+    {
+        $user = Auth::guard('api')->user();
+
+        if (!$user) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Unauthenticated access',
+                'data' => [],
+            ], 401);
+        }
+
+        $selectedSubAdminId = $request->query('selectedSubAdminId');
+        $branchId = $this->resolveSalesSettingsBranchId($user, $selectedSubAdminId);
+
+        $query = Order::with(['user:id,name,phone'])
+            ->where('isDeleted', 0)
+            ->where('payment_method', 'emi')
+            ->where(function ($q) {
+                $q->whereNull('remaining_amount')
+                  ->orWhere('remaining_amount', '>', 0);
+            });
+
+        if ($user->role === 'staff') {
+            $query->where('created_by', $user->id);
+        } else {
+            $query->where('branch_id', $branchId);
+        }
+
+        $today = Carbon::today('Asia/Kolkata');
+        $orders = $query->orderBy('created_at', 'desc')
+            ->get()
+            ->map(function ($order) use ($today) {
+                $pendingDate = $order->created_at;
+
+                return [
+                    'id' => $order->id,
+                    'order_number' => $order->order_number,
+                    'customer_name' => optional($order->user)->name ?? 'N/A',
+                    'customer_phone' => optional($order->user)->phone ?? 'N/A',
+                    'total_amount' => number_format((float) ($order->total_amount ?? 0), 2, '.', ''),
+                    'remaining_amount' => number_format((float) ($order->remaining_amount ?? 0), 2, '.', ''),
+                    'emi_monthly_amount' => number_format((float) ($order->emi_monthly_amount ?? 0), 2, '.', ''),
+                    'emi_month_label' => $pendingDate ? Carbon::parse($pendingDate)->timezone('Asia/Kolkata')->format('d M Y') : 'N/A',
+                    'next_pending_date' => $pendingDate ? Carbon::parse($pendingDate)->timezone('Asia/Kolkata')->format('d M Y') : 'N/A',
+                    'is_overdue' => $pendingDate ? Carbon::parse($pendingDate)->lt($today) : false,
+                ];
+            })
+            ->values();
+
+        return response()->json([
+            'status' => true,
+            'data' => $orders,
+        ]);
+    }
 }
