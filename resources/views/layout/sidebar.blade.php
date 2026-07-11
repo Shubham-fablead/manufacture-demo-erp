@@ -387,6 +387,9 @@
                                         @if (app('hasPermission')(5, 'view'))
                                             <li><a href="{{ route('expense.report') }}">Expenses Report</a></li>
                                         @endif
+                                          @if (app('hasPermission')(37, 'view'))
+                                         <li><a href="{{ route('profit-loss-statement.index') }}">Profit &amp; Loss Statement</a></li>
+                                       @endif
                                     </ul>
                                 </li>
                             @endif

@@ -20,6 +20,8 @@ class Product extends Model
         'barcode',
         'description',
         'price', 
+        'landing_cost',
+        'cost_price',
         'images',
         'quantity',
         'unit_id',
