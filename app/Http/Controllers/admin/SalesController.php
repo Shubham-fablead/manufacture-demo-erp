@@ -15,6 +15,7 @@ use App\Models\SalesReturn;
 use App\Models\Setting;
 use App\Models\TaxRate;
 use App\Models\User;
+use App\Models\Delivery;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -76,6 +77,18 @@ class SalesController extends Controller
             'staffs' => $staffs,
         ]);
     }
+      private function normalizeDeliveryStatus(?string $status): string
+    {
+        $normalized = strtolower(trim((string) $status));
+
+        return match ($normalized) {
+            'partial', 'partially', 'partially_delivered' => 'partially_delivered',
+            'delivered' => 'delivered',
+            'cancelled', 'canceled' => 'cancelled',
+            default => 'pending',
+        };
+    }
+
 
     public function add_sales(Request $request)
     {
@@ -173,6 +186,160 @@ public function emiDetails($id)
         'month_details' => $months,
     ]);
 }
+
+   public function productsDelivery(Request $request)
+    {
+        $branchId = auth()->user()?->branch_id;
+        $setting = $this->fallbackSetting($branchId);
+        $status = trim((string) $request->query('status', ''));
+        $orderNo = trim((string) $request->query('order_no', ''));
+        $fromDate = trim((string) $request->query('from', ''));
+        $toDate = trim((string) $request->query('to', ''));
+
+        $query = Order::with(['creator:id,name', 'deliveries.deliveredBy'])
+            ->where('isDeleted', '!=', 1)
+            ->where('quotation_status', 'sales')
+            ->where('order_type', 'delivery');
+
+        if ($branchId) {
+            $query->where('branch_id', $branchId);
+        }
+
+        if ($orderNo !== '') {
+            $query->where('order_number', 'like', '%' . $orderNo . '%');
+        }
+
+        if ($status !== '') {
+            if ($status === 'partially_delivered') {
+                $query->where(function ($q) {
+                    $q->where('delivery_status', 'partial')
+                      ->orWhere('delivery_status', 'partially_delivered');
+                });
+            } else {
+                $query->where('delivery_status', $status);
+            }
+        }
+
+        if ($fromDate !== '') {
+            $query->whereDate('created_at', '>=', $fromDate);
+        }
+
+        if ($toDate !== '') {
+            $query->whereDate('created_at', '<=', $toDate);
+        }
+
+        $orders = $query->orderByDesc('created_at')->get()->map(function ($order) {
+            $latestDelivery = $order->deliveries->sortByDesc('created_at')->first();
+            $status = $this->normalizeDeliveryStatus($latestDelivery?->status ?: $order->delivery_status);
+
+            return (object) [
+                'id' => $latestDelivery?->id,
+                'order_id' => $order->id,
+                'order' => $order,
+                'status' => $status,
+                'deliveredBy' => $latestDelivery?->deliveredBy ?: $order->creator,
+                'delivered_by' => $latestDelivery?->delivered_by ?: $order->created_by,
+                'has_delivery_record' => (bool) $latestDelivery,
+            ];
+        });
+
+        return view('sales.products-delivery', compact('orders', 'setting', 'status', 'orderNo', 'fromDate', 'toDate'));
+    }
+
+
+      private function attachOrderCustomerDetails(Order $order): void
+    {
+        $orderUser = $order->relationLoaded('user')
+            ? $order->user
+            : ($order->user_id ? User::with('userDetail')->find($order->user_id) : null);
+
+        if ($orderUser) {
+            $order->customer_name       = $orderUser->name ?? 'Walk-in Customer';
+            $order->customer_email      = $orderUser->email ?? '';
+            $order->customer_phone      = $orderUser->phone ?? '';
+            $order->customer_address    = optional($orderUser->userDetail)->address ?? '';
+            $order->customer_city       = optional($orderUser->userDetail)->city ?? '';
+            $order->customer_country    = optional($orderUser->userDetail)->country ?? '';
+        } else {
+            $order->customer_name       = $order->customer_name ?? 'Walk-in Customer';
+            $order->customer_email      = $order->customer_email ?? '';
+            $order->customer_phone      = $order->customer_phone ?? '';
+            $order->customer_address    = $order->customer_address ?? '';
+            $order->customer_city       = $order->customer_city ?? '';
+            $order->customer_country    = $order->customer_country ?? '';
+        }
+    }
+
+
+      public function productsDeliveryData(Request $request)
+    {
+        $branchId = auth()->user()?->branch_id;
+        $setting = $this->fallbackSetting($branchId);
+        $status = trim((string) $request->query('status', ''));
+        $orderNo = trim((string) $request->query('order_no', ''));
+        $fromDate = trim((string) $request->query('from', ''));
+        $toDate = trim((string) $request->query('to', ''));
+
+        $query = Order::with(['creator:id,name', 'deliveries.deliveredBy', 'user.userDetail'])
+            ->where('isDeleted', '!=', 1)
+            ->where('quotation_status', 'sales')
+            ->where('order_type', 'delivery');
+
+        if ($branchId) {
+            $query->where('branch_id', $branchId);
+        }
+
+        if ($orderNo !== '') {
+            $query->where('order_number', 'like', '%' . $orderNo . '%');
+        }
+
+        if ($status !== '') {
+            if ($status === 'partially_delivered') {
+                $query->where(function ($q) {
+                    $q->where('delivery_status', 'partial')
+                        ->orWhere('delivery_status', 'partially_delivered');
+                });
+            } else {
+                $query->where('delivery_status', $status);
+            }
+        }
+
+        if ($fromDate !== '') {
+            $query->whereDate('created_at', '>=', $fromDate);
+        }
+
+        if ($toDate !== '') {
+            $query->whereDate('created_at', '<=', $toDate);
+        }
+
+        $orders = $query->orderByDesc('created_at')->get()->map(function ($order) {
+            $latestDelivery = $order->deliveries->sortByDesc('created_at')->first();
+            $status = $this->normalizeDeliveryStatus($latestDelivery?->status ?: $order->delivery_status);
+
+            return [
+                'id' => $latestDelivery?->id,
+                'order_id' => $order->id,
+                'order_number' => $order->order_number,
+                'created_at' => optional($order->created_at)->format('d-M-Y'),
+                'customer_name' => $order->customer_name ?: ($order->user?->name ?? '--'),
+                'total' => (float) ($order->grand_total ?? $order->total_amount ?? 0),
+                'currency_symbol' => $setting->currency_symbol ?? '₹',
+                'delivered_by' => $latestDelivery?->deliveredBy?->name ?? $latestDelivery?->delivered_by ?? $order->creator?->name ?? '--',
+                'status' => $status,
+                'has_delivery_record' => (bool) $latestDelivery,
+                'pdf_url' => route('sales.delivery.challan.pdf', $order->id),
+                'delivery_url' => route('sales.delivery', $order->id),
+                'status_update_url' => $latestDelivery
+                    ? route('sales.delivery.status.update', $latestDelivery->id)
+                    : route('sales.order.delivery.status.update', $order->id),
+            ];
+        });
+
+        return response()->json([
+            'status' => true,
+            'data' => $orders,
+        ]);
+    }
 
 private function ordinalMonth(int $month): string
 {
@@ -432,6 +599,160 @@ private function ordinalMonth(int $month): string
         // dd($orderItems);
         return view('sales/salse-invoice', compact('view_id', 'sales', 'totalAmount', 'setting', 'userAddress', 'userDeliveryAddress', 'orderItems', 'hasPaymentStarted', 'hasReturnStarted'));
     }
+
+      public function updateDeliveryStatus(Request $request, Delivery $delivery)
+    {
+        $user = auth()->user();
+        $selectedSubAdminId = session('selectedSubAdminId');
+        $branchIdToUse = $user->role === 'staff' && $user->branch_id
+            ? $user->branch_id
+            : (! empty($selectedSubAdminId) ? $selectedSubAdminId : $user->id);
+
+        $delivery->load('order');
+        if (! $delivery->order || (int) $delivery->order->branch_id !== (int) $branchIdToUse) {
+            abort(404);
+        }
+
+        $allowedStatuses = [
+            'pending',
+            'delivered',
+            'partially_delivered',
+            'cancelled',
+        ];
+
+        $data = $request->validate([
+            'status' => 'required|string|in:' . implode(',', $allowedStatuses),
+        ]);
+
+        $delivery->status = $data['status'];
+        $delivery->save();
+
+        $delivery->order->delivery_status = $data['status'] === 'partially_delivered'
+            ? 'partial'
+            : $data['status'];
+        $delivery->order->save();
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Delivery status updated successfully.',
+            'data' => [
+                'id' => $delivery->id,
+                'status' => $delivery->status,
+            ],
+        ]);
+    }
+
+
+     public function updateOrderDeliveryStatus(Request $request, Order $order)
+    {
+        $user = auth()->user();
+        $selectedSubAdminId = session('selectedSubAdminId');
+        $branchIdToUse = $user->role === 'staff' && $user->branch_id
+            ? $user->branch_id
+            : (! empty($selectedSubAdminId) ? $selectedSubAdminId : $user->id);
+
+        if ((int) $order->branch_id !== (int) $branchIdToUse || (int) $order->isDeleted === 1) {
+            abort(404);
+        }
+
+        $allowedStatuses = [
+            'pending',
+            'delivered',
+            'partially_delivered',
+            'cancelled',
+        ];
+
+        $data = $request->validate([
+            'status' => 'required|string|in:' . implode(',', $allowedStatuses),
+        ]);
+
+        $order->delivery_status = $data['status'] === 'partially_delivered'
+            ? 'partial'
+            : $data['status'];
+        $order->save();
+
+        $latestDelivery = Delivery::where('order_id', $order->id)
+            ->latest('created_at')
+            ->first();
+
+        if ($latestDelivery) {
+            $latestDelivery->status = $data['status'];
+            $latestDelivery->save();
+        }
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Order delivery status updated successfully.',
+            'data' => [
+                'id' => $order->id,
+                'status' => $data['status'],
+            ],
+        ]);
+    }
+     public function deliveryChallan($id, Request $request)
+    {
+        $order = Order::with(['user.userDetail', 'order_items.product'])->find($id);
+        if (! $order) {
+            return redirect()->route('sales.list')->with('error', 'Order not found.');
+        }
+
+        $this->attachOrderCustomerDetails($order);
+        $setting = $this->fallbackSetting($order->branch_id ?? auth()->user()->branch_id ?? null);
+
+        $deliveryIds = $request->query('delivery_ids');
+        if ($deliveryIds) {
+            $ids = array_filter(array_map('trim', explode(',', $deliveryIds)));
+            $deliveries = Delivery::whereIn('id', $ids)
+                ->with(['orderItem.product.unit', 'product.unit', 'deliveredBy'])
+                ->get();
+        } else {
+            $deliveries = Delivery::where('order_id', $order->id)
+                ->with(['orderItem.product.unit', 'product.unit', 'deliveredBy'])
+                ->orderByDesc('id')
+                ->limit(20)
+                ->get();
+        }
+
+        return view('sales.delivery-challan', compact('order', 'deliveries', 'setting'));
+    }
+
+    // Generate delivery challan PDF
+    public function deliveryChallanPdf($id, Request $request)
+    {
+        $order = Order::with(['user.userDetail', 'order_items.product'])->find($id);
+        if (! $order) {
+            return redirect()->route('sales.list')->with('error', 'Order not found.');
+        }
+
+        $this->attachOrderCustomerDetails($order);
+        $setting = $this->fallbackSetting($order->branch_id ?? auth()->user()->branch_id ?? null);
+
+        $deliveryIds = $request->query('delivery_ids');
+        if ($deliveryIds) {
+            $ids = array_filter(array_map('trim', explode(',', $deliveryIds)));
+            $deliveries = Delivery::whereIn('id', $ids)
+                ->with(['orderItem.product.unit', 'product.unit', 'deliveredBy'])
+                ->get();
+        } else {
+            $deliveries = Delivery::where('order_id', $order->id)
+                ->with(['orderItem.product.unit', 'product.unit', 'deliveredBy'])
+                ->orderByDesc('id')
+                ->limit(20)
+                ->get();
+        }
+
+        $data = [
+            'order' => $order,
+            'deliveries' => $deliveries,
+            'setting' => $setting,
+            'challan_number' => 'DC-' . $order->id,
+        ];
+
+        $pdf = Pdf::loadView('sales.delivery-challan-pdf', $data)->setPaper('A4', 'portrait');
+        return $pdf->stream('delivery_challan_' . $order->id . '.pdf');
+    }
+
+
 
     // public function salse_invoice_pdf($id)
     // {
