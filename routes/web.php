@@ -246,6 +246,8 @@ Route::middleware(['auth:web', 'auto.permission'])->group(function () {
     Route::post('/debit-note-items/store', [DebitNoteItemController::class, 'store'])->name('debit-notes-items.store');
 
     // Sales
+      Route::get('/sales/products-delivery', [SalesController::class, 'productsDelivery'])->name('sales.products_delivery');
+    Route::get('/sales/products-delivery/data', [SalesController::class, 'productsDeliveryData'])->name('sales.products_delivery.data');
     Route::get('/sales', [SalesController::class, 'sales_list'])->name('sales.list');
     // Route::get('/add-sales', [SalesController::class, 'add_sales'])->name('sales.add');
     Route::get('/edit-sales/{num}', [SalesController::class, 'edit_sales'])->name('sales.edit');
@@ -255,6 +257,13 @@ Route::middleware(['auth:web', 'auto.permission'])->group(function () {
     Route::get('/sales-invoice/{num}', [SalesController::class, 'salse_invoice'])->name('sales.invoice');
     Route::get('/add-sales', [SalesController::class, 'pos'])->name('sales.add');
     Route::get('/sales/invoice/pdf/{id}', [SalesController::class, 'salse_invoice_pdf'])->name('sales.invoice.pdf');
+     Route::get('/sales/delivery/{id}', [SalesController::class, 'delivery'])->name('sales.delivery');
+    Route::post('/sales/delivery/store', [SalesController::class, 'storeDelivery'])->name('sales.delivery.store');
+      Route::post('/sales/delivery/{delivery}/status', [SalesController::class, 'updateDeliveryStatus'])->name('sales.delivery.status.update');
+    Route::post('/sales/order/{order}/delivery-status', [SalesController::class, 'updateOrderDeliveryStatus'])->name('sales.order.delivery.status.update');
+      Route::get('/sales/delivery-challan/{id}', [SalesController::class, 'deliveryChallan'])->name('sales.delivery.challan');
+    Route::get('/sales/delivery/pdf/{id}', [SalesController::class, 'deliveryChallanPdf'])->name('sales.delivery.challan.pdf');
+    Route::get('/sales-invoice/{num}', [SalesController::class, 'salse_invoice'])->name('sales.invoice');
 
     // Vendor
     Route::get('/vendors', [VendorController::class, 'vendor_list'])->name('vendor.list');

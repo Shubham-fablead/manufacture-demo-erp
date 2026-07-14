@@ -87,15 +87,28 @@
                                         <span>Sales &amp; Bills</span> <span class="menu-arrow"></span>
                                     </a>
                                     <ul>
+                                      
                                         @if (app('hasPermission')(2, 'view'))
                                             <li><a href="{{ route('sales.list') }}">All Sales &amp; Bills</a></li>
                                         @endif
                                         @if (app('hasPermission')(2, 'add'))
                                             <li><a href="{{ route('sales.add', ['new_bill' => 1]) }}">New Bill</a></li>
                                         @endif
+                                          {{-- <li><a href="{{ route('sales.products_delivery') }}">Products Delivery</a></li> --}}
+
                                     </ul>
                                 </li>
                             @endif
+
+
+                               @if (app('hasPermission')(2, 'view'))
+                        <li class="sidebar-module sidebar-module-link">
+                            <a href="{{ route('sales.products_delivery') }}" data-search="products delivery sales bills delivery orders">
+                                <i class="fas fa-truck"></i>
+                                <span>Products Delivery</span>
+                            </a>
+                        </li>
+                    @endif
                             @if (app('hasPermission')(10, 'view') || app('hasPermission')(10, 'add'))
                                 <li class="submenu sidebar-module">
                                     <a href="javascript:void(0);">
@@ -387,9 +400,9 @@
                                         @if (app('hasPermission')(5, 'view'))
                                             <li><a href="{{ route('expense.report') }}">Expenses Report</a></li>
                                         @endif
-                                          @if (app('hasPermission')(37, 'view'))
-                                         <li><a href="{{ route('profit-loss-statement.index') }}">Profit &amp; Loss Statement</a></li>
-                                       @endif
+                                           @if (app('hasPermission')(37, 'view'))
+                                    <li><a href="{{ route('profit-loss-statement.index') }}">Profit &amp; Loss Statement</a></li>
+                                @endif
                                     </ul>
                                 </li>
                             @endif
@@ -538,5 +551,4 @@
         </div>
     </div>
 </div>
-
 

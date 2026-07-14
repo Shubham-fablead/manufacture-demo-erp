@@ -90,6 +90,10 @@ class Order extends Model
     {
         return $this->hasMany(Sales_Labour_Items::class, 'order_id', 'id');
     }
+      public function deliveries()
+    {
+        return $this->hasMany(Delivery::class, 'order_id', 'id');
+    }
     public function bank()
     {
         return $this->belongsTo(BankMaster::class, 'emi_bank_id');
