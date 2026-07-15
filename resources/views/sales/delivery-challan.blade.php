@@ -2,6 +2,7 @@
 
 @section('content')
     <div class="content">
+        
         <div class="card">
             <div class="card-body">
                 <div style="max-width:900px;margin:0 auto;">

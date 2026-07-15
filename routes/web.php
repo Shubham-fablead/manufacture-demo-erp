@@ -144,6 +144,7 @@ Route::middleware(['auth:web', 'auto.permission'])->group(function () {
     Route::get('/sales-receipt-payment/customer/{customer}/orders', [SalesReceiptPaymentController::class, 'customerOrders'])->name('sales.receipt.orders');
     Route::get('/sales-receipt-payment/vendor/{vendor}/invoices', [SalesReceiptPaymentController::class, 'vendorInvoices'])->name('sales.receipt.vendor-invoices');
     Route::post('/sales-receipt-payment/store', [SalesReceiptPaymentController::class, 'store'])->name('sales.receipt.store');
+    Route::put('/sales-receipt-payment/transaction/{payment}', [SalesReceiptPaymentController::class, 'updateTransaction'])->name('sales.receipt.transaction.update');
     Route::delete('/sales-receipt-payment/transaction/{payment}', [SalesReceiptPaymentController::class, 'deleteTransaction'])->name('sales.receipt.transaction.delete');
 
 
@@ -247,6 +248,7 @@ Route::middleware(['auth:web', 'auto.permission'])->group(function () {
 
     // Sales
       Route::get('/sales/products-delivery', [SalesController::class, 'productsDelivery'])->name('sales.products_delivery');
+    Route::get('/sales/import', [SalesController::class, 'productsDelivery'])->name('sales.import');
     Route::get('/sales/products-delivery/data', [SalesController::class, 'productsDeliveryData'])->name('sales.products_delivery.data');
     Route::get('/sales', [SalesController::class, 'sales_list'])->name('sales.list');
     // Route::get('/add-sales', [SalesController::class, 'add_sales'])->name('sales.add');

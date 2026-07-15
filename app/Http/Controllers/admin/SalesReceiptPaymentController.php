@@ -1049,4 +1049,133 @@ class SalesReceiptPaymentController extends Controller
             ], 500);
         }
     }
+
+    public function updateTransaction(Request $request, int $paymentId): JsonResponse
+    {
+        $validated = $request->validate([
+            'payment_date' => 'required|date',
+            'payment_amount' => 'required|numeric|min:0.01',
+            'payment_method' => 'required|string|max:50',
+            'payment_type' => 'nullable|string|max:50',
+            'remarks' => 'nullable|string|max:500',
+        ]);
+
+        try {
+            $branchIdToUse = $this->resolveBranchIdToUse();
+
+            DB::transaction(function () use ($paymentId, $validated, $branchIdToUse) {
+                $payment = PaymentStore::query()
+                    ->where('id', $paymentId)
+                    ->where('isDeleted', 0)
+                    ->lockForUpdate()
+                    ->first();
+
+                if (! $payment) {
+                    throw new \RuntimeException('Payment transaction not found or already deleted.');
+                }
+
+                $status = strtolower((string) $payment->status);
+
+                if ($status === 'credit' || ((int) $payment->order_id > 0 && $status !== 'debit')) {
+                    $order = Order::query()
+                        ->where('id', (int) $payment->order_id)
+                        ->where('isDeleted', 0)
+                        ->where(function ($query) use ($branchIdToUse) {
+                            $query->where('branch_id', $branchIdToUse)->orWhereNull('branch_id');
+                        })
+                        ->lockForUpdate()
+                        ->first();
+
+                    if (! $order) {
+                        throw new \RuntimeException('Related order not found for this payment.');
+                    }
+
+                    $payment->update([
+                        'payment_date' => $validated['payment_date'],
+                        'payment_amount' => (float) $validated['payment_amount'],
+                        'payment_method' => $validated['payment_method'],
+                        'payment_type' => $validated['payment_type'] ?? $payment->payment_type,
+                        'remarks' => $validated['remarks'] ?? null,
+                    ]);
+
+                    $orderTotal = (float) ($order->total_amount ?? 0);
+                    $totalPaid = (float) PaymentStore::query()
+                        ->where('order_id', $order->id)
+                        ->where('isDeleted', 0)
+                        ->sum('payment_amount');
+
+                    $newRemaining = round(max(0, $orderTotal - $totalPaid), 2);
+
+                    if ($newRemaining <= 0) {
+                        $paymentStatus = 'completed';
+                    } elseif ($newRemaining < $orderTotal) {
+                        $paymentStatus = 'partially';
+                    } else {
+                        $paymentStatus = 'pending';
+                    }
+
+                    $order->update([
+                        'remaining_amount' => $newRemaining,
+                        'payment_status' => $paymentStatus,
+                    ]);
+
+                    return;
+                }
+
+                if ($status === 'debit' || ((int) $payment->purchase_id > 0 && $status !== 'credit')) {
+                    $invoice = PurchaseInvoice::query()
+                        ->where('id', (int) $payment->purchase_id)
+                        ->where('isDeleted', 0)
+                        ->where(function ($query) use ($branchIdToUse) {
+                            $query->where('branch_id', $branchIdToUse)->orWhereNull('branch_id');
+                        })
+                        ->lockForUpdate()
+                        ->first();
+
+                    if (! $invoice) {
+                        throw new \RuntimeException('Related invoice not found for this payment.');
+                    }
+
+                    $payment->update([
+                        'payment_date' => $validated['payment_date'],
+                        'payment_amount' => (float) $validated['payment_amount'],
+                        'payment_method' => $validated['payment_method'],
+                        'payment_type' => $validated['payment_type'] ?? $payment->payment_type,
+                        'remarks' => $validated['remarks'] ?? null,
+                    ]);
+
+                    $invoiceTotal = (float) ($invoice->grand_total ?? $invoice->total_amount ?? 0);
+                    $totalPaid = (float) PaymentStore::query()
+                        ->where('purchase_id', $invoice->id)
+                        ->where('isDeleted', 0)
+                        ->sum('payment_amount');
+
+                    $newRemaining = round(max(0, $invoiceTotal - $totalPaid), 2);
+
+                    $invoice->update([
+                        'remaining_amount' => $newRemaining,
+                    ]);
+
+                    return;
+                }
+
+                throw new \RuntimeException('Unsupported payment transaction type.');
+            });
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Payment transaction updated successfully.',
+            ]);
+        } catch (\RuntimeException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], 422);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unable to update payment transaction.',
+            ], 500);
+        }
+    }
 }

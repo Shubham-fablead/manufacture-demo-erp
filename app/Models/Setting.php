@@ -29,6 +29,8 @@ use Illuminate\Support\Facades\Storage;
             'currency_position',
             'currency_symbol',
             'favicon',
+            'terms_condition_eng',
+            'terms_condition_guj',
             'working_hours',
             'sunday_off',
             'saturday_off',

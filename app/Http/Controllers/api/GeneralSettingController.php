@@ -72,6 +72,8 @@ class GeneralSettingController extends Controller
             'address'           => 'sometimes|required|string',
             'currency_symbol'   => 'sometimes|required|string',
             'currency_position' => 'sometimes|required|string',
+            'terms_condition_eng' => 'nullable|string',
+            'terms_condition_guj' => 'nullable|string',
             'logo'              => 'nullable|image|mimes:jpeg,png,jpg,webp',
             'favicon'           => 'nullable|image|mimes:jpeg,png,jpg,webp',
             'qr_code'           => 'nullable|image|mimes:jpeg,png,jpg,webp',
@@ -146,6 +148,8 @@ class GeneralSettingController extends Controller
         $settings->address           = $request->input('address', $settings->address);
         $settings->currency_position = $request->input('currency_position', $settings->currency_position);
         $settings->currency_symbol   = $request->input('currency_symbol', $settings->currency_symbol);
+        $settings->terms_condition_eng = $request->input('terms_condition_eng', $settings->terms_condition_eng);
+        $settings->terms_condition_guj = $request->input('terms_condition_guj', $settings->terms_condition_guj);
         $settings->bank_name = $request->input('bank_name', $settings->bank_name);
         $settings->branch = $request->input('branch', $settings->branch);
         $settings->ac_no = $request->input('ac_no', $settings->ac_no);

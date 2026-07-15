@@ -5,19 +5,23 @@
     <meta charset="utf-8">
     <title>Delivery Challan PDF</title>
     <style>
-        @font-face {
-            font-family: 'Nirmala';
+        /* @font-face {
+            font-family: 'Gujarati';
             src: url("file://{{ storage_path('fonts/Nirmala.ttf') }}") format('truetype');
             font-weight: normal;
             font-style: normal;
-        }
+        } */
 
-        @font-face {
-            font-family: 'Nirmala';
+        /* @font-face {
+            font-family: 'Gujarati';
             src: url("file://{{ storage_path('fonts/NirmalaB.ttf') }}") format('truetype');
             font-weight: bold;
             font-style: normal;
-        }
+        } */
+         @font-face {
+    font-family: 'Gujarati';
+    src: url('{{ public_path("fonts/Nirmala.ttf") }}') format('truetype');
+}
 
         @page {
             size: A4;
@@ -98,10 +102,28 @@
         }
 
         .gujarati-terms {
-            font-family: 'Nirmala', 'DejaVu Sans', sans-serif;
+            font-family: 'Gujarati', 'DejaVu Sans', sans-serif !important;
             line-height: 1.35;
             font-size: 10px;
             page-break-inside: avoid;
+            unicode-bidi: embed;
+            direction: ltr;
+            word-break: keep-all;
+        }
+
+        .gujarati-terms,
+        .gujarati-terms * {
+            font-family: 'Gujarati', 'DejaVu Sans', sans-serif !important;
+        }
+
+        .gujarati-terms-list {
+            margin: 6px 0 0;
+            padding-left: 18px;
+        }
+
+        .gujarati-terms-list li {
+            margin-bottom: 4px;
+            line-height: 1.45;
         }
 
         .avoid-break {
@@ -318,8 +340,8 @@
                             </div>
                         @endif
                         @if (!empty($termsGujLines))
-                            <div class="gujarati-terms" style="white-space: pre-line; margin-top: 6px;">
-                                <strong style="font-family: 'Nirmala', 'DejaVu Sans', sans-serif; font-size: 10px;">શરતો અને નિયમો:</strong>
+                            <div class="gujarati-terms" style="white-space: pre-line; margin-top: 6px;font-family:'Gujarati' !important;">
+                                <strong style="font-family: 'Gujarati', 'DejaVu Sans', sans-serif !important; font-size: 10px;">શરતો અને નિયમો:</strong>
                                 {{ "\n" . implode("\n", $termsGujLines) }}
                             </div>
                         @endif

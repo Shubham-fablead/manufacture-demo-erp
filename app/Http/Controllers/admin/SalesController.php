@@ -671,6 +671,7 @@ private function ordinalMonth(int $month): string
             : $data['status'];
         $order->save();
 
+        
         $latestDelivery = Delivery::where('order_id', $order->id)
             ->latest('created_at')
             ->first();
@@ -689,6 +690,130 @@ private function ordinalMonth(int $month): string
             ],
         ]);
     }
+
+    public function storeDelivery(Request $request)
+    {
+        $data = $request->validate([
+            'order_id' => 'required|integer|exists:orders,id',
+            'items' => 'required|array|min:1',
+            'items.*.order_item_id' => 'required|integer|exists:order_items,id',
+            'items.*.delivered_quantity' => 'required|numeric|min:0',
+            'notes' => 'nullable|string|max:1000',
+        ]);
+
+        $user = auth()->user();
+        $selectedSubAdminId = session('selectedSubAdminId');
+        $branchIdToUse = $user->role === 'staff' && $user->branch_id
+            ? $user->branch_id
+            : (! empty($selectedSubAdminId) ? $selectedSubAdminId : $user->id);
+
+        $order = Order::with(['order_items.product'])->findOrFail($data['order_id']);
+        if ((int) $order->branch_id !== (int) $branchIdToUse || (int) $order->isDeleted === 1) {
+            abort(404);
+        }
+
+        $hasDeliveredAny = false;
+
+        \DB::transaction(function () use ($data, $order, $user, &$hasDeliveredAny) {
+            $orderItems = $order->order_items->keyBy('id');
+
+            foreach ($data['items'] as $row) {
+                $orderItemId = (int) $row['order_item_id'];
+                $deliveredQty = round((float) $row['delivered_quantity'], 2);
+
+                if ($deliveredQty <= 0) {
+                    continue;
+                }
+
+                $orderItem = $orderItems->get($orderItemId);
+                if (! $orderItem) {
+                    continue;
+                }
+
+                $alreadyDelivered = (float) Delivery::where('order_id', $order->id)
+                    ->where('order_item_id', $orderItemId)
+                    ->sum('delivered_quantity');
+
+                $orderedQty = (float) ($orderItem->quantity ?? 0);
+                $remainingQty = max(0, $orderedQty - $alreadyDelivered);
+                $finalDeliveredQty = min($deliveredQty, $remainingQty);
+
+                if ($finalDeliveredQty <= 0) {
+                    continue;
+                }
+
+                Delivery::create([
+                    'order_id' => $order->id,
+                    'order_item_id' => $orderItemId,
+                    'product_id' => $orderItem->product_id ?? null,
+                    'delivered_quantity' => $finalDeliveredQty,
+                    'ordered_quantity' => $orderedQty,
+                    'status' => 'delivered',
+                    'delivered_by' => $user?->id,
+                    'delivered_at' => now(),
+                    'notes' => $data['notes'] ?? null,
+                ]);
+
+                $hasDeliveredAny = true;
+            }
+
+            $totalOrdered = (float) $order->order_items->sum('quantity');
+            $totalDelivered = (float) Delivery::where('order_id', $order->id)->sum('delivered_quantity');
+            $remainingQuantity = max(0, $totalOrdered - $totalDelivered);
+
+            $order->remaining_amount = $remainingQuantity;
+            $order->delivery_status = $remainingQuantity <= 0 && $totalDelivered > 0
+                ? 'delivered'
+                : ($totalDelivered > 0 ? 'partial' : 'pending');
+            $order->save();
+        });
+
+        if (! $hasDeliveredAny) {
+            return back()->with('error', 'Please enter a valid delivery quantity.');
+        }
+
+        return redirect()
+            ->route('sales.delivery', $order->id)
+            ->with('success', 'Delivery saved successfully.');
+    }
+    public function delivery($id, Request $request)
+    {
+        $order = Order::with(['user.userDetail', 'order_items.product'])->find($id);
+        if (! $order) {
+            return redirect()->route('sales.list')->with('error', 'Order not found.');
+        }
+
+        $this->attachOrderCustomerDetails($order);
+        $setting = $this->fallbackSetting($order->branch_id ?? auth()->user()->branch_id ?? null);
+
+        $deliveriesQuery = Delivery::where('order_id', $order->id)
+            ->with(['orderItem.product.unit', 'product.unit', 'deliveredBy'])
+            ->orderByDesc('id');
+
+        $deliveryIds = $request->query('delivery_ids');
+        if ($deliveryIds) {
+            $ids = array_filter(array_map('trim', explode(',', $deliveryIds)));
+            $deliveriesQuery->whereIn('id', $ids);
+        }
+
+        $deliveries = $deliveriesQuery->limit(20)->get();
+        $deliveredByItem = $deliveries->groupBy('order_item_id')->map(function ($items) {
+            return (float) $items->sum('delivered_quantity');
+        });
+
+        $orderItems = $order->order_items->map(function ($item) use ($deliveredByItem) {
+            $deliveredQuantity = (float) ($deliveredByItem[$item->id] ?? 0);
+            $remainingToDeliver = max(0, (float) ($item->quantity ?? 0) - $deliveredQuantity);
+
+            $item->remaining_to_deliver = $remainingToDeliver;
+            return $item;
+        });
+
+        $previousDeliveries = $deliveries;
+
+        return view('sales.delivery', compact('order', 'deliveries', 'setting', 'orderItems', 'previousDeliveries'));
+    }
+
      public function deliveryChallan($id, Request $request)
     {
         $order = Order::with(['user.userDetail', 'order_items.product'])->find($id);

@@ -72,10 +72,19 @@
             /* Green */
         }
 
+        .status-advance_receipt {
+            background-color: #7367f0 !important;
+            /* Purple */
+        }
+
         /* Unknown/Other payment method */
         .status-other {
             background-color: #8f99a2 !important;
             /* Gray */
+        }
+
+        .status-emi-pill {
+            background-color: #1b2850 !important;
         }
 
         /* Mobile View Status Styles */
@@ -100,11 +109,12 @@
             white-space: normal !important;
             word-wrap: break-word;
             max-width: 200px;
+            text-transform: capitalize;
             /* optional */
         }
 
         /* For Biller column */
-        .datanew td:nth-child(9) {
+        .datanew td:nth-child(10) {
             max-width: 260px;
         }
 
@@ -115,6 +125,149 @@
             overflow-wrap: anywhere;
             word-break: break-word;
             line-height: 1.3;
+        }
+
+        .sales-action-dropdown {
+            display: inline-flex;
+            justify-content: center;
+            width: 100%;
+        }
+
+        .sales-action-dropdown .action-menu-toggle {
+            align-items: center;
+            background: #fff;
+            border: 1px solid #d7dde8;
+            border-radius: 4px;
+            color: #1b2850;
+            display: inline-flex;
+            height: 28px;
+            justify-content: center;
+            padding: 0;
+            width: 34px;
+        }
+
+        .sales-action-dropdown .action-menu-toggle:hover,
+        .sales-action-dropdown .action-menu-toggle:focus {
+            background: #f8fafc;
+            border-color: #b8c2d2;
+            color: #1b2850;
+        }
+
+        .sales-action-menu {
+            box-sizing: border-box;
+            border: 1px solid #e8ebed;
+            border-radius: 6px;
+            box-shadow: 0 8px 20px rgba(15, 23, 42, 0.12);
+            max-width: 180px;
+            min-width: 168px;
+            overflow-x: hidden;
+            padding: 6px;
+            width: 180px;
+            z-index: 999999999999;
+        }
+
+        .sales-action-menu-floating {
+            position: fixed !important;
+            z-index: 999999999999 !important;
+            bottom: auto !important;
+            right: auto !important;
+            height: auto !important;
+            min-height: 0 !important;
+            margin: 0 !important;
+        }
+
+        .sales-action-menu .dropdown-item {
+            align-items: center;
+            border-radius: 4px;
+            color: #344054;
+            display: flex;
+            font-size: 12px;
+            gap: 8px;
+            padding: 7px 8px;
+            white-space: nowrap;
+            width: 100%;
+        }
+
+        .sales-action-menu .dropdown-item i {
+            color: #667085;
+            font-size: 13px;
+            text-align: center;
+            width: 15px;
+        }
+
+        .sales-action-menu .dropdown-item.text-danger,
+        .sales-action-menu .dropdown-item.text-danger i {
+            color: #ea5455 !important;
+        }
+
+        .sales-action-menu .dropdown-item:hover {
+            background: #f4f6f8;
+            color: #1b2850;
+        }
+
+        .payment-history-list .list-group-item {
+            border: 1px solid #d9dee7;
+            border-radius: 4px;
+            margin-bottom: 8px;
+            padding: 14px 16px;
+        }
+
+        .payment-history-entry {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            align-items: flex-start;
+        }
+
+        .payment-history-meta {
+            font-size: 12px;
+            color: #6c757d;
+            margin-top: 2px;
+            line-height: 1.45;
+        }
+
+        .payment-history-amount {
+            font-size: 16px;
+            font-weight: 700;
+            color: #1b2850;
+            white-space: nowrap;
+        }
+
+        .payment-history-actions {
+            display: flex;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+
+        .payment-history-summary .list-group-item {
+            border: 1px solid #d9dee7;
+            margin-bottom: 0;
+        }
+
+        #editPaymentHistoryModal .modal-dialog {
+            max-width: 620px;
+            width: calc(100% - 32px);
+        }
+
+        .payment-edit-form .form-label {
+            font-size: 12px;
+            margin-bottom: 4px;
+            color: #3b3f49;
+        }
+
+        .payment-edit-summary-box {
+            border: 1px solid #d9dee7;
+            background: #f8f9fb;
+            border-radius: 3px;
+            padding: 10px 12px;
+            margin-bottom: 14px;
+            font-size: 13px;
+            line-height: 1.45;
+        }
+
+        .datanew td:last-child {
+            text-align: center;
+            white-space: nowrap;
         }
 
 
@@ -571,6 +724,178 @@
             border-top: 1px solid #e0e0e0;
         }
 
+        .emi-info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 14px;
+            padding: 4px 2px 0;
+        }
+
+        .emi-info-card {
+            background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+            border: 1px solid #e5eaf2;
+            border-radius: 14px;
+            padding: 14px 16px;
+            box-shadow: 0 8px 24px rgba(27, 40, 80, 0.04);
+            min-height: 74px;
+        }
+
+        .emi-info-label {
+            font-size: 11px;
+            color: #74809a;
+            display: block;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .emi-info-value {
+            font-size: 15px;
+            font-weight: 700;
+            color: #1b2850;
+            word-break: break-word;
+            line-height: 1.3;
+        }
+
+        .emi-summary-panel {
+            background: linear-gradient(135deg, #1b2850 0%, #25376f 100%);
+            color: #fff;
+            border-radius: 18px;
+            padding: 18px 20px;
+            margin-bottom: 18px;
+            box-shadow: 0 18px 35px rgba(27, 40, 80, 0.16);
+        }
+
+        .emi-summary-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+        }
+
+        .emi-summary-title {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            opacity: 0.72;
+            margin-bottom: 4px;
+        }
+
+        .emi-summary-order {
+            font-size: 20px;
+            font-weight: 800;
+            line-height: 1.2;
+        }
+
+        .emi-summary-customer {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-top: 4px;
+        }
+
+        .emi-summary-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            font-size: 12px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .emi-summary-pill i {
+            font-size: 12px;
+        }
+
+        .emi-schedule-panel {
+            background: #f8fafc;
+            border: 1px solid #e5eaf2;
+            border-radius: 18px;
+            padding: 16px;
+        }
+
+        .emi-schedule-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+
+        .emi-schedule-header h6 {
+            margin-bottom: 0;
+            font-weight: 800;
+            color: #1b2850;
+        }
+
+        .emi-next-due {
+            font-size: 12px;
+            font-weight: 600;
+            color: #6c757d;
+            background: #fff;
+            border: 1px solid #e5eaf2;
+            padding: 6px 10px;
+            border-radius: 999px;
+        }
+
+        .emi-schedule-panel .table {
+            margin-bottom: 0;
+            overflow: hidden;
+            border-radius: 14px;
+        }
+
+        .emi-schedule-panel .table thead th {
+            background: #edf1f7;
+            color: #49566f;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            border-bottom: 1px solid #dde4ef !important;
+            white-space: nowrap;
+        }
+
+        .emi-schedule-panel .table tbody td {
+            font-size: 13px;
+            color: #354052;
+            vertical-align: middle;
+        }
+
+        .emi-schedule-panel .table tbody tr:hover {
+            background: #f6f9fe;
+        }
+
+        .emi-schedule-panel .badge {
+            min-width: 76px;
+            padding: 7px 10px;
+            border-radius: 999px;
+            font-weight: 700;
+            font-size: 12px;
+        }
+
+        .emi-schedule-panel .table td:nth-child(3),
+        .emi-schedule-panel .table td:nth-child(4),
+        .emi-schedule-panel .table td:nth-child(5) {
+            white-space: nowrap;
+        }
+
+        .emi-action-btn {
+            background: #1b2850;
+            color: #fff !important;
+            border: none;
+        }
+
+        .emi-action-btn:hover {
+            background: #111a33;
+            color: #fff !important;
+        }
+
         .btn-icon-mobile,
         button.btn-icon-mobile {
             width: 40px;
@@ -618,54 +943,6 @@
             font-size: 16px;
         }
 
-        .sales-action-wrap {
-            position: relative;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .sales-action-toggle {
-            width: 34px;
-            height: 34px;
-            border: 1px solid #cfd7e3;
-            border-radius: 6px;
-            background: #fff;
-            color: #344054;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0;
-            transition: all 0.2s ease;
-            box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
-        }
-
-        .sales-action-toggle:hover {
-            background: #f8fafc;
-            border-color: #b8c4d6;
-            color: #111827;
-        }
-
-        .sales-action-toggle:focus {
-            outline: none;
-            box-shadow: 0 0 0 0.2rem rgba(27, 40, 80, 0.15);
-        }
-
-        .sales-action-toggle i {
-            font-size: 18px;
-            line-height: 1;
-        }
-
-        .sales-action-menu {
-            min-width: 170px;
-        }
-
-        .sales-action-menu .dropdown-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
         /* Additional responsive adjustments for larger screens */
         @media screen and (min-width: 992px) {
             .order-details-content {
@@ -706,11 +983,11 @@
         }
 
         .mobile-order-header-cell:first-child {
-            width: 70%;
+            width: 68%;
         }
 
         .mobile-order-header-cell:last-child {
-            width: 30%;
+            width: 32%;
             text-align: center;
         }
 
@@ -739,12 +1016,16 @@
             font-weight: bold;
             font-size: 16px;
             color: #1b2850;
-            width: 70%;
+            width: 68%;
+            white-space: normal;
+            word-break: break-word;
+            overflow-wrap: anywhere;
+            line-height: 1.35;
         }
 
         .mobile-order-details-cell {
             text-align: center;
-            width: 30%;
+            width: 32%;
         }
 
         .mobile-toggle-btn {
@@ -904,35 +1185,6 @@
             font-weight: 600;
         }
 
-        /* Modal: prevent number inputs from overflowing on large values */
-        #makePaymentModal .modal-body input[type="number"],
-        #makePaymentModal .modal-body input[type="text"] {
-            min-width: 0;
-            width: 100%;
-            max-width: 100%;
-        }
-
-        #makePaymentModal .border.bg-light span {
-            word-break: break-all;
-            overflow-wrap: anywhere;
-        }
-
-        /* Filter total box: no overflow on large amounts */
-        .filter-total-box {
-            min-width: 0;
-        }
-
-        .filter-total-box #filtered-total {
-            word-break: break-all;
-            overflow-wrap: anywhere;
-        }
-
-        /* Summary badges: ensure amounts wrap */
-        .summary-badge-box span:last-child {
-            word-break: break-all;
-            overflow-wrap: anywhere;
-        }
-
 
         .sales-filter-toolbar .filter-field,
         .sales-filter-toolbar .filter-field .custom-select2,
@@ -960,8 +1212,18 @@
             min-width: 74px;
         }
 
-        @media screen and (min-width: 992px) and (max-width: 1199.98px) {
+        .summary-export-group {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            min-height: 34px;
+        }
 
+        .summary-export-group .btn {
+            min-width: 74px;
+        }
+
+        @media screen and (min-width: 992px) and (max-width: 1199.98px) {
             .content,
             .card,
             .card-body,
@@ -1002,7 +1264,6 @@
         }
 
         @media screen and (min-width: 768px) and (max-width: 991.98px) {
-
             .content,
             .card,
             .card-body,
@@ -1040,7 +1301,6 @@
 
 
         @media (max-width: 767.98px) {
-
             html,
             body {
                 overflow-x: hidden;
@@ -1092,7 +1352,7 @@
             /* Dark gray for other pages */
             color: #fff;
             border: none;
-            margin: 0 3px;
+              margin: 0 3px;
             padding: 4px 10px;
             border-radius: 6px;
             font-weight: bold;
@@ -1154,20 +1414,6 @@
             font-size: 14px;
             font-weight: 600;
             background: #fff;
-            word-break: break-all;
-            overflow-wrap: anywhere;
-            white-space: normal;
-            flex-wrap: wrap;
-        }
-
-        .summary-badge-box.total {
-            color: #1b2850;
-            border-color: #ffebd6;
-            background: #fff8f2;
-        }
-
-        .summary-badge-box.total span:last-child {
-            color: #ff9f43;
         }
 
         .summary-badge-box.pending {
@@ -1198,238 +1444,6 @@
                 word-break: break-word;
             }
         }
-
-        /* ===== EMI Modal Redesign ===== */
-        #emiModal .modal-dialog {
-            max-width: 680px;
-        }
-
-        #emiModal .modal-content {
-            border-radius: 12px;
-            overflow: hidden;
-            border: none;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.18);
-        }
-
-        #emiModal .modal-header {
-            background: #fff;
-            border-bottom: 1px solid #eee;
-            padding: 14px 20px;
-        }
-
-        #emiModal .modal-title {
-            font-weight: 700;
-            font-size: 17px;
-            color: #1b2850;
-        }
-
-        .emi-account-card {
-            background: linear-gradient(135deg, #1b2850 0%, #2d3f6e 100%);
-            border-radius: 10px;
-            padding: 18px 20px;
-            color: #fff;
-            margin-bottom: 16px;
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        .emi-account-label {
-            font-size: 10px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1.2px;
-            color: rgba(255,255,255,0.65);
-            margin-bottom: 3px;
-        }
-
-        .emi-account-number {
-            font-size: 22px;
-            font-weight: 800;
-            letter-spacing: 0.5px;
-        }
-
-        .emi-account-customer {
-            font-size: 12px;
-            color: rgba(255,255,255,0.75);
-            margin-top: 2px;
-        }
-
-        .emi-next-due-badge {
-            background: rgba(255,255,255,0.18);
-            border: 1px solid rgba(255,255,255,0.35);
-            border-radius: 20px;
-            padding: 5px 14px;
-            font-size: 12px;
-            font-weight: 600;
-            color: #fff;
-            white-space: nowrap;
-        }
-
-        .emi-info-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-bottom: 18px;
-        }
-
-        .emi-info-card {
-            background: #fff;
-            border: 1px solid #e8ebf0;
-            border-radius: 8px;
-            padding: 12px 14px;
-            transition: box-shadow 0.2s;
-        }
-
-        .emi-info-card:hover {
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-        }
-
-        .emi-info-card-label {
-            font-size: 10px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.8px;
-            color: #8a94a6;
-            margin-bottom: 5px;
-        }
-
-        .emi-info-card-value {
-            font-size: 16px;
-            font-weight: 700;
-            color: #1b2850;
-        }
-
-        .emi-monthly-section-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 10px;
-            flex-wrap: wrap;
-            gap: 8px;
-        }
-
-        .emi-monthly-title {
-            font-size: 15px;
-            font-weight: 700;
-            color: #1b2850;
-        }
-
-        .emi-filters {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            margin-bottom: 10px;
-            align-items: center;
-        }
-
-        .emi-filter-select {
-            border: 1px solid #dce0e7;
-            border-radius: 6px;
-            padding: 4px 10px;
-            font-size: 12px;
-            color: #1b2850;
-            background: #fff;
-            cursor: pointer;
-            height: 30px;
-        }
-
-        .emi-filter-search {
-            border: 1px solid #dce0e7;
-            border-radius: 6px;
-            padding: 4px 10px;
-            font-size: 12px;
-            color: #1b2850;
-            background: #fff;
-            height: 30px;
-            width: 140px;
-        }
-
-        .emi-filter-search::placeholder {
-            color: #aab;
-        }
-
-        .emi-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 13px;
-        }
-
-        .emi-table thead th {
-            background: #f4f6fb;
-            color: #8a94a6;
-            font-size: 10px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.7px;
-            padding: 8px 12px;
-            border-bottom: 2px solid #e8ebf0;
-            text-align: left;
-        }
-
-        .emi-table tbody tr {
-            border-bottom: 1px solid #f0f2f7;
-            transition: background 0.15s;
-        }
-
-        .emi-table tbody tr:hover {
-            background: #f8f9ff;
-        }
-
-        .emi-table tbody td {
-            padding: 10px 12px;
-            color: #2d3559;
-            font-weight: 500;
-        }
-
-        .emi-table tbody td.emi-td-dash {
-            color: #b0b8c9;
-        }
-
-        .emi-status-paid {
-            background: #28c76f;
-            color: #fff;
-            border-radius: 5px;
-            padding: 3px 10px;
-            font-size: 11px;
-            font-weight: 700;
-            display: inline-block;
-        }
-
-        .emi-status-pending {
-            background: #ea5455;
-            color: #fff;
-            border-radius: 5px;
-            padding: 3px 10px;
-            font-size: 11px;
-            font-weight: 700;
-            display: inline-block;
-        }
-
-        .emi-table-wrap {
-            max-height: 280px;
-            overflow-y: auto;
-            border: 1px solid #e8ebf0;
-            border-radius: 8px;
-        }
-
-        .emi-table-wrap::-webkit-scrollbar {
-            width: 5px;
-        }
-
-        .emi-table-wrap::-webkit-scrollbar-thumb {
-            background: #c0c8da;
-            border-radius: 3px;
-        }
-
-        .emi-no-rows {
-            text-align: center;
-            padding: 20px;
-            color: #b0b8c9;
-            font-size: 13px;
-        }
     </style>
     @if (session('error'))
         <div class="alert alert-danger" id="error-message">
@@ -1445,6 +1459,7 @@
             .fade-out.hidden {
                 opacity: 0;
             }
+
         </style>
 
         <script>
@@ -1466,11 +1481,13 @@
                 <h4>All Sales & Bills</h4>
                 <!-- <h6>Manage your sales</h6> -->
             </div>
-            <div class="page-btn">
-                @if (app('hasPermission')(2, 'add'))
+            <div class="page-btn d-flex">
+                 @if (app('hasPermission')(2, 'add'))
+                    <a href="{{ route('sales.import') }}" class="btn btn-sm btn-added me-2">
+                        <i class="fas fa-file-import me-1"></i> Import
+                    </a>
                     <a href="{{ route('sales.add', ['new_bill' => 1]) }}" class="btn btn-sm btn-added"><img
-                            src="{{ env('ImagePath') . 'admin/assets/img/icons/plus.svg' }}" alt="img"
-                            class="me-1">New
+                            src="{{ env('ImagePath') . 'admin/assets/img/icons/plus.svg' }}" alt="img" class="me-1">New
                         Bill</a>
                 @endif
             </div>
@@ -1509,21 +1526,6 @@
                             </div>
                         </div>
 
-
-
-                        <!-- Sort Filter -->
-                        <div class="col-md-2 col-6 filter-field">
-                            <div class="mb-1 custom-select2">
-                                <select id="filter-sort" data-placeholder="Latest First"
-                                    class="form-control form-control-sm filter-select2">
-                                    <option value="latest">Latest First</option>
-                                    <option value="oldest">Oldest First</option>
-                                    <option value="order_no_asc">Order No. 1 to Last</option>
-                                    <option value="order_no_desc">Order No. Last to 1</option>
-                                </select>
-                            </div>
-                        </div>
-
                         <!-- Month Filter -->
                         <div class="col-md-2 col-6 filter-field">
                             <div class="mb-1 custom-select2">
@@ -1554,7 +1556,7 @@
                             </div>
                         </div>
 
-                        <div class="col-md-2 col-6 filter-field {{ $financialYearEnabled ?? true ? '' : 'd-none' }}"
+                        <div class="col-md-2 col-6 filter-field {{ ($financialYearEnabled ?? true) ? '' : 'd-none' }}"
                             id="sales-financial-year-filter">
                             <div class="mb-1">
                                 <select id="filter-financial-year" class="form-control form-control-sm">
@@ -1563,14 +1565,28 @@
                             </div>
                         </div>
 
+                        @if (($staffList ?? collect())->count())
+                        <!-- Staff Filter -->
+                        <div class="col-md-2 col-6 filter-field">
+                            <div class="mb-1 custom-select2">
+                                <select id="filter-staff" class="form-control form-control-sm filter-select2" data-placeholder="All Staff">
+                                    <option value="all">All Staff</option>
+                                    @foreach ($staffList as $staff)
+                                        <option value="{{ $staff->id }}">{{ $staff->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                        @endif
+
                         <!-- Date Filter -->
                         <!-- <div class="col-md-2 col-6">
-                                                                                                                                            <div class="form-group mb-0">
-                                                                                                                                                <label for="filter-date" class="form-label">Date</label>
-                                                                                                                                                <input type="text" id="filter-date" placeholder="Choose Date"
-                                                                                                                                                    class="datetimepicker form-control form-control-sm">
-                                                                                                                                            </div>
-                                                                                                                                        </div> -->
+                                                                                                            <div class="form-group mb-0">
+                                                                                                                <label for="filter-date" class="form-label">Date</label>
+                                                                                                                <input type="text" id="filter-date" placeholder="Choose Date"
+                                                                                                                    class="datetimepicker form-control form-control-sm">
+                                                                                                            </div>
+                                                                                                        </div> -->
                         <!-- Date -->
                         <div class="col-md-2 col-6 filter-field">
                             <!-- <div class="form-group mb-0"> -->
@@ -1583,35 +1599,33 @@
                         <!-- Order Type Filter -->
                         <div class="col-md-2 col-6 filter-field">
                             <div class="mb-1 custom-select2">
-                                <select id="filter-order-type" data-placeholder="All Order Types"
-                                    class="form-control form-control-sm filter-select2">
+                                <select id="filter-order-type" class="form-control form-control-sm filter-select2"
+                                    data-placeholder="All Order Types">
                                     <option value="all">All Order Types</option>
-                                    <option value="Self Pickup">Self Pickup</option>
-                                    <option value="Delivery">Delivery</option>
+                                    <option value="self_pickup">Self Pickup</option>
+                                    <option value="delivery">Delivery</option>
                                 </select>
                             </div>
                         </div>
 
-                        <!-- Export Buttons -->
-                        <div class="col-md-2 col-12 mb-1 filter-field filter-export">
-                            <div class="filter-export-group mt-1">
-                                <button id="exportAllChallan" class="btn btn-sm btn-success flex-fill">
-                                    <i class="fas fa-file-excel"></i> Excel
-                                </button>
-                                <button id="exportPdf" class="btn btn-sm btn-danger flex-fill">
-                                    <i class="fas fa-file-pdf"></i> PDF
-                                </button>
+                        <!-- Sort Filter -->
+                        <div class="col-md-2 col-6 filter-field">
+                            <div class="mb-1 custom-select2">
+                                <select id="filter-sort" class="form-control form-control-sm filter-select2"
+                                    data-placeholder="Sort By">
+                                    <option value="date_desc">Latest First</option>
+                                    <option value="date_asc">Oldest First</option>
+                                    <option value="order_no_asc">Order No. 1 to Last</option>
+                                    <option value="order_no_desc">Order No. Last to 1</option>
+                                </select>
                             </div>
                         </div>
+
                     </div>
                 </div>
 
-                @if (in_array(auth()->user()->role, ['admin', 'sub-admin']))
+                @if (in_array(auth()->user()->role, ['admin', 'sub-admin', 'staff']))
                     <div class="summary-badges-row">
-                        <div class="summary-badge-box total">
-                            <span>Total:</span>
-                            <span id="filtered-total">₹0.00</span>
-                        </div>
                         <div class="summary-badge-box pending">
                             <span>Total Pending:</span>
                             <span id="filtered-pending-total">₹0.00</span>
@@ -1619,6 +1633,29 @@
                         <div class="summary-badge-box paid">
                             <span>Total Paid:</span>
                             <span id="filtered-paid-total">₹0.00</span>
+                        </div>
+                        <div class="summary-badge-box" style="color: #1b2850; border-color: #c5cde0; background: #f4f6fb;">
+                            <span>Total:</span>
+                            <span id="filtered-total" style="color: #ff9f43; font-weight: 700; margin-left: 4px;">₹0.00</span>
+                        </div>
+                        <div class="summary-export-group">
+                            <button id="exportAllChallan" class="btn btn-sm btn-success">
+                                <i class="fas fa-file-excel"></i> Excel
+                            </button>
+                            <button id="exportPdf" class="btn btn-sm btn-danger">
+                                <i class="fas fa-file-pdf"></i> PDF
+                            </button>
+                        </div>
+                    </div>
+                @else
+                    <div class="summary-badges-row">
+                        <div class="summary-export-group">
+                            <button id="exportAllChallan" class="btn btn-sm btn-success">
+                                <i class="fas fa-file-excel"></i> Excel
+                            </button>
+                            <button id="exportPdf" class="btn btn-sm btn-danger">
+                                <i class="fas fa-file-pdf"></i> PDF
+                            </button>
                         </div>
                     </div>
                 @endif
@@ -1664,10 +1701,10 @@
                     <table class="table datanew" id="order-table" style="width: 100%;">
                         <thead>
                             <tr>
-                                <th>Order Number</th>
+                                <th>Order No.</th>
                                 <th class="">Details</th>
                                 <th>Date</th>
-                                <th>Customer Name</th>
+                                <th>Customer</th>
                                 <th>Quotation/Sale</th>
                                 <th>Payment Status</th>
                                 {{-- <th>Return Status</th> --}}
@@ -1675,6 +1712,9 @@
                                 <th>Assigned Staff</th>
                                 <th>Order Type</th>
                                 <th>Biller</th>
+                                @if(isset($setting) && $setting->enable_einvoice == 1)
+                                <th>E-Invoice</th>
+                                @endif
                                 <th class="text-center">Action</th>
                             </tr>
                         </thead>
@@ -1714,7 +1754,7 @@
         </div>
 
     </div>
-    <form id="makePaymentForm">
+    <form id="makePaymentForm" novalidate>
         <div class="modal fade" id="makePaymentModal" tabindex="-1">
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -1744,14 +1784,8 @@
 
 
 
-                        <div class="border p-2 rounded bg-light"
-                            style="word-break: break-all; overflow-wrap: anywhere; font-size: 14px;">
-                            <strong>Total Amount:</strong> ₹<span id="emiTotal"
-                                style="word-break: break-all;"></span><br>
-                            <div id="tdsAmountSection" class="d-none">
-                                <strong>TDS (<span id="tdsPercentageDisplay">0</span>%):</strong>
-                                ₹<span id="tdsAmountDisplay">0.00</span><br>
-                            </div>
+                        <div class="border p-2 rounded bg-light">
+                            <strong>Total Amount:</strong> ₹<span id="emiTotal"></span><br>
                             <div id="returnAmountSection" class="d-none">
                                 <strong>Return Amount:</strong> ₹<span id="returnAmountDisplay">0.00</span><br>
                             </div>
@@ -1774,6 +1808,7 @@
                                 <option value="online">Online</option>
                                 <option value="cash_online">Cash + Online</option>
                                 <option value="emi">EMI</option>
+
                             </select>
                             <div class="text-danger" id="paymentMethodError"></div>
                         </div>
@@ -1886,17 +1921,95 @@
                             <div class="text-danger" id="bankError"></div>
                         </div>
 
-                        <div class="mb-3 d-none" id="emiFields">
+                        <div class="mb-3 d-none" id="emiMonthDiv">
                             <label for="emiMonthSelect" class="form-label">EMI Month</label>
                             <select class="form-select" id="emiMonthSelect" name="emi_month">
                                 <option value="" selected disabled>Select EMI Month</option>
                             </select>
                             <div class="text-danger" id="emiMonthError"></div>
+                        </div>
 
-                            <label for="emiMonthlyAmount" class="form-label mt-2">Monthly EMI</label>
-                            <input type="number" class="form-control" id="emiMonthlyAmount" name="emi_monthly"
-                                readonly>
+                        <div class="mb-3 d-none" id="emiMonthlyAmountDiv">
+                            <label for="emiMonthlyAmountInput" class="form-label">Monthly EMI</label>
+                            <input type="number" class="form-control" id="emiMonthlyAmountInput"
+                                name="emi_monthly_amount" readonly>
                             <div class="text-danger" id="emiMonthlyAmountError"></div>
+                        </div>
+
+                        <div id="emiBox" style="display:none; margin-bottom: 1rem;">
+                            <div class="row g-2">
+                                <div class="col-md-6 col-6">
+                                    <div class="form-group mb-3">
+                                        <label class="form-label">Down Payment (Optional)</label>
+                                        <input type="number" class="form-control" id="emiDownPayment" name="emi_down_payment" placeholder="₹ Amount" min="0" step="0.01">
+                                        <small class="text-danger d-none" id="emiDownPaymentError"></small>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-6">
+                                    <div class="form-group mb-3">
+                                        <label class="form-label">Loan Amount</label>
+                                        <input type="number" class="form-control" id="emiLoanAmount" name="emi_loan_amount" placeholder="Auto Calculate" min="0" step="0.01" readonly>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-6">
+                                    <div class="form-group mb-3">
+                                        <label class="form-label">EMI Tenure</label>
+                                        <select class="form-select" id="emiTenure" name="emi_tenure">
+                                            <option value="">Select Tenure</option>
+                                            <option value="3">3 Months</option>
+                                            <option value="6">6 Months</option>
+                                            <option value="9">9 Months</option>
+                                            <option value="12">12 Months</option>
+                                            <option value="custom">Custom</option>
+                                        </select>
+                                        <small class="text-danger d-none" id="emiTenureError"></small>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-6 d-none" id="emiCustomTenureCol">
+                                    <div class="form-group mb-3">
+                                        <label class="form-label">Custom Tenure (Months)</label>
+                                        <input type="number" class="form-control" id="emiCustomTenure" name="emi_custom_tenure" min="1" max="120" step="1" placeholder="Enter months">
+                                        <small class="text-danger d-none" id="emiCustomTenureError"></small>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-6">
+                                    <div class="form-group mb-3">
+                                        <label class="form-label">Interest Rate (%) <small class="text-muted">Optional</small></label>
+                                        <input type="number" class="form-control" id="emiInterestRate" name="emi_interest_rate" value="0" min="0" step="0.01">
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-6">
+                                    <div class="form-group mb-3">
+                                        <label class="form-label">Monthly EMI</label>
+                                        <input type="number" class="form-control" id="emiBoxMonthlyAmount" name="emi_box_monthly_amount" placeholder="Auto Calculate" min="0" step="0.01" readonly>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-6">
+                                    <div class="form-group mb-3">
+                                        <label class="form-label">Aadhar Number</label>
+                                        <input type="text" class="form-control" id="emiAadharNumber" name="emi_aadhar_number" placeholder="Customer Aadhar Number">
+                                        <small class="text-danger d-none" id="emiAadharError"></small>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-6">
+                                    <div class="form-group mb-3">
+                                        <label class="form-label">DO ID <small class="text-muted"></small></label>
+                                        <input type="text" class="form-control" id="emiDoId" name="emi_do_id" placeholder="DO ID">
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-6">
+                                    <div class="form-group mb-3">
+                                        <label class="form-label">PAN Number <small class="text-muted">Optional</small></label>
+                                        <input type="text" class="form-control" id="emiPanNumber" name="emi_pan_number" placeholder="PAN Number">
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-6">
+                                    <div class="form-group mb-3">
+                                        <label class="form-label">Guarantor Name <small class="text-muted">Optional</small></label>
+                                        <input type="text" class="form-control" id="emiGuarantorName" name="emi_guarantor_name" placeholder="Guarantor Name">
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
                         <!-- Fully Paid Fields -->
@@ -1905,13 +2018,6 @@
                             <input type="number" class="form-control" id="cashAmount" name="cashAmount" min="0"
                                 step="0.01">
                             <div class="text-danger" id="cashAmountError"></div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="paymentDateInput" class="form-label">Payment Date</label>
-                            <input type="text" class="form-control datetimepicker" id="paymentDateInput"
-                                name="payment_date" placeholder="Choose Payment Date" autocomplete="off">
-                            <div class="text-danger" id="paymentDateError"></div>
                         </div>
 
                         <div class="mb-3">
@@ -1952,7 +2058,99 @@
             </div>
         </div>
     </form>
-    <div class="modal fade" id="addBankModal" tabindex="-1" aria-labelledby="addBankModalLabel" aria-hidden="true">
+    <div class="modal fade" id="emiDetailsModal" tabindex="-1" aria-labelledby="emiDetailsModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="emiDetailsModalLabel">EMI Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">x</button>
+                </div>
+                <div class="modal-body">
+                    <div class="emi-summary-panel">
+                        <div class="emi-summary-top">
+                            <div>
+                                <div class="emi-summary-title">EMI Account</div>
+                                <div class="emi-summary-order" id="emiOrderNumber">-</div>
+                                <div class="emi-summary-customer">
+                                    Customer: <span id="emiCustomerName">-</span>
+                                </div>
+                            </div>
+                            <div class="emi-summary-pill">
+                                <i class="bi bi-calendar3"></i>
+                                <span id="emiNextDueLabel">Next due: -</span>
+                            </div>
+                        </div>
+
+                        <div class="emi-info-grid">
+                            <div class="emi-info-card">
+                                <span class="emi-info-label">EMI Tenure</span>
+                                <div class="emi-info-value" id="emiTenureValue">-</div>
+                            </div>
+                            <div class="emi-info-card">
+                                <span class="emi-info-label">Monthly EMI</span>
+                                <div class="emi-info-value" id="emiMonthlyAmountValue">-</div>
+                            </div>
+                            <div class="emi-info-card">
+                                <span class="emi-info-label">Down Payment</span>
+                                <div class="emi-info-value" id="emiDownPaymentValue">-</div>
+                            </div>
+                            <div class="emi-info-card">
+                                <span class="emi-info-label">Loan Amount</span>
+                                <div class="emi-info-value" id="emiLoanAmountValue">-</div>
+                            </div>
+                            <div class="emi-info-card">
+                                <span class="emi-info-label">Interest Rate</span>
+                                <div class="emi-info-value" id="emiInterestRateValue">-</div>
+                            </div>
+                            <div class="emi-info-card">
+                                <span class="emi-info-label">Guarantor Name</span>
+                                <div class="emi-info-value" id="emiGuarantorValue">-</div>
+                            </div>
+                            <div class="emi-info-card">
+                                <span class="emi-info-label">Aadhar Number</span>
+                                <div class="emi-info-value" id="emiAadharValue">-</div>
+                            </div>
+                            <div class="emi-info-card">
+                                <span class="emi-info-label">PAN Number</span>
+                                <div class="emi-info-value" id="emiPanValue">-</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="emi-schedule-panel">
+                        <div class="emi-schedule-header">
+                            <h6 class="mb-0">Month Wise EMI Details</h6>
+                            <span class="emi-next-due" id="emiNextDueSchedule"></span>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-sm table-bordered align-middle mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th style="width: 20%;">Month</th>
+                                        <th style="width: 20%;">Status</th>
+                                        <th style="width: 20%;">Amount</th>
+                                        <th style="width: 20%;">Paid On</th>
+                                        <th style="width: 20%;">Remark</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="emiMonthWiseBody">
+                                    <tr>
+                                        <td colspan="5" class="text-center text-muted">No EMI data loaded.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="addBankModal" tabindex="-1" aria-labelledby="addBankModalLabel"
+        aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <form id="addBankForm">
@@ -1969,8 +2167,7 @@
                             </div>
                             <div class="col-6 mb-3">
                                 <label for="add_account_number" class="form-label">Account Number</label>
-                                <input type="text" class="form-control" id="add_account_number"
-                                    name="account_number">
+                                <input type="text" class="form-control" id="add_account_number" name="account_number">
                                 <div class="text-danger small" id="addAccountNumberError"></div>
                             </div>
                             <div class="col-6 mb-3">
@@ -2019,7 +2216,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">x</button>
                 </div>
                 <div class="modal-body">
-                    <ul id="globalPaymentHistoryList" class="list-group"></ul>
+                    <ul id="globalPaymentHistoryList" class="list-group payment-history-list"></ul>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-cancel" data-bs-dismiss="modal">Close</button>
@@ -2028,66 +2225,59 @@
         </div>
     </div>
 
-    <div class="modal fade" id="editPaymentModal" tabindex="-1" aria-labelledby="editPaymentLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" style="max-width: 520px;">
+    <div class="modal fade" id="editPaymentHistoryModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content">
-                <div class="modal-header" style="padding: 16px 18px 14px;">
-                    <h5 class="modal-title" id="editPaymentLabel">Edit Payment</h5>
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Payment</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">x</button>
                 </div>
-                <div class="modal-body" style="padding: 18px;">
-                    <input type="hidden" id="editPaymentId">
-                    <input type="hidden" id="editPaymentOrderId">
-                    <input type="hidden" id="editPaymentTotalValue" value="0">
-                    <input type="hidden" id="editPaymentBaseRemaining" value="0">
-                    <input type="hidden" id="editPaymentOriginalAmount" value="0">
-                    <div class="border rounded-2 p-3 mb-3" style="background:#f8f9fc; border-color:#d9dfeb !important;">
-                        <div class="fw-semibold" style="font-size:14px; color:#1f2937;">
-                            Total Amount: <span id="editPaymentTotalAmount">₹0.00</span>
+                <div class="modal-body">
+                    <form id="editPaymentHistoryForm" class="payment-edit-form">
+                        <input type="hidden" id="editPaymentId">
+                        <input type="hidden" id="editPaymentOrderId">
+                        <input type="hidden" id="editPaymentOrderTotal">
+                        <input type="hidden" id="editPaymentOriginalRemaining">
+                        <div class="payment-edit-summary-box">
+                            <div><strong>Total Amount:</strong> <span id="editPaymentOrderTotalText">₹0.00</span></div>
+                            <div><strong>Remaining Amount:</strong> <span id="editPaymentOriginalRemainingText">₹0.00</span></div>
                         </div>
-                        <div class="fw-semibold" style="font-size:14px; color:#1f2937;">
-                            Remaining Amount: <span id="editPaymentRemainingAmount">₹0.00</span>
+                        <div class="mb-3">
+                            <label class="form-label">Payment Date</label>
+                            <input type="date" class="form-control" id="editPaymentDate" required>
                         </div>
-                    </div>
-                    <div class="mb-3">
-                        <label for="editPaymentDate" class="form-label">Payment Date</label>
-                        <input type="date" class="form-control" id="editPaymentDate" style="height:44px;">
-                    </div>
-                    <div class="mb-3">
-                        <label for="editPaymentMethod" class="form-label">Select Payment Method</label>
-                        <select class="form-select" id="editPaymentMethod" style="height:44px;">
-                            <option value="cash">Cash</option>
-                            <option value="online">Online</option>
-                            {{-- <option value="emi">EMI</option> --}}
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label for="editPaymentType" class="form-label">Paid Type</label>
-                        <select class="form-select" id="editPaymentType" style="height:44px;">
-                            <option value="fully">Cash Fully</option>
-                            <option value="partially">Cash Partially</option>
-                            {{-- <option value="emi">EMI</option> --}}
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label for="editPaymentAmount" class="form-label">Enter Amount</label>
-                        <input type="number" class="form-control" id="editPaymentAmount" min="0"
-                            step="0.01" style="height:44px;">
-                    </div>
-                    <div class="mb-3">
-                        <label for="editPaymentBank" class="form-label">Pending Amount</label>
-                        <input type="text" class="form-control" id="editPaymentPendingAmount" readonly
-                            style="height:44px; background:#e9edf2;">
-                        <div id="editPaymentBankWrap" class="d-none"></div>
-                    </div>
-                    <div class="mb-3">
-                        <label for="editPaymentRemarks" class="form-label">Remark</label>
-                        <textarea class="form-control" id="editPaymentRemarks" rows="4" style="resize:none;"></textarea>
-                    </div>
+                        <div class="mb-3">
+                            <label class="form-label">Select Payment Method</label>
+                            <select class="form-select" id="editPaymentMethod" required>
+                                <option value="cash">Cash</option>
+                                <option value="online">Online</option>
+                                <option value="cash_online">Cash + Online</option>
+                                <option value="emi">EMI</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Paid Type</label>
+                            <select class="form-select" id="editPaymentType">
+                                <option value="">Select</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Enter Amount</label>
+                            <input type="number" step="0.01" min="0.01" class="form-control" id="editPaymentAmount" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Pending Amount</label>
+                            <input type="text" class="form-control" id="editPaymentPendingAmount" readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Remark</label>
+                            <textarea class="form-control" id="editPaymentRemarks" rows="3"></textarea>
+                        </div>
+                    </form>
                 </div>
-                <div class="modal-footer" style="justify-content:flex-start; gap:8px; padding: 0 18px 18px;">
-                    <button type="button" class="btn btn-warning" id="saveEditPaymentBtn" style="min-width: 140px; height: 48px;">Update Payment</button>
-                    <button type="button" class="btn btn-dark" data-bs-dismiss="modal" style="min-width: 120px; height: 48px;">Cancel</button>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-warning text-white" id="savePaymentHistoryEditBtn">Update Payment</button>
+                    <button type="button" class="btn btn-dark" data-bs-dismiss="modal">Cancel</button>
                 </div>
             </div>
         </div>
@@ -2099,111 +2289,325 @@
             <div class="spinner-border text-primary" role="status" aria-hidden="true"></div>
         </div>
     </div>
+@endsection
 
-    <!-- Redesigned EMI Details Modal -->
-    <div class="modal fade" id="emiModal" tabindex="-1" aria-labelledby="emiModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-scrollable" style="max-width:680px;">
+    <!-- QR Upload Modal -->
+    <div class="modal fade" id="qrUploadModal" tabindex="-1" aria-labelledby="qrUploadModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
-
                 <div class="modal-header">
-                    <h5 class="modal-title" id="emiModalLabel">EMI Details</h5>
+                    <h5 class="modal-title" id="qrUploadModalLabel">Upload Custom QR Code</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">x</button>
                 </div>
-
-                <div class="modal-body" style="padding: 20px;">
-
-                    <!-- Account Header Card -->
-                    <div class="emi-account-card">
-                        <div>
-                            <div class="emi-account-label">EMI Account</div>
-                            <div class="emi-account-number" id="emiOrderNumber">—</div>
-                            <div class="emi-account-customer">Customer: <span id="emiCustomerName">—</span></div>
+                <div class="modal-body">
+                    <form id="qrUploadForm" enctype="multipart/form-data">
+                        @csrf
+                        <input type="hidden" name="order_id" id="qrOrderId">
+                        <div class="mb-3">
+                            <label for="qr_code_image" class="form-label">Select QR Image</label>
+                            <input class="form-control" type="file" id="qr_code_image" name="qr_code_image" accept="image/*" required>
                         </div>
-                        <div class="emi-next-due-badge" id="emiNextDueBadge">Next due: —</div>
-                    </div>
-
-                    <!-- Info Cards Grid -->
-                    <div class="emi-info-grid">
-                        <div class="emi-info-card">
-                            <div class="emi-info-card-label">EMI Tenure</div>
-                            <div class="emi-info-card-value" id="emiTenureDisplay">—</div>
+                        <div class="text-end">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-primary" id="qrUploadBtn">Upload</button>
                         </div>
-                        <div class="emi-info-card">
-                            <div class="emi-info-card-label">Monthly EMI</div>
-                            <div class="emi-info-card-value" id="emiMonthlyDisplay">—</div>
-                        </div>
-                        <div class="emi-info-card">
-                            <div class="emi-info-card-label">Down Payment</div>
-                            <div class="emi-info-card-value" id="emiDownPaymentDisplay">—</div>
-                        </div>
-                        <div class="emi-info-card">
-                            <div class="emi-info-card-label">Loan Amount</div>
-                            <div class="emi-info-card-value" id="emiLoanAmountDisplay">—</div>
-                        </div>
-                        <div class="emi-info-card">
-                            <div class="emi-info-card-label">Interest Rate</div>
-                            <div class="emi-info-card-value" id="emiInterestDisplay">—</div>
-                        </div>
-                        <div class="emi-info-card">
-                            <div class="emi-info-card-label">Guarantor Name</div>
-                            <div class="emi-info-card-value" id="emiGuarantorDisplay" style="font-size:14px;">—</div>
-                        </div>
-                        <div class="emi-info-card">
-                            <div class="emi-info-card-label">Aadhar Number</div>
-                            <div class="emi-info-card-value" id="emiAadharDisplay" style="font-size:14px;">—</div>
-                        </div>
-                        <div class="emi-info-card">
-                            <div class="emi-info-card-label">PAN Number</div>
-                            <div class="emi-info-card-value" id="emiPanDisplay" style="font-size:14px;">—</div>
-                        </div>
-                    </div>
-
-                    <!-- Month Wise Section -->
-                    <div class="emi-monthly-section-header">
-                        <div class="emi-monthly-title">Month Wise EMI Details</div>
-                        <div class="emi-next-due-badge" id="emiNextDueBadge2" style="background:#1b2850;border-color:#3a4f8c;">Next due: —</div>
-                    </div>
-
-                    <!-- Filters -->
-                    <div class="emi-filters">
-                        <select id="emiStatusFilter" class="emi-filter-select">
-                            <option value="all">All Status</option>
-                            <option value="paid">Paid</option>
-                            <option value="pending">Pending</option>
-                        </select>
-                        <input type="text" id="emiMonthSearch" class="emi-filter-search" placeholder="Search month...">
-                    </div>
-
-                    <!-- Month Table -->
-                    <div class="emi-table-wrap">
-                        <table class="emi-table">
-                            <thead>
-                                <tr>
-                                    <th>Month</th>
-                                    <th>Status</th>
-                                    <th>Amount</th>
-                                    <th>Paid On</th>
-                                    <th>Remark</th>
-                                </tr>
-                            </thead>
-                            <tbody id="emiMonthTableBody">
-                                <tr><td colspan="5" class="emi-no-rows">Loading...</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-
+                    </form>
                 </div>
-
             </div>
         </div>
     </div>
-@endsection
 
+    <!-- E-Invoice Details Modal -->
+    <style>
+    .einvoice-modal-header {
+        flex-direction: column;
+        align-items: center;
+        border-bottom: none;
+        padding-bottom: 0;
+    }
+    .einvoice-check-icon {
+        width: 60px;
+        height: 60px;
+        background-color: #e8f5e9;
+        color: #4caf50;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 30px;
+        margin-bottom: 15px;
+        border: 3px solid #4caf50;
+    }
+    .einvoice-badge {
+        background-color: #28a745;
+        color: white;
+        padding: 5px 10px;
+        border-radius: 4px;
+        font-weight: bold;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+    }
+    .einvoice-warning {
+        color: #ff9800;
+        font-size: 13px;
+        margin-top: 10px;
+        text-align: center;
+    }
+    .einvoice-details-table {
+        width: 100%;
+        margin-top: 20px;
+    }
+    .einvoice-details-table td {
+        padding: 8px 0;
+        border-bottom: 1px solid #f1f1f1;
+    }
+    .einvoice-details-table td:first-child {
+        color: #666;
+        font-weight: 500;
+    }
+    .einvoice-details-table td:last-child {
+        text-align: right;
+        font-weight: bold;
+        color: #333;
+    }
+    </style>
+    <div class="modal fade" id="einvoiceDetailsModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" style="max-width: 450px;">
+            <div class="modal-content">
+                <div class="modal-header einvoice-modal-header">
+                    <!-- <div class="einvoice-check-icon">
+                        <i class="fas fa-check"></i>
+                    </div> -->
+                    <h4 class="modal-title mb-3">E-Invoice Details</h4>
+                    <div class="einvoice-badge">
+                        <i class="fas fa-check-square"></i> E-Invoice Saved to Database <span class="badge bg-success ms-1">New</span>
+                    </div>
+                    <div class="einvoice-warning" id="einvoiceWarning">
+                        <i class="fas fa-exclamation-triangle"></i> IRP API not configured. E-Invoice marked without IRN. Go to Settings -> E-Invoice Settings to configure.
+                    </div>
+                </div>
+                <div class="modal-body pt-0 pb-4 px-4">
+                    <table class="einvoice-details-table">
+                        <tr>
+                            <td>Order No.</td>
+                            <td id="einvOrderNo">-</td>
+                        </tr>
+                        <tr>
+                            <td>IRN</td>
+                            <td id="einvIrn">-</td>
+                        </tr>
+                        <tr>
+                            <td>Ack. No.</td>
+                            <td id="einvAckNo">-</td>
+                        </tr>
+                        <tr>
+                            <td>Ack. Date</td>
+                            <td id="einvAckDate">-</td>
+                        </tr>
+                    </table>
+                    
+                    <div class="d-flex justify-content-center gap-3 mt-4">
+                        <button type="button" class="btn btn-primary     text-white px-4" id="einvDownloadBtn"><i class="fas fa-download"></i> Download PDF</button>
+                        <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+        </div>
+    </div>
+    
 @push('js')
     <script>
-        var userRole = "{{ auth()->check() ? auth()->user()->role : 'guest' }}";
-        window.staffOptions = @json($staffs ?? []);
-        var currencySymbol = "{{ $currencySymbol ?? '₹' }}";
+        // Suppress DataTables warning alerts globally
+        $.fn.dataTable.ext.errMode = 'none';
+        
+        const userRole = "{{ auth()->user()->role }}";
+        const salesStaffList = @json($staffList ?? []);
+        const canAssignStaff = {{ ($staffList ?? collect())->count() > 0 ? 'true' : 'false' }};
+        const isEinvoiceEnabled = {{ !empty($setting->enable_einvoice) ? 1 : 0 }};
+    </script>
+
+    <script>
+        /**
+         * Build the inline staff assignment cell HTML.
+         * Shows a <select> dropdown pre-selected to currentStaffId when staff list is available.
+         */
+        function buildStaffCell(orderId, currentStaffId, currentStaffName) {
+            if (!canAssignStaff || !salesStaffList.length) {
+                return currentStaffName
+                    ? `<span class="biller-wrap">${currentStaffName}</span>`
+                    : `<span style="color:#aaa;">—</span>`;
+            }
+
+            // Normalize: treat null/undefined/""/0 all as "no staff"
+            const normalizedId = (currentStaffId !== null && currentStaffId !== undefined && currentStaffId !== '' && parseInt(currentStaffId) > 0)
+                ? parseInt(currentStaffId)
+                : null;
+
+            let options = `<option value=""${normalizedId === null ? ' selected' : ''}>— Unassigned —</option>`;
+            salesStaffList.forEach(function(s) {
+                const isSelected = normalizedId !== null && parseInt(s.id) === normalizedId;
+                options += `<option value="${s.id}"${isSelected ? ' selected' : ''}>${s.name}</option>`;
+            });
+
+            return `<select class="assign-staff-select form-select form-select-sm"
+                        data-order-id="${orderId}"
+                        data-prev-val="${normalizedId !== null ? normalizedId : ''}"
+                        style="min-width:110px;max-width:160px;font-size:12px;padding:2px 4px;border-radius:4px;border:1px solid #ced4da;">
+                        ${options}
+                    </select>`;
+        }
+
+        function buildOrderTypeCell(orderId, currentOrderType) {
+            const normalizedType = String(currentOrderType || 'self_pickup').trim().toLowerCase();
+            const options = [
+                { value: 'self_pickup', label: 'Self Pickup' },
+                { value: 'delivery', label: 'Delivery' }
+            ].map(function(option) {
+                const isSelected = option.value === normalizedType;
+                return `<option value="${option.value}"${isSelected ? ' selected' : ''}>${option.label}</option>`;
+            }).join('');
+
+            return `<select class="assign-order-type-select form-select form-select-sm"
+                        data-order-id="${orderId}"
+                        style="min-width:120px;max-width:170px;font-size:12px;padding:2px 4px;border-radius:4px;border:1px solid #ced4da;">
+                        ${options}
+                    </select>`;
+        }
+
+        // Store previous value on focus
+        $(document).on('focus', '.assign-staff-select', function() {
+            $(this).data('prev-val', $(this).val() || '');
+        });
+
+        /**
+         * Save staff assignment via API.
+         */
+        $(document).on('change', '.assign-staff-select', function() {
+            const $sel = $(this);
+            const orderId = $sel.data('order-id');
+            const staffId = $sel.val();
+            const prevStaffId = $sel.data('prev-val') || '';
+            const authToken = localStorage.getItem('authToken') || window.authToken || '';
+
+            Swal.fire({
+                title: 'Are you sure?',
+                text: 'Are you sure you want to assign this staff?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ff9f43',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, assign!',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $sel.prop('disabled', true);
+
+                    $.ajax({
+                        url: '/api/orders/' + orderId + '/assign-staff',
+                        method: 'POST',
+                        headers: {
+                            'Authorization': 'Bearer ' + authToken,
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                        data: { staff_id: staffId },
+                        success: function(response) {
+                            $sel.prop('disabled', false);
+                            if (response.status) {
+                                // Update the prev-val data attribute
+                                $sel.data('prev-val', staffId);
+
+                                // Update the orderDataMap so expandable rows stay in sync
+                                if (window.orderDataMap && window.orderDataMap[orderId]) {
+                                    window.orderDataMap[orderId].staff_id   = response.staff_id;
+                                    window.orderDataMap[orderId].staff_name = response.staff_name;
+                                }
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Success',
+                                    text: response.message,
+                                    confirmButtonText: 'OK',
+                                    confirmButtonColor: '#ff9f43',
+                                });
+                            } else {
+                                // Revert to previous value
+                                $sel.val(prevStaffId);
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: response.message || 'Failed to assign staff.',
+                                });
+                            }
+                        },
+                        error: function() {
+                            $sel.prop('disabled', false);
+                            // Revert to previous value
+                            $sel.val(prevStaffId);
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: 'Error saving staff assignment. Please try again.',
+                            });
+                        }
+                    });
+                } else {
+                    // Revert to previous value
+                    $sel.val(prevStaffId);
+                }
+            });
+        });
+
+        $(document).on('change', '.assign-order-type-select', function() {
+            const $sel = $(this);
+            const orderId = $sel.data('order-id');
+            const orderType = $sel.val();
+            const authToken = localStorage.getItem('authToken') || window.authToken || '';
+
+            $sel.prop('disabled', true);
+
+            $.ajax({
+                url: '/api/orders/' + orderId + '/order-type',
+                method: 'POST',
+                headers: {
+                    'Authorization': 'Bearer ' + authToken,
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                data: { order_type: orderType },
+                success: function(response) {
+                    $sel.prop('disabled', false);
+                    if (response.status) {
+                        if (window.orderDataMap && window.orderDataMap[orderId]) {
+                            window.orderDataMap[orderId].order_type = response.order_type;
+                        }
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Updated',
+                            text: response.message || 'Order type updated successfully.',
+                            timer: 1400,
+                            showConfirmButton: false
+                        });
+                    } else {
+                        $sel.val((window.orderDataMap && window.orderDataMap[orderId] && window.orderDataMap[orderId].order_type) || 'self_pickup');
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: response.message || 'Failed to update order type.'
+                        });
+                    }
+                },
+                error: function(xhr) {
+                    $sel.prop('disabled', false);
+                    $sel.val((window.orderDataMap && window.orderDataMap[orderId] && window.orderDataMap[orderId].order_type) || 'self_pickup');
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: xhr.responseJSON?.message || 'Failed to update order type.'
+                    });
+                }
+            });
+        });
     </script>
 
     <script>
@@ -2211,105 +2615,7 @@
         // Helper function to get status badge HTML
         // In your JavaScript code, update the getStatusBadge and getMobileStatusBadge functions:
 
-        // ===== EMI Details Modal Logic =====
-        var emiAllMonths = []; // store all month rows for filtering
-
-        function renderEmiTable(rows) {
-            if (!rows || rows.length === 0) {
-                $('#emiMonthTableBody').html('<tr><td colspan="5" class="emi-no-rows">No records found.</td></tr>');
-                return;
-            }
-            var html = '';
-            rows.forEach(function(row) {
-                var statusBadge = row.status && row.status.toLowerCase() === 'paid'
-                    ? '<span class="emi-status-paid">Paid</span>'
-                    : '<span class="emi-status-pending">Pending</span>';
-                var paidOn = (row.paid_on && row.paid_on !== '-') ? row.paid_on : '<span class="emi-td-dash">-</span>';
-                var remark = (row.remark && row.remark !== '-') ? row.remark : '<span class="emi-td-dash">-</span>';
-                var amt = '₹' + Number(row.amount).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
-                html += '<tr>';
-                html += '<td>' + (row.label || '') + '</td>';
-                html += '<td>' + statusBadge + '</td>';
-                html += '<td>' + amt + '</td>';
-                html += '<td>' + paidOn + '</td>';
-                html += '<td>' + remark + '</td>';
-                html += '</tr>';
-            });
-            $('#emiMonthTableBody').html(html);
-        }
-
-        function filterEmiTable() {
-            var status = $('#emiStatusFilter').val();
-            var search = ($('#emiMonthSearch').val() || '').toLowerCase().trim();
-            var filtered = emiAllMonths.filter(function(row) {
-                var matchStatus = (status === 'all') || (row.status && row.status.toLowerCase() === status);
-                var matchSearch = !search || (row.label && row.label.toLowerCase().indexOf(search) !== -1);
-                return matchStatus && matchSearch;
-            });
-            renderEmiTable(filtered);
-        }
-
-        $('#emiStatusFilter').on('change', filterEmiTable);
-        $('#emiMonthSearch').on('input', filterEmiTable);
-
-        function openEmiDetails(id) {
-            // Reset filters
-            $('#emiStatusFilter').val('all');
-            $('#emiMonthSearch').val('');
-
-            // Reset modal fields
-            $('#emiOrderNumber').text('—');
-            $('#emiCustomerName').text('—');
-            $('#emiNextDueBadge').text('Next due: —');
-            $('#emiNextDueBadge2').text('Next due: —');
-            $('#emiTenureDisplay').text('—');
-            $('#emiMonthlyDisplay').text('—');
-            $('#emiDownPaymentDisplay').text('—');
-            $('#emiLoanAmountDisplay').text('—');
-            $('#emiInterestDisplay').text('—');
-            $('#emiGuarantorDisplay').text('—');
-            $('#emiAadharDisplay').text('—');
-            $('#emiPanDisplay').text('—');
-            $('#emiMonthTableBody').html('<tr><td colspan="5" class="emi-no-rows">Loading...</td></tr>');
-            emiAllMonths = [];
-
-            // Open Modal
-            $('#emiModal').modal('show');
-
-            $.ajax({
-                url: "{{ route('sales.emi.details', ':id') }}".replace(':id', id),
-                type: "GET",
-                dataType: "json",
-                success: function(res) {
-                    var fmt = function(n) {
-                        return '₹' + Number(n || 0).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
-                    };
-                    var nextDueLabel = res.next_due_label || 'Completed';
-                    var nextDueText = 'Next due: ' + nextDueLabel;
-
-                    $('#emiOrderNumber').text(res.order_number || '—');
-                    $('#emiCustomerName').text(res.customer_name || '—');
-                    $('#emiNextDueBadge').text(nextDueText);
-                    $('#emiNextDueBadge2').text(nextDueText);
-                    $('#emiTenureDisplay').text((res.months || 0) + ' Months');
-                    $('#emiMonthlyDisplay').text(fmt(res.emi_amount));
-                    $('#emiDownPaymentDisplay').text(fmt(res.down_payment));
-                    $('#emiLoanAmountDisplay').text(fmt(res.loan_amount));
-                    $('#emiInterestDisplay').text(Number(res.interest_rate || 0).toFixed(2) + '%');
-                    $('#emiGuarantorDisplay').text(res.guarantor_name || 'N/A');
-                    $('#emiAadharDisplay').text(res.aadhar_number || 'N/A');
-                    $('#emiPanDisplay').text(res.pan_number || 'N/A');
-
-                    emiAllMonths = Array.isArray(res.month_details) ? res.month_details : [];
-                    renderEmiTable(emiAllMonths);
-                },
-                error: function(xhr) {
-                    console.log(xhr.responseText);
-                    $('#emiMonthTableBody').html('<tr><td colspan="5" class="emi-no-rows">Unable to load EMI Details.</td></tr>');
-                }
-            });
-        }
-
+        // Helper function to get status badge HTML
         function formatPaymentHistoryDate(value) {
             if (!value) return 'N/A';
 
@@ -2331,54 +2637,464 @@
             return value;
         }
 
-        function formatDateForInput(value) {
-            if (!value) return '';
+        function formatCurrencyValue(amount, currencySymbol = '₹', currencyPosition = 'left') {
+            const numericAmount = parseFloat(amount || 0);
+            const formattedAmount = numericAmount.toLocaleString(undefined, {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
 
-            const datePart = String(value).split(' ')[0];
-            if (/^\d{4}-\d{2}-\d{2}$/.test(datePart)) {
-                return datePart;
-            }
-
-            const parsedDate = new Date(value);
-            if (!isNaN(parsedDate.getTime())) {
-                return parsedDate.toISOString().slice(0, 10);
-            }
-
-            return '';
+            return currencyPosition === 'right' ?
+                `${formattedAmount}${currencySymbol}` :
+                `${currencySymbol}${formattedAmount}`;
         }
 
-        function formatPaymentMethodLabel(value) {
-            const method = String(value || '').toLowerCase();
+        function formatEmiTenureValue(value) {
+            if (!value && value !== 0) return 'N/A';
 
-            switch (method) {
-                case 'cash':
-                    return 'Cash';
-                case 'online':
-                case 'upi':
-                    return 'Online';
-                case 'emi':
-                    return 'EMI';
-                case 'cash_online':
-                    return 'Cash + Online';
-                default:
-                    return value || 'N/A';
+            const raw = String(value).trim();
+            if (!raw) return 'N/A';
+
+            const lower = raw.toLowerCase();
+            if (lower.includes('month') || lower.includes('year')) {
+                return raw;
             }
+
+            const months = parseInt(raw, 10);
+            if (Number.isFinite(months) && months > 0) {
+                return months === 1 ? '1 Month' : `${months} Months`;
+            }
+
+            return raw;
         }
 
-        function formatPaymentTypeLabel(value) {
-            const type = String(value || '').toLowerCase();
+        function getEmiDisplayValue(order, currencySymbol, currencyPosition) {
+            const monthly = order.emi_monthly_amount ?? order.emi_monthly ?? order.emi_monthly_value;
+            return formatCurrencyValue(monthly || 0, currencySymbol, currencyPosition);
+        }
 
-            switch (type) {
-                case 'fully':
-                    return 'Fully';
-                case 'partially':
-                case 'partial':
-                    return 'Partially';
-                case 'emi':
-                    return 'EMI';
-                default:
-                    return value || 'N/A';
+        function resolveEmiTenure(order, fallback = 0) {
+            const rawTenure = order?.emi_tenure || order?.emi_duration || fallback || 0;
+            return parseInt(String(rawTenure).replace(/[^0-9]/g, ''), 10) || 0;
+        }
+
+        function resolvePaymentOrder($button) {
+            const orderId = $button.data('id');
+            const mappedOrder = window.orderDataMap && window.orderDataMap[orderId] ? window.orderDataMap[orderId] : {};
+
+            return {
+                ...mappedOrder,
+                id: orderId,
+                payment_method: $button.data('method') || mappedOrder.payment_method || '',
+                emi_tenure: mappedOrder.emi_tenure || mappedOrder.emi_duration || $button.data('emi-duration') || 0,
+                emi_monthly_amount: parseFloat(mappedOrder.emi_monthly_amount || $button.data('emi-monthly-amount') || 0),
+                total_amount: parseFloat(mappedOrder.total_amount || $button.data('total-amount') || 0),
+                remaining_amount: parseFloat(mappedOrder.remaining_amount || $button.data('remaining-amount') || 0),
+                total_return: parseFloat(mappedOrder.total_return || $button.data('return-amount') || 0),
+                currencySymbol: mappedOrder.currencySymbol || '₹',
+                currencyPosition: mappedOrder.currencyPosition || 'left'
+            };
+        }
+
+        function hasEmiData(order) {
+            return String(order.payment_method || '').toLowerCase() === 'emi' ||
+                parseFloat(order.emi_monthly_amount || 0) > 0 ||
+                !!order.emi_tenure ||
+                parseFloat(order.emi_loan_amount || 0) > 0;
+        }
+
+        function isDeliveryOrder(order) {
+            return String((order && order.order_type) || '').toLowerCase() === 'delivery';
+        }
+
+        function buildTicketCreateUrl(order) {
+            const params = new URLSearchParams();
+
+            if (order && order.id) {
+                params.set('order_id', order.id);
             }
+
+            const customerId = order?.user_id || order?.user?.id || '';
+            if (customerId) {
+                params.set('customer_id', customerId);
+            }
+
+            const queryString = params.toString();
+            return queryString ? `/ticket-create?${queryString}` : '/ticket-create';
+        }
+
+        function buildSalesActionDropdown(order, currentStatus) {
+            const status = String(currentStatus || (order && order.quotation_status) || 'sales').toLowerCase();
+            let menuItems = '';
+
+            @if (app('hasPermission')(2, 'view'))
+                if (parseFloat(order.remaining_amount || 0) > 0 && status === 'sales') {
+                    menuItems += `<a href="javascript:void(0);" class="dropdown-item make-payment-btn"
+                        data-bs-toggle="modal" data-bs-target="#makePaymentModal"
+                        data-id="${order.id}" data-amount="${order.remaining_amount}"
+                        data-method="${order.payment_method || ''}"
+                        data-emi-months="${order.remaining_emi_months}"
+                        data-emi-duration="${order.emi_tenure || order.emi_duration || 0}"
+                        data-emi-monthly-amount="${order.emi_monthly_amount || 0}"
+                        data-total-amount="${order.total_amount || 0}"
+                        data-remaining-amount="${order.remaining_amount}"
+                        data-return-amount="${order.total_return || 0}"
+                        data-remaining-emi-months="${order.remaining_emi_months}">
+                        <i class="fas fa-money-bill"></i><span>Pay</span>
+                    </a>`;
+                }
+
+                menuItems += `<button type="button" class="dropdown-item open-history" data-id="${order.id}">
+                    <i class="fas fa-history"></i><span>History</span>
+                </button>`;
+            @endif
+
+            if (status === 'quotation' || status === 'advance_receipt') {
+                menuItems += `<a class="dropdown-item convert-to-sales" href="javascript:void(0);" data-id="${order.id}">
+                    <i class="fas fa-exchange-alt"></i><span>Convert to Sales</span>
+                </a>`;
+            }
+
+            if (hasEmiData(order)) {
+                menuItems += `<button type="button" class="dropdown-item open-emi-details" data-order-id="${order.id}">
+                    <i class="fas fa-calendar-alt"></i><span>EMI Details</span>
+                </button>`;
+            }
+
+            @if (app('hasPermission')(2, 'view'))
+                menuItems += `<a class="dropdown-item" href="/sales-details/${order.id}">
+                    <i class="fas fa-eye"></i><span>View</span>
+                </a>`;
+
+                menuItems += `<a class="dropdown-item" href="${buildTicketCreateUrl(order)}">
+                    <i class="fas fa-ticket-alt"></i><span>Raise Ticket</span>
+                </a>`;
+
+                if (status === 'sales' && isDeliveryOrder(order)) {
+                    menuItems += `<a class="dropdown-item deliver-order" href="/sales/delivery/${order.id}" data-id="${order.id}">
+                        <i class="fas fa-truck"></i><span>Delivery</span>
+                    </a>`;
+                }
+            @endif
+
+            @if (app('hasPermission')(2, 'edit'))
+                if (parseFloat(order.total_return || 0) === 0) {
+                    menuItems += `<a class="dropdown-item" href="/edit-sales/${order.id}">
+                        <i class="fas fa-edit"></i><span>Edit</span>
+                    </a>`;
+                }
+            @endif
+
+            @if (app('hasPermission')(2, 'view'))
+                menuItems += `<a class="dropdown-item" href="/sales-invoice/${order.id}">
+                    <i class="fas fa-file-invoice"></i><span>Invoice</span>
+                </a>`;
+
+                menuItems += `<a class="dropdown-item" href="javascript:void(0);" onclick="window.open('/sales/invoice/pdf/${order.id}');">
+                    <i class="fas fa-print"></i><span>Print Invoice</span>
+                </a>`;
+            @endif
+
+            if (typeof isEinvoiceEnabled !== 'undefined' && isEinvoiceEnabled == 0) {
+                menuItems += `<a class="dropdown-item" href="javascript:void(0);" onclick="openQrUploadModal('${order.id}')">
+                    <i class="fas fa-qrcode"></i><span>Upload QR</span>
+                </a>`;
+            }
+
+            if (userRole !== 'sales-manager' && userRole !== 'purchase-manager' && userRole !== 'inventory-manager') {
+                @if (app('hasPermission')(2, 'delete'))
+                    menuItems += `<a class="dropdown-item text-danger delete-order" href="javascript:void(0);" data-id="${order.id}">
+                        <i class="fas fa-trash"></i><span>Delete</span>
+                    </a>`;
+                @endif
+            }
+
+            if (!menuItems) {
+                menuItems = '<span class="dropdown-item text-muted">No actions</span>';
+            }
+
+            return `<div class="dropdown sales-action-dropdown">
+                <button class="btn action-menu-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="Actions">
+                    <i class="fas fa-ellipsis-h"></i>
+                </button>
+                <div class="dropdown-menu dropdown-menu-end sales-action-menu">
+                    ${menuItems}
+                </div>
+            </div>`;
+        }
+
+        function positionSalesActionMenu(dropdownEl) {
+            const $dropdown = $(dropdownEl);
+            const $menu = $dropdown.data('floating-menu') || $dropdown.find('.sales-action-menu');
+            const button = $dropdown.find('.action-menu-toggle')[0];
+
+            if (!$menu.length || !button) {
+                return;
+            }
+
+            const rect = button.getBoundingClientRect();
+            const menuEl = $menu[0];
+            const menuWidth = menuEl.offsetWidth || 168;
+            const menuHeight = menuEl.offsetHeight || menuEl.scrollHeight || 220;
+            const viewportWidth = window.innerWidth || document.documentElement.clientWidth;
+            const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
+            const gap = 4;
+
+            let left = rect.right - menuWidth;
+            left = Math.max(8, Math.min(left, viewportWidth - menuWidth - 8));
+
+            const spaceBelow = viewportHeight - rect.bottom - gap - 8;
+            const spaceAbove = rect.top - gap - 8;
+            let top = rect.bottom + gap;
+
+            if (menuHeight > spaceBelow && spaceAbove > spaceBelow) {
+                top = Math.max(8, rect.top - menuHeight - gap);
+            }
+
+            $menu.css({
+                left: `${left}px`,
+                maxHeight: `${Math.max(120, Math.min(menuHeight, Math.max(spaceBelow, spaceAbove, 120)))}px`,
+                overflowY: 'auto',
+                position: 'fixed',
+                top: `${top}px`,
+                transform: 'none'
+            });
+        }
+
+        $(document).on('show.bs.dropdown', '.sales-action-dropdown', function() {
+            const $dropdown = $(this);
+            const $menu = $dropdown.find('.sales-action-menu');
+
+            if (!$menu.length) {
+                return;
+            }
+
+            $dropdown.data('floating-menu', $menu);
+            $dropdown.data('menu-parent', $menu.parent());
+            $dropdown.data('menu-next', $menu.next());
+            $menu.addClass('sales-action-menu-floating').appendTo('body');
+        });
+
+        $(document).on('shown.bs.dropdown', '.sales-action-dropdown', function() {
+            const dropdownEl = this;
+            requestAnimationFrame(() => {
+                positionSalesActionMenu(dropdownEl);
+            });
+        });
+
+        $(document).on('hidden.bs.dropdown', '.sales-action-dropdown', function() {
+            const $dropdown = $(this);
+            const $menu = $dropdown.data('floating-menu');
+            const $parent = $dropdown.data('menu-parent');
+            const $next = $dropdown.data('menu-next');
+
+            if ($menu && $menu.length && $parent && $parent.length) {
+                $menu.removeClass('sales-action-menu-floating').removeAttr('style');
+                if ($next && $next.length && $.contains($parent[0], $next[0])) {
+                    $menu.insertBefore($next);
+                } else {
+                    $parent.append($menu);
+                }
+            }
+
+            $dropdown.removeData('floating-menu menu-parent menu-next');
+        });
+
+        $(window).on('scroll resize', function() {
+            $('.sales-action-dropdown.show').each(function() {
+                positionSalesActionMenu(this);
+            });
+        });
+
+        function openEmiDetails(order) {
+            const currencySymbol = order.currencySymbol || '₹';
+            const currencyPosition = order.currencyPosition || 'left';
+            const authToken = localStorage.getItem("authToken") || window.authToken || '';
+
+            $('#emiOrderNumber').text(order.order_number || 'N/A');
+            $('#emiCustomerName').text(order.user?.name || 'N/A');
+            $('#emiTenureValue').text(formatEmiTenureValue(order.emi_tenure || order.emi_duration || 'N/A'));
+            $('#emiMonthlyAmountValue').text(getEmiDisplayValue(order, currencySymbol, currencyPosition));
+            $('#emiDownPaymentValue').text(formatCurrencyValue(order.emi_down_payment || 0, currencySymbol, currencyPosition));
+            $('#emiLoanAmountValue').text(formatCurrencyValue(order.emi_loan_amount || 0, currencySymbol, currencyPosition));
+            $('#emiInterestRateValue').text(`${parseFloat(order.emi_interest_rate || 0).toFixed(2)}%`);
+            $('#emiAadharValue').text(order.emi_aadhar_number || 'N/A');
+            $('#emiPanValue').text(order.emi_pan_number || 'N/A');
+            $('#emiGuarantorValue').text(order.emi_guarantor_name || 'N/A');
+
+            $('#emiMonthWiseBody').html('<tr><td colspan="5" class="text-center text-muted">Loading EMI schedule...</td></tr>');
+            $('#emiNextDueLabel, #emiNextDueSchedule').text('');
+
+            const modal = new bootstrap.Modal(document.getElementById('emiDetailsModal'));
+            modal.show();
+
+            $.ajax({
+                url: '/api/sales/payment-history/' + order.id,
+                method: 'GET',
+                headers: {
+                    "Authorization": "Bearer " + authToken
+                },
+                success: function(response) {
+                    renderEmiMonthWiseDetails(order, response.data || []);
+                },
+                error: function() {
+                    $('#emiMonthWiseBody').html('<tr><td colspan="5" class="text-center text-danger">Failed to load EMI schedule.</td></tr>');
+                    $('#emiNextDueLabel, #emiNextDueSchedule').text('');
+                }
+            });
+        }
+
+        let currentPaymentOrder = null;
+
+        function loadEmiMonthOptionsForPayment(orderId, emiTenure, emiMonthlyAmount, orderData = null) {
+            const order = orderData || { id: orderId, emi_tenure: emiTenure, emi_monthly_amount: emiMonthlyAmount };
+            const tenure = resolveEmiTenure(order, emiTenure);
+
+            if (tenure <= 0) {
+                $('#emiMonthDiv').addClass('d-none');
+                $('#emiMonthSelect').empty().append('<option value="" selected disabled>Select EMI Month</option>');
+                $('#emiMonthError').text('This order does not have an EMI plan. Edit the sale to configure EMI tenure.');
+                return;
+            }
+
+            $('#emiMonthError').text('');
+            const token = localStorage.getItem("authToken") || window.authToken || '';
+
+            $.ajax({
+                url: '/api/sales/payment-history/' + orderId,
+                method: 'GET',
+                headers: {
+                    "Authorization": "Bearer " + token
+                },
+                success: function(response) {
+                    const emiMonths = [];
+                    (response.data || []).forEach(function(payment) {
+                        const paymentMethod = String(payment.payment_method || '').toLowerCase();
+                        const paymentType = String(payment.payment_type || '').toLowerCase();
+                        if (paymentMethod === 'emi' || paymentType === 'emi') {
+                            if (payment.emi_month) {
+                                emiMonths.push(parseInt(payment.emi_month, 10));
+                            }
+                        }
+                    });
+                    populateEmiMonthOptions({
+                        ...order,
+                        emi_tenure: tenure,
+                        emi_duration: tenure
+                    }, emiMonths);
+
+                    if (emiMonthlyAmount > 0) {
+                        $('#emiMonthlyAmountInput').val(emiMonthlyAmount);
+                    }
+                },
+                error: function() {
+                    populateEmiMonthOptions({
+                        ...order,
+                        emi_tenure: tenure,
+                        emi_duration: tenure
+                    }, []);
+                }
+            });
+        }
+
+        function populateEmiMonthOptions(order, paidMonths = []) {
+            const tenureRaw = order.emi_tenure || order.emi_duration || 0;
+            const tenure = parseInt(String(tenureRaw).replace(/[^0-9]/g, ''), 10) || 0;
+            const monthlyAmount = parseFloat(order.emi_monthly_amount || 0);
+            const currencySymbol = order.currencySymbol || '₹';
+            const currencyPosition = order.currencyPosition || 'left';
+            const $select = $('#emiMonthSelect');
+            $select.empty().append('<option value="" selected disabled>Select EMI Month</option>');
+
+            if (tenure <= 0) {
+                $('#emiMonthDiv').addClass('d-none');
+                return;
+            }
+
+            const paidSet = new Set((paidMonths || []).map(v => parseInt(v, 10)).filter(v => Number.isFinite(v) && v > 0));
+            let nextDueMonth = null;
+
+            for (let month = 1; month <= tenure; month++) {
+                const label = month === 1 ? '1st Month' : month === 2 ? '2nd Month' : month === 3 ? '3rd Month' : `${month}th Month`;
+                const isPaid = paidSet.has(month);
+                if (nextDueMonth === null && !isPaid) {
+                    nextDueMonth = month;
+                }
+                const isLocked = nextDueMonth !== null && month > nextDueMonth;
+                const amountLabel = monthlyAmount > 0 ? ` - ${formatCurrencyValue(monthlyAmount, currencySymbol, currencyPosition)}` : '';
+                const statusLabel = isPaid ? ' (Paid)' : (isLocked ? ' (Upcoming)' : ' (Pay now)');
+                const option = `<option value="${month}" ${isPaid || isLocked ? 'disabled' : ''}>${label}${amountLabel}${statusLabel}</option>`;
+                $select.append(option);
+            }
+
+            if (nextDueMonth !== null) {
+                $select.val(String(nextDueMonth));
+                $('#emiMonthError').text('');
+            } else {
+                $select.empty().append('<option value="" selected disabled>All EMI months are paid</option>');
+                $('#emiMonthError').text('All EMI months for this order have already been paid.');
+            }
+
+            $('#emiMonthDiv').removeClass('d-none');
+        }
+
+        function renderEmiMonthWiseDetails(order, history) {
+            const tenureRaw = order.emi_tenure || order.emi_duration || 0;
+            const tenure = parseInt(String(tenureRaw).replace(/[^0-9]/g, ''), 10) || 0;
+            const monthlyAmount = parseFloat(order.emi_monthly_amount || 0);
+            const paidMap = new Map();
+
+            (history || []).forEach(function(payment) {
+                const paymentMethod = String(payment.payment_method || '').toLowerCase();
+                const paymentType = String(payment.payment_type || '').toLowerCase();
+                if (paymentMethod === 'emi' || paymentType === 'emi') {
+                    const monthNo = parseInt(payment.emi_month, 10);
+                    if (monthNo > 0) {
+                        paidMap.set(monthNo, payment);
+                    }
+                }
+            });
+
+            const rows = [];
+            for (let month = 1; month <= tenure; month++) {
+                const payment = paidMap.get(month);
+                const isPaid = !!payment;
+                const label = month === 1 ? '1st Month' : month === 2 ? '2nd Month' : month === 3 ? '3rd Month' : `${month}th Month`;
+                rows.push(`
+                    <tr>
+                        <td>${label}</td>
+                        <td>
+                            <span class="status-badge ${isPaid ? 'status-completed' : 'status-pending'}">
+                                ${isPaid ? 'Paid' : 'Pending'}
+                            </span>
+                        </td>
+                        <td>${formatCurrencyValue(payment?.payment_amount || monthlyAmount, order.currencySymbol || '₹', order.currencyPosition || 'left')}</td>
+                        <td>${isPaid ? formatPaymentHistoryDate(payment.payment_date || payment.created_at) : '-'}</td>
+                        <td>${isPaid ? (payment.remarks || '-') : '-'}</td>
+                    </tr>
+                `);
+            }
+
+            if (!rows.length) {
+                rows.push('<tr><td colspan="5" class="text-center text-muted">No EMI schedule found.</td></tr>');
+            }
+
+            $('#emiMonthWiseBody').html(rows.join(''));
+
+            const nextDue = (history || [])
+                .filter(function(payment) {
+                    return String(payment.payment_method || '').toLowerCase() === 'emi' || String(payment.payment_type || '').toLowerCase() === 'emi';
+                })
+                .map(function(payment) { return parseInt(payment.emi_month, 10); })
+                .filter(function(v) { return Number.isFinite(v) && v > 0; });
+
+            let nextMonth = 1;
+            while (nextMonth <= tenure && nextDue.includes(nextMonth)) {
+                nextMonth++;
+            }
+
+            $('#emiNextDueLabel').text(nextMonth <= tenure ? `Next due: ${nextMonth === 1 ? '1st' : nextMonth === 2 ? '2nd' : nextMonth === 3 ? '3rd' : `${nextMonth}th`} Month` : 'All EMI months paid');
+            $('#emiNextDueSchedule').text(nextMonth <= tenure ? `Next due: ${nextMonth === 1 ? '1st' : nextMonth === 2 ? '2nd' : nextMonth === 3 ? '3rd' : `${nextMonth}th`} Month` : 'All EMI months paid');
         }
 
         function getStatusBadge(status, type = 'payment', extraPaid = 0) {
@@ -2390,18 +3106,16 @@
                         return `<span class="status-badge status-quotation">Quotation</span>`;
                     case 'sales':
                     case 'sale':
-                    case 'sales':
                         return `<span class="status-badge status-sales">Sales</span>`;
+                    case 'advance_receipt':
+                        return `<span class="status-badge status-other">Advance Receipt</span>`;
                     default:
                         return `<span class="status-badge status-other">${status || 'N/A'}</span>`;
                 }
             }
 
             if (type === 'payment') {
-                // Check if there's extra paid (advance/overpayment)
-                if (extraPaid > 0) {
-                    return `<span class="status-badge status-pending">Extra Paid: ₹${extraPaid.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>`; // Red for extra paid
-                }
+
 
                 // Payment Status badges
                 switch (status) {
@@ -2430,7 +3144,8 @@
                         return `<span class="status-badge status-cash">Cash</span>`; // Teal
                     case 'online':
                         return `<span class="status-badge status-online">Online</span>`; // Green
-
+                    case 'emi':
+                        return `<span class="status-badge status-emi">EMI</span>`; // Red
                     case 'cash_online':
                     case 'cash + online':
                         return `<span class="status-badge status-cash_online">Cash+Online</span>`; // Green
@@ -2457,10 +3172,7 @@
             }
 
             if (type === 'payment') {
-                // Check if there's extra paid (advance/overpayment)
-                if (extraPaid > 0) {
-                    return `<span class="mobile-badge status-pending">Extra: ₹${extraPaid.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>`; // Red for extra paid
-                }
+
 
                 switch (status) {
                     case 'pending':
@@ -2487,7 +3199,8 @@
                         return `<span class="mobile-badge status-cash">Cash</span>`; // Teal
                     case 'online':
                         return `<span class="mobile-badge status-online">Online</span>`; // Green
-
+                    case 'emi':
+                        return `<span class="mobile-badge status-emi">EMI</span>`; // Red
                     case 'cash_online':
                     case 'cash + online':
                         return `<span class="mobile-badge status-cash_online">Cash+Online</span>`; // Green
@@ -2529,38 +3242,54 @@
                 // Build action buttons HTML
                 let actionBtns = '';
                 @if (app('hasPermission')(2, 'view'))
-                    // if (status === 'sales') {
-                    if (parseFloat(order.remaining_amount || 0) > 0 && status === 'sales') {
-                        actionBtns += `<a href="javascript:void(0);" class="btn btn-sm btn-primary make-payment-btn"
+                // if (status === 'sales') {
+                if (parseFloat(order.remaining_amount || 0) > 0 && status === 'sales') {
+                    actionBtns += `<a href="javascript:void(0);" class="btn btn-sm btn-primary make-payment-btn"
                         data-bs-toggle="modal" data-bs-target="#makePaymentModal"
                         data-id="${order.id}" data-amount="${order.remaining_amount}"
                         data-method="${order.payment_method || ''}"
                         data-emi-months="${order.remaining_emi_months}"
-                        data-emi-duration="${order.emi_duration || 0}"
+                        data-emi-duration="${order.emi_tenure || order.emi_duration || 0}"
+                        data-emi-monthly-amount="${order.emi_monthly_amount || 0}"
                         data-total-amount="${order.total_amount || 0}"
                         data-remaining-amount="${order.remaining_amount}"
                         data-return-amount="${order.total_return || 0}"
                         data-remaining-emi-months="${order.remaining_emi_months}"
-                        data-tds-percentage="${order.tds_percentage || 0}"
-                        data-tds-amount="${order.tds_amount || 0}"
-                        data-emi-tenure="${order.emi_tenure || 0}"
-                        data-emi-monthly="${order.emi_monthly_amount || 0}"
                         title="Make Payment">
                         <i class="fas fa-money-bill"></i> Pay
                     </a>`;
-                    }
+                }
                 @endif
 
                 @if (app('hasPermission')(2, 'view'))
-                    actionBtns += `<button class="btn btn-sm btn-secondary open-history" data-id="${order.id}" title="Payment History">
+                actionBtns += `<button class="btn btn-sm btn-secondary open-history" data-id="${order.id}" title="Payment History">
                     <i class="fas fa-history"></i> History
                 </button>`;
                 @endif
 
-                if ((order.quotation_status || '').toLowerCase() === 'quotation') {
+                if (['quotation', 'advance_receipt'].includes((order.quotation_status || '').toLowerCase())) {
                     actionBtns += `<a class="btn btn-sm btn-success convert-to-sales" href="javascript:void(0);" data-id="${order.id}" title="Convert to Sales">
                         Convert to Sales
                     </a>`;
+                }
+
+                if ((order.quotation_status || '').toLowerCase() === 'advance_receipt') {
+                    actionBtns += `<a class="btn btn-sm make-payment-btn" href="javascript:void(0);"
+                        data-bs-toggle="modal" data-bs-target="#makePaymentModal"
+                        data-id="${order.id}" data-amount="${order.remaining_amount}"
+                        data-method="${order.payment_method || 'cash'}"
+                        data-total-amount="${order.total_amount || 0}"
+                        data-remaining-amount="${order.remaining_amount}"
+                        style="background-color:#7367f0;color:#fff;"
+                        title="Complete Payment for Advance Receipt">
+                        <i class="fas fa-check-circle"></i> Complete Payment
+                    </a>`;
+                }
+
+                if (hasEmiData(order)) {
+                    actionBtns += `<button type="button" class="btn btn-sm emi-action-btn open-emi-details" data-order-id="${order.id}" title="View EMI Details">
+                        <i class="fas fa-calendar-alt"></i> EMI
+                    </button>`;
                 }
 
                 @if (app('hasPermission')(2, 'view'))
@@ -2568,6 +3297,13 @@
                         <i class="fas fa-eye"></i> View
                     </a>`;
                 @endif
+
+                // Show delivery/truck icon only for delivery sales.
+                if ((order.quotation_status || '').toLowerCase() === 'sales' && isDeliveryOrder(order)) {
+                    actionBtns += `<a class="btn btn-sm btn-primary me-2 deliver-order" href="/sales/delivery/${order.id}" data-id="${order.id}" title="Delivery">
+                        <i class="fas fa-truck"></i>
+                    </a>`;
+                }
 
                 // if (!order.has_payment || order.has_payment === 0) {
                 @if (app('hasPermission')(2, 'edit'))
@@ -2592,6 +3328,12 @@
                             <i class="fas fa-trash"></i> Delete
                         </a>`;
                     @endif
+                }
+
+                if (typeof isEinvoiceEnabled !== 'undefined' && isEinvoiceEnabled == 0) {
+                    actionBtns += `<a class="btn btn-sm btn-outline-primary" href="javascript:void(0);" onclick="openQrUploadModal('${order.id}')" title="Upload QR">
+                        <i class="fas fa-qrcode"></i> Upload QR
+                    </a>`;
                 }
 
                 const cardHtml = `
@@ -2633,31 +3375,43 @@
                                     ${getMobileStatusBadge(parseFloat(order.total_return || 0) > 0 ? 'returned' : '', 'return')}
                                 </span>
                             </div>
-                            ${parseFloat(order.tds_amount || 0) > 0 ? `
-                                                                <div class="mobile-detail-row">
-                                                                    <span class="mobile-detail-label" style="color: #6f42c1;">TDS (${parseFloat(order.tds_percentage || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}%):</span>
-                                                                    <span class="mobile-detail-value" style="color: #6f42c1; font-weight: bold;">
-                                                                        ${currencySymbol}${parseFloat(order.tds_amount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                                                                    </span>
-                                                                </div>
-                                                            ` : ''}
                             ${order.extra_paid > 0 ? `
-                                                                <div class="mobile-detail-row">
-                                                                    <span class="mobile-detail-label" style="color: #dc3545;">Extra Paid:</span>
-                                                                    <span class="mobile-detail-value" style="color: #dc3545; font-weight: bold;">
-                                                                        ${currencySymbol}${parseFloat(order.extra_paid || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                                                                    </span>
-                                                                </div>
-                                                            ` : ''}
+                                <div class="mobile-detail-row">
+                                    <span class="mobile-detail-label" style="color: #dc3545;">Extra Paid:</span>
+                                    <span class="mobile-detail-value" style="color: #dc3545; font-weight: bold;">
+                                        ${currencySymbol}${parseFloat(order.extra_paid || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                    </span>
+                                </div>
+                            ` : ''}
                             <div class="mobile-detail-row">
                                 <span class="mobile-detail-label">Payment Method:</span>
                                 <span class="mobile-detail-value">
                                     ${getMobileStatusBadge(order.payment_method, 'method')}
                                 </span>
                             </div>
+                            ${hasEmiData(order) ? `
+                                <div class="mobile-detail-row">
+                                    <span class="mobile-detail-label">EMI Tenure:</span>
+                                    <span class="mobile-detail-value">${formatEmiTenureValue(order.emi_tenure || order.emi_duration || 'N/A')}</span>
+                                </div>
+                                <div class="mobile-detail-row">
+                                    <span class="mobile-detail-label">Monthly EMI:</span>
+                                    <span class="mobile-detail-value" style="font-weight: 700; color: #1b2850;">
+                                        ${getEmiDisplayValue(order, currencySymbol, currencyPosition)}
+                                    </span>
+                                </div>
+                            ` : ''}
                             <div class="mobile-detail-row">
                                 <span class="mobile-detail-label">Total:</span>
                                 <span class="mobile-detail-value" style="font-weight: bold; color: #ff9f43;">${displayAmount}</span>
+                            </div>
+                            <div class="mobile-detail-row">
+                                <span class="mobile-detail-label">Assigned Staff:</span>
+                                <span class="mobile-detail-value">${buildStaffCell(order.id, order.staff_id, order.staff_name)}</span>
+                            </div>
+                            <div class="mobile-detail-row">
+                                <span class="mobile-detail-label">Order Type:</span>
+                                <span class="mobile-detail-value">${buildOrderTypeCell(order.id, order.order_type)}</span>
                             </div>
                             <div class="mobile-detail-row">
                                 <span class="mobile-detail-label">Biller:</span>
@@ -2665,13 +3419,13 @@
                             </div>
                             ${parseFloat(order.remaining_amount || 0) > 0 &&
                             (order.quotation_status || 'sales').toLowerCase() === 'sales' ? `
-                                                                <div class="mobile-detail-row">
-                                                                    <span class="mobile-detail-label">Remaining:</span>
-                                                                    <span class="mobile-detail-value" style="color: #dc3545; font-weight: bold;">
-                                                                        ${currencySymbol}${parseFloat(order.remaining_amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                                                                    </span>
-                                                                </div>
-                                                            ` : ''}
+                                <div class="mobile-detail-row">
+                                    <span class="mobile-detail-label">Remaining:</span>
+                                    <span class="mobile-detail-value" style="color: #dc3545; font-weight: bold;">
+                                        ${currencySymbol}${parseFloat(order.remaining_amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                    </span>
+                                </div>
+                            ` : ''}
                             <div class="mobile-action-buttons">
                                 ${actionBtns}
                             </div>
@@ -2747,6 +3501,13 @@
                 </a>`;
             @endif
 
+            // Delivery/truck icon (mobile) - only for delivery sales.
+            if ((order.quotation_status || 'sales').toLowerCase() === 'sales' && isDeliveryOrder(order)) {
+                actionBtns += `<a class="btn-icon-mobile btn-deliver deliver-order" href="/sales/delivery/${order.id}" data-id="${order.id}" title="Delivery">
+                    <i class="fas fa-truck"></i>
+                </a>`;
+            }
+
             // Delete icon button
             if (userRole !== 'sales-manager' && userRole !== 'purchase-manager' && userRole !== 'inventory-manager') {
                 @if (app('hasPermission')(2, 'delete'))
@@ -2754,6 +3515,12 @@
                         <i class="fas fa-trash"></i>
                     </a>`;
                 @endif
+            }
+
+            if (typeof isEinvoiceEnabled !== 'undefined' && isEinvoiceEnabled == 0) {
+                actionBtns += `<a class="btn-icon-mobile" style="background-color: #6c757d; color: white;" href="javascript:void(0);" onclick="openQrUploadModal('${order.id}')" title="Upload QR Code">
+                    <i class="fas fa-qrcode"></i>
+                </a>`;
             }
 
             // Payment icon button if there's remaining amount
@@ -2766,22 +3533,25 @@
                     data-id="${order.id}" data-amount="${order.remaining_amount}"
                     data-method="${order.payment_method || ''}"
                     data-emi-months="${order.remaining_emi_months}"
-                    data-emi-duration="${order.emi_duration || 0}"
+                    data-emi-duration="${order.emi_tenure || order.emi_duration || 0}"
+                    data-emi-monthly-amount="${order.emi_monthly_amount || 0}"
                     data-total-amount="${order.total_amount || 0}"
                     data-remaining-amount="${order.remaining_amount}"
                     data-return-amount="${order.total_return || 0}"
                     data-remaining-emi-months="${order.remaining_emi_months}"
-                    data-tds-percentage="${order.tds_percentage || 0}"
-                    data-tds-amount="${order.tds_amount || 0}"
-                    data-emi-tenure="${order.emi_tenure || 0}"
-                    data-emi-monthly="${order.emi_monthly_amount || 0}"
                     title="Make Payment">
                     <i class="fas fa-money-bill-wave"></i>
                 </a>`;
             }
 
+            if (hasEmiData(order)) {
+                actionBtns += `<button type="button" class="btn-icon-mobile btn-payment open-emi-details" data-order-id="${order.id}" title="EMI Details">
+                    <i class="fas fa-calendar-alt"></i>
+                </button>`;
+            }
+
             return `
-        <td colspan="9" class="order-details-content">
+        <td colspan="10" class="order-details-content">
             <div class="order-details-list">
                 <div class="order-detail-row-simple">
                     <span class="order-detail-label-simple">Order Number:</span>
@@ -2813,31 +3583,43 @@
                         ${getStatusBadge(parseFloat(order.total_return || 0) > 0 ? 'returned' : '', 'return')}
                     </span>
                 </div>
-                ${parseFloat(order.tds_amount || 0) > 0 ? `
-                                                    <div class="order-detail-row-simple">
-                                                        <span class="order-detail-label-simple" style="color: #6f42c1;">TDS (${parseFloat(order.tds_percentage || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}%):</span>
-                                                        <span class="order-detail-value-simple" style="color: #6f42c1; font-weight: bold;">
-                                                            ${currencySymbol}${parseFloat(order.tds_amount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                                                        </span>
-                                                    </div>
-                                                ` : ''}
                 ${(order.extra_paid || 0) > 0 ? `
-                                                    <div class="order-detail-row-simple">
-                                                        <span class="order-detail-label-simple" style="color: #dc3545;">Extra Paid:</span>
-                                                        <span class="order-detail-value-simple" style="color: #dc3545; font-weight: bold;">
-                                                            ${currencySymbol}${parseFloat(order.extra_paid).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} (Advance/Refund)
-                                                        </span>
-                                                    </div>
-                                                ` : ''}
+                    <div class="order-detail-row-simple">
+                        <span class="order-detail-label-simple" style="color: #dc3545;">Extra Paid:</span>
+                        <span class="order-detail-value-simple" style="color: #dc3545; font-weight: bold;">
+                            ${currencySymbol}${parseFloat(order.extra_paid).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} (Advance/Refund)
+                        </span>
+                    </div>
+                ` : ''}
                 <div class="order-detail-row-simple">
                     <span class="order-detail-label-simple">Payment Method:</span>
                     <span class="order-detail-value-simple">
                         ${getStatusBadge(order.payment_method, 'method')}
                     </span>
                 </div>
+                ${hasEmiData(order) ? `
+                    <div class="order-detail-row-simple">
+                        <span class="order-detail-label-simple">EMI Tenure:</span>
+                        <span class="order-detail-value-simple">${formatEmiTenureValue(order.emi_tenure || order.emi_duration || 'N/A')}</span>
+                    </div>
+                    <div class="order-detail-row-simple">
+                        <span class="order-detail-label-simple">Monthly EMI:</span>
+                        <span class="order-detail-value-simple" style="font-weight: 700; color: #1b2850;">
+                            ${getEmiDisplayValue(order, currencySymbol, currencyPosition)}
+                        </span>
+                    </div>
+                ` : ''}
                 <div class="order-detail-row-simple">
                     <span class="order-detail-label-simple">Total:</span>
                     <span class="order-detail-value-simple" style="font-weight: bold; color: #ff9f43;">${displayAmount}</span>
+                </div>
+                <div class="order-detail-row-simple">
+                    <span class="order-detail-label-simple">Assigned Staff:</span>
+                    <span class="order-detail-value-simple">${buildStaffCell(order.id, order.staff_id, order.staff_name)}</span>
+                </div>
+                <div class="order-detail-row-simple">
+                    <span class="order-detail-label-simple">Order Type:</span>
+                    <span class="order-detail-value-simple">${buildOrderTypeCell(order.id, order.order_type)}</span>
                 </div>
                 <div class="order-detail-row-simple">
                     <span class="order-detail-label-simple">Biller:</span>
@@ -2845,13 +3627,13 @@
                 </div>
                 ${parseFloat(order.remaining_amount || 0) > 0 &&
 (order.quotation_status || 'sales').toLowerCase() === 'sales' ? `
-                                                    <div class="order-detail-row-simple">
-                                                        <span class="order-detail-label-simple">Remaining:</span>
-                                                        <span class="order-detail-value-simple" style="color: #dc3545; font-weight: bold;">
-                                                            ${currencySymbol}${parseFloat(order.remaining_amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                                                        </span>
-                                                    </div>
-                                                ` : ''}
+                    <div class="order-detail-row-simple">
+                        <span class="order-detail-label-simple">Remaining:</span>
+                        <span class="order-detail-value-simple" style="color: #dc3545; font-weight: bold;">
+                            ${currencySymbol}${parseFloat(order.remaining_amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        </span>
+                    </div>
+                ` : ''}
             </div>
             <div class="mobile-action-buttons-simple">
                 ${actionBtns}
@@ -3033,12 +3815,11 @@
                 }
 
                 // Update Select2 rendered text directly to ensure UI is in sync
-                const monthText = $('#filter-month option:selected').text() || 'All Months';
-                const yearText = $('#filter-year option:selected').text() || 'All Years';
-                const monthRendered = $('#filter-month').next('.select2-container').find('.select2-selection__rendered');
-                const yearRendered = $('#filter-year').next('.select2-container').find('.select2-selection__rendered');
-                if (monthRendered.length) monthRendered.text(monthText.trim());
-                if (yearRendered.length) yearRendered.text(yearText.trim());
+                $('.filter-select2').each(function() {
+                    const text = $(this).find('option:selected').text() || $(this).data('placeholder');
+                    const rendered = $(this).next('.select2-container').find('.select2-selection__rendered');
+                    if (rendered.length) rendered.text(text.trim());
+                });
             } catch (e) {
                 // console.warn('Failed to update Select2 display:', e);
             }
@@ -3062,8 +3843,10 @@
             });
 
             const syncFilterSelect2Display = () => {
-                $('#filter-month, #filter-year').each(function() {
-                    $(this).trigger('change.select2');
+                $('.filter-select2').each(function() {
+                    const text = $(this).find('option:selected').text() || $(this).data('placeholder');
+                    const rendered = $(this).next('.select2-container').find('.select2-selection__rendered');
+                    if (rendered.length) rendered.text(text.trim());
                 });
             };
             syncFilterSelect2Display();
@@ -3109,8 +3892,7 @@
             }
 
             function toggleSalesFinancialYearFilter(enabled) {
-                isFinancialYearEnabled = (enabled === true || enabled === 1 || String(enabled).toLowerCase() ===
-                    'true' || String(enabled).toLowerCase() === 'on' || String(enabled) === '1');
+                isFinancialYearEnabled = Boolean(Number(enabled));
                 const $financialYearWrapper = $('#sales-financial-year-filter');
                 if (isFinancialYearEnabled) {
                     $financialYearWrapper.removeClass('d-none');
@@ -3131,21 +3913,30 @@
                 loadOrders(1);
             });
 
+            $('#filter-sort').off('change select2:select select2:unselect').on('change select2:select select2:unselect', function() {
+                syncFilterSelect2Display();
+                loadOrders(1);
+            });
+
             $(document).on('click', '.make-payment-btn', function() {
-                let jobCardId = $(this).data('id');
-                let totalAmount = $(this).data('total-amount');
-                let remainingAmount = $(this).data('remaining-amount');
-                let returnAmount = parseFloat($(this).data('return-amount')) || 0;
-                let method = $(this).data('method') || '';
-                let tdsPercentage = parseFloat($(this).data('tds-percentage')) || 0;
-                let tdsAmount = parseFloat($(this).data('tds-amount')) || 0;
-                let emiTenure = parseInt($(this).data('emi-tenure')) || 0;
-                let emiMonthly = parseFloat($(this).data('emi-monthly')) || 0;
+                const paymentOrder = resolvePaymentOrder($(this));
+                let jobCardId = paymentOrder.id;
+                let totalAmount = paymentOrder.total_amount;
+                let remainingAmount = paymentOrder.remaining_amount;
+                let returnAmount = paymentOrder.total_return;
+                let method = paymentOrder.payment_method || '';
+                let emiMonthlyAmount = parseFloat(paymentOrder.emi_monthly_amount || 0);
+                let emiTenure = resolveEmiTenure(paymentOrder);
+
+                currentPaymentOrder = {
+                    id: jobCardId,
+                    method: method,
+                    emiTenure: emiTenure,
+                    emiMonthlyAmount: emiMonthlyAmount,
+                    order: paymentOrder
+                };
 
                 // ✅ Fill modal hidden inputs + text spans
-                $('#paymentMethodSelect').data('emi-tenure', emiTenure);
-                $('#paymentMethodSelect').data('emi-monthly', emiMonthly);
-                $('#paymentMethodSelect').data('order-id', jobCardId);
                 $('#paymentJobCardId').val(jobCardId);
                 $('#emiTotal').text(parseFloat(totalAmount).toLocaleString(undefined, {
                     minimumFractionDigits: 2,
@@ -3155,21 +3946,6 @@
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2
                 }));
-
-                // ✅ Show TDS row only when TDS is applied
-                if (tdsAmount > 0) {
-                    $('#tdsPercentageDisplay').text(tdsPercentage.toLocaleString(undefined, {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2
-                    }));
-                    $('#tdsAmountDisplay').text(tdsAmount.toLocaleString(undefined, {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2
-                    }));
-                    $('#tdsAmountSection').removeClass('d-none');
-                } else {
-                    $('#tdsAmountSection').addClass('d-none');
-                }
 
                 if (returnAmount > 0) {
                     $('#returnAmountDisplay').text(returnAmount.toLocaleString(undefined, {
@@ -3184,16 +3960,18 @@
                 $('#remainingAmountHidden').val(remainingAmount);
                 $('#paymentMethodHidden').val(method);
 
-                // ✅ Set payment date to today's date by default
-                const today = new Date();
-                const dd = String(today.getDate()).padStart(2, '0');
-                const mm = String(today.getMonth() + 1).padStart(2, '0');
-                const yyyy = today.getFullYear();
-                const todayFormatted = `${dd}-${mm}-${yyyy}`;
-                $('#paymentDateInput').val(todayFormatted);
-
                 // ✅ Reset payment method dropdown to default
                 $('#paymentMethodSelect').val('');
+                $('#emiMonthlyAmountInput').val(emiMonthlyAmount > 0 ? emiMonthlyAmount : '');
+                if (String(method).toLowerCase() === 'emi') {
+                    $('#paymentMethodSelect').val('emi').trigger('change');
+                    $('#emiMonthlyAmountDiv').removeClass('d-none');
+                    $('#bank_container').removeClass('d-none');
+                    $('#emiMonthlyAmountInput').val(emiMonthlyAmount > 0 ? emiMonthlyAmount : remainingAmount);
+                    loadEmiMonthOptionsForPayment(jobCardId, emiTenure, emiMonthlyAmount, paymentOrder);
+                } else {
+                    $('#emiMonthDiv, #emiMonthlyAmountDiv').addClass('d-none');
+                }
 
                 // ✅ Hide history box initially
                 $('#paymentHistoryBox').addClass('d-none');
@@ -3214,29 +3992,23 @@
                                 $('#paymentHistoryList').html(
                                     '<li>No payment history found.</li>');
                             } else {
-                                historyHtml = '';
+                            historyHtml = '';
 
-                                history.forEach(function(payment) {
+history.forEach(function(payment) {
 
-                                    const paymentMethod = payment
-                                        .payment_method ?
-                                        payment.payment_method.charAt(0)
-                                        .toUpperCase() + payment.payment_method
-                                        .slice(1).toLowerCase() :
-                                        'N/A';
+    const paymentMethod = payment.payment_method
+        ? payment.payment_method.charAt(0).toUpperCase() + payment.payment_method.slice(1).toLowerCase()
+        : 'N/A';
 
-                                    const paymentType = payment.payment_type ?
-                                        payment.payment_type.charAt(0)
-                                        .toUpperCase() + payment.payment_type
-                                        .slice(1).toLowerCase() :
-                                        'N/A';
+    const paymentType = payment.payment_type
+        ? payment.payment_type.charAt(0).toUpperCase() + payment.payment_type.slice(1).toLowerCase()
+        : 'N/A';
 
-                                    const paymentRemark = payment.remarks &&
-                                        String(payment.remarks).trim() !== '' ?
-                                        payment.remarks :
-                                        'N/A';
+    const paymentRemark = payment.remarks && String(payment.remarks).trim() !== ''
+        ? payment.remarks
+        : 'N/A';
 
-                                    historyHtml += `
+    historyHtml += `
         <li class="mb-2">
             <strong>Amount:</strong> ₹${parseFloat(payment.payment_amount).toLocaleString(undefined, {
                 minimumFractionDigits: 2,
@@ -3251,16 +4023,16 @@
 
             <strong>Remark:</strong> ${paymentRemark}<br>
 
-            ${payment.payment_method === 'emi'
+            ${payment.payment_type === 'emi'
                 ? `<strong>EMI Months:</strong> ${payment.emi_month || 0}<br>`
                 : ''}
         </li>
 
         <hr class="my-1"/>
     `;
-                                });
+});
 
-                                $('#paymentHistoryList').html(historyHtml);
+$('#paymentHistoryList').html(historyHtml);
                                 // Add Summary
                                 if (response.summary) {
                                     let summaryHtml = `
@@ -3295,10 +4067,12 @@
                 let method = $(this).val();
 
                 // Hide all optional sections first
-                $('#cashOnlineTypeDiv, #fullyCashOnlineFields, #partialCashOnlineFields, #onlineTypeDiv, #paidTypeDiv, #upiAmountDiv, #partialPaidFields, #fullyPaidFields, #bank_container, #emiFields')
+                $('#cashOnlineTypeDiv, #fullyCashOnlineFields, #partialCashOnlineFields, #onlineTypeDiv, #paidTypeDiv, #upiAmountDiv, #partialPaidFields, #fullyPaidFields, #bank_container, #emiMonthDiv, #emiMonthlyAmountDiv')
                     .addClass('d-none');
+                $('#emiBox').hide();
                 $('#bank_id').val('');
                 $("#bankError").text("");
+                $('#emiMonthError, #emiMonthlyAmountError').text('');
 
                 if (method === 'cash') {
                     $('#paidTypeDiv').removeClass('d-none'); // Show paid type options
@@ -3312,60 +4086,21 @@
                     $('#bank_container').removeClass('d-none');
                 } else if (method === 'emi') {
                     $('#bank_container').removeClass('d-none');
-                    $('#emiFields').removeClass('d-none');
-
-                    let emiTenure = parseInt($(this).data('emi-tenure')) || 0;
-                    let emiMonthly = parseFloat($(this).data('emi-monthly')) || 0;
-                    let orderId = $(this).data('order-id');
-
-                    $('#emiMonthlyAmount').val(emiMonthly);
-
-                    if (orderId && emiTenure > 0) {
-                        $.ajax({
-                            url: '/api/sales/payment-history/' + orderId,
-                            method: 'GET',
-                            headers: {
-                                "Authorization": "Bearer " + authToken
-                            },
-                            success: function(response) {
-                                let history = response.data || [];
-                                let paidCount = history.filter(p => p.payment_type === 'emi' ||
-                                    p.payment_method === 'emi').length;
-
-                                let options =
-                                    '<option value="" selected disabled>Select EMI Month</option>';
-                                for (let i = 1; i <= emiTenure; i++) {
-                                    let suffix = 'th';
-                                    if (![11, 12, 13].includes(i % 100)) {
-                                        switch (i % 10) {
-                                            case 1:
-                                                suffix = 'st';
-                                                break;
-                                            case 2:
-                                                suffix = 'nd';
-                                                break;
-                                            case 3:
-                                                suffix = 'rd';
-                                                break;
-                                        }
-                                    }
-                                    let label = i + suffix + ' Month - ₹' + emiMonthly;
-                                    if (i <= paidCount) {
-                                        options +=
-                                            `<option value="${i}" disabled>${label} (Paid)</option>`;
-                                    } else if (i === paidCount + 1) {
-                                        options +=
-                                            `<option value="${i}">${label} (Pay now)</option>`;
-                                    } else {
-                                        options += `<option value="${i}">${label}</option>`;
-                                    }
-                                }
-                                $('#emiMonthSelect').html(options);
-                                if (paidCount < emiTenure) {
-                                    $('#emiMonthSelect').val(paidCount + 1);
-                                }
-                            }
-                        });
+                    if (currentPaymentOrder && currentPaymentOrder.method === 'emi') {
+                        $('#emiMonthDiv, #emiMonthlyAmountDiv').removeClass('d-none');
+                        $('#emiBox').hide();
+                        loadEmiMonthOptionsForPayment(
+                            currentPaymentOrder.id,
+                            currentPaymentOrder.emiTenure,
+                            currentPaymentOrder.emiMonthlyAmount,
+                            currentPaymentOrder.order
+                        );
+                    } else {
+                        $('#emiMonthDiv, #emiMonthlyAmountDiv').addClass('d-none');
+                        $('#emiBox').show();
+                        if (typeof refreshEmiCalculations === 'function') {
+                            refreshEmiCalculations();
+                        }
                     }
                 }
             });
@@ -3430,24 +4165,18 @@
                     error: function(xhr) {
                         const errors = xhr.responseJSON?.errors || {};
 
-                        $('#addBankNameError').text(errors.bank_name ? errors.bank_name[0] :
-                            '');
-                        $('#addAccountNumberError').text(errors.account_number ? errors
-                            .account_number[0] : '');
-                        $('#addIfscCodeError').text(errors.ifsc_code ? errors.ifsc_code[0] :
-                            '');
-                        $('#addBranchNameError').text(errors.branch_name ? errors.branch_name[
-                            0] : '');
-                        $('#addOpeningBalanceError').text(errors.opening_balance ? errors
-                            .opening_balance[0] : '');
+                        $('#addBankNameError').text(errors.bank_name ? errors.bank_name[0] : '');
+                        $('#addAccountNumberError').text(errors.account_number ? errors.account_number[0] : '');
+                        $('#addIfscCodeError').text(errors.ifsc_code ? errors.ifsc_code[0] : '');
+                        $('#addBranchNameError').text(errors.branch_name ? errors.branch_name[0] : '');
+                        $('#addOpeningBalanceError').text(errors.opening_balance ? errors.opening_balance[0] : '');
                         $('#addBankStatusError').text(errors.status ? errors.status[0] : '');
 
                         if (!Object.keys(errors).length) {
                             Swal.fire({
                                 icon: 'error',
                                 title: 'Error',
-                                text: xhr.responseJSON?.message ||
-                                    'Failed to add bank.',
+                                text: xhr.responseJSON?.message || 'Failed to add bank.',
                                 confirmButtonText: 'OK'
                             });
                         }
@@ -3456,6 +4185,61 @@
                         saveButton.prop('disabled', false).text('Save Bank');
                     }
                 });
+            });
+
+            function parseEmiAmount(val) {
+                let num = parseFloat(val);
+                return isNaN(num) ? 0 : num;
+            }
+
+            function refreshEmiCalculations() {
+                const total = parseFloat($('#remainingAmountHidden').val()) || 0;
+                const downPayment = parseEmiAmount($("#emiDownPayment").val());
+                const loanAmount = Math.max(total - downPayment, 0);
+                $("#emiLoanAmount").val(loanAmount.toFixed(2));
+                
+                const tenure = $("#emiTenure").val();
+                const isCustomTenure = tenure === "custom";
+                if (isCustomTenure) {
+                    $("#emiCustomTenureCol").removeClass("d-none").show();
+                } else {
+                    $("#emiCustomTenureCol").addClass("d-none").hide();
+                }
+                const months = isCustomTenure
+                    ? parseInt($("#emiCustomTenure").val() || "0", 10)
+                    : parseInt(tenure || "0", 10);
+                const annualRate = parseEmiAmount($("#emiInterestRate").val());
+
+                $("#emiCustomTenureError").addClass("d-none").text("");
+                if (isCustomTenure) {
+                    const rawCustom = ($("#emiCustomTenure").val() || "").trim();
+                    if (rawCustom !== "" && (months <= 0 || !Number.isInteger(months))) {
+                        $("#emiCustomTenureError").removeClass("d-none").text("Please enter a valid positive whole number.");
+                    }
+                }
+                if (downPayment > 0 && downPayment >= total && total > 0) {
+                    $("#emiDownPaymentError").removeClass("d-none").text("Down payment must be less than loan amount.");
+                } else {
+                    $("#emiDownPaymentError").addClass("d-none").text("");
+                }
+
+                let emi = 0;
+                if (loanAmount > 0 && months > 0) {
+                    if (annualRate === 0) {
+                        emi = loanAmount / months;
+                    } else {
+                        const R = annualRate / 12 / 100;
+                        const pow = Math.pow(1 + R, months);
+                        emi = (loanAmount * R * pow) / (pow - 1);
+                    }
+                    $("#emiBoxMonthlyAmount").val(emi.toFixed(2));
+                } else {
+                    $("#emiBoxMonthlyAmount").val("");
+                }
+            }
+
+            $(document).on('input change', '#emiDownPayment, #emiInterestRate, #emiTenure, #emiCustomTenure', function() {
+                refreshEmiCalculations();
             });
 
             $('#paidTypeSelect').on('change', function() {
@@ -3618,10 +4402,58 @@
                 let paidType = $('#paidTypeSelect').val();
                 let onlineType = $('#onlineTypeSelect').val();
                 let cashOnlineType = $('#cashOnlineTypeSelect').val();
+                let emiMonth = $('#emiMonthSelect').val();
+                let emiMonthlyAmount = parseFloat($('#emiMonthlyAmountInput').val()) || 0;
 
 
 
                 // EMI Validation
+                if (paymentMethod === 'emi') {
+                    if (currentPaymentOrder && currentPaymentOrder.method === 'emi') {
+                        if (!$("#bank_id").val()) {
+                            isValid = false;
+                            $("#bankError").text("Please select a bank.");
+                            return false;
+                        }
+                        if (!emiMonth) {
+                            isValid = false;
+                            $('#emiMonthError').text('Please select EMI month.');
+                            return false;
+                        }
+                        if (!emiMonthlyAmount || emiMonthlyAmount <= 0) {
+                            isValid = false;
+                            $('#emiMonthlyAmountError').text('Monthly EMI amount is required.');
+                            return false;
+                        }
+                        const nextSelectableMonth = $('#emiMonthSelect option:not(:disabled)').first().val();
+                        if (String(emiMonth) !== String(nextSelectableMonth)) {
+                            isValid = false;
+                            $('#emiMonthError').text('Please pay the next pending EMI month in sequence.');
+                            return false;
+                        }
+                    } else {
+                        // NEW EMI SETUP
+                        if (!$("#bank_id").val()) {
+                            isValid = false;
+                            $("#bankError").text("Please select a bank.");
+                            return false;
+                        }
+                        const tenure = $("#emiTenure").val();
+                        if (!tenure) {
+                            isValid = false;
+                            $('#emiTenureError').removeClass('d-none').text('Please select tenure.');
+                            return false;
+                        }
+                        const months = tenure === "custom"
+                            ? parseInt($("#emiCustomTenure").val() || "0", 10)
+                            : parseInt(tenure || "0", 10);
+                        if (months <= 0) {
+                            isValid = false;
+                            $('#emiCustomTenureError').removeClass('d-none').text('Please enter valid tenure.');
+                            return false;
+                        }
+                    }
+                }
 
 
 
@@ -3854,7 +4686,7 @@
                 if (isValid) {
                     // this.submit(); // submit the form
                 }
-                let selectedPaymentType = $('#paymentType').val();
+                let selectedPaymentType = $('#paymentMethodSelect').val();
                 $('#paymentMethodHidden').val(selectedPaymentType);
 
                 if ($("#paymentMethodDiv").hasClass("d-none")) {
@@ -3868,14 +4700,21 @@
 
                 let submitButton = $(this).find('button[type="submit"]');
                 submitButton.prop('disabled', true).text('Processing...');
-                if (paymentMethodSelect === 'emi') {
-                    let emiTotal = $('#emiMonthlyAmount').val();
-                    formData.append('emi_paid_value', emiTotal);
-                }
-
                 if (selectedPaymentType === 'emi') {
-                    let emi_val = $('#emiMonthlyAmount').val();
-                    formData.append('amount', emi_val);
+                    if (currentPaymentOrder && currentPaymentOrder.method === 'emi') {
+                        formData.append('emi_month', emiMonth);
+                        formData.append('emi_monthly_amount', emiMonthlyAmount);
+                        formData.append('payment_type', 'emi');
+                        formData.append('amount', emiMonthlyAmount);
+                        formData.append('payment_amount', emiMonthlyAmount);
+                        formData.append('is_existing_emi', '1');
+                    } else {
+                        formData.append('payment_type', 'emi');
+                        formData.append('is_new_emi', '1');
+                        let emiDownPmt = $('#emiDownPayment').val() || 0;
+                        formData.append('amount', emiDownPmt);
+                        formData.append('payment_amount', emiDownPmt);
+                    }
                 }
 
                 $.ajax({
@@ -3924,13 +4763,22 @@
                     }
                 });
             });
+
+            $(document).on('click', '.open-emi-details', function() {
+                const orderId = $(this).data('order-id');
+                const order = window.orderDataMap && window.orderDataMap[orderId];
+                if (!order) {
+                    return;
+                }
+                openEmiDetails(order);
+            });
             $('#makePaymentModal').on('hidden.bs.modal', function() {
 
                 // Reset entire form
                 $('#makePaymentForm')[0].reset();
 
                 // Hide all dynamic sections
-                $('#cashOnlineTypeDiv, #fullyCashOnlineFields, #partialCashOnlineFields, #onlineTypeDiv, #paidTypeDiv, #upiAmountDiv, #partialPaidFields, #fullyPaidFields, #bank_container')
+                $('#cashOnlineTypeDiv, #fullyCashOnlineFields, #partialCashOnlineFields, #onlineTypeDiv, #paidTypeDiv, #upiAmountDiv, #partialPaidFields, #fullyPaidFields, #bank_container, #emiMonthDiv, #emiMonthlyAmountDiv')
                     .addClass('d-none');
 
                 // Clear error messages
@@ -3944,16 +4792,15 @@
                 $('#paymentJobCardId').val('');
                 $('#remainingAmountHidden').val('');
                 $('#paymentMethodHidden').val('');
-                $('#paymentDateInput').val('');
-                $('#paymentDateError').text('');
+                $('#emiMonthSelect').html('<option value="" selected disabled>Select EMI Month</option>');
+                $('#emiMonthlyAmountInput').val('');
+                $('#bank_id').val('');
             });
 
             function loadOrders(page = 1) {
                 currentPage = page;
                 const selectedMonth = normalizeFilterValue($('#filter-month').val() || '');
                 const selectedYear = normalizeFilterValue($('#filter-year').val() || '');
-                const selectedSort = $('#filter-sort').val() || 'latest';
-                const selectedOrderType = $('#filter-order-type').val() || 'all';
                 let selectedDate = ($('#filter-date').val() || '').trim();
                 if (selectedDate && selectedDate.includes('-')) {
                     const parts = selectedDate.split('-');
@@ -3971,11 +4818,12 @@
                         search: searchQuery,
                         month: selectedMonth,
                         year: selectedYear,
-                        order_sort: selectedSort,
-                        order_type: selectedOrderType,
                         date: selectedDate,
                         financial_year: normalizeFilterValue($('#filter-financial-year').val() || ''),
-                        selectedSubAdminId: selectedSubAdminId || ''
+                        selectedSubAdminId: selectedSubAdminId || '',
+                        staff_id: normalizeFilterValue($('#filter-staff').val() || ''),
+                        order_type: normalizeFilterValue($('#filter-order-type').val() || ''),
+                        sort_by: $('#filter-sort').val() || 'date_desc'
                     },
                     headers: {
                         'X-CSRF-TOKEN': "{{ csrf_token() }}",
@@ -4029,82 +4877,101 @@
                                     currencySymbol + amount;
 
 
-                                let actionBtns = `<div class="dropdown sales-action-wrap">
-                                    <button type="button" class="sales-action-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Actions">
-                                        <i class="fas fa-ellipsis-h"></i>
-                                    </button>
-                                    <ul class="dropdown-menu dropdown-menu-end shadow sales-action-menu">`;
+                                let actionBtns = ``;
 
+                                // if (status === 'sales') {
                                 if (parseFloat(order.remaining_amount || 0) > 0 && status ===
                                     'sales') {
-                                    actionBtns += `<li><a href="javascript:void(0);" class="dropdown-item make-payment-btn" data-bs-toggle="modal" data-bs-target="#makePaymentModal"
+                                    actionBtns += `<a href="javascript:void(0);" class="me-3 make-payment-btn" data-bs-toggle="modal" data-bs-target="#makePaymentModal"
                                         data-id="${order.id}" data-amount="${order.remaining_amount}" data-method="${order.payment_method || ''}"
-                                        data-emi-months="${order.remaining_emi_months}" data-emi-duration="${order.emi_duration || 0}"
+                                        data-emi-months="${order.remaining_emi_months}" data-emi-duration="${order.emi_tenure || order.emi_duration || 0}"
+                                        data-emi-monthly-amount="${order.emi_monthly_amount || 0}"
                                         data-total-amount="${order.total_amount || 0}" data-remaining-amount="${order.remaining_amount}"
                                         data-return-amount="${order.total_return || 0}"
-                                        data-remaining-emi-months="${order.remaining_emi_months}"
-                                        data-tds-percentage="${order.tds_percentage || 0}"
-                                        data-tds-amount="${order.tds_amount || 0}"
-                                        data-emi-tenure="${order.emi_tenure || 0}"
-                                        data-emi-monthly="${order.emi_monthly_amount || 0}" 
-                                        title="Make Payment">
-                                        <i class="fas fa-money-bill-wave me-2 text-secondary"></i> Pay
-                                    </a></li>`;
+                                        data-remaining-emi-months="${order.remaining_emi_months}" title="Make Payment">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="#092C4C" viewBox="0 0 24 24">
+                                            <path d="M21 7H3V5h18v2zm0 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9h18zm-2 4H5v6h14v-6zM8 12h2v2H8v-2zm6 0h2v2h-2v-2z"/>
+                                        </svg>
+                                    </a>`;
 
                                 }
-                                actionBtns += `<li><button class="dropdown-item open-history" data-id="${order.id}" title="Payment History">
-                                    <i class="fas fa-history me-2 text-secondary"></i> History
-                               </button></li>`;
-
-                                if ((order.payment_method || '').toLowerCase() === 'emi') {
-                                    actionBtns += `<li><a class="dropdown-item" href="javascript:void(0);" onclick="openEmiDetails(${order.id})" title="EMI Details">
-                                       <i class="fas fa-calendar-alt me-2 text-secondary"></i> EMI Details
-                                   </a></li>`;
+                                actionBtns += `<button class="btn open-history" data-id="${order.id}" title="Payment History">
+                                                <i class="fas fa-history" style="font-size: 16px;"></i>
+                                            </button>`;
+                                if (['quotation', 'advance_receipt'].includes((order.quotation_status || '').toLowerCase())) {
+                                    actionBtns += `<a class="btn btn-sm btn-success me-2 convert-to-sales" href="javascript:void(0);" data-id="${order.id}" title="Convert to Sales">
+                                    Convert to Sales
+                                </a>`;
                                 }
-
-                                if ((order.quotation_status || '').toLowerCase() ===
-                                    'quotation') {
-                                    actionBtns += `<li><a class="dropdown-item convert-to-sales" href="javascript:void(0);" data-id="${order.id}" title="Convert to Sales">
-                                        <i class="fas fa-exchange-alt me-2 text-success"></i> Convert to Sales
-                                    </a></li>`;
+                                if (hasEmiData(order)) {
+                                    actionBtns += `<button type="button" class="btn btn-sm emi-action-btn open-emi-details" data-order-id="${order.id}" title="View EMI Details">
+                                        <i class="fas fa-calendar-alt"></i> EMI
+                                    </button>`;
                                 }
-
                                 @if (app('hasPermission')(2, 'view'))
-                                    actionBtns += `<li><a class="dropdown-item" href="/sales-details/${order.id}">
-                                        <i class="fas fa-eye me-2 text-secondary"></i> View
-                                   </a></li>`;
-                                @endif
+                                    actionBtns += `<a class="me-3" href="/sales-details/${order.id}">
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 9C11.206 9.00524 10.4459 9.32299 9.88447 9.88447C9.32299 10.4459 9.00524 11.206 9 12C9 13.642 10.358 15 12 15C13.641 15 15 13.642 15 12C15 10.359 13.641 9 12 9Z" fill="#092C4C"/>
+            <path d="M12 5C4.36704 5 2.07304 11.617 2.05204 11.684L1.94604 12L2.05105 12.316C2.07305 12.383 4.36704 19 12 19C19.633 19 21.927 12.383 21.948 12.316L22.054 12L21.949 11.684C21.927 11.617 19.633 5 12 5ZM12 17C6.64904 17 4.57604 13.154 4.07404 12C4.57804 10.842 6.65204 7 12 7C17.351 7 19.424 10.846 19.926 12C19.422 13.158 17.348 17 12 17Z" fill="#092C4C"/>
+            </svg>
 
-                                actionBtns += `<li><a class="dropdown-item" href="/tickets/create?order_id=${order.id}">
-                                   <i class="fas fa-ticket-alt me-2 text-secondary"></i> Raise Ticket
-                               </a></li>`;
 
-                                @if (app('hasPermission')(2, 'edit'))
-                                    if (parseFloat(order.total_return || 0) === 0) {
-                                        actionBtns += `<li><a class="dropdown-item" href="/edit-sales/${order.id}">
-                                            <i class="fas fa-edit me-2 text-secondary"></i> Edit
-                                        </a></li>`;
+                                        </a>`;
+                                
+                                    // Show delivery/truck icon only for delivery sales.
+                                    if (status === 'sales' && isDeliveryOrder(order)) {
+                                        actionBtns += `<a class="me-3 deliver-order" href="/sales/delivery/${order.id}" data-id="${order.id}" title="Delivery">
+                                            <i class="fas fa-truck" style="font-size:16px;"></i>
+                                        </a>`;
                                     }
                                 @endif
-                                @if (app('hasPermission')(2, 'view'))
-                                    actionBtns += `<li><a class="dropdown-item" href="/sales-invoice/${order.id}">
-                                        <i class="fas fa-file-invoice me-2 text-secondary"></i> Invoice
-                                    </a></li>`;
-                                    actionBtns += `<li><a class="dropdown-item" href="javascript:void(0);" onclick="window.open('/sales/invoice/pdf/' + ${order.id});"  title="Print Invoice">
-                                        <i class="fas fa-print me-2 text-secondary"></i> Print Invoice
-                                    </a></li>`;
-                                @endif
+                                // if (!order.has_payment || order.has_payment === 0) {
+                                @if (app('hasPermission')(2, 'edit'))
+                                    if (parseFloat(order.total_return || 0) === 0) {
+                                        actionBtns += `
+                                            <a class="me-3" href="/edit-sales/${order.id}">
+                                                <svg width="16" height="20" viewBox="0 0 16 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M15.045 5.401C15.423 5.023 15.631 4.521 15.631 3.987C15.631 3.453 15.423 2.951 15.045 2.573L13.459 0.987001C13.081 0.609001 12.579 0.401001 12.045 0.401001C11.511 0.401001 11.009 0.609001 10.632 0.986001L0 11.585V16H4.413L15.045 5.401ZM12.045 2.401L13.632 3.986L12.042 5.57L10.456 3.985L12.045 2.401ZM2 14V12.415L9.04 5.397L10.626 6.983L3.587 14H2ZM0 18H16V20H0V18Z" fill="#092C4C"/>
+                </svg>
 
-                                if (!['sales-manager', 'purchase-manager', 'inventory-manager']
-                                    .includes(userRole)) {
+                                            </a>`;
+                                    }
+                                @endif
+                                // }
+                                @if (app('hasPermission')(2, 'view'))
+                                    actionBtns += `
+                                        <a class="me-3" href="/sales-invoice/${order.id}">
+
+
+            <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="#092C4C" viewBox="0 0 24 24">
+                <path d="M14 2H7a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7zm0 2.5L16.5 7H14zM8 11h8v1.5H8zm0 3h8v1.5H8zm0 3h5v1.5H8z"/>
+            </svg>
+                                        </a>
+                                        <a class="me-3" href="javascript:void(0);" onclick="window.open('/sales/invoice/pdf/' + ${order.id});"  title="Print Invoice">
+            <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="#092C4C" viewBox="0 0 24 24">
+                <path d="M19 7V4a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v3H3a1 1 0 0 0-1 1v9a2 2 0 0 0 2 2h2v3h12v-3h2a2 2 0 0 0 2-2V8a1 1 0 0 0-1-1h-2zM7 4h10v3H7V4zm10 16H7v-4h10v4zm3-6a1 1 0 0 1-1 1h-2v-2H7v2H5a1 1 0 0 1-1-1V9h16v5z"/>
+            </svg>
+        </a>`;
+                                @endif
+                                let deleteButton = '';
+
+                                if (
+                                    userRole !== 'sales-manager' &&
+                                    userRole !== 'purchase-manager' &&
+                                    userRole !== 'inventory-manager'
+                                ) {
                                     @if (app('hasPermission')(2, 'delete'))
-                                        actionBtns += `<li><a class="dropdown-item text-danger delete-order" href="javascript:void(0);" data-id="${order.id}">
-                                            <i class="fas fa-trash-alt me-2 text-danger"></i> Delete
-                                        </a></li>`;
+                                        actionBtns += `
+                                        <a class="me-3 delete-order" href="javascript:void(0);" data-id="${order.id}">
+                                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M5 20C5 20.5304 5.21071 21.0391 5.58579 21.4142C5.96086 21.7893 6.46957 22 7 22H17C17.5304 22 18.0391 21.7893 18.4142 21.4142C18.7893 21.0391 19 20.5304 19 20V8H21V6H17V4C17 3.46957 16.7893 2.96086 16.4142 2.58579C16.0391 2.21071 15.5304 2 15 2H9C8.46957 2 7.96086 2.21071 7.58579 2.58579C7.21071 2.96086 7 3.46957 7 4V6H3V8H5V20ZM9 4H15V6H9V4ZM8 8H17V20H7V8H8Z" fill="#092C4C"/>
+                                                <path d="M9 10H11V18H9V10ZM13 10H15V18H13V10Z" fill="#092C4C"/>
+                                            </svg>
+                                        </a>
+                                    `;
                                     @endif
                                 }
-
-                                actionBtns += `</ul></div>`;
+                                actionBtns = buildSalesActionDropdown(order, status);
                                 // Store order data for expandable row
                                 const orderData = {
                                     ...order,
@@ -4113,7 +4980,7 @@
                                     currencyPosition: currencyPosition
                                 };
 
-                                tableBody.push([
+                                let rowData = [
                                     `<div class="order-mobile-summary">
                                         <span class="order-mobile-customer">${order.user?.name || 'N/A'}</span>
 
@@ -4130,17 +4997,16 @@
                                         order
                                         .extra_paid || 0),
                                     displayAmount || '0.00',
-                                    `<select class="form-select form-select-sm assigned-staff-select" data-order-id="${order.id}" style="width: 140px;">
-                                        <option value="">— Unassigned —</option>
-                                        ${window.staffOptions ? window.staffOptions.map(staff => `<option value="${staff.id}" ${order.staff_id == staff.id ? 'selected' : ''}>${staff.name}</option>`).join('') : ''}
-                                     </select>`,
-                                    `<select class="form-select form-select-sm order-type-select" data-order-id="${order.id}" style="width: 140px;">
-                                        <option value="Self Pickup" ${order.order_type === 'Self Pickup' ? 'selected' : ''}>Self Pickup</option>
-                                        <option value="Delivery" ${order.order_type === 'Delivery' ? 'selected' : ''}>Delivery</option>
-                                       </select>`,
-                                    `<span class="biller-wrap">${order.biller || 'Admin'}</span>`,
-                                    actionBtns
-                                ]);
+                                    buildStaffCell(order.id, order.staff_id, order.staff_name),
+                                    buildOrderTypeCell(order.id, order.order_type),
+                                    `<span class="biller-wrap">${order.biller || 'Admin'}</span>`
+                                ];
+
+                                if (typeof isEinvoiceEnabled !== 'undefined' && isEinvoiceEnabled == 1) {
+                                    rowData.push(`<button class="btn btn-sm" onclick="openEinvoiceModal('${order.id}', '${order.order_number}', '${order.irn || ''}', '${order.ack_no || ''}', '${order.ack_date || ''}')" style="background-color: #6f42c1; color: white; border: none; border-radius: 4px;">Invoice</button>`);
+                                }
+                                rowData.push(actionBtns);
+                                tableBody.push(rowData);
 
                                 // Store order data for later use in expandable row
                                 if (!window.orderDataMap) {
@@ -4152,6 +5018,21 @@
 
 
                             table.clear().rows.add(tableBody).draw();
+
+                            // Force-apply selected values on staff dropdowns after DataTables renders HTML
+                            function syncStaffDropdowns() {
+                                $('#order-table tbody .assign-staff-select').each(function() {
+                                    const orderId = $(this).data('order-id');
+                                    const orderData = window.orderDataMap && window.orderDataMap[orderId];
+                                    if (orderData && orderData.staff_id) {
+                                        $(this).val(String(orderData.staff_id));
+                                    }
+                                });
+                            }
+                            setTimeout(syncStaffDropdowns, 50);
+                            table.on('draw.staffsync', function() {
+                                setTimeout(syncStaffDropdowns, 50);
+                            });
 
                             // Add expandable rows after table is drawn
                             function addExpandableRows() {
@@ -4215,7 +5096,7 @@
                             }, 100);
                         } else {
                             table.clear().draw();
-                            $(".datanew tbody").html('<tr><td colspan="9">No order found</td></tr>');
+                            $(".datanew tbody").html('<tr><td colspan="10">No order found</td></tr>');
                             updateSalesSummaryTotals(0, 0, 0, '₹', 'left');
                             window.salesSummaryTotals = {
                                 total_amount: 0,
@@ -4332,9 +5213,6 @@
 
             loadOrders(currentPage);
 
-            $('#filter-sort, #filter-order-type').on('change select2:select', function() {
-                loadOrders(1);
-            });
             // Function to calculate the total for visible (filtered) rows
 
             // Month short names
@@ -4375,37 +5253,7 @@
                     return;
                 }
 
-                // Convert to YYYY-MM-DD
-                if (selectedDate.includes('-')) {
-                    let parts = selectedDate.split('-');
-                    if (parts.length === 3) {
-                        selectedDate = `${parts[2]}-${parts[1]}-${parts[0]}`;
-                    }
-                }
-
-                $.ajax({
-                    url: '/api/orders/filter',
-                    method: 'GET',
-                    data: {
-                        date: selectedDate,
-                        financial_year: normalizeFilterValue($('#filter-financial-year').val() ||
-                            ''),
-                        selectedSubAdminId: selectedSubAdminId
-                    },
-                    headers: {
-                        "Authorization": "Bearer " + authToken,
-                    },
-                    success: function(response) {
-                        if (response.status) {
-                            if (typeof response.financial_year_enabled !== 'undefined') {
-                                toggleSalesFinancialYearFilter(response.financial_year_enabled);
-                            }
-                            $('.pagination-controls').hide();
-                            renderOrders(response.data, selectedDate);
-                            calculateFilteredTotal();
-                        }
-                    }
-                });
+                loadOrders(1);
             });
 
             // Listen to both native change and Select2 events so UI and programmatic
@@ -4442,43 +5290,8 @@
                         }
                     }
 
-                    $.ajax({
-                        url: '/api/orders/filter',
-                        method: 'GET',
-                        headers: {
-                            "Authorization": "Bearer " + authToken
-                        },
-                        data: {
-                            month: selectedMonth,
-                            year: selectedYear,
-                            financial_year: normalizeFilterValue($('#filter-financial-year').val() ||
-                                ''),
-                            selectedSubAdminId: selectedSubAdminId
-                        },
-                        success: function(response) {
-                            if (response.status) {
-                                if (typeof response.financial_year_enabled !== 'undefined') {
-                                    toggleSalesFinancialYearFilter(response.financial_year_enabled);
-                                }
-                                $('.pagination-controls').hide();
-                                renderOrdersByMonthAndYear(response.data, selectedMonth,
-                                    selectedYear); // render table with filters
-
-                                updateSelect2Display(selectedMonth, selectedYear);
-                                // Recalculate total after rendering
-                                setTimeout(function() {
-                                    calculateFilteredTotal();
-                                }, 200);
-                            } else {
-                                // console.error('Filter failed:', response.message ||
-                                //     'Unknown error');
-                            }
-                        },
-                        error: function(xhr, status, error) {
-                            // console.error('AJAX error:', error);
-                            alert('Failed to filter orders. Please try again.');
-                        }
-                    });
+                    updateSelect2Display(selectedMonth, selectedYear);
+                    loadOrders(1);
                 });
 
             $('#filter-financial-year').off('change').on('change', function() {
@@ -4490,6 +5303,24 @@
                     calculateFilteredTotal();
                 }, 200);
             });
+
+            $('#filter-staff').off('change select2:select select2:unselect').on('change select2:select select2:unselect', function() {
+                syncFilterSelect2Display();
+                fetchAllOrders();
+                setTimeout(function() {
+                    calculateFilteredTotal();
+                }, 200);
+            });
+
+            $('#filter-order-type').off('change select2:select select2:unselect').on(
+                'change select2:select select2:unselect',
+                function() {
+                    syncFilterSelect2Display();
+                    fetchAllOrders();
+                    setTimeout(function() {
+                        calculateFilteredTotal();
+                    }, 200);
+                });
 
             function fetchAllOrders() {
                 loadOrders(1);
@@ -4627,79 +5458,95 @@
                 const status = String(order.quotation_status || 'sales').toLowerCase();
                 const remaining = parseFloat(order.remaining_amount || 0);
 
-                let actionBtns = `<div class="dropdown sales-action-wrap">
-                                    <button type="button" class="sales-action-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Actions">
-                                        <i class="fas fa-ellipsis-h"></i>
-                                    </button>
-                                    <ul class="dropdown-menu dropdown-menu-end shadow sales-action-menu">`;
+                let actionBtns = ``;
 
+                // if (status === 'sales') {
                 if (parseFloat(order.remaining_amount || 0) > 0 && status === 'sales') {
-                    actionBtns += `<li><a href="javascript:void(0);" class="dropdown-item make-payment-btn" data-bs-toggle="modal" data-bs-target="#makePaymentModal"
+                    actionBtns += `<a href="javascript:void(0);" class="me-3 make-payment-btn" data-bs-toggle="modal" data-bs-target="#makePaymentModal"
                                         data-id="${order.id}" data-amount="${order.remaining_amount}" data-method="${order.payment_method || ''}"
-                                        data-emi-months="${order.remaining_emi_months}" data-emi-duration="${order.emi_duration || 0}"
+                    data-emi-months="${order.remaining_emi_months}" data-emi-duration="${order.emi_tenure || order.emi_duration || 0}"
+                    data-emi-monthly-amount="${order.emi_monthly_amount || 0}"
                                         data-total-amount="${order.total_amount || 0}" data-remaining-amount="${order.remaining_amount}"
                                         data-return-amount="${order.total_return || 0}"
-                                        data-remaining-emi-months="${order.remaining_emi_months}"
-                                        data-tds-percentage="${order.tds_percentage || 0}"
-                                        data-tds-amount="${order.tds_amount || 0}"
-                                        data-emi-tenure="${order.emi_tenure || 0}"
-                                        data-emi-monthly="${order.emi_monthly_amount || 0}" 
-                                        title="Make Payment">
-                                        <i class="fas fa-money-bill-wave me-2 text-secondary"></i> Pay
-                                    </a></li>`;
+                                        data-remaining-emi-months="${order.remaining_emi_months}" title="Make Payment">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="#092C4C" viewBox="0 0 24 24">
+                                            <path d="M21 7H3V5h18v2zm0 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9h18zm-2 4H5v6h14v-6zM8 12h2v2H8v-2zm6 0h2v2h-2v-2z"/>
+                                        </svg>
+                                    </a>`;
 
                 }
-                actionBtns += `<li><button class="dropdown-item open-history" data-id="${order.id}" title="Payment History">
-                                    <i class="fas fa-history me-2 text-secondary"></i> History
-                               </button></li>`;
-
-                if ((order.payment_method || '').toLowerCase() === 'emi') {
-                    actionBtns += `<li><a class="dropdown-item" href="javascript:void(0);" onclick="openEmiDetails(${order.id})" title="EMI Details">
-                                       <i class="fas fa-calendar-alt me-2 text-secondary"></i> EMI Details
-                                   </a></li>`;
+                actionBtns += `<button class="btn open-history" data-id="${order.id}" title="Payment History">
+                                                <i class="fas fa-history" style="font-size: 16px;"></i>
+                                            </button>`;
+                if (['quotation', 'advance_receipt'].includes((order.quotation_status || '').toLowerCase())) {
+                    actionBtns += `<a class="btn btn-sm btn-success me-2 convert-to-sales" href="javascript:void(0);" data-id="${order.id}" title="Convert to Sales">
+                        Convert to Sales
+                    </a>`;
                 }
-
-                if ((order.quotation_status || '').toLowerCase() === 'quotation') {
-                    actionBtns += `<li><a class="dropdown-item convert-to-sales" href="javascript:void(0);" data-id="${order.id}" title="Convert to Sales">
-                        <i class="fas fa-exchange-alt me-2 text-success"></i> Convert to Sales
-                    </a></li>`;
+                if (hasEmiData(order)) {
+                    actionBtns += `<button type="button" class="btn btn-sm emi-action-btn open-emi-details" data-order-id="${order.id}" title="View EMI Details">
+                        <i class="fas fa-calendar-alt"></i> EMI
+                    </button>`;
                 }
-
                 @if (app('hasPermission')(2, 'view'))
-                    actionBtns += `<li><a class="dropdown-item" href="/sales-details/${order.id}">
-                                        <i class="fas fa-eye me-2 text-secondary"></i> View
-                                   </a></li>`;
+
+                    actionBtns += `
+                                        <a class="me-3" href="/sales-details/${order.id}">
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 9C11.206 9.00524 10.4459 9.32299 9.88447 9.88447C9.32299 10.4459 9.00524 11.206 9 12C9 13.642 10.358 15 12 15C13.641 15 15 13.642 15 12C15 10.359 13.641 9 12 9Z" fill="#092C4C"/>
+            <path d="M12 5C4.36704 5 2.07304 11.617 2.05204 11.684L1.94604 12L2.05105 12.316C2.07305 12.383 4.36704 19 12 19C19.633 19 21.927 12.383 21.948 12.316L22.054 12L21.949 11.684C21.927 11.617 19.633 5 12 5ZM12 17C6.64904 17 4.57604 13.154 4.07404 12C4.57804 10.842 6.65204 7 12 7C17.351 7 19.424 10.846 19.926 12C19.422 13.158 17.348 17 12 17Z" fill="#092C4C"/>
+            </svg>
+                                        </a>`;
                 @endif
-
-                actionBtns += `<li><a class="dropdown-item" href="/tickets/create?order_id=${order.id}">
-                                   <i class="fas fa-ticket-alt me-2 text-secondary"></i> Raise Ticket
-                               </a></li>`;
-
+                // if (!order.has_payment || order.has_payment === 0) {
                 @if (app('hasPermission')(2, 'edit'))
                     if (parseFloat(order.total_return || 0) === 0) {
-                        actionBtns += `<li><a class="dropdown-item" href="/edit-sales/${order.id}">
-                                            <i class="fas fa-edit me-2 text-secondary"></i> Edit
-                                        </a></li>`;
+                        actionBtns += `
+                                            <a class="me-3" href="/edit-sales/${order.id}">
+                                                <svg width="16" height="20" viewBox="0 0 16 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M15.045 5.401C15.423 5.023 15.631 4.521 15.631 3.987C15.631 3.453 15.423 2.951 15.045 2.573L13.459 0.987001C13.081 0.609001 12.579 0.401001 12.045 0.401001C11.511 0.401001 11.009 0.609001 10.632 0.986001L0 11.585V16H4.413L15.045 5.401ZM12.045 2.401L13.632 3.986L12.042 5.57L10.456 3.985L12.045 2.401ZM2 14V12.415L9.04 5.397L10.626 6.983L3.587 14H2ZM0 18H16V20H0V18Z" fill="#092C4C"/>
+                </svg>
+
+                                            </a>`;
                     }
                 @endif
+                // }
+                actionBtns += `
                 @if (app('hasPermission')(2, 'view'))
-                    actionBtns += `<li><a class="dropdown-item" href="/sales-invoice/${order.id}">
-                                        <i class="fas fa-file-invoice me-2 text-secondary"></i> Invoice
-                                    </a></li>`;
-                    actionBtns += `<li><a class="dropdown-item" href="javascript:void(0);" onclick="window.open('/sales/invoice/pdf/' + ${order.id});"  title="Print Invoice">
-                                        <i class="fas fa-print me-2 text-secondary"></i> Print Invoice
-                                    </a></li>`;
+
+                                        <a class="me-3" href="/sales-invoice/${order.id}">
+
+
+            <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="#092C4C" viewBox="0 0 24 24">
+                <path d="M14 2H7a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7zm0 2.5L16.5 7H14zM8 11h8v1.5H8zm0 3h8v1.5H8zm0 3h5v1.5H8z"/>
+            </svg>
+                                        </a>
+                                        <a class="me-3" href="javascript:void(0);" onclick="window.open('/sales/invoice/pdf/' + ${order.id});"  title="Print Invoice">
+            <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="#092C4C" viewBox="0 0 24 24">
+                <path d="M19 7V4a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v3H3a1 1 0 0 0-1 1v9a2 2 0 0 0 2 2h2v3h12v-3h2a2 2 0 0 0 2-2V8a1 1 0 0 0-1-1h-2zM7 4h10v3H7V4zm10 16H7v-4h10v4zm3-6a1 1 0 0 1-1 1h-2v-2H7v2H5a1 1 0 0 1-1-1V9h16v5z"/>
+            </svg>
+        </a>
+
                 @endif
+                                        ${!['sales-manager', 'purchase-manager', 'inventory-manager'].includes(userRole) ? `
+                                                                                        @if (app('hasPermission')(2, 'delete'))
+                                                                                        <a class="me-3 delete-order" href="javascript:void(0);" data-id="${order.id}">
+                                                                                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                                                                <path d="M5 20C5 20.5304 5.21071 21.0391 5.58579 21.4142C5.96086 21.7893 6.46957 22 7 22H17C17.5304 22 18.0391 21.7893 18.4142 21.4142C18.7893 21.0391 19 20.5304 19 20V8H21V6H17V4C17 3.46957 16.7893 2.96086 16.4142 2.58579C16.0391 2.21071 15.5304 2 15 2H9C8.46957 2 7.96086 2.21071 7.58579 2.58579C7.21071 2.96086 7 3.46957 7 4V6H3V8H5V20ZM9 4H15V6H9V4ZM8 8H17V20H7V8H8Z" fill="#092C4C"/>
+                                                                                                <path d="M9 10H11V18H9V10ZM13 10H15V18H13V10Z" fill="#092C4C"/>
+                                                                                            </svg>
+                                                                                        </a>
+                                                                                        @endif
 
-                if (!['sales-manager', 'purchase-manager', 'inventory-manager'].includes(userRole)) {
-                    @if (app('hasPermission')(2, 'delete'))
-                        actionBtns += `<li><a class="dropdown-item text-danger delete-order" href="javascript:void(0);" data-id="${order.id}">
-                                            <i class="fas fa-trash-alt me-2 text-danger"></i> Delete
-                                        </a></li>`;
-                    @endif
+                                                                                    ` : ''}
+    `
+                // Show delivery/truck icon only for delivery sales.
+                if (status === 'sales' && isDeliveryOrder(order)) {
+                    actionBtns += `<a class="me-3 deliver-order" href="/sales/delivery/${order.id}" data-id="${order.id}" title="Delivery">
+                        <i class="fas fa-truck" style="font-size:16px;"></i>
+                    </a>`;
                 }
-
-                actionBtns += `</ul></div>`;
+                actionBtns = buildSalesActionDropdown(order, status);
                 // Your existing HTML table rendering here...
                 const orderData = {
                     ...order,
@@ -4722,6 +5569,8 @@
                     getStatusBadge(order.quotation_status || 'sales', 'quotation'),
                     getStatusBadge(order.payment_status, 'payment', order.extra_paid || 0),
                     displayAmount || '0.00',
+                    buildStaffCell(order.id, order.staff_id, order.staff_name),
+                    buildOrderTypeCell(order.id, order.order_type),
                     `<span class="biller-wrap">${order.biller || 'Admin'}</span>`,
                     actionBtns
                 ]);
@@ -4742,6 +5591,20 @@
 
             const table = $('#order-table').DataTable();
             table.clear().rows.add(tableBody).draw();
+
+            // Force-apply selected values on staff dropdowns after DataTables renders
+            setTimeout(function() {
+                $('#order-table tbody .assign-staff-select').each(function() {
+                    const orderId = $(this).data('order-id');
+                    const od = window.orderDataMap && window.orderDataMap[orderId];
+                    if (od && od.staff_id) { $(this).val(String(od.staff_id)); }
+                });
+                $('#order-table tbody .assign-order-type-select').each(function() {
+                    const orderId = $(this).data('order-id');
+                    const od = window.orderDataMap && window.orderDataMap[orderId];
+                    if (od && od.order_type) { $(this).val(String(od.order_type)); }
+                });
+            }, 50);
 
             // Add expandable rows
             function addExpandableRowsForMonthYear() {
@@ -4815,80 +5678,89 @@
                 const formattedDate = `${day}-${month}-${year} ${hours}:${minutes} ${ampm}`;
 
                 // 🔹 Build action buttons properly
-                let actionBtns = `<div class="dropdown sales-action-wrap">
-                                    <button type="button" class="sales-action-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Actions">
-                                        <i class="fas fa-ellipsis-h"></i>
-                                    </button>
-                                    <ul class="dropdown-menu dropdown-menu-end shadow sales-action-menu">`;
+                let actionBtns = ``;
 
+                // if (status === 'sales') {
                 if (parseFloat(order.remaining_amount || 0) > 0 && status === 'sales') {
-                    actionBtns += `<li><a href="javascript:void(0);" class="dropdown-item make-payment-btn" data-bs-toggle="modal" data-bs-target="#makePaymentModal"
+                    actionBtns += `<a href="javascript:void(0);" class="me-3 make-payment-btn" data-bs-toggle="modal" data-bs-target="#makePaymentModal"
                                         data-id="${order.id}" data-amount="${order.remaining_amount}" data-method="${order.payment_method || ''}"
-                                        data-emi-months="${order.remaining_emi_months}" data-emi-duration="${order.emi_duration || 0}"
+                                        data-emi-months="${order.remaining_emi_months}" data-emi-duration="${order.emi_tenure || order.emi_duration || 0}"
+                                        data-emi-monthly-amount="${order.emi_monthly_amount || 0}"
                                         data-total-amount="${order.total_amount || 0}" data-remaining-amount="${order.remaining_amount}"
                                         data-return-amount="${order.total_return || 0}"
-                                        data-remaining-emi-months="${order.remaining_emi_months}"
-                                        data-tds-percentage="${order.tds_percentage || 0}"
-                                        data-tds-amount="${order.tds_amount || 0}"
-                                        data-emi-tenure="${order.emi_tenure || 0}"
-                                        data-emi-monthly="${order.emi_monthly_amount || 0}" 
-                                        title="Make Payment">
-                                        <i class="fas fa-money-bill-wave me-2 text-secondary"></i> Pay
-                                    </a></li>`;
+                                        data-remaining-emi-months="${order.remaining_emi_months}" title="Make Payment">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="#092C4C" viewBox="0 0 24 24">
+                                            <path d="M21 7H3V5h18v2zm0 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9h18zm-2 4H5v6h14v-6zM8 12h2v2H8v-2zm6 0h2v2h-2v-2z"/>
+                                        </svg>
+                                    </a>`;
 
                 }
-                actionBtns += `<li><button class="dropdown-item open-history" data-id="${order.id}" title="Payment History">
-                                    <i class="fas fa-history me-2 text-secondary"></i> History
-                               </button></li>`;
-
-                if ((order.payment_method || '').toLowerCase() === 'emi') {
-                    actionBtns += `<li><a class="dropdown-item" href="javascript:void(0);" onclick="openEmiDetails(${order.id})" title="EMI Details">
-                                       <i class="fas fa-calendar-alt me-2 text-secondary"></i> EMI Details
-                                   </a></li>`;
+                actionBtns += `<button class="btn open-history" data-id="${order.id}" title="Payment History">
+                                                <i class="fas fa-history" style="font-size: 16px;"></i>
+                                            </button>`;
+                if (['quotation', 'advance_receipt'].includes((order.quotation_status || '').toLowerCase())) {
+                    actionBtns += `<a class="btn btn-sm btn-success me-2 convert-to-sales" href="javascript:void(0);" data-id="${order.id}" title="Convert to Sales">
+                        Convert to Sales
+                    </a>`;
                 }
-
-                if ((order.quotation_status || '').toLowerCase() === 'quotation') {
-                    actionBtns += `<li><a class="dropdown-item convert-to-sales" href="javascript:void(0);" data-id="${order.id}" title="Convert to Sales">
-                        <i class="fas fa-exchange-alt me-2 text-success"></i> Convert to Sales
-                    </a></li>`;
+                if (hasEmiData(order)) {
+                    actionBtns += `<button type="button" class="btn btn-sm emi-action-btn open-emi-details" data-order-id="${order.id}" title="View EMI Details">
+                        <i class="fas fa-calendar-alt"></i> EMI
+                    </button>`;
                 }
 
                 @if (app('hasPermission')(2, 'view'))
-                    actionBtns += `<li><a class="dropdown-item" href="/sales-details/${order.id}">
-                                        <i class="fas fa-eye me-2 text-secondary"></i> View
-                                   </a></li>`;
+                    actionBtns += `<a class="me-3" href="/sales-details/${order.id}">
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 9C11.206 9.00524 10.4459 9.32299 9.88447 9.88447C9.32299 10.4459 9.00524 11.206 9 12C9 13.642 10.358 15 12 15C13.641 15 15 13.642 15 12C15 10.359 13.641 9 12 9Z" fill="#092C4C"/>
+            <path d="M12 5C4.36704 5 2.07304 11.617 2.05204 11.684L1.94604 12L2.05105 12.316C2.07305 12.383 4.36704 19 12 19C19.633 19 21.927 12.383 21.948 12.316L22.054 12L21.949 11.684C21.927 11.617 19.633 5 12 5ZM12 17C6.64904 17 4.57604 13.154 4.07404 12C4.57804 10.842 6.65204 7 12 7C17.351 7 19.424 10.846 19.926 12C19.422 13.158 17.348 17 12 17Z" fill="#092C4C"/>
+            </svg>
+
+
+                                        </a>`;
                 @endif
-
-                actionBtns += `<li><a class="dropdown-item" href="/tickets/create?order_id=${order.id}">
-                                   <i class="fas fa-ticket-alt me-2 text-secondary"></i> Raise Ticket
-                               </a></li>`;
-
+                // if (!order.has_payment || order.has_payment === 0) {
                 @if (app('hasPermission')(2, 'edit'))
                     if (parseFloat(order.total_return || 0) === 0) {
-                        actionBtns += `<li><a class="dropdown-item" href="/edit-sales/${order.id}">
-                                            <i class="fas fa-edit me-2 text-secondary"></i> Edit
-                                        </a></li>`;
+                        actionBtns += `
+                                            <a class="me-3" href="/edit-sales/${order.id}">
+                                                <svg width="16" height="20" viewBox="0 0 16 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M15.045 5.401C15.423 5.023 15.631 4.521 15.631 3.987C15.631 3.453 15.423 2.951 15.045 2.573L13.459 0.987001C13.081 0.609001 12.579 0.401001 12.045 0.401001C11.511 0.401001 11.009 0.609001 10.632 0.986001L0 11.585V16H4.413L15.045 5.401ZM12.045 2.401L13.632 3.986L12.042 5.57L10.456 3.985L12.045 2.401ZM2 14V12.415L9.04 5.397L10.626 6.983L3.587 14H2ZM0 18H16V20H0V18Z" fill="#092C4C"/>
+                </svg>
+
+                                            </a>`;
                     }
                 @endif
+                // }
+                actionBtns += `
                 @if (app('hasPermission')(2, 'view'))
-                    actionBtns += `<li><a class="dropdown-item" href="/sales-invoice/${order.id}">
-                                        <i class="fas fa-file-invoice me-2 text-secondary"></i> Invoice
-                                    </a></li>`;
-                    actionBtns += `<li><a class="dropdown-item" href="javascript:void(0);" onclick="window.open('/sales/invoice/pdf/' + ${order.id});"  title="Print Invoice">
-                                        <i class="fas fa-print me-2 text-secondary"></i> Print Invoice
-                                    </a></li>`;
-                @endif
+                                        <a class="me-3" href="/sales-invoice/${order.id}">
 
-                if (!['sales-manager', 'purchase-manager', 'inventory-manager'].includes(userRole)) {
-                    @if (app('hasPermission')(2, 'delete'))
-                        actionBtns += `<li><a class="dropdown-item text-danger delete-order" href="javascript:void(0);" data-id="${order.id}">
-                                            <i class="fas fa-trash-alt me-2 text-danger"></i> Delete
-                                        </a></li>`;
-                    @endif
-                }
 
-                actionBtns += `</ul></div>`;
+            <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="#092C4C" viewBox="0 0 24 24">
+                <path d="M14 2H7a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7zm0 2.5L16.5 7H14zM8 11h8v1.5H8zm0 3h8v1.5H8zm0 3h5v1.5H8z"/>
+            </svg>
+                                        </a>
+                                        <a class="me-3" href="javascript:void(0);" onclick="window.open('/sales/invoice/pdf/' + ${order.id});"  title="Print Invoice">
+            <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="#092C4C" viewBox="0 0 24 24">
+                <path d="M19 7V4a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v3H3a1 1 0 0 0-1 1v9a2 2 0 0 0 2 2h2v3h12v-3h2a2 2 0 0 0 2-2V8a1 1 0 0 0-1-1h-2zM7 4h10v3H7V4zm10 16H7v-4h10v4zm3-6a1 1 0 0 1-1 1h-2v-2H7v2H5a1 1 0 0 1-1-1V9h16v5z"/>
+            </svg>
+        </a>
+                        @endif
 
+                                         ${!['sales-manager', 'purchase-manager', 'inventory-manager'].includes(userRole) ? `
+                                                                                                                                 @if (app('hasPermission')(2, 'delete'))
+                                                                                        <a class="me-3 delete-order" href="javascript:void(0);" data-id="${order.id}">
+                                                                                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                                                                <path d="M5 20C5 20.5304 5.21071 21.0391 5.58579 21.4142C5.96086 21.7893 6.46957 22 7 22H17C17.5304 22 18.0391 21.7893 18.4142 21.4142C18.7893 21.0391 19 20.5304 19 20V8H21V6H17V4C17 3.46957 16.7893 2.96086 16.4142 2.58579C16.0391 2.21071 15.5304 2 15 2H9C8.46957 2 7.96086 2.21071 7.58579 2.58579C7.21071 2.96086 7 3.46957 7 4V6H3V8H5V20ZM9 4H15V6H9V4ZM8 8H17V20H7V8H8Z" fill="#092C4C"/>
+                                                                                                <path d="M9 10H11V18H9V10ZM13 10H15V18H13V10Z" fill="#092C4C"/>
+                                                                                            </svg>
+                                                                                        </a>
+                                                                                        @endif
+                                                                                    ` : ''}
+    `
+
+                actionBtns = buildSalesActionDropdown(order, status);
                 const orderData = {
                     ...order,
                     created_date: formattedDate,
@@ -4912,6 +5784,7 @@
                     getStatusBadge(order.quotation_status || 'sales', 'quotation'),
                     getStatusBadge(order.payment_status, 'payment', order.extra_paid || 0),
                     displayAmount || '0.00',
+                    buildStaffCell(order.id, order.staff_id, order.staff_name),
                     `<span class="biller-wrap">${order.biller || 'Admin'}</span>`,
                     actionBtns
                 ]);
@@ -4932,6 +5805,20 @@
 
             const table = $('#order-table').DataTable();
             table.clear().rows.add(tableBody).draw();
+
+            // Force-apply selected values on staff dropdowns after DataTables renders
+            setTimeout(function() {
+                $('#order-table tbody .assign-staff-select').each(function() {
+                    const orderId = $(this).data('order-id');
+                    const od = window.orderDataMap && window.orderDataMap[orderId];
+                    if (od && od.staff_id) { $(this).val(String(od.staff_id)); }
+                });
+                $('#order-table tbody .assign-order-type-select').each(function() {
+                    const orderId = $(this).data('order-id');
+                    const od = window.orderDataMap && window.orderDataMap[orderId];
+                    if (od && od.order_type) { $(this).val(String(od.order_type)); }
+                });
+            }, 50);
 
             // Add expandable rows
             function addExpandableRowsForDate() {
@@ -4969,270 +5856,6 @@
                 calculateFilteredTotal();
             }, 200);
         }
-
-        function renderSalesPaymentHistory(history, summary) {
-            let html = '';
-
-            if (!history || history.length === 0) {
-                html = '<li class="list-group-item">No payment history found.</li>';
-            } else {
-                html = history.map(function(payment) {
-                    return `
-                        <li class="list-group-item">
-                            <div class="d-flex justify-content-between gap-3">
-                                <div class="flex-grow-1">
-                                    <div class="fw-semibold">${formatPaymentHistoryDate(payment.payment_date || payment.created_at)}</div>
-                                    <div class="small text-muted">
-                                        Method: ${formatPaymentMethodLabel(payment.payment_method)} |
-                                        Type: ${formatPaymentTypeLabel(payment.payment_type)}
-                                    </div>
-                                    <div class="small">Remarks: ${payment.remarks ? payment.remarks : 'N/A'}</div>
-                                </div>
-                                <div class="d-flex gap-2 flex-shrink-0 align-items-start">
-                                    <button type="button" class="btn btn-sm btn-outline-warning edit-payment-btn"
-                                        data-bs-toggle="modal" data-bs-target="#editPaymentModal"
-                                        data-payment-id="${payment.id}" data-order-id="${payment.order_id || ''}">
-                                        <i class="fas fa-pen"></i>
-                                    </button>
-                                    <button type="button" class="btn btn-sm btn-outline-danger delete-payment-btn"
-                                        data-payment-id="${payment.id}" data-order-id="${payment.order_id || ''}">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="mt-2 fw-semibold">
-                                ₹${parseFloat(payment.payment_amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                            </div>
-                        </li>
-                    `;
-                }).join('');
-            }
-
-            html += `
-                <li class="list-group-item mt-2 bg-light">
-                    <strong>Order Total:</strong> ₹${parseFloat(summary.order_total || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                </li>
-                <li class="list-group-item bg-light">
-                    <strong>Total Paid:</strong> ₹${parseFloat(summary.total_paid || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                </li>
-                <li class="list-group-item bg-light">
-                    <strong>Return Amount:</strong> ₹${parseFloat(summary.return_amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                </li>
-            `;
-
-            if (summary.extra_paid > 0) {
-                html += `
-                    <li class="list-group-item bg-warning">
-                        <strong>Extra Paid:</strong>
-                        ₹${parseFloat(summary.extra_paid).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                        <span class="text-danger">(Advance / Refund)</span>
-                    </li>
-                `;
-            } else {
-                html += `
-                    <li class="list-group-item bg-light">
-                        <strong>Remaining:</strong> ₹${parseFloat(summary.remaining || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                    </li>
-                `;
-            }
-
-            $('#globalPaymentHistoryList').html(html);
-        }
-
-        function loadSalesPaymentHistory(orderId) {
-            const authToken = localStorage.getItem("authToken");
-
-            $('#globalPaymentHistoryList').html('<li class="list-group-item">Loading...</li>');
-            $.ajax({
-                url: '/api/order/payment-history/' + orderId,
-                method: 'GET',
-                headers: {
-                    "Authorization": "Bearer " + authToken
-                },
-                success: function(response) {
-                    renderSalesPaymentHistory(response.data || [], response.summary || {});
-                    new bootstrap.Modal(document.getElementById('paymentHistoryModal')).show();
-                },
-                error: function() {
-                    $('#globalPaymentHistoryList').html(
-                        '<li class="list-group-item text-danger">Failed to load payment history.</li>');
-                    new bootstrap.Modal(document.getElementById('paymentHistoryModal')).show();
-                }
-            });
-        }
-
-        $(document).on('click', '.open-history', function(event) {
-            event.preventDefault();
-            event.stopImmediatePropagation();
-            loadSalesPaymentHistory($(this).data('id'));
-        });
-
-        $(document).on('click', '.edit-payment-btn', function(event) {
-            event.preventDefault();
-            event.stopImmediatePropagation();
-
-            const paymentId = $(this).data('payment-id');
-            const authToken = localStorage.getItem("authToken");
-
-            $.ajax({
-                url: '/api/sales/payment/' + paymentId,
-                method: 'GET',
-                headers: {
-                    "Authorization": "Bearer " + authToken
-                },
-                success: function(response) {
-                    const payment = response.data || {};
-                    const totalAmount = parseFloat(payment.total_amount || payment.order_total || 0);
-                    const remainingAmount = parseFloat(payment.remaining_amount || 0);
-                    const originalAmount = parseFloat(payment.payment_amount || 0);
-                    $('#editPaymentId').val(payment.id || '');
-                    $('#editPaymentOrderId').val(payment.order_id || '');
-                    $('#editPaymentTotalValue').val(totalAmount || 0);
-                    $('#editPaymentBaseRemaining').val(remainingAmount + originalAmount);
-                    $('#editPaymentOriginalAmount').val(originalAmount || 0);
-                    $('#editPaymentTotalAmount').text(`₹${totalAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`);
-                    $('#editPaymentRemainingAmount').text(`₹${remainingAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`);
-                    $('#editPaymentMethod').val((payment.payment_method || 'cash').toLowerCase());
-                    $('#editPaymentType').val((payment.payment_type || 'fully').toLowerCase());
-                    $('#editPaymentAmount').val(originalAmount.toFixed(2));
-                    $('#editPaymentBank').val(payment.bank_id || '');
-                    $('#editPaymentDate').val(formatDateForInput(payment.payment_date || payment
-                        .created_at));
-                    $('#editPaymentRemarks').val(payment.remarks || '');
-                    $('#editPaymentBankWrap').toggle((payment.payment_method || '').toLowerCase() !==
-                        'cash');
-                    $('#editPaymentPendingAmount').val(remainingAmount.toFixed(2));
-
-                    new bootstrap.Modal(document.getElementById('editPaymentModal')).show();
-                }
-            });
-        });
-
-        $(document).on('click', '.delete-payment-btn', function(event) {
-            event.preventDefault();
-            event.stopImmediatePropagation();
-
-            const paymentId = $(this).data('payment-id');
-            const orderId = $(this).data('order-id');
-            const authToken = localStorage.getItem("authToken");
-
-            Swal.fire({
-                title: 'Delete payment?',
-                text: 'This will remove the payment from history.',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Delete',
-                confirmButtonColor: '#dc3545',
-                cancelButtonText: 'Cancel'
-            }).then((result) => {
-                if (!result.isConfirmed) return;
-
-                $.ajax({
-                    url: '/api/payment-store/' + paymentId + '/delete',
-                    method: 'POST',
-                    headers: {
-                        "Authorization": "Bearer " + authToken,
-                        "X-CSRF-TOKEN": "{{ csrf_token() }}"
-                    },
-                    success: function(response) {
-                        if (response.status) {
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'Deleted',
-                                text: response.message ||
-                                    'Payment deleted successfully.'
-                            });
-                            loadSalesPaymentHistory(orderId);
-                        } else {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Error',
-                                text: response.message || 'Unable to delete payment.'
-                            });
-                        }
-                    },
-                    error: function(xhr) {
-                        const message = xhr.responseJSON?.message ||
-                            'Unable to delete payment.';
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error',
-                            text: message
-                        });
-                    }
-                });
-            });
-        });
-
-        function updateEditPaymentPendingAmount() {
-            const baseRemaining = parseFloat($('#editPaymentBaseRemaining').val() || 0);
-            const originalAmount = parseFloat($('#editPaymentOriginalAmount').val() || 0);
-            const enteredAmount = parseFloat($('#editPaymentAmount').val() || 0);
-            const updatedRemaining = Math.max(baseRemaining - enteredAmount, 0);
-
-            $('#editPaymentPendingAmount').val(updatedRemaining.toFixed(2));
-            $('#editPaymentRemainingAmount').text(`₹${updatedRemaining.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`);
-        }
-
-        $(document).on('change input', '#editPaymentAmount', function() {
-            updateEditPaymentPendingAmount();
-        });
-
-        $(document).on('change', '#editPaymentMethod', function() {
-            $('#editPaymentBankWrap').toggle($(this).val() !== 'cash');
-        });
-
-        $(document).on('change', '#editPaymentType', function() {
-            updateEditPaymentPendingAmount();
-        });
-
-        $('#saveEditPaymentBtn').on('click', function() {
-            const paymentId = $('#editPaymentId').val();
-            const authToken = localStorage.getItem("authToken");
-
-            $.ajax({
-                url: '/api/sales/payment/' + paymentId + '/update',
-                method: 'POST',
-                headers: {
-                    "Authorization": "Bearer " + authToken,
-                    "X-CSRF-TOKEN": "{{ csrf_token() }}"
-                },
-                data: {
-                    payment_amount: $('#editPaymentAmount').val(),
-                    payment_date: $('#editPaymentDate').val(),
-                    payment_method: $('#editPaymentMethod').val(),
-                    payment_type: $('#editPaymentType').val(),
-                    bank_id: $('#editPaymentBank').val(),
-                    remarks: $('#editPaymentRemarks').val()
-                },
-                success: function(response) {
-                    if (response.status) {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Updated',
-                            text: response.message || 'Payment updated successfully.'
-                        });
-                        bootstrap.Modal.getInstance(document.getElementById('editPaymentModal')).hide();
-                        loadSalesPaymentHistory($('#editPaymentOrderId').val());
-                    } else {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error',
-                            text: response.message || 'Unable to update payment.'
-                        });
-                    }
-                },
-                error: function(xhr) {
-                    const message = xhr.responseJSON?.message || 'Unable to update payment.';
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: message
-                    });
-                }
-            });
-        });
-
         // Global history modal open
         $(document).on('click', '.open-history', function() {
             var authToken = localStorage.getItem("authToken");
@@ -5311,6 +5934,283 @@
                 }
             });
         });
+
+        $(document).on('click', '.open-history', function() {
+            const authToken = localStorage.getItem("authToken");
+            const jobCardId = $(this).data('id');
+
+            $.ajax({
+                url: '/api/order/payment-history/' + jobCardId,
+                method: 'GET',
+                headers: {
+                    "Authorization": "Bearer " + authToken
+                },
+                success: function(response) {
+                    const history = response.data || [];
+                    const summary = response.summary || {};
+                    let html = '';
+
+                    if (history.length === 0) {
+                        html = '<li class="list-group-item">No payment history found.</li>';
+                    } else {
+                        html = history.map(function(p) {
+                            const paymentDate = formatPaymentHistoryDate(p.payment_date || p.created_at);
+                            const paymentAmount = parseFloat(p.payment_amount || 0).toLocaleString(undefined, {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2
+                            });
+                            const paymentMethod = p.payment_method ? String(p.payment_method) : 'N/A';
+                            const paymentType = p.payment_type ? String(p.payment_type) : 'N/A';
+                            const paymentRemarks = p.remarks && String(p.remarks).trim() !== '' ? p.remarks : 'N/A';
+
+                            return `
+            <li class="list-group-item">
+                <div class="payment-history-entry">
+                    <div class="flex-grow-1">
+                        <div class="fw-semibold">${paymentDate}</div>
+                        <div class="payment-history-meta">
+                            Method: ${paymentMethod.charAt(0).toUpperCase() + paymentMethod.slice(1).toLowerCase()} | Type: ${paymentType.charAt(0).toUpperCase() + paymentType.slice(1).toLowerCase()}
+                            <br>
+                            Remarks: ${paymentRemarks}
+                        </div>
+                        <div class="mt-2 payment-history-amount">₹${paymentAmount}</div>
+                    </div>
+                    <div class="payment-history-actions">
+                        <button type="button" class="btn btn-sm btn-outline-warning payment-history-edit-btn"
+                            data-payment-id="${p.id}"
+                            data-order-id="${p.order_id || ''}"
+                            data-order-total="${summary.order_total || 0}"
+                            data-payment-date="${p.payment_date || ''}"
+                            data-payment-amount="${p.payment_amount || ''}"
+                            data-payment-method="${p.payment_method || ''}"
+                            data-payment-type="${p.payment_type || ''}"
+                            data-payment-remaining="${p.remaining_amount || summary.remaining || 0}"
+                            data-payment-remarks="${p.remarks || ''}"
+                            title="Edit">
+                            <i class="fas fa-pen"></i>
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-danger payment-history-delete-btn" data-payment-id="${p.id}" title="Delete">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            </li>
+        `;
+                        }).join('');
+                    }
+
+                    html += `
+        <li class="list-group-item mt-2 bg-light payment-history-summary">
+            <strong>Order Total:</strong> ₹${parseFloat(summary.order_total || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+        </li>
+        <li class="list-group-item bg-light payment-history-summary">
+            <strong>Total Paid:</strong> ₹${parseFloat(summary.total_paid || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+        </li>
+        <li class="list-group-item bg-light payment-history-summary">
+            <strong>Return Amount:</strong> ₹${parseFloat(summary.return_amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+        </li>
+    `;
+
+                    if (summary.extra_paid > 0) {
+                        html += `
+            <li class="list-group-item bg-warning payment-history-summary">
+                <strong>Extra Paid:</strong> ₹${parseFloat(summary.extra_paid).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                <span class="text-danger">(Advance / Refund)</span>
+            </li>
+        `;
+                    } else {
+                        html += `
+            <li class="list-group-item bg-light payment-history-summary">
+                <strong>Remaining:</strong> ₹${parseFloat(summary.remaining || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+            </li>
+        `;
+                    }
+
+                    $('#globalPaymentHistoryList').html(html);
+                    new bootstrap.Modal(document.getElementById('paymentHistoryModal')).show();
+                },
+                error: function() {
+                    $('#globalPaymentHistoryList').html(
+                        '<li class="list-group-item text-danger">Failed to load payment history.</li>'
+                    );
+                    new bootstrap.Modal(document.getElementById('paymentHistoryModal')).show();
+                }
+            });
+        });
+
+        function normalizeEditPaymentType(type) {
+            type = String(type || '').toLowerCase();
+
+            if (['cash_partially', 'online_partially', 'cash_online_partially', 'partial'].includes(type)) {
+                return 'partially';
+            }
+
+            if (['cash_fully', 'online_fully', 'cash_online_fully', 'full'].includes(type)) {
+                return 'fully';
+            }
+
+            return ['partially', 'fully', 'emi'].includes(type) ? type : '';
+        }
+
+        function setEditPaymentTypeOptions(method, selectedType) {
+            const normalizedMethod = String(method || '').toLowerCase();
+            const labelPrefix = {
+                cash: 'Cash',
+                online: 'Online',
+                cash_online: 'Cash + Online',
+                emi: 'EMI'
+            }[normalizedMethod] || 'Payment';
+
+            const options = normalizedMethod === 'emi' ? [
+                { value: 'emi', label: 'EMI' }
+            ] : [
+                { value: '', label: 'Select' },
+                { value: 'partially', label: labelPrefix + ' Partially' },
+                { value: 'fully', label: labelPrefix + ' Fully' }
+            ];
+
+            $('#editPaymentType').html(options.map(function(option) {
+                return `<option value="${option.value}">${option.label}</option>`;
+            }).join('')).val(normalizeEditPaymentType(selectedType));
+        }
+
+        $(document).on('click', '.payment-history-edit-btn', function() {
+            const originalAmount = parseFloat($(this).data('payment-amount') || 0);
+            const originalRemaining = parseFloat($(this).data('payment-remaining') || 0);
+            const paymentMethod = $(this).data('payment-method') || '';
+            const paymentType = $(this).data('payment-type') || '';
+
+            $('#editPaymentId').val($(this).data('payment-id'));
+            $('#editPaymentDate').val($(this).data('payment-date'));
+            $('#editPaymentMethod').val(paymentMethod);
+            setEditPaymentTypeOptions(paymentMethod, paymentType);
+            $('#editPaymentRemarks').val($(this).data('payment-remarks'));
+            $('#editPaymentOrderId').val($(this).data('order-id') || '');
+            $('#editPaymentOrderTotal').val($(this).data('order-total') || '');
+            $('#editPaymentOriginalAmount').val(originalAmount);
+            $('#editPaymentOriginalRemaining').val(originalRemaining);
+            $('#editPaymentOrderTotalText').text('₹' + (parseFloat($(this).data('order-total') || 0)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+            $('#editPaymentOriginalRemainingText').text('₹' + originalRemaining.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+            $('#editPaymentAmount').val(originalAmount.toFixed(2));
+            $('#editPaymentPendingAmount').val((originalRemaining + originalAmount - originalAmount).toFixed(2));
+            new bootstrap.Modal(document.getElementById('editPaymentHistoryModal')).show();
+        });
+
+        $(document).on('change', '#editPaymentMethod', function() {
+            setEditPaymentTypeOptions($(this).val(), $('#editPaymentType').val());
+        });
+
+        $(document).on('input', '#editPaymentAmount', function() {
+            const originalRemaining = parseFloat($('#editPaymentOriginalRemaining').val() || 0);
+            const originalAmount = parseFloat($('#editPaymentOriginalAmount').val() || 0);
+            const enteredAmount = parseFloat($(this).val() || 0);
+            const pending = Math.max(0, originalRemaining + originalAmount - enteredAmount);
+            $('#editPaymentPendingAmount').val(pending.toFixed(2));
+        });
+
+        $(document).on('click', '#savePaymentHistoryEditBtn', function() {
+            const paymentId = $('#editPaymentId').val();
+            const updateUrl = @json(route('sales.receipt.transaction.update', ['payment' => '__PAYMENT__']));
+            const authToken = localStorage.getItem('authToken');
+
+            $.ajax({
+                url: updateUrl.replace('__PAYMENT__', paymentId),
+                method: 'PUT',
+                data: {
+                    payment_date: $('#editPaymentDate').val(),
+                    payment_amount: $('#editPaymentAmount').val(),
+                    payment_method: $('#editPaymentMethod').val(),
+                    payment_type: $('#editPaymentType').val(),
+                    remarks: $('#editPaymentRemarks').val(),
+                    _token: $('#csrf_token').val() || $('meta[name="csrf-token"]').attr('content')
+                },
+                headers: {
+                    'X-CSRF-TOKEN': $('#csrf_token').val() || $('meta[name="csrf-token"]').attr('content'),
+                    'Authorization': authToken ? 'Bearer ' + authToken : ''
+                },
+                success: function(response) {
+                    if (response && response.success) {
+                        bootstrap.Modal.getInstance(document.getElementById('editPaymentHistoryModal')).hide();
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Updated',
+                            text: response.message || 'Payment transaction updated successfully.'
+                        });
+                        $('#viewHistoryBtn').trigger('click');
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Unable to update',
+                            text: (response && response.message) ? response.message : 'Unable to update payment transaction.'
+                        });
+                    }
+                },
+                error: function(xhr) {
+                    const message = xhr.responseJSON && xhr.responseJSON.message
+                        ? (typeof xhr.responseJSON.message === 'string' ? xhr.responseJSON.message : 'Validation failed.')
+                        : 'An error occurred while updating the payment transaction.';
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Unable to update',
+                        text: message
+                    });
+                }
+            });
+        });
+
+        $(document).on('click', '.payment-history-delete-btn', function() {
+            const paymentId = $(this).data('payment-id');
+            const deleteUrl = @json(route('sales.receipt.transaction.delete', ['payment' => '__PAYMENT__']));
+            const authToken = localStorage.getItem('authToken');
+
+            Swal.fire({
+                title: 'Delete this payment?',
+                text: 'This will remove the payment transaction and recalculate the remaining amount.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Delete',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (!result.isConfirmed) {
+                    return;
+                }
+
+                $.ajax({
+                    url: deleteUrl.replace('__PAYMENT__', paymentId),
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': $('#csrf_token').val() || $('meta[name="csrf-token"]').attr('content'),
+                        'Authorization': authToken ? 'Bearer ' + authToken : ''
+                    },
+                    success: function(response) {
+                        if (response && response.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Deleted',
+                                text: response.message || 'Payment transaction deleted successfully.'
+                            });
+                            $('#viewHistoryBtn').trigger('click');
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Unable to delete',
+                                text: (response && response.message) ? response.message : 'Unable to delete payment transaction.'
+                            });
+                        }
+                    },
+                    error: function(xhr) {
+                        const message = xhr.responseJSON && xhr.responseJSON.message
+                            ? xhr.responseJSON.message
+                            : 'An error occurred while deleting the payment transaction.';
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Unable to delete',
+                            text: message
+                        });
+                    }
+                });
+            });
+        });
         $(document).on('click', '.delete-order', function() {
             var orderId = $(this).data('id'); // ✅ Correct usage
             var authToken = localStorage.getItem("authToken");
@@ -5373,125 +6273,13 @@
             });
         });
 
-        $(document).on('mousedown focus', '.assigned-staff-select, .order-type-select', function() {
-            $(this).data('prev', $(this).val());
-        });
-
-        $(document).on('change', '.assigned-staff-select', function() {
-            const $select = $(this);
-            const orderId = $select.data('order-id');
-            const staffId = $select.val();
-            const prevStaffId = $select.data('prev') !== undefined ? $select.data('prev') : '';
-            const authToken = localStorage.getItem("authToken");
-
-            Swal.fire({
-                title: "Are you sure?",
-                text: "Do you want to update the assigned staff?",
-                icon: "warning",
-                showCancelButton: true,
-                confirmButtonColor: "#ff9f43",
-                cancelButtonColor: "#6c757d",
-                confirmButtonText: "Yes, update it!",
-                cancelButtonText: "Cancel"
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $.ajax({
-                        url: '/api/sales/' + orderId + '/update-staff',
-                        method: 'POST',
-                        headers: {
-                            'X-CSRF-TOKEN': "{{ csrf_token() }}",
-                            "Authorization": "Bearer " + authToken,
-                        },
-                        data: {
-                            staff_id: staffId
-                        },
-                        success: function(response) {
-                            if (response.status === true) {
-                                Swal.fire({
-                                    title: "Updated!",
-                                    text: response.message || 'Staff assigned successfully.',
-                                    icon: "success",
-                                    confirmButtonColor: '#ff9f43',
-                                    confirmButtonText: 'OK'
-                                });
-                                $select.data('prev', staffId);
-                            } else {
-                                Swal.fire('Error', response.message || 'Something went wrong', 'error');
-                                $select.val(prevStaffId);
-                            }
-                        },
-                        error: function(xhr) {
-                            Swal.fire('Error', xhr.responseJSON?.message || 'Something went wrong', 'error');
-                            $select.val(prevStaffId);
-                        }
-                    });
-                } else {
-                    $select.val(prevStaffId);
-                }
-            });
-        });
-
-        $(document).on('change', '.order-type-select', function() {
-            const $select = $(this);
-            const orderId = $select.data('order-id');
-            const orderType = $select.val();
-            const prevOrderType = $select.data('prev') !== undefined ? $select.data('prev') : 'Self Pickup';
-            const authToken = localStorage.getItem("authToken");
-
-            Swal.fire({
-                title: "Are you sure?",
-                text: "Do you want to update the order type?",
-                icon: "warning",
-                showCancelButton: true,
-                confirmButtonColor: "#ff9f43",
-                cancelButtonColor: "#6c757d",
-                confirmButtonText: "Yes, update it!",
-                cancelButtonText: "Cancel"
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $.ajax({
-                        url: '/api/sales/' + orderId + '/update-order-type',
-                        method: 'POST',
-                        headers: {
-                            'X-CSRF-TOKEN': "{{ csrf_token() }}",
-                            "Authorization": "Bearer " + authToken,
-                        },
-                        data: {
-                            order_type: orderType
-                        },
-                        success: function(response) {
-                            if (response.status === true) {
-                                Swal.fire({
-                                    title: "Updated!",
-                                    text: response.message || 'Order type updated successfully.',
-                                    icon: "success",
-                                    confirmButtonColor: '#ff9f43',
-                                    confirmButtonText: 'OK'
-                                });
-                                $select.data('prev', orderType);
-                            } else {
-                                Swal.fire('Error', response.message || 'Something went wrong', 'error');
-                                $select.val(prevOrderType);
-                            }
-                        },
-                        error: function(xhr) {
-                            Swal.fire('Error', xhr.responseJSON?.message || 'Something went wrong', 'error');
-                            $select.val(prevOrderType);
-                        }
-                    });
-                } else {
-                    $select.val(prevOrderType);
-                }
-            });
-        });
-
         $(document).on('click', '.convert-to-sales', function() {
             const orderId = $(this).data('id');
             const authToken = localStorage.getItem("authToken");
 
             Swal.fire({
                 title: "Are you sure?",
-                text: "You want to convert this quotation to sales!",
+                text: "You want to convert this to a sale!",
                 icon: "warning",
                 showCancelButton: true,
                 confirmButtonColor: "#3085d6",
@@ -5503,52 +6291,8 @@
                     return;
                 }
 
-                $.ajax({
-                    url: '/api/convert-quotation-to-sale/' + orderId,
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': "{{ csrf_token() }}",
-                        "Authorization": "Bearer " + authToken,
-                    },
-                    success: function(response) {
-                        if (response.status === true) {
-                            Swal.fire({
-                                title: "Converted!",
-                                text: response.message ||
-                                    "Quotation converted to sales successfully.",
-                                icon: "success",
-                                confirmButtonColor: '#ff9f43',
-                                confirmButtonText: 'OK'
-                            }).then(() => {
-                                location.reload();
-                            });
-                        } else {
-                            Swal.fire({
-                                title: "Error",
-                                text: response.message ||
-                                    "Failed to convert quotation.",
-                                icon: "error",
-                                confirmButtonColor: '#ff9f43',
-                                confirmButtonText: 'OK'
-                            });
-                        }
-                    },
-                    error: function(xhr) {
-                        let errorMessage = "Failed to convert quotation.";
-                        if (xhr.responseJSON && (xhr.responseJSON.message || xhr.responseJSON
-                                .error)) {
-                            errorMessage = xhr.responseJSON.message || xhr.responseJSON.error;
-                        }
-
-                        Swal.fire({
-                            title: "Error",
-                            text: errorMessage,
-                            icon: "error",
-                            confirmButtonColor: '#ff9f43',
-                            confirmButtonText: 'OK'
-                        });
-                    }
-                });
+                // Redirect to the Add Sale POS interface with the order ID so we can finish the checkout
+                window.location.href = '/add-sales?convert_order_id=' + orderId;
             });
         });
 
@@ -5575,6 +6319,7 @@
             let selectedMonth = normalizeFilterValue(selectedMonthRaw);
             let selectedDate = $('#filter-date').val() || '';
             let selectedCustomerId = $('#filter-customer').val() || '';
+            let selectedOrderType = normalizeFilterValue($('#filter-order-type').val() || '');
             const selectedSubAdminId = localStorage.getItem("selectedSubAdminId");
 
             $.ajax({
@@ -5591,6 +6336,7 @@
                     month: selectedMonth,
                     date: selectedDate,
                     customerId: selectedCustomerId,
+                    order_type: selectedOrderType,
                     selectedSubAdminId: selectedSubAdminId,
                     type: 'pdf'
                 },
@@ -5635,11 +6381,12 @@
             let selectedMonth = normalizeFilterValue(selectedMonthRaw);
             let selectedDate = $('#filter-date').val() || '';
             let selectedVendorId = $('#filter-customer').val() || '';
+            let selectedOrderType = normalizeFilterValue($('#filter-order-type').val() || '');
             const selectedSubAdminId = localStorage.getItem("selectedSubAdminId");
             let authToken = localStorage.getItem("authToken");
 
             let url =
-                `/api/export-order?year=${selectedYear}&month=${selectedMonth}&date=${selectedDate}&customer_id=${selectedVendorId}&selectedSubAdminId=${selectedSubAdminId}&format_currency=indian`;
+                `/api/export-order?year=${selectedYear}&month=${selectedMonth}&date=${selectedDate}&customer_id=${selectedVendorId}&order_type=${selectedOrderType}&selectedSubAdminId=${selectedSubAdminId}&format_currency=indian`;
             $.ajax({
                 url: url,
                 method: "GET",
@@ -5680,6 +6427,89 @@
                 },
                 complete: function() {
                     toggleDownloadLoader(false);
+                }
+            });
+        });
+        
+        // QR Upload Logic
+        function openQrUploadModal(orderId) {
+            $('#qrOrderId').val(orderId);
+            $('#qrUploadForm')[0].reset();
+            const modal = new bootstrap.Modal(document.getElementById('qrUploadModal'));
+            modal.show();
+        }
+
+        function openEinvoiceModal(orderId, orderNo, irn, ackNo, ackDate) {
+            $('#einvOrderNo').text(orderNo && orderNo !== 'null' ? orderNo : '-');
+            $('#einvIrn').text(irn && irn !== 'null' ? irn : '-');
+            $('#einvAckNo').text(ackNo && ackNo !== 'null' ? ackNo : '-');
+            $('#einvAckDate').text(ackDate && ackDate !== 'null' ? ackDate : '-');
+            
+            if (irn && irn !== 'null' && irn.length > 5) {
+                $('#einvoiceWarning').addClass('d-none');
+            } else {
+                $('#einvoiceWarning').removeClass('d-none');
+            }
+            
+            $('#einvDownloadBtn').attr('onclick', `window.open('/sales/invoice/pdf/${orderId}')`);
+            
+            const modal = new bootstrap.Modal(document.getElementById('einvoiceDetailsModal'));
+            modal.show();
+        }
+
+        $(document).on('submit', '#qrUploadForm', function(e) {
+            e.preventDefault();
+            const orderId = $('#qrOrderId').val();
+            const formData = new FormData(this);
+            const authToken = localStorage.getItem('authToken') || window.authToken || '';
+            const btn = $('#qrUploadSubmitBtn');
+            const originalText = btn.html();
+
+            btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Uploading...');
+
+            $.ajax({
+                url: '/api/orders/' + orderId + '/upload-qr',
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                headers: {
+                    "Authorization": "Bearer " + authToken,
+                    "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr('content')
+                },
+                success: function(response) {
+                    if (response.status) {
+                        Swal.fire({
+                            title: "Success",
+                            text: response.message,
+                            icon: "success",
+                            confirmButtonColor: '#ff9f43',
+                            confirmButtonText: 'OK'
+                        }).then(() => {
+                            bootstrap.Modal.getInstance(document.getElementById('qrUploadModal')).hide();
+                            fetchOrders(); // reload table
+                        });
+                    } else {
+                        Swal.fire({
+                            title: "Error",
+                            text: response.message || "Upload failed.",
+                            icon: "error",
+                            confirmButtonColor: '#ff9f43',
+                            confirmButtonText: 'OK'
+                        });
+                    }
+                },
+                error: function(xhr) {
+                    Swal.fire({
+                        title: "Error",
+                        text: xhr.responseJSON?.message || "Upload failed. Please try again.",
+                        icon: "error",
+                        confirmButtonColor: '#ff9f43',
+                        confirmButtonText: 'OK'
+                    });
+                },
+                complete: function() {
+                    btn.prop('disabled', false).html(originalText);
                 }
             });
         });
