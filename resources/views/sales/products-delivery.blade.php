@@ -70,6 +70,7 @@
             .delivery-table th:nth-child(2) { width: 38%; }
             .delivery-status { min-width: 130px; width: 130px; }
         }
+        
     </style>
 
     <div class="delivery-page-shell">

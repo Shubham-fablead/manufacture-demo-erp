@@ -152,6 +152,13 @@
                         </button>
                     </li>
                     <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="delivery-terms-tab" data-bs-toggle="tab"
+                            data-bs-target="#delivery-terms" type="button" role="tab"
+                            aria-controls="delivery-terms" aria-selected="false">
+                            Delivery Terms &amp; Conditions
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
                         <button class="nav-link" id="dashboard-tab" data-bs-toggle="tab" data-bs-target="#dashboard-settings"
                             type="button" role="tab" aria-controls="dashboard-settings" aria-selected="false">
                             📊 Dashboard
@@ -486,6 +493,34 @@
                             <div class="col-lg-12">
                                 <a href="javascript:void(0);" class="btn btn-submit me-2"
                                     id="btn-setting-submit">Submit</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ================= DELIVERY TERMS TAB ================= -->
+                    <div class="tab-pane fade" id="delivery-terms" role="tabpanel" aria-labelledby="delivery-terms-tab">
+                        <div class="row">
+                            <div class="col-lg-6 col-sm-6">
+                                <div class="form-group">
+                                    <label>Delivery Terms &amp; Conditions (English)</label>
+                                    <textarea id="terms_condition_eng" class="form-control" rows="10"
+                                        placeholder="Enter English delivery terms and conditions"></textarea>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-6 col-sm-6">
+                                <div class="form-group">
+                                    <label>Delivery Terms &amp; Conditions (Gujarati)</label>
+                                    <textarea id="terms_condition_guj" class="form-control" rows="10"
+                                        placeholder="Enter Gujarati delivery terms and conditions"></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mt-3">
+                            <div class="col-lg-12">
+                                <a href="javascript:void(0);" class="btn btn-submit me-2"
+                                    id="btn-setting-submit-delivery">Update</a>
                             </div>
                         </div>
                     </div>
@@ -1086,6 +1121,8 @@
                         $("#email").val(settings.email);
                         $("#phone").val(settings.phone);
                         $("#state_code").val(settings.state_code);
+                        $("#terms_condition_eng").val(settings.terms_condition_eng);
+                        $("#terms_condition_guj").val(settings.terms_condition_guj);
                         $addressField.val(settings.address);
                         $officeLatitudeField.val(settings.office_latitude ?? '');
                         $officeLongitudeField.val(settings.office_longitude ?? '');
@@ -1589,8 +1626,8 @@
             });
 
             // Update General Settings
-            $("#btn-setting-submit").on("click", function(e) {
-                e.preventDefault(); // prevent form submission if there are errors
+                $("#btn-setting-submit").on("click", function(e) {
+                    e.preventDefault(); // prevent form submission if there are errors
 
                 let lowStock = parseFloat($('#low_stock').val()) || 0;
 
@@ -1670,6 +1707,8 @@
                 formData.append("email", $("#email").val());
                 formData.append("phone", $("#phone").val());
                 formData.append("state_code", $("#state_code").val());
+                formData.append("terms_condition_eng", $("#terms_condition_eng").val());
+                formData.append("terms_condition_guj", $("#terms_condition_guj").val());
                 formData.append("address", $addressField.val());
                 formData.append("office_latitude", $officeLatitudeField.val());
                 formData.append("office_longitude", $officeLongitudeField.val());
@@ -1728,10 +1767,15 @@
                         toggleGeneralSettingsBtnLoading(false);
                     }
                 });
-            });
+                });
 
-            // ================== COMPANY RULES SAVE ==================
-            $("#saveCompanyRules").on("click", function(e) {
+                $(document).on("click", "#btn-setting-submit-delivery", function(e) {
+                    e.preventDefault();
+                    $("#btn-setting-submit").trigger("click");
+                });
+
+                // ================== COMPANY RULES SAVE ==================
+                $("#saveCompanyRules").on("click", function(e) {
                 e.preventDefault();
 
                 const selectedSubAdminId = localStorage.getItem("selectedSubAdminId");
