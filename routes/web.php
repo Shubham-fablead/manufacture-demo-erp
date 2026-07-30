@@ -279,16 +279,15 @@ Route::middleware(['auth:web', 'auto.permission'])->group(function () {
     Route::get('/vendor-view/{id}', [VendorController::class, 'vendor_view'])->name('vendor.view');
 
 
-
-
-    //plans
-    Route::get('/plans', [PlanController::class, 'index'])->name('plans.planlist');
-    Route::get('/add-plan', [PlanController::class, 'create'])->name('plans.addplan');
-    Route::post('/add-plan', [PlanController::class, 'store'])->name('plans.store');
-    Route::get('/edit-plan/{plan}', [PlanController::class, 'edit'])->name('plans.edit');
-    Route::put('/edit-plan/{plan}', [PlanController::class, 'update'])->name('plans.update');
-    Route::delete('/delete-plan/{plan}', [PlanController::class, 'destroy'])->name('plans.destroy');
-
+         //plans
+    Route::get('/plan', [PlanController::class,'index'])->name('plans.planlist');
+    Route::get('/add-plan', [PlanController::class,'create'])->name('plans.addplan');
+    Route::post('/add-plan', [PlanController::class,'store'])->name('plans.store');
+    Route::get('/edit-plan/{plan}', [PlanController::class,'edit'])->name('plans.edit');
+    Route::put('/edit-plan/{plan}', [PlanController::class,'update'])->name('plans.update');
+    Route::delete('/delete-plan/{plan}', [PlanController::class,'destroy'])->name('plans.destroy');
+    Route::get('/my-plan', [PlanController::class,'myplan'])->name('plans.myplan');
+    Route::get('/plan-details', [PlanController::class, 'myPlanDetails'])->name('plans.details');
     // Follow Up
     Route::get('/follow-ups', [FollowUpController::class, 'follow_up_list'])->name('followup.list');
     Route::get('/add-follow-up', [FollowUpController::class, 'add_follow_up'])->name('followup.add');

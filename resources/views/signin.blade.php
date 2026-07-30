@@ -641,6 +641,58 @@
             </div>
         </div>
     </div>
+    
+    <!-- Plan Expiration Warning Modal -->
+    <div class="modal fade" id="planWarningModal" tabindex="-1" aria-labelledby="planWarningModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="border-radius: 12px; border: none; padding: 20px;">
+                <div class="modal-header border-0 pb-0" style="justify-content: flex-end;">
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="background: none; border: none; font-size: 20px; color: #888;">
+                        x
+                    </button>
+                </div>
+                <div class="modal-body text-center pt-0">
+                    <!-- Warning Icon -->
+                    <div style="width: 60px; height: 60px; background-color: #ff5b5c; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
+                        <i class="fas fa-exclamation" style="color: white; font-size: 30px;"></i>
+                    </div>
+                    
+                    <h4 class="mb-3" style="font-weight: 700; color: #333;">Plan Expiration Warning</h4>
+                    
+                    <p class="mb-4 text-muted" style="font-size: 14px;" id="planWarningMessage">
+                        Your subscription plan will expire in <strong id="planWarningDays"></strong>. Please renew it to avoid interruption in service.
+                    </p>
+                    
+                    <div style="background-color: #f8f9fa; border-left: 4px solid #38d39f; border-radius: 8px; padding: 15px; margin-bottom: 20px; text-align: left;">
+                        <div class="d-flex justify-content-between mb-2" style="font-size: 13px;">
+                            <span class="text-muted">Plan:</span>
+                            <strong style="color: #ff5b5c;" id="planWarningName"></strong>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2" style="font-size: 13px;">
+                            <span class="text-muted">Expires On:</span>
+                            <strong style="color: #ff5b5c;" id="planWarningDate"></strong>
+                        </div>
+                        <div class="d-flex justify-content-between" style="font-size: 13px;">
+                            <span class="text-muted">Days Remaining:</span>
+                            <strong style="color: #ff5b5c;" id="planWarningDaysRemaining"></strong>
+                        </div>
+                    </div>
+                    
+                    <div class="text-start">
+                        <h6 style="color: #f7933a; font-weight: 700; margin-bottom: 10px;">Contact us to Renew:</h6>
+                        <div class="d-flex align-items-center mb-2" style="font-size: 13px; color: #666;">
+                            <i class="fas fa-phone-alt me-2"></i> +91 9824734531
+                        </div>
+                        <div class="d-flex align-items-center" style="font-size: 13px; color: #666;">
+                            <i class="fas fa-envelope me-2"></i> info@fableadtechnolabs.com
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End Plan Expiration Warning Modal -->
+
     {{-- <footer style="position: fixed; bottom: 0; left: 0; right: 0; text-align: center; padding: 10px 0; background-color: #f4f4f4; height: 50px; z-index: 1000; box-shadow: 0 -2px 5px rgba(0,0,0,0.1);">
         <h1 style="font-size: 14px; font-weight: 600; margin: 0;">© <?= date('Y') ?> <a href="https://www.fableadtech.com/" target="_blank" rel="noopener noreferrer" style="color: inherit; text-decoration: none;">Copyright - Fablead Developers Technolab</a></h1>
     </footer> --}}
@@ -772,13 +824,29 @@
                         localStorage.setItem("selectedSubAdminId", selectedId); // Use selectedId instead of response.user.id
                         window.location.href = response.redirect;
                     } else if (response.error) {
-                        $("#loginMessage").text(response.error).css("color", "red");
+                        if (response.plan_expired) {
+                            $("#planWarningMessage").html("Your subscription plan <strong>has expired</strong>. Please renew it to continue using the service.");
+                            $("#planWarningName").text(response.plan_details.name);
+                            $("#planWarningDate").text(response.plan_details.end_date);
+                            $("#planWarningDaysRemaining").text(response.plan_details.days_remaining + " days");
+                            $("#planWarningModal").modal('show');
+                        } else {
+                            $("#loginMessage").text(response.error).css("color", "red");
+                        }
                     }
                 },
                 error: function (xhr) {
                     // console.error("Error:", xhr.responseText);
                     let msg = xhr.responseJSON?.message || xhr.responseJSON?.error || "Login failed.";
-                    $("#loginMessage").text(msg).css("color", "red");
+                    if (xhr.responseJSON?.plan_expired) {
+                        $("#planWarningMessage").html("Your subscription plan <strong>has expired</strong>. Please renew it to continue using the service.");
+                        $("#planWarningName").text(xhr.responseJSON.plan_details.name);
+                        $("#planWarningDate").text(xhr.responseJSON.plan_details.end_date);
+                        $("#planWarningDaysRemaining").text(xhr.responseJSON.plan_details.days_remaining + " days");
+                        $("#planWarningModal").modal('show');
+                    } else {
+                        $("#loginMessage").text(msg).css("color", "red");
+                    }
                 },
                 complete: function () {
                     $submitBtn.html(originalText).prop("disabled", false);

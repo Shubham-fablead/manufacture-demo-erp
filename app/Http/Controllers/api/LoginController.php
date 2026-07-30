@@ -49,6 +49,30 @@ class LoginController extends Controller
         if (Auth::attempt(['email' => $email, 'password' => $request->password])) {
             RateLimiter::clear($key); // reset after success
             $user = Auth::user();
+
+            // Plan expiration check for admin and sub-admin
+            if (in_array($user->role, ['admin', 'sub-admin']) && $user->plan_id) {
+                $plan = \App\Models\Plan::find($user->plan_id);
+                if ($plan && $plan->end_date) {
+                    $endDate = \Carbon\Carbon::parse($plan->end_date)->startOfDay();
+                    $today = \Carbon\Carbon::now('Asia/Kolkata')->startOfDay();
+                    
+                    if ($today->gt($endDate)) {
+                        Auth::logout();
+                        return response()->json([
+                            'status' => false, 
+                            'error' => 'Your subscription plan has expired. Please renew it to continue using the service.',
+                            'plan_expired' => true,
+                            'plan_details' => [
+                                'name' => $plan->name,
+                                'end_date' => $endDate->format('d F Y'),
+                                'days_remaining' => 0
+                            ]
+                        ], 403);
+                    }
+                }
+            }
+
             $token = $user->createToken('LaravelPassportToken')->accessToken;
 
             // Get permissions

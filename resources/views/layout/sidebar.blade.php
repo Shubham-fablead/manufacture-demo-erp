@@ -522,7 +522,13 @@
                             <span>Settings</span> <span class="menu-arrow"></span>
                         </a>
                         <ul>
-                            <li><a href="{{ route('plans.planlist') }}">Plans</a></li>
+                                 @if (in_array(auth()->user()->role, ['admin', 'sub-admin']))
+                                <li><a href="{{ route('plans.planlist') }}" class="{{ request()->routeIs('plans.planlist') ? 'active' : '' }}">Plans</a></li>
+                                <!-- <li><a href="{{ route('plans.details') }}" class="{{ request()->routeIs('plans.details') ? 'active' : '' }}">Plan Details</a></li> -->
+                            @endif
+                            @if (in_array(auth()->user()->role, ['admin', 'sub-admin']))
+                                <li><a href="{{ route('plans.myplan') }}">My Plan Details</a></li>
+                            @endif
                             @if (app('hasPermission')(14, 'view'))
                                 <li><a href="{{ route('setting.generalsettings') }}">Shop Settings</a></li>
                             @endif

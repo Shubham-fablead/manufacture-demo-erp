@@ -290,7 +290,7 @@
             text-align: right;
         }
     </style> --}}
-    <style>
+<style>
     .color_box {
         display: block;
         width: 100%;
@@ -2060,4 +2060,64 @@
             });
         });
     </script>
+
+    @if (isset($planWarning))
+    <!-- Plan Expiration Warning Modal -->
+    <div class="modal fade" id="dashboardPlanWarningModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="border-radius: 12px; border: none; padding: 20px;">
+                <div class="modal-header border-0 pb-0" style="justify-content: flex-end;">
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="background: none; border: none; font-size: 20px; color: #888;">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body text-center pt-0">
+                    <!-- Warning Icon -->
+                    <div style="width: 60px; height: 60px; background-color: #ff5b5c; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
+                        <i class="fas fa-exclamation" style="color: white; font-size: 30px;"></i>
+                    </div>
+                    
+                    <h4 class="mb-3" style="font-weight: 700; color: #333;">Plan Expiration Warning</h4>
+                    
+                    <p class="mb-4 text-muted" style="font-size: 14px;">
+                        Your subscription plan will expire in <strong>{{ $planWarning['days_remaining'] }} days</strong>. Please renew it to avoid interruption in service.
+                    </p>
+                    
+                    <div style="background-color: #f8f9fa; border-left: 4px solid #38d39f; border-radius: 8px; padding: 15px; margin-bottom: 20px; text-align: left;">
+                        <div class="d-flex justify-content-between mb-2" style="font-size: 13px;">
+                            <span class="text-muted">Plan:</span>
+                            <strong style="color: #ff5b5c;">{{ $planWarning['name'] }}</strong>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2" style="font-size: 13px;">
+                            <span class="text-muted">Expires On:</span>
+                            <strong style="color: #ff5b5c;">{{ $planWarning['end_date'] }}</strong>
+                        </div>
+                        <div class="d-flex justify-content-between" style="font-size: 13px;">
+                            <span class="text-muted">Days Remaining:</span>
+                            <strong style="color: #ff5b5c;">{{ $planWarning['days_remaining'] }} days</strong>
+                        </div>
+                    </div>
+                    
+                    <div class="text-start">
+                        <h6 style="color: #f7933a; font-weight: 700; margin-bottom: 10px;">Contact us to Renew:</h6>
+                        <div class="d-flex align-items-center mb-2" style="font-size: 13px; color: #666;">
+                            <i class="fas fa-phone-alt me-2"></i> +91 9824734531
+                        </div>
+                        <div class="d-flex align-items-center" style="font-size: 13px; color: #666;">
+                            <i class="fas fa-envelope me-2"></i> info@fableadtechnolabs.com
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        $(document).ready(function() {
+            setTimeout(function() {
+                $('#dashboardPlanWarningModal').modal('show');
+            }, 1000);
+        });
+    </script>
+    @endif
 @endpush
