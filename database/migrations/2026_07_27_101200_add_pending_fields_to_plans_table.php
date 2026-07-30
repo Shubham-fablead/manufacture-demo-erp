@@ -11,11 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (!Schema::hasColumn('leaves', 'half_day')) {
-            Schema::table('leaves', function (Blueprint $table) {
-                $table->boolean('half_day')->default(0)->after('status');
-            });
-        }
+        Schema::table('plans', function (Blueprint $table) {
+            $table->json('features')->nullable()->after('sub_branch_id');
+            $table->decimal('total_amount', 10, 2)->nullable()->after('features');
+        });
     }
 
     /**
@@ -23,8 +22,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('leaves', function (Blueprint $table) {
-            $table->dropColumn('half_day');
+        Schema::table('plans', function (Blueprint $table) {
+            $table->dropColumn(['features', 'total_amount']);
         });
     }
 };

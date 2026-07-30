@@ -230,6 +230,31 @@ class AuthController extends Controller
         $currencySymbol   = $settings->currency_symbol ?? '₹';
         $currencyPosition = $settings->currency_position ?? 'left';
 
+        // Plan Expiration Warning (for admin/sub-admin)
+        $planWarning = null;
+        if (in_array($user->role, ['admin', 'sub-admin']) && $user->plan_id) {
+            $plan = \App\Models\Plan::find($user->plan_id);
+            if ($plan && $plan->end_date) {
+                $endDate = \Carbon\Carbon::parse($plan->end_date)->startOfDay();
+                $today = \Carbon\Carbon::now('Asia/Kolkata')->startOfDay();
+                $daysRemaining = $today->diffInDays($endDate, false); // false for negative if passed
+
+                // If expiring in 30 days or less (but not expired yet or just expired today)
+                if ($daysRemaining <= 30 && $daysRemaining >= 0) {
+                    // Check if we already showed it in this session
+                    if (!session()->has('planWarningShown')) {
+                        $planWarning = [
+                            'name' => $plan->name,
+                            'end_date' => $endDate->format('d F Y'),
+                            'days_remaining' => $daysRemaining
+                        ];
+                        // Mark as shown for this session
+                        session()->put('planWarningShown', true);
+                    }
+                }
+            }
+        }
+
         return view('index', compact(
             'totalPurchaseAmount',
             'totalSalesAmount',
@@ -251,6 +276,7 @@ class AuthController extends Controller
             'purchaseChartpreviousyear',
             'salesChartThisMonth',
             'purchaseChartThisMonth',
+            'planWarning'
         ));
     }
 

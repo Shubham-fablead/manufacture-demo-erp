@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
 {
@@ -11,11 +12,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (!Schema::hasColumn('leaves', 'half_day')) {
-            Schema::table('leaves', function (Blueprint $table) {
-                $table->boolean('half_day')->default(0)->after('status');
-            });
-        }
+        DB::statement("ALTER TABLE `plans` MODIFY COLUMN `duration` VARCHAR(255) NULL");
     }
 
     /**
@@ -23,8 +20,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('leaves', function (Blueprint $table) {
-            $table->dropColumn('half_day');
-        });
+        DB::statement("ALTER TABLE `plans` MODIFY COLUMN `duration` VARCHAR(255) NULL");
     }
 };

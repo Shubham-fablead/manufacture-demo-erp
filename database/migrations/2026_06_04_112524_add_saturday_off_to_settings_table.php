@@ -11,9 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('settings', function (Blueprint $table) {
-            $table->string('saturday_off')->default('no')->nullable()->after('sunday_off');
-        });
+        if (!Schema::hasColumn('settings', 'saturday_off')) {
+            Schema::table('settings', function (Blueprint $table) {
+                $table->string('saturday_off')->default('no')->nullable()->after('sunday_off');
+            });
+        }
     }
 
     /**

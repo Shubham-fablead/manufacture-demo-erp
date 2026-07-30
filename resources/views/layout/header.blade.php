@@ -980,6 +980,10 @@
 @php
     $user = auth()->user();
     $logoRedirectRoute = $user && $user->role === 'staff' ? route('auth.profile') : route('auth.dashboard');
+    $activePlan = null;
+    if ($user && in_array($user->role, ['admin', 'sub-admin']) && $user->plan_id) {
+        $activePlan = \App\Models\Plan::find($user->plan_id);
+    }
 @endphp
 
 <div class="header">
@@ -1012,7 +1016,23 @@
 
     <ul class="nav user-menu">
         <div class="d-flex align-items-center header-search-container tab-view">
-            @if (in_array($user->role, ['admin']))
+        
+             @if ($activePlan)
+                <a href="{{ route('plans.myplan') }}" class="me-3 d-none d-lg-flex align-items-center justify-content-center" style="border: 1px solid #dcdcdc; border-radius: 4px; padding: 4px 12px; background-color: #fff; height: 38px; text-decoration: none; cursor: pointer;">
+                    <div style="margin-right: 8px; display: flex; align-items: center;">
+                        <i class="fa fa-crown" style="color: #ff9f43; font-size: 20px;"></i>
+                    </div>
+                    <div class="d-flex flex-column justify-content-center">
+                        <span style="color: #333; font-weight: 600; font-size: 13px; line-height: 1.1;">
+                            {{ $activePlan->name }}
+                        </span>
+                        <span style="color: #888; font-size: 10px; line-height: 1.2;">
+                            Expires: {{ $activePlan->end_date ? \Carbon\Carbon::parse($activePlan->end_date)->format('d-m-Y') : 'N/A' }}
+                        </span>
+                    </div>
+                </a>
+            @endif
+        @if (in_array($user->role, ['admin']))
                 <div class="me-3" id="subBranchContainer" style="display: none;">
                     <div class="d-flex align-items-center">
                         <select id="subBrandSelect" class="form-select form-select-sm" style="width: 300px;">
@@ -1040,6 +1060,7 @@
             @endif
 
             <!-- Search Field Container -->
+       
             <div class="header-search d-flex align-items-center position-relative me-3 ">
                 <!-- Search Icon -->
                 <img src="{{ env('ImagePath') . '/admin/assets/img/icons/search.svg' }}" alt="Search"

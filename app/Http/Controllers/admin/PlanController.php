@@ -11,7 +11,7 @@ class PlanController extends Controller
 {
     public function index()
     {
-        $plans = Plan::with('features')->withCount('features')->latest()->get();
+        $plans = Plan::latest()->get();
 
         return view('plans.planlist', compact('plans'));
     }
@@ -24,20 +24,24 @@ class PlanController extends Controller
     public function store(Request $request)
     {
         $validated = $this->validatePlan($request);
-        $features  = $this->sanitizeFeatures($request->input('features', []));
+        $featuresArray = [];
+        if (!empty($validated['features'])) {
+            $featuresArray = array_values(array_filter(array_map('trim', preg_split('/[\n,]+/', $validated['features']))));
+        }
 
-        DB::transaction(function () use ($validated, $features) {
+        DB::transaction(function () use ($validated, $featuresArray) {
             $plan = Plan::create([
                 'name'          => $validated['name'],
                 'price'         => $validated['price']         ?? null,
+                'total_amount'  => $validated['total_amount']  ?? null,
                 'duration'      => $validated['duration'],
                 'subtitle'      => $validated['subtitle']      ?? null,
                 'user_limit'    => $validated['user_limit']    ?? null,
                 'branch_limit'  => $validated['branch_limit']  ?? null,
                 'storage_limit' => $validated['storage_limit'] ?? null,
                 'is_active'     => $validated['is_active'],
+                'features'      => $featuresArray,
             ]);
-            $this->syncFeatures($plan, $features);
         });
 
         return redirect()->route('plans.planlist')->with('success', 'Plan created successfully.');
@@ -45,8 +49,6 @@ class PlanController extends Controller
 
     public function edit(Plan $plan)
     {
-        $plan->load('features');
-
         return view('plans.editplan', compact('plan'));
     }
 
@@ -58,12 +60,15 @@ class PlanController extends Controller
     public function update(Request $request, Plan $plan)
     {
         $validated = $this->validatePlan($request);
-        $features = $this->sanitizeFeatures($request->input('features', []));
+        $featuresArray = [];
+        if (!empty($validated['features'])) {
+            $featuresArray = array_values(array_filter(array_map('trim', preg_split('/[\n,]+/', $validated['features']))));
+        }
 
-        DB::transaction(function () use ($plan, $validated, $features) {
-            $plan->update($validated);
-            $plan->features()->delete();
-            $this->syncFeatures($plan, $features);
+        DB::transaction(function () use ($plan, $validated, $featuresArray) {
+            $updateData = $validated;
+            $updateData['features'] = $featuresArray;
+            $plan->update($updateData);
         });
 
         return redirect()->route('plans.planlist')->with('success', 'Plan updated successfully.');
@@ -72,11 +77,22 @@ class PlanController extends Controller
     public function destroy(Plan $plan)
     {
         DB::transaction(function () use ($plan) {
-            $plan->features()->delete();
             $plan->delete();
         });
 
         return redirect()->route('plans.planlist')->with('success', 'Plan deleted successfully.');
+    }
+
+    public function myplan()
+    {
+        $user = auth()->user();
+        if (!$user->plan_id) {
+            return redirect()->route('auth.profile')->with('error', 'No active plan found.');
+        }
+
+        $plan = Plan::find($user->plan_id);
+
+        return view('plans.myplan', compact('user', 'plan'));
     }
 
     private function validatePlan(Request $request): array
@@ -84,32 +100,16 @@ class PlanController extends Controller
         return $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'price' => ['nullable', 'numeric'],
+            'total_amount' => ['nullable', 'numeric'],
             'duration' => ['required', 'string', 'in:month,year'],
             'subtitle' => ['nullable', 'string'],
             'user_limit' => ['nullable', 'integer'],
             'branch_limit' => ['nullable', 'integer'],
             'storage_limit' => ['nullable', 'integer'],
             'is_active' => ['required', 'boolean'],
-            'features' => ['nullable', 'array'],
-            'features.*' => ['nullable', 'string', 'max:255'],
+            'features' => ['nullable', 'string'],
         ]);
     }
 
-    private function sanitizeFeatures(array $features): array
-    {
-        return collect($features)
-            ->map(fn ($feature) => trim((string) $feature))
-            ->filter()
-            ->values()
-            ->all();
-    }
 
-    private function syncFeatures(Plan $plan, array $features): void
-    {
-        foreach ($features as $feature) {
-            $plan->features()->create([
-                'feature' => $feature,
-            ]);
-        }
-    }
 }
