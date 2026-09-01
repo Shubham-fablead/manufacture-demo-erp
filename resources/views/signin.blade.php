@@ -167,9 +167,9 @@
 
         .login-logo .logo-img {
             display: block;
-            width: clamp(104px, 16vw, 132px);
+            width: 190px;
             max-width: 70%;
-            max-height: clamp(62px, 11vh, 82px);
+            max-height: 90px;
             object-fit: contain;
             margin: 0 auto !important;
         }
@@ -460,8 +460,8 @@
             }
 
             .login-logo .logo-img {
-                width: 112px;
-                max-width: 72%;
+                width: 150px;
+                max-width: 68%;
             }
 
             .login-userheading h3 {
@@ -506,8 +506,9 @@
             }
 
             .login-logo .logo-img {
-                width: 98px;
-                max-height: 58px;
+                width: 140px;
+                max-width: 75%;
+                max-height: 75px;
             }
 
             .login-userheading {
@@ -569,7 +570,9 @@
                 <!-- <div class="login-content"> -->
                     <div class="login-userset">
                         <div class="login-logo">
-                            <img src="{{ $settings?->logo ? env('ImagePath') . '/storage/' . $settings->logo : 'https://fableadtechnolabs.com/static/media/250x150%20(1).b3f5a4db48c7770366ef.webp'}}"
+                            <!-- <img src="{{ $settings?->logo ? env('ImagePath') . '/storage/' . $settings->logo : 'https://fableadtechnolabs.com/static/media/250x150%20(1).b3f5a4db48c7770366ef.webp'}}"
+                                alt="img" class="logo-img"> -->
+                                <img src="{{ env('ImagePath') . 'admin/assets/img/Fablead_ERP_2048x1024.png' }}"
                                 alt="img" class="logo-img">
                         </div>
                         <div class="login-userheading">
